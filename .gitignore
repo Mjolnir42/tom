@@ -32,3 +32,5 @@ _testmain.go
 *.prof
 
 /vendor
+*.log
+/cmd/tomd/tomd
