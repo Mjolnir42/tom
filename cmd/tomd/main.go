@@ -18,6 +18,7 @@ import (
 	"github.com/droundy/goopt"
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/config"
+	"github.com/mjolnir42/tom/internal/core"
 	"github.com/mjolnir42/tom/internal/handler"
 	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/rest"
@@ -94,8 +95,8 @@ func run() int {
 	go pingDatabase(lm, conn)
 
 	// start core application
-	//core := tom.New(hm, lm, conn, &TomCfg)
-	//core.Start()
+	core := core.New(hm, lm, conn, &TomCfg)
+	core.Start()
 
 	for i := range TomCfg.Daemon {
 		dm := TomCfg.Daemon[i]
