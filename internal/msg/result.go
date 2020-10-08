@@ -20,6 +20,7 @@ type Result struct {
 	Section    string
 	Action     string
 	Code       uint16
+	Err        error
 
 	Server []proto.Server
 }
@@ -50,9 +51,12 @@ func (r *Result) Forbidden() {
 	r.Clear()
 }
 
-func (r *Result) ServerError() {
+func (r *Result) ServerError(err ...error) {
 	r.Code = http.StatusInternalServerError
 	r.Clear()
+	if len(err) > 0 {
+		r.Err = err[len(err)-1]
+	}
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
