@@ -17,8 +17,9 @@ import (
 	"github.com/mjolnir42/tom/internal/msg"
 )
 
-func connectToDatabase(lm *lhm.LogHandleMap) {
+func connectToDatabase(lm *lhm.LogHandleMap) *sql.DB {
 	var err error
+	var conn *sql.DB
 
 	driver := `postgres`
 
@@ -36,7 +37,6 @@ func connectToDatabase(lm *lhm.LogHandleMap) {
 	// enable handling of infinity timestamps
 	pq.EnableInfinityTs(msg.NegTimeInf, msg.PosTimeInf)
 
-	// conn is a global variable
 	if conn, err = sql.Open(driver, connect); err != nil {
 		lm.GetLogger(`error`).Fatal(err)
 	}
@@ -56,9 +56,11 @@ func connectToDatabase(lm *lhm.LogHandleMap) {
 	conn.SetMaxIdleConns(5)
 	conn.SetMaxOpenConns(15)
 	conn.SetConnMaxLifetime(12 * time.Hour)
+
+	return conn
 }
 
-func pingDatabase(lm *lhm.LogHandleMap) {
+func pingDatabase(lm *lhm.LogHandleMap, conn *sql.DB) {
 	ticker := time.NewTicker(time.Second).C
 
 	for {

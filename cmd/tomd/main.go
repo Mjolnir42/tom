@@ -8,7 +8,6 @@
 package main // import "github.com/mjolnir42/tom/"
 
 import (
-	"database/sql"
 	"fmt"
 	"net/url"
 	"os"
@@ -27,8 +26,6 @@ import (
 
 // global variables
 var (
-	// main database connection pool
-	conn *sql.DB
 	// config file runtime configuration
 	TomCfg config.Configuration
 	// lookup table of logfile handles for logrotate reopen
@@ -92,9 +89,9 @@ func run() int {
 	// create handler map
 	hm := handler.NewMap()
 
-	// start database connection
-	connectToDatabase(lm)
-	go pingDatabase(lm)
+	// start main database connection pool
+	conn := connectToDatabase(lm)
+	go pingDatabase(lm, conn)
 
 	// start core application
 	//core := tom.New(hm, lm, conn, &TomCfg)
