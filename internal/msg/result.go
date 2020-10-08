@@ -8,6 +8,7 @@
 package msg // import "github.com/mjolnir42/tom/internal/msg"
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/mjolnir42/tom/pkg/proto"
@@ -57,6 +58,19 @@ func (r *Result) ServerError(err ...error) {
 	if len(err) > 0 {
 		r.Err = err[len(err)-1]
 	}
+}
+
+func (r *Result) NotImplemented(err ...error) {
+	r.Code = http.StatusNotImplemented
+	r.Clear()
+	if len(err) > 0 {
+		r.Err = err[len(err)-1]
+	}
+}
+
+func (r *Result) UnknownRequest(rq *Request) {
+	r.NotImplemented(fmt.Errorf("Unknown requested action:"+
+		" %s/%s", rq.Section, rq.Action))
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
