@@ -34,16 +34,25 @@ func FromRequest(rq *Request) Result {
 	}
 }
 
+func (r *Result) Clear() {
+	switch r.Section {
+	case SectionServer:
+		r.Server = []proto.Server{}
+	}
+}
+
 func (r *Result) OK() {
 	r.Code = http.StatusOK
 }
 
 func (r *Result) Forbidden() {
 	r.Code = http.StatusForbidden
+	r.Clear()
 }
 
 func (r *Result) ServerError() {
 	r.Code = http.StatusInternalServerError
+	r.Clear()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
