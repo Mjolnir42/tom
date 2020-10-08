@@ -10,18 +10,18 @@ package handler // import "github.com/mjolnir42/soma/internal/handler"
 import (
 	"database/sql"
 
+	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/msg"
-	"github.com/sirupsen/logrus"
 )
 
 // Handler process a specific request type
 type Handler interface {
-	Register(*sql.DB, ...*logrus.Logger)
-	Run()
-	ShutdownNow()
+	Configure(*sql.DB, *lhm.LogHandleMap)
 	Intake() chan msg.Request
 	PriorityIntake() chan msg.Request
-	RegisterRequests(*Map)
+	Register(*Map)
+	Run()
+	ShutdownNow()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

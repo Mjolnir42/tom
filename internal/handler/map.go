@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/msg"
-	"github.com/sirupsen/logrus"
 )
 
 // Map is a concurrent map that is used to look up input
@@ -86,12 +86,12 @@ func (h *Map) Range() map[string]Handler {
 	return h.hmap
 }
 
-// Register calls register() for each handler
-func (h *Map) Register(n string, c *sql.DB, l []*logrus.Logger) {
+// Configure calls configure() for each handler
+func (h *Map) Configure(n string, c *sql.DB, lm *lhm.LogHandleMap) {
 	h.Lock()
 	defer h.Unlock()
-	h.hmap[n].Register(c, l...)
-	h.hmap[n].RegisterRequests(h)
+	h.hmap[n].Configure(c, lm)
+	h.hmap[n].Register(h)
 }
 
 // Request registers a request to a handler registered as name
