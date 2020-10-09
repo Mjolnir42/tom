@@ -36,7 +36,11 @@ func FromRequest(rq *Request) Result {
 	}
 }
 
-func (r *Result) Clear() {
+func (r *Result) Clear(err ...error) {
+	if len(err) > 0 {
+		r.Err = err[len(err)-1]
+	}
+
 	switch r.Section {
 	case SectionServer:
 		r.Server = []proto.Server{}
@@ -55,17 +59,11 @@ func (r *Result) Forbidden() {
 func (r *Result) ServerError(err ...error) {
 	r.Code = http.StatusInternalServerError
 	r.Clear()
-	if len(err) > 0 {
-		r.Err = err[len(err)-1]
-	}
 }
 
 func (r *Result) NotImplemented(err ...error) {
 	r.Code = http.StatusNotImplemented
 	r.Clear()
-	if len(err) > 0 {
-		r.Err = err[len(err)-1]
-	}
 }
 
 func (r *Result) UnknownRequest(rq *Request) {
