@@ -35,11 +35,14 @@ func (h *ReadHandler) process(q *msg.Request) {
 // list returns all servers
 func (h *ReadHandler) list(q *msg.Request, mr *msg.Result) {
 	var (
-		id, namespace, name, typ string
-		rows                     *sql.Rows
-		err                      error
+		id, namespace, key, value string
+		rows                      *sql.Rows
+		err                       error
+		server                    proto.Server
+		ok                        bool
 	)
 
+	list := make(map[string]proto.Server)
 	if rows, err = h.stmtList.Query(); err != nil {
 		mr.ServerError(err)
 		return
@@ -49,23 +52,32 @@ func (h *ReadHandler) list(q *msg.Request, mr *msg.Result) {
 		if err = rows.Scan(
 			&id,
 			&namespace,
-			&name,
-			&typ,
+			&key,
+			&value,
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err)
 			return
 		}
-		mr.Server = append(mr.Server, proto.Server{
-			ID:        id,
-			Namespace: namespace,
-			Name:      name,
-			Type:      typ,
-		})
+		if server, ok = list[id]; !ok {
+			server = proto.Server{}
+		}
+		server.ID = id
+		server.Namespace = namespace
+		switch {
+		case key == `type`:
+			server.Type = value
+		case key == `name`:
+			server.Name = value
+		}
+		list[id] = server
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err)
 		return
+	}
+	for _, server := range list {
+		mr.Server = append(mr.Server, server)
 	}
 	mr.OK()
 }
