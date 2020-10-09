@@ -15,6 +15,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/internal/stmt"
 )
 
 func connectToDatabase(lm *lhm.LogHandleMap) *sql.DB {
@@ -45,10 +46,10 @@ func connectToDatabase(lm *lhm.LogHandleMap) *sql.DB {
 	}
 
 	lm.GetLogger(`application`).Print(`Connected to database`)
-	if _, err = conn.Exec(`SET TIME ZONE 'UTC';`); err != nil {
+	if _, err = conn.Exec(stmt.DatabaseTimezone); err != nil {
 		lm.GetLogger(`error`).Fatal(err)
 	}
-	if _, err = conn.Exec(`SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL SERIALIZABLE;`); err != nil {
+	if _, err = conn.Exec(stmt.DatabaseIsolationLevel); err != nil {
 		lm.GetLogger(`error`).Fatal(err)
 	}
 
