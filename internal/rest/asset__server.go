@@ -25,6 +25,12 @@ func (x *Rest) RouteRegisterServer(rt *httprouter.Router) *httprouter.Router {
 func (x *Rest) ServerList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
+	// if both ?name and ?namespace are set as query paramaters, the
+	// server is uniquely identified. Process this as ServerShow request
+	if r.URL.Query().Get(`name`) != `` && r.URL.Query().Get(`namespace`) != `` {
+		return x.ServerShow(w, r, params)
+	}
+
 	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionList
