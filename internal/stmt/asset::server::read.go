@@ -67,7 +67,15 @@ WHERE       now()::timestamptz(3) <@ asset.server_unique_attribute_values.validi
      AND    (meta.dictionary.name = $4::varchar OR $4::varchar IS NULL);`
 
 	ServerLink = `
-SELECT      $1::uuid;`
+SELECT      asset.server_linking.serverID_A as serverID,
+            asset.server_linking.dictionaryID_A as dictionaryID
+FROM        asset.server_linking
+WHERE       asset.server_linking.serverID_B = $1:uuid
+UNION
+SELECT      asset.server_linking.serverID_B as serverID,
+            asset.server_linking.dictionaryID_B as dictionaryID
+FROM        asset.server_linking
+WHERE       asset.server_linking.serverID_A = $1:uuid;`
 
 	ServerList = `
 SELECT      asset.server.serverID,
