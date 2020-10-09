@@ -47,7 +47,9 @@ func (x *Rest) ServerShow(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionShow
 	request.Server = proto.Server{
-		ID: params.ByName(`serverID`),
+		ID:        params.ByName(`serverID`),
+		Namespace: r.URL.Query().Get(`namespace`),
+		Name:      r.URL.Query().Get(`name`),
 	}
 
 	if !x.isAuthorized(&request) {
