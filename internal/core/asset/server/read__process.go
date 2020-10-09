@@ -75,12 +75,13 @@ func (h *ReadHandler) show(q *msg.Request, mr *msg.Result) {
 	var (
 		tx                                           *sql.Tx
 		err                                          error
-		txFind, txAttr                               *sql.Stmt
+		txFind, txAttr, txParent, txLink             *sql.Stmt
 		qrySrvID, qrySrvName, qryDictID, qryDictName *sql.NullString
 		rows                                         *sql.Rows
 		server                                       proto.Server
 		ambiguous                                    bool
 		id, dictID, dictName, attrID, key, value     string
+		rteID, rteDictID, rteDictName, rteName       string
 	)
 
 	// start transaction
@@ -170,6 +171,8 @@ func (h *ReadHandler) show(q *msg.Request, mr *msg.Result) {
 			return
 		case key == `type`:
 			server.Type = value
+		case key == `name`:
+			server.Name = value
 		default:
 			server.Property = append(server.Property, [2]string{key, value})
 		}
@@ -178,8 +181,85 @@ func (h *ReadHandler) show(q *msg.Request, mr *msg.Result) {
 		mr.ServerError(err)
 		return
 	}
-	// TODO: query parent
-	// TODO: query links
+	// query parent
+	txParent = tx.Stmt(h.stmtParent)
+	if err = txParent.QueryRow(
+		server.ID,
+	).Scan(
+		&rteID,
+		&rteDictID,
+		&rteDictName,
+		&rteName,
+	); err == sql.ErrNoRows {
+		// not an error
+	} else if err != nil {
+		mr.ServerError(err)
+		return
+	}
+	server.Parent = (&proto.Runtime{
+		ID:        rteID,
+		Namespace: rteDictName,
+		Name:      rteName,
+	}).TomID()
+
+	// query links
+	qrySrvName.String = ``
+	qrySrvName.Valid = false
+	qryDictName.String = ``
+	qryDictName.Valid = false
+	txLink = tx.Stmt(h.stmtLink)
+	if rows, err = txLink.Query(
+		server.ID,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	for rows.Next() {
+		if err = rows.Scan(
+			&id,
+			&dictID,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			return
+		}
+
+		if qrySrvID.String = id; qrySrvID.String != `` {
+			qrySrvID.Valid = true
+		}
+		if qryDictID.String = dictID; qryDictID.String != `` {
+			qryDictID.Valid = true
+		}
+		if err = tx.Stmt(h.stmtFind).QueryRow(
+			qrySrvName,
+			qrySrvID,
+			qryDictID,
+			qryDictName,
+		).Scan(
+			id,
+			dictID,
+			dictName,
+			attrID,
+			key,
+			value,
+		); err == sql.ErrNoRows {
+			rows.Close()
+			mr.ServerError(fmt.Errorf(`Inconsistent dataset`))
+			return
+		} else if err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			return
+		}
+		server.Link = append(server.Link, (&proto.Server{
+			Namespace: dictName,
+			Name:      value,
+		}).TomID())
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
 
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err)
