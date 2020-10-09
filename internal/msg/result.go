@@ -56,6 +56,11 @@ func (r *Result) Forbidden() {
 	r.Clear()
 }
 
+func (r *Result) ExpectationFailed(err ...error) {
+	r.Code = http.StatusExpectationFailed
+	r.Clear()
+}
+
 func (r *Result) ServerError(err ...error) {
 	r.Code = http.StatusInternalServerError
 	r.Clear()
