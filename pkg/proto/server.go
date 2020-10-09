@@ -18,4 +18,17 @@ type Server struct {
 	Property  []Property `json:"property"`
 }
 
+func (s *Server) String() string {
+	str := `tom://` + s.Namespace + `/server`
+	switch {
+	case s.Name != `` && s.ID != ``:
+		str = str + `/name=` + s.Name + `,id=` + s.ID
+	case s.Name != ``:
+		str = str + `/name=` + s.Name
+	case s.ID != ``:
+		str = str + `/id=` + s.ID
+	}
+	return str
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
