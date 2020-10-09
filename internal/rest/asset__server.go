@@ -28,7 +28,8 @@ func (x *Rest) ServerList(w http.ResponseWriter, r *http.Request,
 	// if both ?name and ?namespace are set as query paramaters, the
 	// server is uniquely identified. Process this as ServerShow request
 	if r.URL.Query().Get(`name`) != `` && r.URL.Query().Get(`namespace`) != `` {
-		return x.ServerShow(w, r, params)
+		x.ServerShow(w, r, params)
+		return
 	}
 
 	request := msg.New(r, params)
