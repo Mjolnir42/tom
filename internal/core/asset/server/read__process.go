@@ -9,8 +9,10 @@ package server // import "github.com/mjolnir42/tom/internal/core/asset/server"
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/internal/stmt"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
@@ -70,32 +72,119 @@ func (h *ReadHandler) list(q *msg.Request, mr *msg.Result) {
 
 // show returns full details for a specific server
 func (h *ReadHandler) show(q *msg.Request, mr *msg.Result) {
-	/* TODO
 	var (
-		id, namespace, name, typ string
-		err                      error
+		tx                                           *sql.Tx
+		err                                          error
+		txFind, txAttr                               *sql.Stmt
+		qrySrvID, qrySrvName, qryDictID, qryDictName *sql.NullString
+		rows                                         *sql.Rows
+		server                                       proto.Server
+		ambiguous                                    bool
+		id, dictID, dictName, attrID, key, value     string
 	)
-	if err = h.stmtShow.QueryRow(
-		q.Server.ID,
-	).Scan(
-		&id,
-		&namespace,
-		&name,
-		&typ,
-	); err == sql.ErrNoRows {
-		mr.NotFound(err)
-		return
-	} else if err != nil {
+
+	// start transaction
+	if tx, err = h.conn.Begin(); err != nil {
 		mr.ServerError(err)
 		return
 	}
-	mr.Server = append(mr.Server, proto.Server{
-		ID:        id,
-		Namespace: namespace,
-		Name:      name,
-		Type:      typ,
-	})
-	*/
+	if _, err = tx.Exec(stmt.ReadOnlyTransaction); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	defer tx.Rollback()
+
+	// find the server
+	if qrySrvID.String = q.Server.ID; qrySrvID.String != `` {
+		qrySrvID.Valid = true
+	}
+	if qrySrvName.String = q.Server.Name; qrySrvName.String != `` {
+		qrySrvName.Valid = true
+	}
+	if qryDictName.String = q.Server.Namespace; qryDictName.String != `` {
+		qryDictName.Valid = true
+	}
+	txFind = tx.Stmt(h.stmtFind)
+	if rows, err = txFind.Query(
+		qrySrvName,
+		qrySrvID,
+		qryDictID,
+		qryDictName,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	for rows.Next() {
+		if ambiguous {
+			rows.Close()
+			mr.ExpectationFailed(fmt.Errorf(`Request is ambiguous`))
+			return
+		}
+		if err = rows.Scan(
+			&id,
+			&dictID,
+			&dictName,
+			&attrID,
+			&key,
+			&value,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			return
+		}
+		server = proto.Server{
+			ID:        id,
+			Namespace: dictName,
+			Name:      value,
+		}
+		ambiguous = true
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	// query all server attributes
+	txAttr = tx.Stmt(h.stmtAttribute)
+	if rows, err = txAttr.Query(
+		server.ID,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	for rows.Next() {
+		if err = rows.Scan(
+			&id,
+			&dictName,
+			&key,
+			&value,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			return
+		}
+		switch {
+		case id != server.ID || dictName != server.Namespace:
+			rows.Close()
+			mr.ExpectationFailed(fmt.Errorf(`Request is ambiguous`))
+			return
+		case key == `type`:
+			server.Type = value
+		default:
+			server.Property = append(server.Property, [2]string{key, value})
+		}
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	// TODO: query parent
+	// TODO: query links
+
+	if err = tx.Commit(); err != nil {
+		mr.ServerError(err)
+		return
+	}
 	mr.OK()
 }
 
