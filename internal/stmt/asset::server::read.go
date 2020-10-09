@@ -111,9 +111,9 @@ WHERE       now()::timestamptz(3) <@ asset.server_unique_attribute_values.validi
      AND    meta.unique_attribute.attribute IN ('name');`
 
 	ServerParent = `
-SELECT      asset.server.serverID,
-            asset.runtime_environment.rteID,
+SELECT      asset.runtime_environment.rteID,
             asset.runtime_environment.dictionaryID,
+            meta.dictionary.name,
             asset.runtime_environment_unique_attribute_values.value
 FROM        asset.server
     JOIN    asset.server_parent
