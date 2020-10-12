@@ -9,7 +9,8 @@ package proto //
 
 // Request
 type Request struct {
-	Server *Server `json:"server,omitempty"`
+	Runtime *Runtime `json:"runtime,omitempty"`
+	Server  *Server  `json:"server,omitempty"`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
