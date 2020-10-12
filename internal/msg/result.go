@@ -51,24 +51,24 @@ func (r *Result) OK() {
 	r.Code = http.StatusOK
 }
 
-func (r *Result) Forbidden() {
+func (r *Result) Forbidden(err ...error) {
 	r.Code = http.StatusForbidden
-	r.Clear()
+	r.Clear(err...)
 }
 
 func (r *Result) ExpectationFailed(err ...error) {
 	r.Code = http.StatusExpectationFailed
-	r.Clear()
+	r.Clear(err...)
 }
 
 func (r *Result) ServerError(err ...error) {
 	r.Code = http.StatusInternalServerError
-	r.Clear()
+	r.Clear(err...)
 }
 
 func (r *Result) NotImplemented(err ...error) {
 	r.Code = http.StatusNotImplemented
-	r.Clear()
+	r.Clear(err...)
 }
 
 func (r *Result) UnknownRequest(rq *Request) {
