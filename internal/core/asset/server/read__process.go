@@ -212,7 +212,7 @@ func (h *ReadHandler) show(q *msg.Request, mr *msg.Result) {
 		ID:        rteID,
 		Namespace: rteDictName,
 		Name:      rteName,
-	}).TomID()
+	}).FormatTomID()
 
 	// query links
 	qrySrvName.String = ``
@@ -266,7 +266,7 @@ func (h *ReadHandler) show(q *msg.Request, mr *msg.Result) {
 		server.Link = append(server.Link, (&proto.Server{
 			Namespace: dictName,
 			Name:      value,
-		}).TomID())
+		}).FormatTomID())
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err)

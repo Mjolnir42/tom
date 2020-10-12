@@ -19,9 +19,9 @@ import (
 // router
 func (x *Rest) RouteRegisterServer(rt *httprouter.Router) *httprouter.Router {
 	rt.GET(`/server/`, x.Authenticated(x.ServerList))
-	rt.GET(`/server/:serverID`, x.Authenticated(x.ServerShow))
+	rt.GET(`/server/:tomID`, x.Authenticated(x.ServerShow))
 	rt.POST(`/server/`, x.Authenticated(x.ServerAdd))
-	rt.DELETE(`/server/:serverID`, x.Authenticated(x.ServerRemove))
+	rt.DELETE(`/server/:tomID`, x.Authenticated(x.ServerRemove))
 	return rt
 }
 
@@ -58,9 +58,16 @@ func (x *Rest) ServerShow(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionShow
 	request.Server = proto.Server{
-		ID:        params.ByName(`serverID`),
+		TomID:     params.ByName(`tomID`),
 		Namespace: r.URL.Query().Get(`namespace`),
 		Name:      r.URL.Query().Get(`name`),
+	}
+
+	if err := request.Server.ParseTomID(); err != nil {
+		if err != proto.ErrEmptyTomID {
+			x.replyBadRequest(&w, &request, err)
+			return
+		}
 	}
 
 	if !x.isAuthorized(&request) {
@@ -107,8 +114,16 @@ func (x *Rest) ServerRemove(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionRemove
 	request.Server = proto.Server{
-		ID: params.ByName(`serverID`),
+		TomID: params.ByName(`tomID`),
 	}
+
+	if err := request.Server.ParseTomID(); err != nil {
+		if err != proto.ErrEmptyTomID {
+			x.replyBadRequest(&w, &request, err)
+			return
+		}
+	}
+
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
 		return

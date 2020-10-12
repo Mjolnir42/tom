@@ -22,15 +22,30 @@ type Runtime struct {
 }
 
 func (r *Runtime) String() string {
-	return r.DNS()
+	return r.FormatDNS()
 }
 
-func (r *Runtime) DNS() string {
+func (r *Runtime) FormatDNS() string {
 	return r.Name + `.` + r.Namespace + `.` + EntityRuntime + `.tom`
 }
 
-func (r *Runtime) TomID() string {
+func (r *Runtime) FormatTomID() string {
 	return `tom://` + r.Namespace + `/` + EntityRuntime + `/name=` + r.Name
+}
+
+func (r *Runtime) ParseTomID() error {
+	switch {
+	case r.TomID == ``:
+		return ErrEmptyTomID
+	case isTomIDFormatDNS(r.TomID):
+		r.Name, r.Namespace, _ = parseTomIDFormatDNS(r.TomID)
+		return nil
+	case isTomIDFormatURI(r.TomID):
+		r.Name, r.Namespace, _ = parseTomIDFormatURI(r.TomID)
+		return nil
+	default:
+		return ErrInvalidTomID
+	}
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
