@@ -13,6 +13,12 @@ import (
 	"github.com/mjolnir42/tom/internal/msg"
 )
 
+func (x *Rest) replyBadRequest(w *http.ResponseWriter, q *msg.Request, err error) {
+	result := msg.FromRequest(q)
+	result.BadRequest(err)
+	x.send(w, &result)
+}
+
 func (x *Rest) replyForbidden(w *http.ResponseWriter, q *msg.Request) {
 	result := msg.FromRequest(q)
 	result.Forbidden()

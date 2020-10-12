@@ -8,12 +8,17 @@
 package rest // import "github.com/mjolnir42/tom/internal/rest/"
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"reflect"
+	"runtime/debug"
 
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/config"
 	"github.com/mjolnir42/tom/internal/handler"
 	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 type Rest struct {
@@ -50,6 +55,33 @@ func (x *Rest) Run() {
 		x.conf.Daemon[x.idx].Key,
 		router,
 	))
+}
+
+func panicCatcher(w http.ResponseWriter, lm *lhm.LogHandleMap) {
+	if r := recover(); r != nil {
+		lm.GetLogger(`error`).Errorf("PANIC! %s, TRACE: %s", r, debug.Stack())
+		http.Error(w,
+			http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+}
+
+// decodeJSONBody unmarshals the JSON request body from r into s
+func decodeJSONBody(r *http.Request, s interface{}) error {
+	decoder := json.NewDecoder(r.Body)
+	var err error
+
+	switch s.(type) {
+	case *proto.Request:
+		c := s.(*proto.Request)
+		err = decoder.Decode(c)
+	default:
+		rt := reflect.TypeOf(s)
+		err = fmt.Errorf("DecodeJSON: unhandled request of type: %s", rt)
+	}
+	return err
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
