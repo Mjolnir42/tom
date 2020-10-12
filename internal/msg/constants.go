@@ -7,11 +7,15 @@
 
 package msg // import "github.com/mjolnir42/tom/internal/msg"
 
+import (
+	"github.com/mjolnir42/tom/pkg/proto"
+)
+
 const (
 	CategoryAsset        = `asset`
 	SectionOrchestration = `orchestration`
-	SectionRuntime       = `runtime`
-	SectionServer        = `server`
+	SectionRuntime       = proto.EntityRuntime
+	SectionServer        = proto.EntityServer
 	SectionSocket        = `socket`
 )
 

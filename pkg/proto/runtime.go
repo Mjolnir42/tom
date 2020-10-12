@@ -7,6 +7,8 @@
 
 package proto //
 
+const EntityRuntime = `runtime`
+
 // Runtime defines a runtime within the asset model
 type Runtime struct {
 	ID        string     `json:"-"`
@@ -23,11 +25,11 @@ func (r *Runtime) String() string {
 }
 
 func (r *Runtime) DNS() string {
-	return r.Name + `.` + r.Namespace + `.` + `runtime.tom`
+	return r.Name + `.` + r.Namespace + `.` + EntityRuntime + `.tom`
 }
 
 func (r *Runtime) TomID() string {
-	return `tom://` + r.Namespace + `/runtime` + `/name=` + r.Name
+	return `tom://` + r.Namespace + `/` + EntityRuntime + `/name=` + r.Name
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

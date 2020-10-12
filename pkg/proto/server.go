@@ -7,6 +7,8 @@
 
 package proto //
 
+const EntityServer = `server`
+
 // Server defines a server within the asset model
 type Server struct {
 	ID        string     `json:"-"`
@@ -23,11 +25,11 @@ func (s *Server) String() string {
 }
 
 func (s *Server) DNS() string {
-	return s.Name + `.` + s.Namespace + `.` + `server.tom`
+	return s.Name + `.` + s.Namespace + `.` + EntityServer + `.tom`
 }
 
 func (s *Server) TomID() string {
-	return `tom://` + s.Namespace + `/server` + `/name=` + s.Name
+	return `tom://` + s.Namespace + `/` + EntityServer + `/name=` + s.Name
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
