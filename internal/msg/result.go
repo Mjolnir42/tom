@@ -51,6 +51,11 @@ func (r *Result) OK() {
 	r.Code = http.StatusOK
 }
 
+func (r *Result) BadRequest(err ...error) {
+	r.Code = http.StatusBadRequest
+	r.Clear(err...)
+}
+
 func (r *Result) Forbidden(err ...error) {
 	r.Code = http.StatusForbidden
 	r.Clear(err...)
