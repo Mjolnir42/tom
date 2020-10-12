@@ -12,6 +12,7 @@ const EntityRuntime = `runtime`
 // Runtime defines a runtime within the asset model
 type Runtime struct {
 	ID        string     `json:"-"`
+	TomID     string     `json:"-"`
 	Namespace string     `json:"namespace"`
 	Name      string     `json:"name"`
 	Type      string     `json:"type"`

@@ -12,6 +12,7 @@ const EntityServer = `server`
 // Server defines a server within the asset model
 type Server struct {
 	ID        string     `json:"-"`
+	TomID     string     `json:"-"`
 	Namespace string     `json:"namespace"`
 	Name      string     `json:"name"`
 	Type      string     `json:"type"`
