@@ -8,10 +8,18 @@
 package msg // import "github.com/mjolnir42/tom/internal/msg"
 
 const (
-	CategoryAsset = `asset`
-	SectionServer = `server`
-	ActionList    = `list`
-	ActionShow    = `show`
+	CategoryAsset        = `asset`
+	SectionOrchestration = `orchestration`
+	SectionRuntime       = `runtime`
+	SectionServer        = `server`
+	SectionSocket        = `socket`
+)
+
+const (
+	ActionAdd    = `add`
+	ActionList   = `list`
+	ActionRemove = `remove`
+	ActionShow   = `show`
 )
 
 const (
