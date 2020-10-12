@@ -15,9 +15,13 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
+// RouteRegisterServer registers the server routes with the request
+// router
 func (x *Rest) RouteRegisterServer(rt *httprouter.Router) *httprouter.Router {
 	rt.GET(`/server/`, x.Authenticated(x.ServerList))
 	rt.GET(`/server/:serverID`, x.Authenticated(x.ServerShow))
+	rt.POST(`/server/`, x.Authenticated(x.ServerAdd))
+	rt.DELETE(`/server/:serverID`, x.Authenticated(x.ServerRemove))
 	return rt
 }
 
@@ -59,6 +63,52 @@ func (x *Rest) ServerShow(w http.ResponseWriter, r *http.Request,
 		Name:      r.URL.Query().Get(`name`),
 	}
 
+	if !x.isAuthorized(&request) {
+		x.replyForbidden(&w, &request)
+		return
+	}
+
+	x.hm.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
+}
+
+// ServerAdd function
+func (x *Rest) ServerAdd(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w, x.lm)
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionServer
+	request.Action = msg.ActionAdd
+
+	req := proto.Server{}
+	if err := decodeJSONBody(r, &req); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	request.Server = req
+
+	if !x.isAuthorized(&request) {
+		x.replyForbidden(&w, &request)
+		return
+	}
+
+	x.hm.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
+}
+
+// ServerRemove function
+func (x *Rest) ServerRemove(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionServer
+	request.Action = msg.ActionRemove
+	request.Server = proto.Server{
+		ID: params.ByName(`serverID`),
+	}
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
 		return
