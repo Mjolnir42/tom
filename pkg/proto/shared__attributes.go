@@ -20,8 +20,8 @@ type AttributeDefinition struct {
 }
 
 const (
-	tomIDFormatDNS = `^(:?[^[:space:]])\.(:?[^[:space:]]+)\.(:?server|runtime)\.tom\.?$`
-	tomIDFormatURI = `^tom://(:?[^[:space:]]+)/(:?server|runtime)/name=(:?[^[:space:]]+)$`
+	tomIDFormatDNS = `^(:?[^[:space:]])\.(:?[^[:space:]]+)\.(:?server|runtime|orchestration)\.tom\.?$`
+	tomIDFormatURI = `^tom://(:?[^[:space:]]+)/(:?server|runtime|orchestration)/name=(:?[^[:space:]]+)$`
 )
 
 func isTomIDFormatDNS(s string) bool {
