@@ -23,7 +23,9 @@ type Result struct {
 	Code       uint16
 	Err        error
 
-	Server []proto.Server
+	Orchestration []proto.Orchestration
+	Runtime       []proto.Runtime
+	Server        []proto.Server
 }
 
 func FromRequest(rq *Request) Result {
@@ -42,6 +44,10 @@ func (r *Result) Clear(err ...error) {
 	}
 
 	switch r.Section {
+	case SectionOrchestration:
+		r.Orchestration = []proto.Orchestration{}
+	case SectionRuntime:
+		r.Runtime = []proto.Runtime{}
 	case SectionServer:
 		r.Server = []proto.Server{}
 	}

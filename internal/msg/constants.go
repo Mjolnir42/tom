@@ -13,7 +13,7 @@ import (
 
 const (
 	CategoryAsset        = `asset`
-	SectionOrchestration = `orchestration`
+	SectionOrchestration = proto.EntityOrchestration
 	SectionRuntime       = proto.EntityRuntime
 	SectionServer        = proto.EntityServer
 	SectionSocket        = `socket`
