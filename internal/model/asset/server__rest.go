@@ -5,34 +5,35 @@
  * that can be found in the LICENSE file.
  */
 
-package rest // import "github.com/mjolnir42/tom/internal/rest/"
+package asset // import "github.com/mjolnir42/tom/internal/model/asset/"
 
 import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/internal/rest"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 // RouteRegisterServer registers the server routes with the request
 // router
-func (x *Rest) RouteRegisterServer(rt *httprouter.Router) *httprouter.Router {
-	rt.GET(`/server/`, x.Authenticated(x.ServerList))
-	rt.GET(`/server/:tomID`, x.Authenticated(x.ServerShow))
-	rt.POST(`/server/`, x.Authenticated(x.ServerAdd))
-	rt.DELETE(`/server/:tomID`, x.Authenticated(x.ServerRemove))
+func (m *Model) RouteRegisterServer(rt *httprouter.Router) *httprouter.Router {
+	rt.GET(`/server/`, m.x.Authenticated(m.ServerList))
+	rt.GET(`/server/:tomID`, m.x.Authenticated(m.ServerShow))
+	rt.POST(`/server/`, m.x.Authenticated(m.ServerAdd))
+	rt.DELETE(`/server/:tomID`, m.x.Authenticated(m.ServerRemove))
 	return rt
 }
 
 // ServerList function
-func (x *Rest) ServerList(w http.ResponseWriter, r *http.Request,
+func (m *Model) ServerList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
 	// if both ?name and ?namespace are set as query paramaters, the
 	// server is uniquely identified. Process this as ServerShow request
 	if r.URL.Query().Get(`name`) != `` && r.URL.Query().Get(`namespace`) != `` {
-		x.ServerShow(w, r, params)
+		m.ServerShow(w, r, params)
 		return
 	}
 
@@ -40,18 +41,18 @@ func (x *Rest) ServerList(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionList
 
-	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request)
+	if !m.x.IsAuthorized(&request) {
+		m.x.ReplyForbidden(&w, &request)
 		return
 	}
 
-	x.hm.MustLookup(&request).Intake() <- request
+	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	x.send(&w, &result)
+	m.x.Send(&w, &result)
 }
 
 // ServerShow function
-func (x *Rest) ServerShow(w http.ResponseWriter, r *http.Request,
+func (m *Model) ServerShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
 	request := msg.New(r, params)
@@ -65,49 +66,49 @@ func (x *Rest) ServerShow(w http.ResponseWriter, r *http.Request,
 
 	if err := request.Server.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {
-			x.replyBadRequest(&w, &request, err)
+			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}
 	}
 
-	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request)
+	if !m.x.IsAuthorized(&request) {
+		m.x.ReplyForbidden(&w, &request)
 		return
 	}
 
-	x.hm.MustLookup(&request).Intake() <- request
+	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	x.send(&w, &result)
+	m.x.Send(&w, &result)
 }
 
 // ServerAdd function
-func (x *Rest) ServerAdd(w http.ResponseWriter, r *http.Request,
+func (m *Model) ServerAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
-	defer panicCatcher(w, x.lm)
+	defer rest.PanicCatcher(w, m.x.LM)
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionAdd
 
 	req := proto.Server{}
-	if err := decodeJSONBody(r, &req); err != nil {
-		x.replyBadRequest(&w, &request, err)
+	if err := rest.DecodeJSONBody(r, &req); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
 	request.Server = req
 
-	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request)
+	if !m.x.IsAuthorized(&request) {
+		m.x.ReplyForbidden(&w, &request)
 		return
 	}
 
-	x.hm.MustLookup(&request).Intake() <- request
+	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	x.send(&w, &result)
+	m.x.Send(&w, &result)
 }
 
 // ServerRemove function
-func (x *Rest) ServerRemove(w http.ResponseWriter, r *http.Request,
+func (m *Model) ServerRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
 	request := msg.New(r, params)
@@ -119,19 +120,19 @@ func (x *Rest) ServerRemove(w http.ResponseWriter, r *http.Request,
 
 	if err := request.Server.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {
-			x.replyBadRequest(&w, &request, err)
+			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}
 	}
 
-	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request)
+	if !m.x.IsAuthorized(&request) {
+		m.x.ReplyForbidden(&w, &request)
 		return
 	}
 
-	x.hm.MustLookup(&request).Intake() <- request
+	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	x.send(&w, &result)
+	m.x.Send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

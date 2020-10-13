@@ -14,6 +14,7 @@ import (
 	"reflect"
 	"runtime/debug"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/config"
 	"github.com/mjolnir42/tom/internal/handler"
@@ -24,8 +25,8 @@ import (
 type Rest struct {
 	isAuthorized func(*msg.Request) bool
 	conf         *config.Configuration
-	hm           *handler.Map
-	lm           *lhm.LogHandleMap
+	HM           *handler.Map
+	LM           *lhm.LogHandleMap
 	idx          int
 }
 
@@ -39,25 +40,23 @@ func New(
 	x := Rest{}
 	x.isAuthorized = authorizationFunction
 	x.idx = index
-	x.hm = hm
-	x.lm = lm
+	x.HM = hm
+	x.LM = lm
 	x.conf = cfg
 	return &x
 }
 
-func (x *Rest) Run() {
-	router := x.setupRouter()
-
+func (x *Rest) Run(rt *httprouter.Router) {
 	// TODO switch to new abortable interface
-	x.lm.GetLogger(`error`).Fatal(http.ListenAndServeTLS(
+	x.LM.GetLogger(`error`).Fatal(http.ListenAndServeTLS(
 		x.conf.Daemon[x.idx].URL.Host,
 		x.conf.Daemon[x.idx].Cert,
 		x.conf.Daemon[x.idx].Key,
-		router,
+		rt,
 	))
 }
 
-func panicCatcher(w http.ResponseWriter, lm *lhm.LogHandleMap) {
+func PanicCatcher(w http.ResponseWriter, lm *lhm.LogHandleMap) {
 	if r := recover(); r != nil {
 		lm.GetLogger(`error`).Errorf("PANIC! %s, TRACE: %s", r, debug.Stack())
 		http.Error(w,
@@ -69,7 +68,7 @@ func panicCatcher(w http.ResponseWriter, lm *lhm.LogHandleMap) {
 }
 
 // decodeJSONBody unmarshals the JSON request body from r into s
-func decodeJSONBody(r *http.Request, s interface{}) error {
+func DecodeJSONBody(r *http.Request, s interface{}) error {
 	decoder := json.NewDecoder(r.Body)
 	var err error
 

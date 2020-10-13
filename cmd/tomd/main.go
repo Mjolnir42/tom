@@ -16,10 +16,12 @@ import (
 	"syscall"
 
 	"github.com/droundy/goopt"
+	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/config"
 	"github.com/mjolnir42/tom/internal/core"
 	"github.com/mjolnir42/tom/internal/handler"
+	"github.com/mjolnir42/tom/internal/model/asset"
 	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/rest"
 	"github.com/sirupsen/logrus"
@@ -107,9 +109,13 @@ func run() int {
 		} else {
 			dm.URL.Scheme = `http`
 		}
-
 		api := rest.New(func(q *msg.Request) bool { return true }, i, hm, lm, &TomCfg)
-		go api.Run()
+		// create datamodels
+		router := httprouter.New()
+		model := asset.New(api)
+		router = model.RouteRegisterServer(router)
+
+		go api.Run(router)
 	}
 
 	// signal handler for shutdown

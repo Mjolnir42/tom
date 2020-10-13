@@ -5,7 +5,7 @@
  * that can be found in the LICENSE file.
  */
 
-package server // import "github.com/mjolnir42/tom/internal/core/asset/server"
+package asset // import "github.com/mjolnir42/tom/internal/model/asset/"
 
 import (
 	"database/sql"
@@ -19,23 +19,23 @@ import (
 // Implementation of the handler.Handler interface
 
 // Configure injects the handler with db connection and logging
-func (h *ReadHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
+func (h *ServerReadHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
 	h.conn = conn
 	h.lm = lm
 }
 
 // Intake exposes the Input channel as part of the handler interface
-func (h *ReadHandler) Intake() chan msg.Request {
+func (h *ServerReadHandler) Intake() chan msg.Request {
 	return h.Input
 }
 
 // PriorityIntake aliases Intake as part of the handler interface
-func (h *ReadHandler) PriorityIntake() chan msg.Request {
+func (h *ServerReadHandler) PriorityIntake() chan msg.Request {
 	return h.Intake()
 }
 
 // Register the handlername for the requests it wants to receive
-func (h *ReadHandler) Register(hm *handler.Map) {
+func (h *ServerReadHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
 		msg.ActionShow,
@@ -44,8 +44,8 @@ func (h *ReadHandler) Register(hm *handler.Map) {
 	}
 }
 
-// Run is the event loop for ReadHandler
-func (h *ReadHandler) Run() {
+// Run is the event loop for ServerReadHandler
+func (h *ServerReadHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
@@ -74,7 +74,7 @@ func (h *ReadHandler) Run() {
 }
 
 // ShutdownNow signals the handler to shut down
-func (h *ReadHandler) ShutdownNow() {
+func (h *ServerReadHandler) ShutdownNow() {
 	close(h.Shutdown)
 }
 

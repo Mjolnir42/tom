@@ -5,7 +5,7 @@
  * that can be found in the LICENSE file.
  */
 
-package server // import "github.com/mjolnir42/tom/internal/core/asset/server"
+package asset // import "github.com/mjolnir42/tom/internal/model/asset/"
 
 import (
 	"database/sql"
@@ -17,7 +17,7 @@ import (
 )
 
 // process is the request dispatcher
-func (h *ReadHandler) process(q *msg.Request) {
+func (h *ServerReadHandler) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 	//	logRequest(h.reqLog, q)
 
@@ -33,7 +33,7 @@ func (h *ReadHandler) process(q *msg.Request) {
 }
 
 // list returns all servers
-func (h *ReadHandler) list(q *msg.Request, mr *msg.Result) {
+func (h *ServerReadHandler) list(q *msg.Request, mr *msg.Result) {
 	var (
 		id, namespace, key, value string
 		rows                      *sql.Rows
@@ -83,7 +83,7 @@ func (h *ReadHandler) list(q *msg.Request, mr *msg.Result) {
 }
 
 // show returns full details for a specific server
-func (h *ReadHandler) show(q *msg.Request, mr *msg.Result) {
+func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	var (
 		tx                                           *sql.Tx
 		err                                          error

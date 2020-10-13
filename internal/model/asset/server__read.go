@@ -5,7 +5,7 @@
  * that can be found in the LICENSE file.
  */
 
-package server // import "github.com/mjolnir42/tom/internal/core/asset/server"
+package asset // import "github.com/mjolnir42/tom/internal/model/asset/"
 
 import (
 	"database/sql"
@@ -15,8 +15,8 @@ import (
 	"github.com/mjolnir42/tom/internal/msg"
 )
 
-// ReadHandler ...
-type ReadHandler struct {
+// ServerReadHandler ...
+type ServerReadHandler struct {
 	Input         chan msg.Request
 	Shutdown      chan struct{}
 	name          string
@@ -29,8 +29,8 @@ type ReadHandler struct {
 	stmtLink      *sql.Stmt
 }
 
-func NewReadHandler(length int) (string, *ReadHandler) {
-	h := &ReadHandler{}
+func NewServerReadHandler(length int) (string, *ServerReadHandler) {
+	h := &ServerReadHandler{}
 	h.name = handler.GenerateName(`asset::server`) + `/read`
 	h.Input = make(chan msg.Request, length)
 	h.Shutdown = make(chan struct{})
