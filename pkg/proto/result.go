@@ -9,6 +9,7 @@ package proto //
 
 // Server defines a server within the asset model
 type Result struct {
+	Namespace     *[]Namespace     `json:"namespace,omitempty"`
 	Orchestration *[]Orchestration `json:"orchestration,omitempty"`
 	Runtime       *[]Runtime       `json:"runtime,omitempty"`
 	Server        *[]Server        `json:"server,omitempty"`

@@ -9,6 +9,7 @@ package proto //
 
 // Request
 type Request struct {
+	Namespace     *Namespace     `json:"namespace,omitempty"`
 	Orchestration *Orchestration `json:"orchestration,omitempty"`
 	Runtime       *Runtime       `json:"runtime,omitempty"`
 	Server        *Server        `json:"server,omitempty"`
