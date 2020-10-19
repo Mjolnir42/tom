@@ -7,7 +7,7 @@
 
 package proto //
 
-// Server defines a server within the asset model
+// Result is the response wrapper of Tom's public API
 type Result struct {
 	Namespace     *[]Namespace     `json:"namespace,omitempty"`
 	Orchestration *[]Orchestration `json:"orchestration,omitempty"`

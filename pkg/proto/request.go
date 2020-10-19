@@ -7,7 +7,7 @@
 
 package proto //
 
-// Request
+// Request is the request wrapper of Tom's public API
 type Request struct {
 	Namespace     *Namespace     `json:"namespace,omitempty"`
 	Orchestration *Orchestration `json:"orchestration,omitempty"`
