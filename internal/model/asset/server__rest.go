@@ -65,7 +65,7 @@ func (m *Model) ServerShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	if err := request.Server.ParseTomID(); err != nil {
-		if err != proto.ErrEmptyTomID {
+		if !(err == proto.ErrEmptyTomID && request.Server.Name != ``) {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}
@@ -119,10 +119,8 @@ func (m *Model) ServerRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	if err := request.Server.ParseTomID(); err != nil {
-		if err != proto.ErrEmptyTomID {
-			m.x.ReplyBadRequest(&w, &request, err)
-			return
-		}
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
 	}
 
 	if !m.x.IsAuthorized(&request) {
