@@ -12,6 +12,11 @@ import (
 )
 
 const (
+	CategoryMeta     = `meta`
+	SectionNamespace = proto.EntityNamespace
+)
+
+const (
 	CategoryAsset        = `asset`
 	SectionOrchestration = proto.EntityOrchestration
 	SectionRuntime       = proto.EntityRuntime

@@ -24,6 +24,7 @@ type Request struct {
 	RequestURI string
 	Reply      chan Result `json:"-"`
 
+	Namespace     proto.Namespace
 	Orchestration proto.Orchestration
 	Runtime       proto.Runtime
 	Server        proto.Server
