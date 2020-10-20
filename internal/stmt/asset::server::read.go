@@ -8,7 +8,7 @@
 package stmt // import "github.com/mjolnir42/tom/internal/stmt"
 
 const (
-	ServerStatements = ``
+	ServerReadStatements = ``
 
 	ServerAttribute = `
 SELECT      asset.server.serverID,

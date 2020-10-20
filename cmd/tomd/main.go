@@ -110,10 +110,11 @@ func run() int {
 			dm.URL.Scheme = `http`
 		}
 		api := rest.New(func(q *msg.Request) bool { return true }, i, hm, lm, &TomCfg)
-		// create datamodels
 		router := httprouter.New()
-		model := asset.New(api)
-		router = model.RouteRegisterServer(router)
+
+		// create datamodels
+		assetmodel := asset.New(api)
+		router = assetmodel.RouteRegisterServer(router)
 
 		go api.Run(router)
 	}

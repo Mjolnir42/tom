@@ -7,10 +7,24 @@
 
 package core // import "github.com/mjolnir42/tom/internal/core/"
 
-import ()
+import (
+	"github.com/mjolnir42/tom/internal/model/asset"
+)
 
 // Start launches all application handlers
 func (x *Core) Start() {
+	x.hm.Add(asset.NewServerReadHandler(x.conf.QueueLen))
+	x.hm.Add(asset.NewServerWriteHandler(x.conf.QueueLen))
+
+	for handlerName := range x.hm.Range() {
+		x.hm.Configure(
+			handlerName,
+			x.db,
+			x.lm,
+		)
+		// start the handler in a goroutine
+		x.hm.Run(handlerName)
+	}
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
