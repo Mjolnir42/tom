@@ -15,6 +15,8 @@ import (
 func (x *Core) Start() {
 	x.hm.Add(asset.NewServerReadHandler(x.conf.QueueLen))
 	x.hm.Add(asset.NewServerWriteHandler(x.conf.QueueLen))
+	x.hm.Add(asset.NewRuntimeReadHandler(x.conf.QueueLen))
+	x.hm.Add(asset.NewRuntimeWriteHandler(x.conf.QueueLen))
 
 	for handlerName := range x.hm.Range() {
 		x.hm.Configure(

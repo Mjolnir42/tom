@@ -115,6 +115,7 @@ func run() int {
 		// create datamodels
 		assetmodel := asset.New(api)
 		router = assetmodel.RouteRegisterServer(router)
+		router = assetmodel.RouteRegisterRuntime(router)
 
 		go api.Run(router)
 	}
