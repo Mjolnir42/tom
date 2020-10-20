@@ -120,6 +120,7 @@ func run() int {
 		assetmodel := asset.New(api)
 		router = assetmodel.RouteRegisterServer(router)
 		router = assetmodel.RouteRegisterRuntime(router)
+		router = assetmodel.RouteRegisterOrchestration(router)
 
 		go api.Run(router)
 	}
