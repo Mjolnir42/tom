@@ -31,7 +31,7 @@ type ServerReadHandler struct {
 
 func NewServerReadHandler(length int) (string, *ServerReadHandler) {
 	h := &ServerReadHandler{}
-	h.name = handler.GenerateName(`asset::server`) + `/read`
+	h.name = handler.GenerateName(msg.CategoryAsset+`::`+msg.SectionServer) + `/read`
 	h.Input = make(chan msg.Request, length)
 	h.Shutdown = make(chan struct{})
 	return h.name, h
