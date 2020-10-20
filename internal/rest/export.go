@@ -22,11 +22,11 @@ func (x *Rest) IsAuthorized(q *msg.Request) bool {
 }
 
 func (x *Rest) ReplyBadRequest(w *http.ResponseWriter, q *msg.Request, err error) {
-	x.replyBadRequest(w, q, err)
+	x.replyBadRequestDispatch(w, q, err)
 }
 
 func (x *Rest) ReplyForbidden(w *http.ResponseWriter, q *msg.Request) {
-	x.replyForbidden(w, q)
+	x.replyForbiddenDispatch(w, q)
 }
 
 func (x *Rest) ReplyServerError(w *http.ResponseWriter, q *msg.Request, err error) {
