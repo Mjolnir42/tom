@@ -24,6 +24,7 @@ type Configuration struct {
 	LogLevel string     `json:"log.level"`
 	LogPath  string     `json:"log.path"`
 	Version  string     `json:"-"`
+	QueueLen int        `json:"handler.queue.length,string"`
 }
 
 type DbConfig struct {
@@ -72,6 +73,11 @@ func (c *Configuration) Parse(fname string, lh *lhm.LogHandleMap) error {
 		lh.EarlyFatal(err)
 	}
 	json.Unmarshal([]byte(uclJSON), &c)
+
+	if c.QueueLen <= 0 {
+		lh.EarlyPrintf("Adjusting QueueLen from %d to %d (default)", c.QueueLen, 8)
+		c.QueueLen = 8
+	}
 
 	//
 	switch c.LogLevel {
