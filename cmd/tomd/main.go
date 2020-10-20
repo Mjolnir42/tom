@@ -22,6 +22,7 @@ import (
 	"github.com/mjolnir42/tom/internal/core"
 	"github.com/mjolnir42/tom/internal/handler"
 	"github.com/mjolnir42/tom/internal/model/asset"
+	"github.com/mjolnir42/tom/internal/model/meta"
 	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/rest"
 	"github.com/sirupsen/logrus"
@@ -113,6 +114,9 @@ func run() int {
 		router := httprouter.New()
 
 		// create datamodels
+		metamodel := meta.New(api)
+		router = metamodel.RouteRegisterNamespace(router)
+
 		assetmodel := asset.New(api)
 		router = assetmodel.RouteRegisterServer(router)
 		router = assetmodel.RouteRegisterRuntime(router)
