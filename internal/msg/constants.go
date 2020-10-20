@@ -18,10 +18,11 @@ const (
 
 const (
 	CategoryAsset        = `asset`
+	SectionContainer     = proto.EntityContainer
 	SectionOrchestration = proto.EntityOrchestration
 	SectionRuntime       = proto.EntityRuntime
 	SectionServer        = proto.EntityServer
-	SectionSocket        = `socket`
+	SectionSocket        = proto.EntitySocket
 )
 
 const (
