@@ -23,6 +23,11 @@ type Orchestration struct {
 	UniqProperty []Property        `json:"-"`
 }
 
+func (o *Orchestration) SetTomID() Entity {
+	o.TomID = o.FormatDNS()
+	return o
+}
+
 func (o *Orchestration) String() string {
 	return o.FormatDNS()
 }

@@ -23,6 +23,11 @@ type Server struct {
 	UniqProperty []Property        `json:"-"`
 }
 
+func (s *Server) SetTomID() Entity {
+	s.TomID = s.FormatDNS()
+	return s
+}
+
 func (s *Server) String() string {
 	return s.FormatDNS()
 }

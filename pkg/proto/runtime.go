@@ -23,6 +23,11 @@ type Runtime struct {
 	UniqProperty []Property        `json:"-"`
 }
 
+func (r *Runtime) SetTomID() Entity {
+	r.TomID = r.FormatDNS()
+	return r
+}
+
 func (r *Runtime) String() string {
 	return r.FormatDNS()
 }

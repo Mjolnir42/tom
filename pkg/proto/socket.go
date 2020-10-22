@@ -21,6 +21,11 @@ type Socket struct {
 	UniqProperty []Property        `json:"-"`
 }
 
+func (s *Socket) SetTomID() Entity {
+	s.TomID = s.FormatDNS()
+	return s
+}
+
 func (s *Socket) String() string {
 	return s.FormatDNS()
 }

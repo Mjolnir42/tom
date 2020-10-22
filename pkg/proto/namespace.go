@@ -24,6 +24,11 @@ type Namespace struct {
 	UniqProperty []Property            `json:"-"`
 }
 
+func (n *Namespace) SetTomID() Entity {
+	n.TomID = n.FormatDNS()
+	return n
+}
+
 func (n *Namespace) String() string {
 	return n.FormatDNS()
 }

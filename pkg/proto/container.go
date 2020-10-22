@@ -23,6 +23,11 @@ type Container struct {
 	UniqProperty []Property        `json:"-"`
 }
 
+func (c *Container) SetTomID() Entity {
+	c.TomID = c.FormatDNS()
+	return c
+}
+
 func (c *Container) String() string {
 	return c.FormatDNS()
 }
