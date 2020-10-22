@@ -56,4 +56,15 @@ func (n *Namespace) ParseTomID() error {
 	}
 }
 
+func (n *Namespace) PropertyIterator() <-chan Property {
+	ret := make(chan Property)
+	go func() {
+		for key := range n.PropertyMap {
+			ret <- Property{key, n.PropertyMap[key]}
+		}
+		close(ret)
+	}()
+	return ret
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

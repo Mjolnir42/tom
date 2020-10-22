@@ -12,6 +12,7 @@ type Entity interface {
 	FormatDNS() string
 	FormatTomID() string
 	ParseTomID() error
+	PropertyIterator() <-chan Property
 	SetTomID() Entity
 }
 

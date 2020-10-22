@@ -55,4 +55,15 @@ func (o *Orchestration) ParseTomID() error {
 	}
 }
 
+func (o *Orchestration) PropertyIterator() <-chan Property {
+	ret := make(chan Property)
+	go func() {
+		for key := range o.PropertyMap {
+			ret <- Property{key, o.PropertyMap[key]}
+		}
+		close(ret)
+	}()
+	return ret
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -55,4 +55,15 @@ func (r *Runtime) ParseTomID() error {
 	}
 }
 
+func (r *Runtime) PropertyIterator() <-chan Property {
+	ret := make(chan Property)
+	go func() {
+		for key := range r.PropertyMap {
+			ret <- Property{key, r.PropertyMap[key]}
+		}
+		close(ret)
+	}()
+	return ret
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
