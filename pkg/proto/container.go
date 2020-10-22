@@ -9,4 +9,45 @@ package proto //
 
 const EntityContainer = `container`
 
+// Container ...
+type Container struct {
+	ID           string            `json:"-"`
+	TomID        string            `json:"-"`
+	Namespace    string            `json:"namespace"`
+	Name         string            `json:"name"`
+	Type         string            `json:"type"`
+	Parent       string            `json:"parent"`
+	Link         []string          `json:"link"`
+	PropertyMap  map[string]string `json:"property"`
+	StdProperty  []Property        `json:"-"`
+	UniqProperty []Property        `json:"-"`
+}
+
+func (c *Container) String() string {
+	return c.FormatDNS()
+}
+
+func (c *Container) FormatDNS() string {
+	return c.Name + `.` + c.Namespace + `.` + EntityContainer + `.tom`
+}
+
+func (c *Container) FormatTomID() string {
+	return `tom://` + c.Namespace + `/` + EntityContainer + `/name=` + c.Name
+}
+
+func (c *Container) ParseTomID() error {
+	switch {
+	case c.TomID == ``:
+		return ErrEmptyTomID
+	case isTomIDFormatDNS(c.TomID):
+		c.Name, c.Namespace, _ = parseTomIDFormatDNS(c.TomID)
+		return nil
+	case isTomIDFormatURI(c.TomID):
+		c.Name, c.Namespace, _ = parseTomIDFormatURI(c.TomID)
+		return nil
+	default:
+		return ErrInvalidTomID
+	}
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
