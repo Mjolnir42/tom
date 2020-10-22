@@ -92,8 +92,8 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		rows                                         *sql.Rows
 		server                                       proto.Server
 		ambiguous                                    bool
-		id, dictID, dictName, attrID, key, value     string
-		rteID, rteDictID, rteDictName, rteName       string
+		id, dictID, dictName, attrID, attrTyp, value string
+		rteID, rteDictID, rteDictName, rteName, key  string
 	)
 
 	// start transaction
@@ -171,6 +171,7 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 			&dictName,
 			&key,
 			&value,
+			&attrTyp,
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err)
@@ -186,7 +187,17 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		case key == `name`:
 			server.Name = value
 		default:
-			server.Property = append(server.Property, [2]string{key, value})
+			server.PropertyMap[key] = value
+			switch attrTyp {
+			case `unique`:
+				server.UniqProperty = append(server.UniqProperty, [2]string{key, value})
+			case `standard`:
+				server.StdProperty = append(server.StdProperty, [2]string{key, value})
+			default:
+				rows.Close()
+				mr.ExpectationFailed(fmt.Errorf(`Received impossible attribute type`))
+				return
+			}
 		}
 	}
 	if err = rows.Err(); err != nil {

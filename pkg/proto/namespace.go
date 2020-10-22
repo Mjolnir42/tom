@@ -11,15 +11,17 @@ const EntityNamespace = `namespace`
 
 // Namespace defines ...
 type Namespace struct {
-	ID         string                `json:"-"`
-	TomID      string                `json:"-"`
-	Name       string                `json:"name"`
-	Type       string                `json:"type"`
-	LookupKey  string                `json:"lookup-attribute-key"`
-	LookupURI  string                `json:"lookup-uri"`
-	Constraint []string              `json:"entity-contraint-list"`
-	Attributes []AttributeDefinition `json:"attributes"`
-	Property   []Property            `json:"property"`
+	ID           string                `json:"-"`
+	TomID        string                `json:"-"`
+	Name         string                `json:"name"`
+	Type         string                `json:"type"`
+	LookupKey    string                `json:"lookup-attribute-key"`
+	LookupURI    string                `json:"lookup-uri"`
+	Constraint   []string              `json:"entity-contraint-list"`
+	Attributes   []AttributeDefinition `json:"attributes"`
+	PropertyMap  map[string]string     `json:"property"`
+	StdProperty  []Property            `json:"-"`
+	UniqProperty []Property            `json:"-"`
 }
 
 func (n *Namespace) String() string {
