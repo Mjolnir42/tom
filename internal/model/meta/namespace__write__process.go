@@ -41,6 +41,13 @@ func (h *NamespaceWriteHandler) process(q *msg.Request) {
 
 // add creates a new namespace
 func (h *NamespaceWriteHandler) add(q *msg.Request, mr *msg.Result) {
+	// tx.Begin()
+	// stmt.NamespaceAdd(proto.Namespace.Name)
+	// stmt.NamespaceConfigure(proto.Namespace.Name, `dict_type`, proto.Namespace.Type
+	// stmt.NamespaceConfigure(proto.Namespace.Name, `dict_lookup`, proto.Namespace.LookupKey)
+	// stmt.NamespaceConfigure(proto.Namespace.Name, `dict_uri`, proto.Namespace.LookupURI)
+	// stmt.NamespaceConfigure(proto.Namespace.Name, `dict_ntt_list`, // proto.Namespace.Constraint[])
+	// tx.Commit()
 }
 
 // remove deletes a specific namespace
