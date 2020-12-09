@@ -17,15 +17,16 @@ import (
 
 // NamespaceWriteHandler ...
 type NamespaceWriteHandler struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	name       string
-	conn       *sql.DB
-	lm         *lhm.LogHandleMap
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	stmtAttStdAdd *sql.Stmt
-	stmtAddUnqAdd *sql.Stmt
+	Input                chan msg.Request
+	Shutdown             chan struct{}
+	name                 string
+	conn                 *sql.DB
+	lm                   *lhm.LogHandleMap
+	stmtAdd              *sql.Stmt
+	stmtConfig           *sql.Stmt
+	stmtRemove           *sql.Stmt
+	stmtAttStdAdd        *sql.Stmt
+	stmtAddUnqAdd        *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
 	stmtTxStdPropSelect  *sql.Stmt

@@ -53,9 +53,9 @@ func (h *NamespaceWriteHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.NamespaceAdd:    &h.stmtAdd,
-		stmt.NamespaceRemove: &h.stmtRemove,
-		stmt.NamespaceConfigure: &h.stmtConfig,
+		stmt.NamespaceAdd:                  &h.stmtAdd,
+		stmt.NamespaceConfigure:            &h.stmtConfig,
+		stmt.NamespaceRemove:               &h.stmtRemove,
 		stmt.NamespaceAttributeAddStandard: &h.stmtAttStdAdd,
 		stmt.NamespaceAttributeAddUnique:   &h.stmtAddUnqAdd,
 		stmt.NamespaceTxStdPropertyAdd:     &h.stmtTxStdPropAdd,

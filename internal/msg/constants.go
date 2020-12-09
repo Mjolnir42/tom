@@ -26,14 +26,14 @@ const (
 )
 
 const (
-	ActionAdd    = `add`
-	ActionList   = `list`
-	ActionRemove = `remove`
-	ActionShow   = `show`
+	ActionAdd        = `add`
 	ActionAttrAdd    = `attribute.add`
 	ActionAttrRemove = `attribute.remove`
+	ActionList       = `list`
 	ActionPropSet    = `property.set`
 	ActionPropUpdate = `property.update`
+	ActionRemove     = `remove`
+	ActionShow       = `show`
 )
 
 const (
