@@ -51,6 +51,7 @@ func (h *NamespaceWriteHandler) Run() {
 	for statement, prepared := range map[string]**sql.Stmt{
 		stmt.NamespaceAdd:    &h.stmtAdd,
 		stmt.NamespaceRemove: &h.stmtRemove,
+		stmt.NamespaceConfigure: &h.stmtConfig,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(h.name, err, stmt.Name(statement))

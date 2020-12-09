@@ -34,12 +34,36 @@ FROM              ins_dct
   CROSS JOIN      ins_nam
 ON CONFLICT       ON CONSTRAINT __mdq_temporal DO NOTHING;`
 
+	NamespaceConfigure = `
+WITH cte     AS ( SELECT      dictionaryID AS dictID
+                  FROM        meta.dictionary
+                  WHERE       name = $1::text ),
+     ins_reg AS ( INSERT INTO meta.attribute ( dictionaryID, attribute )
+                  SELECT      dictID,
+                              $2::text
+                  FROM        cte ),
+     ins_typ AS ( INSERT INTO meta.standard_attribute ( dictionaryID, attribute )
+                  SELECT      dictID,
+                              $2::text
+                  FROM        cte
+                  ON CONFLICT ON CONSTRAINT __uniq_attribute DO UPDATE SET dictionaryID=EXCLUDED.dictionaryID
+                  RETURNING   attributeID AS attrID )
+INSERT INTO       meta.dictionary_standard_attribute_values ( dictionaryID, attributeID, value, validity )
+SELECT            dictID,
+                  attrID,
+                  $3::text,
+                  '[-infinity,infinity]'::tstzrange
+FROM              cte
+  CROSS JOIN      ins_typ
+ON CONFLICT       ON CONSTRAINT __mda_temporal DO NOTHING;`
+
 	NamespaceRemove = `
 SELECT      'Namespace.REMOVE';`
 )
 
 func init() {
 	m[NamespaceAdd] = `NamespaceAdd`
+	m[NamespaceConfigure] = `NamespaceConfigure`
 	m[NamespaceRemove] = `NamespaceRemove`
 }
 
