@@ -25,6 +25,8 @@ func (h *NamespaceWriteHandler) process(q *msg.Request) {
 		h.add(q, &result)
 	case msg.ActionRemove:
 		h.remove(q, &result)
+	case msg.ActionAttrAdd:
+		h.attributeAdd(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -37,6 +39,10 @@ func (h *NamespaceWriteHandler) add(q *msg.Request, mr *msg.Result) {
 
 // remove deletes a specific namespace
 func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
+}
+
+// attributeAdd ...
+func (h *NamespaceWriteHandler) attributeAdd(q *msg.Request, mr *msg.Result) {
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

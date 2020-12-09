@@ -24,6 +24,8 @@ type NamespaceWriteHandler struct {
 	lm         *lhm.LogHandleMap
 	stmtAdd    *sql.Stmt
 	stmtRemove *sql.Stmt
+	stmtAttStdAdd *sql.Stmt
+	stmtAddUnqAdd *sql.Stmt
 }
 
 func NewNamespaceWriteHandler(length int) (string, *NamespaceWriteHandler) {

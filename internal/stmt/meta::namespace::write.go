@@ -59,10 +59,42 @@ ON CONFLICT       ON CONSTRAINT __mda_temporal DO NOTHING;`
 
 	NamespaceRemove = `
 SELECT      'Namespace.REMOVE';`
+
+	NamespaceAttributeAddStandard = `
+WITH cte     AS ( SELECT      dictionaryID AS dictID
+                  FROM        meta.dictionary
+                  WHERE       name = $1::text ),
+     ins_reg AS ( INSERT INTO meta.attribute ( dictionaryID, attribute )
+                  SELECT      dictID,
+                              $2::text
+                  FROM        cte )
+INSERT INTO        meta.standard_attribute ( dictionaryID, attribute )
+SELECT            cte.dictID,
+                  v.value
+FROM              cte
+  CROSS JOIN      (VALUES($2::text)) AS v (value)
+ON CONFLICT       ON CONSTRAINT __uniq_attribute DO NOTHING;`
+
+	NamespaceAttributeAddUnique = `
+WITH cte     AS ( SELECT      dictionaryID AS dictID
+                  FROM        meta.dictionary
+                  WHERE       name = $1::text ),
+     ins_reg AS ( INSERT INTO meta.attribute ( dictionaryID, attribute )
+                  SELECT      dictID,
+                              $2::text
+                  FROM        cte )
+INSERT INTO        meta.unique_attribute ( dictionaryID, attribute )
+SELECT            cte.dictID,
+                  v.value
+FROM              cte
+  CROSS JOIN      (VALUES($2::text)) AS v (value)
+ON CONFLICT       ON CONSTRAINT __uniq_unique_attr DO NOTHING;`
 )
 
 func init() {
 	m[NamespaceAdd] = `NamespaceAdd`
+	m[NamespaceAttributeAddStandard] = `NamespaceAttributeAddStandard`
+	m[NamespaceAttributeAddUnique] = `NamespaceAttributeAddUnique`
 	m[NamespaceConfigure] = `NamespaceConfigure`
 	m[NamespaceRemove] = `NamespaceRemove`
 }

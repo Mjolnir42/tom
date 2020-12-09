@@ -30,6 +30,7 @@ const (
 	ActionList   = `list`
 	ActionRemove = `remove`
 	ActionShow   = `show`
+	ActionAttrAdd    = `attribute.add`
 )
 
 const (

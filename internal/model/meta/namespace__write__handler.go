@@ -39,6 +39,7 @@ func (h *NamespaceWriteHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
 		msg.ActionShow,
+		msg.ActionAttrAdd,
 	} {
 		hm.Request(msg.SectionNamespace, action, h.name)
 	}
@@ -52,6 +53,8 @@ func (h *NamespaceWriteHandler) Run() {
 		stmt.NamespaceAdd:    &h.stmtAdd,
 		stmt.NamespaceRemove: &h.stmtRemove,
 		stmt.NamespaceConfigure: &h.stmtConfig,
+		stmt.NamespaceAttributeAddStandard: &h.stmtAttStdAdd,
+		stmt.NamespaceAttributeAddUnique:   &h.stmtAddUnqAdd,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(h.name, err, stmt.Name(statement))
