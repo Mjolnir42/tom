@@ -26,6 +26,12 @@ type NamespaceWriteHandler struct {
 	stmtRemove *sql.Stmt
 	stmtAttStdAdd *sql.Stmt
 	stmtAddUnqAdd *sql.Stmt
+	stmtTxStdPropAdd     *sql.Stmt
+	stmtTxStdPropClamp   *sql.Stmt
+	stmtTxStdPropSelect  *sql.Stmt
+	stmtTxUniqPropAdd    *sql.Stmt
+	stmtTxUniqPropClamp  *sql.Stmt
+	stmtTxUniqPropSelect *sql.Stmt
 }
 
 func NewNamespaceWriteHandler(length int) (string, *NamespaceWriteHandler) {

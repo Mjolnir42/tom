@@ -89,6 +89,122 @@ SELECT            cte.dictID,
 FROM              cte
   CROSS JOIN      (VALUES($2::text)) AS v (value)
 ON CONFLICT       ON CONSTRAINT __uniq_unique_attr DO NOTHING;`
+
+	NamespaceTxStdPropertySelect = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.standard_attribute.attributeID
+                   FROM        meta.standard_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
+                  WHERE        meta.standard_attribute.attribute = $2::text )
+SELECT            value,
+                  lower(validity),
+                  upper(validity)
+FROM              meta.dictionary_standard_attribute_values
+    JOIN           cte_dct
+      ON           cte_dct.dictionaryID = meta.dictionary_standard_attribute_values.dictionaryID
+    JOIN          cte_att
+      ON           cte_att.attributeID = meta.dictionary_standard_attribute_values.attributeID
+   WHERE           now()::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity
+   FOR UPDATE;`
+
+	NamespaceTxStdPropertyClamp = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.standard_attribute.attributeID
+                   FROM        meta.standard_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
+                  WHERE        meta.standard_attribute.attribute = $2::text )
+UPDATE            meta.dictionary_standard_attribute_values
+   SET            meta.dictionary_standard_attribute_values.validity = tstzrange(lower(validity), now()::timestamptz(3), '[)')
+FROM              cte_dct
+    CROSS JOIN    cte_att
+WHERE              meta.dictionary_standard_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND              meta.dictionary_standard_attribute_values.attributeID     = cte_att.attributeID
+  AND              meta.dictionary_standard_attribute_values.value            = $3::text
+  AND              lower(meta.dictionary_standard_attribute_values.validity) = $4::timestamptz(3)
+  AND              upper(meta.dictionary_standard_attribute_values.validity) = $5::timestamptz(3)
+  AND             now()::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity
+RETURNING          upper(meta.dictionary_standard_attribute_values.validity);`
+
+	NamespaceTxStdPropertyAdd = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.standard_attribute.attributeID
+                   FROM        meta.standard_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
+                  WHERE        meta.standard_attribute.attribute = $2::text )
+INSERT INTO        meta.dictionary_standard_attribute_values ( dictionaryID, attributeID, value, validity )
+SELECT            cte_dct.dictionaryID,
+                  cte_att.attributeID,
+                  $3::text,
+                  tstzrange($4::timestamptz(3), 'infinity', '[]')
+FROM              cte_dct
+    CROSS JOIN    cte_att;`
+
+	NamespaceTxUniqPropertySelect = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.unique_attribute.attributeID
+                   FROM        meta.unique_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
+                  WHERE        meta.unique_attribute.attribute = $2::text )
+SELECT            value,
+                  lower(validity),
+                  upper(validity)
+FROM              meta.dictionary_unique_attribute_values
+    JOIN           cte_dct
+      ON           cte_dct.dictionaryID = meta.dictionary_unique_attribute_values.dictionaryID
+    JOIN          cte_att
+      ON           cte_att.attributeID = meta.dictionary_unique_attribute_values.attributeID
+   WHERE           now()::timestamptz(3) <@ meta.dictionary_unique_attribute_values.validity
+   FOR UPDATE;`
+
+	NamespaceTxUniqPropertyClamp = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.unique_attribute.attributeID
+                   FROM        meta.unique_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
+                  WHERE        meta.unique_attribute.attribute = $2::text )
+UPDATE            meta.dictionary_unique_attribute_values
+   SET            meta.dictionary_unique_attribute_values.validity = tstzrange(lower(validity), now()::timestamptz(3), '[)')
+FROM              cte_dct
+    CROSS JOIN    cte_att
+WHERE              meta.dictionary_unique_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND              meta.dictionary_unique_attribute_values.attributeID     = cte_att.attributeID
+  AND              meta.dictionary_unique_attribute_values.value            = $3::text
+  AND              lower(meta.dictionary_unique_attribute_values.validity) = $4::timestamptz(3)
+  AND              upper(meta.dictionary_unique_attribute_values.validity) = $5::timestamptz(3)
+  AND             now()::timestamptz(3) <@ meta.dictionary_unique_attribute_values.validity
+RETURNING          upper(meta.dictionary_unique_attribute_values.validity);`
+
+	NamespaceTxUniqPropertyAdd = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.unique_attribute.attributeID
+                  FROM        meta.unique_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
+                  WHERE        meta.unique_attribute.attribute = $2::text )
+INSERT INTO       meta.dictionary_unique_attribute_values ( dictionaryID, attributeID, value, validity )
+SELECT            cte_dct.dictionaryID,
+                  cte_att.attributeID,
+                  $3::text,
+                  tstzrange($4::timestamptz(3), 'infinity', '[]')
+FROM              cte_dct
+    CROSS JOIN    cte_att;`
 )
 
 func init() {
@@ -97,6 +213,12 @@ func init() {
 	m[NamespaceAttributeAddUnique] = `NamespaceAttributeAddUnique`
 	m[NamespaceConfigure] = `NamespaceConfigure`
 	m[NamespaceRemove] = `NamespaceRemove`
+	m[NamespaceTxStdPropertyAdd] = `NamespaceTxStdPropertyAdd`
+	m[NamespaceTxStdPropertyClamp] = `NamespaceTxStdPropertyClamp`
+	m[NamespaceTxStdPropertySelect] = `NamespaceTxStdPropertySelect`
+	m[NamespaceTxUniqPropertyAdd] = `NamespaceTxUniqPropertyAdd`
+	m[NamespaceTxUniqPropertyClamp] = `NamespaceTxUniqPropertyClamp`
+	m[NamespaceTxUniqPropertySelect] = `NamespaceTxUniqPropertySelect`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

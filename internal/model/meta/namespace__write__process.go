@@ -27,6 +27,10 @@ func (h *NamespaceWriteHandler) process(q *msg.Request) {
 		h.remove(q, &result)
 	case msg.ActionAttrAdd:
 		h.attributeAdd(q, &result)
+	case msg.ActionPropSet:
+		h.propertySet(q, &result)
+	case msg.ActionPropUpdate:
+		h.propertyUpdate(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -43,6 +47,28 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 
 // attributeAdd ...
 func (h *NamespaceWriteHandler) attributeAdd(q *msg.Request, mr *msg.Result) {
+}
+
+// propertySet ...
+func (h *NamespaceWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
+	// tx.Begin()
+	// forall Property in Request
+	// 		NamespaceTxStdPropertySelect -> already has value?
+	// 		yes: NamespaceTxStdPropertyClamp
+	// 		NamespaceTxStdPropertyAdd
+	// forall Property currently set but not in Request
+	//		NamespaceTxStdPropertyClamp
+	// tx.Commit()
+}
+
+// propertyUpdate ...
+func (h *NamespaceWriteHandler) propertyUpdate(q *msg.Request, mr *msg.Result) {
+	// tx.Begin()
+	// forall Property in Request
+	// 		NamespaceTxStdPropertySelect -> already has value?
+	// 		yes:NamespaceTxStdPropertyClamp
+	// 		NamespaceTxStdPropertyAdd
+	// tx.Commit()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
