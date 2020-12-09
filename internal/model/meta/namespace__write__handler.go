@@ -37,12 +37,12 @@ func (h *NamespaceWriteHandler) PriorityIntake() chan msg.Request {
 // Register the handlername for the requests it wants to receive
 func (h *NamespaceWriteHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
-		msg.ActionList,
-		msg.ActionShow,
+		msg.ActionAdd,
 		msg.ActionAttrAdd,
 		msg.ActionAttrRemove,
 		msg.ActionPropSet,
 		msg.ActionPropUpdate,
+		msg.ActionRemove,
 	} {
 		hm.Request(msg.SectionNamespace, action, h.name)
 	}
