@@ -58,7 +58,7 @@ FROM              cte
 ON CONFLICT       ON CONSTRAINT __mda_temporal DO NOTHING;`
 
 	NamespaceRemove = `
-SELECT      'Namespace.REMOVE';`
+SELECT      'Namespace.REMOVE(TODO)';`
 
 	NamespaceAttributeAddStandard = `
 WITH cte     AS ( SELECT      dictionaryID AS dictID

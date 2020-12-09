@@ -27,6 +27,8 @@ func (h *NamespaceWriteHandler) process(q *msg.Request) {
 		h.remove(q, &result)
 	case msg.ActionAttrAdd:
 		h.attributeAdd(q, &result)
+	case msg.ActionAttrRemove:
+		h.attributeRemove(q, &result)
 	case msg.ActionPropSet:
 		h.propertySet(q, &result)
 	case msg.ActionPropUpdate:
@@ -47,6 +49,10 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 
 // attributeAdd ...
 func (h *NamespaceWriteHandler) attributeAdd(q *msg.Request, mr *msg.Result) {
+}
+
+// attributeRemove ...
+func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) {
 }
 
 // propertySet ...

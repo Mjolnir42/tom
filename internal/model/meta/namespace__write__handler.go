@@ -40,6 +40,7 @@ func (h *NamespaceWriteHandler) Register(hm *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 		msg.ActionAttrAdd,
+		msg.ActionAttrRemove,
 		msg.ActionPropSet,
 		msg.ActionPropUpdate,
 	} {

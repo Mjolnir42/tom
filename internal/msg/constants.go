@@ -31,6 +31,7 @@ const (
 	ActionRemove = `remove`
 	ActionShow   = `show`
 	ActionAttrAdd    = `attribute.add`
+	ActionAttrRemove = `attribute.remove`
 	ActionPropSet    = `property.set`
 	ActionPropUpdate = `property.update`
 )
