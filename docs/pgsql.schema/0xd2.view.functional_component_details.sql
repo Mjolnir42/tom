@@ -5,7 +5,7 @@ CREATE  VIEW view.functional_component_details AS
 SELECT  ixfc.componentID AS componentID,
         md.dictionaryID AS componentDictionaryID,
         md.name AS componentDictionaryName,
-        ixmis.isID AS informationSystemID,
+        ypisp.isID AS informationSystemID,
         msa.attributeID AS attributeID,
         msa.attribute AS attributeName,
         ixfcqv.value AS attributeValue
@@ -16,15 +16,15 @@ JOIN    ix.functional_component_unique_attribute_values AS ixfcqv
   ON    ixfc.componentID = ixfcqv.componentID
 JOIN    meta.standard_attribute AS msa
   ON    ixfcqv.attributeID = msa.attributeID
-JOIN    ix.mapping_information_system AS ixmis
-  ON    ixfc.componentID = ixmis.componentID
+JOIN    yp.information_system_parent AS ypisp
+  ON    ixfc.componentID = ypisp.componentID
 WHERE   NOW()::timestamptz(3) <@ ixfcqv.validity
-  AND   NOW()::timestamptz(3) <@ ixmis.validity
+  AND   NOW()::timestamptz(3) <@ ypisp.validity
 UNION
 SELECT  ixfc.componentID AS componentID,
         md.dictionaryID AS componentDictionaryID,
         md.name AS componentDictionaryName,
-        ixmis.isID AS informationSystemID,
+        ypisp.isID AS informationSystemID,
         mqa.attributeID AS attributeID,
         mqa.attribute AS attributeName,
         ixfcqv.value AS attributeValue
@@ -35,10 +35,10 @@ JOIN    ix.functional_component_unique_attribute_values AS ixfcqv
   ON    ixfc.componentID = ixfcqv.componentID
 JOIN    meta.unique_attribute AS mqa
   ON    ixfcqv.attributeID = mqa.attributeID
-JOIN    ix.mapping_information_system AS ixmis
-  ON    ixfc.componentID = ixmis.componentID
+JOIN    yp.information_system_parent AS ypisp
+  ON    ixfc.componentID = ypisp.componentID
 WHERE   NOW()::timestamptz(3) <@ ixfcqv.validity
-  AND   NOW()::timestamptz(3) <@ ixmis.validity;
+  AND   NOW()::timestamptz(3) <@ ypisp.validity;
 
 CREATE  FUNCTION view.functional_component_details_at(at timestamptz)
   RETURNS TABLE ( componentID             uuid,
@@ -53,7 +53,7 @@ CREATE  FUNCTION view.functional_component_details_at(at timestamptz)
   SELECT  ixfc.componentID AS componentID,
           md.dictionaryID AS componentDictionaryID,
           md.name AS componentDictionaryName,
-          ixmis.isID AS informationSystemID,
+          ypisp.isID AS informationSystemID,
           msa.attributeID AS attributeID,
           msa.attribute AS attributeName,
           ixfcqv.value AS attributeValue
@@ -64,15 +64,15 @@ CREATE  FUNCTION view.functional_component_details_at(at timestamptz)
     ON    ixfc.componentID = ixfcqv.componentID
   JOIN    meta.standard_attribute AS msa
     ON    ixfcqv.attributeID = msa.attributeID
-  JOIN    ix.mapping_information_system AS ixmis
-    ON    ixfc.componentID = ixmis.componentID
+  JOIN    yp.information_system_parent AS ypisp
+    ON    ixfc.componentID = ypisp.componentID
   WHERE   at::timestamptz(3) <@ ixfcqv.validity
-    AND   at::timestamptz(3) <@ ixmis.validity
+    AND   at::timestamptz(3) <@ ypisp.validity
   UNION
   SELECT  ixfc.componentID AS componentID,
           md.dictionaryID AS componentDictionaryID,
           md.name AS componentDictionaryName,
-          ixmis.isID AS informationSystemID,
+          ypisp.isID AS informationSystemID,
           mqa.attributeID AS attributeID,
           mqa.attribute AS attributeName,
           ixfcqv.value AS attributeValue
@@ -83,9 +83,9 @@ CREATE  FUNCTION view.functional_component_details_at(at timestamptz)
     ON    ixfc.componentID = ixfcqv.componentID
   JOIN    meta.unique_attribute AS mqa
     ON    ixfcqv.attributeID = mqa.attributeID
-  JOIN    ix.mapping_information_system AS ixmis
-    ON    ixfc.componentID = ixmis.componentID
+  JOIN    yp.information_system_parent AS ypisp
+    ON    ixfc.componentID = ypisp.componentID
   WHERE   at::timestamptz(3) <@ ixfcqv.validity
-    AND   at::timestamptz(3) <@ ixmis.validity
+    AND   at::timestamptz(3) <@ ypisp.validity
   $BODY$
   LANGUAGE sql IMMUTABLE;

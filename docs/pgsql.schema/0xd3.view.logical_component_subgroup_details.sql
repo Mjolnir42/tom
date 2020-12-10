@@ -5,8 +5,8 @@ CREATE  VIEW view.deployment_group_details AS
 SELECT  ixdg.groupID AS groupID,
         md.dictionaryID AS groupDictionaryID,
         md.name AS groupDictionaryName,
-        ixmfc.componentID AS componentID,
-        ixmis.isID AS informationSystemID,
+        ixfcp.componentID AS componentID,
+        ypisp.isID AS informationSystemID,
         mqa.attributeID AS attributeID,
         mqa.attribute AS attributeName,
         ixdgqv.value AS attributeValue
@@ -17,19 +17,19 @@ JOIN    ix.deployment_group_unique_attribute_values AS ixdgqv
   ON    ixdg.groupID = ixdgqv.groupID
 JOIN    meta.unique_attribute AS mqa
   ON    ixdgqv.attributeID = mqa.attributeID
-JOIN    ix.mapping_functional_component AS ixmfc
-  ON    ixdg.groupID = ixmfc.groupID
-JOIN    ix.mapping_information_system AS ixmis
-  ON    ixmfc.componentID = ixmis.componentID
+JOIN    ix.functional_component_parent AS ixfcp
+  ON    ixdg.groupID = ixfcp.groupID
+JOIN    yp.information_system_parent AS ypisp
+  ON    ixfcp.componentID = ypisp.componentID
 WHERE   NOW()::timestamptz(3) <@ ixdgqv.validity
-  AND   NOW()::timestamptz(3) <@ ixmfc.validity
-  AND   NOW()::timestamptz(3) <@ ixmis.validity
+  AND   NOW()::timestamptz(3) <@ ixfcp.validity
+  AND   NOW()::timestamptz(3) <@ ypisp.validity
 UNION
 SELECT  ixdg.groupID AS groupID,
         md.dictionaryID AS groupDictionaryID,
         md.name AS groupDictionaryName,
-        ixmfc.componentID AS componentID,
-        ixmis.isID AS informationSystemID,
+        ixfcp.componentID AS componentID,
+        ypisp.isID AS informationSystemID,
         mqa.attributeID AS attributeID,
         mqa.attribute AS attributeName,
         ixdgqv.value AS attributeValue
@@ -40,13 +40,13 @@ JOIN    ix.deployment_group_unique_attribute_values AS ixdgqv
   ON    ixdg.groupID = ixdgqv.groupID
 JOIN    meta.unique_attribute AS mqa
   ON    ixdgqv.attributeID = mqa.attributeID
-JOIN    ix.mapping_functional_component AS ixmfc
-  ON    ixdg.groupID = ixmfc.groupID
-JOIN    ix.mapping_information_system AS ixmis
-  ON    ixmfc.componentID = ixmis.componentID
+JOIN    ix.functional_component_parent AS ixfcp
+  ON    ixdg.groupID = ixfcp.groupID
+JOIN    yp.information_system_parent AS ypisp
+  ON    ixfcp.componentID = ypisp.componentID
 WHERE   NOW()::timestamptz(3) <@ ixdgqv.validity
-  AND   NOW()::timestamptz(3) <@ ixmfc.validity
-  AND   NOW()::timestamptz(3) <@ ixmis.validity;
+  AND   NOW()::timestamptz(3) <@ ixfcp.validity
+  AND   NOW()::timestamptz(3) <@ ypisp.validity;
 
 CREATE  FUNCTION view.deployment_group_details_at(at timestamptz)
   RETURNS TABLE ( groupID             uuid,
@@ -62,8 +62,8 @@ CREATE  FUNCTION view.deployment_group_details_at(at timestamptz)
   SELECT  ixdg.groupID AS groupID,
           md.dictionaryID AS groupDictionaryID,
           md.name AS groupDictionaryName,
-          ixmfc.componentID AS componentID,
-          ixmis.isID AS informationSystemID,
+          ixfcp.componentID AS componentID,
+          ypisp.isID AS informationSystemID,
           mqa.attributeID AS attributeID,
           mqa.attribute AS attributeName,
           ixdgqv.value AS attributeValue
@@ -74,19 +74,19 @@ CREATE  FUNCTION view.deployment_group_details_at(at timestamptz)
     ON    ixdg.groupID = ixdgqv.groupID
   JOIN    meta.unique_attribute AS mqa
     ON    ixdgqv.attributeID = mqa.attributeID
-  JOIN    ix.mapping_functional_component AS ixmfc
-    ON    ixdg.groupID = ixmfc.groupID
-  JOIN    ix.mapping_information_system AS ixmis
-    ON    ixmfc.componentID = ixmis.componentID
+  JOIN    ix.functional_component_parent AS ixfcp
+    ON    ixdg.groupID = ixfcp.groupID
+  JOIN    yp.information_system_parent AS ypisp
+    ON    ixfcp.componentID = ypisp.componentID
   WHERE   at::timestamptz(3) <@ ixdgqv.validity
-    AND   at::timestamptz(3) <@ ixmfc.validity
-    AND   at::timestamptz(3) <@ ixmis.validity
+    AND   at::timestamptz(3) <@ ixfcp.validity
+    AND   at::timestamptz(3) <@ ypisp.validity
   UNION
   SELECT  ixdg.groupID AS groupID,
           md.dictionaryID AS groupDictionaryID,
           md.name AS groupDictionaryName,
-          ixmfc.componentID AS componentID,
-          ixmis.isID AS informationSystemID,
+          ixfcp.componentID AS componentID,
+          ypisp.isID AS informationSystemID,
           mqa.attributeID AS attributeID,
           mqa.attribute AS attributeName,
           ixdgqv.value AS attributeValue
@@ -97,12 +97,12 @@ CREATE  FUNCTION view.deployment_group_details_at(at timestamptz)
     ON    ixdg.groupID = ixdgqv.groupID
   JOIN    meta.unique_attribute AS mqa
     ON    ixdgqv.attributeID = mqa.attributeID
-  JOIN    ix.mapping_functional_component AS ixmfc
-    ON    ixdg.groupID = ixmfc.groupID
-  JOIN    ix.mapping_information_system AS ixmis
-    ON    ixmfc.componentID = ixmis.componentID
+  JOIN    ix.functional_component_parent AS ixfcp
+    ON    ixdg.groupID = ixfcp.groupID
+  JOIN    yp.information_system_parent AS ypisp
+    ON    ixfcp.componentID = ypisp.componentID
   WHERE   at::timestamptz(3) <@ ixdgqv.validity
-    AND   at::timestamptz(3) <@ ixmfc.validity
-    AND   at::timestamptz(3) <@ ixmis.validity
+    AND   at::timestamptz(3) <@ ixfcp.validity
+    AND   at::timestamptz(3) <@ ypisp.validity
   $BODY$
   LANGUAGE sql IMMUTABLE;

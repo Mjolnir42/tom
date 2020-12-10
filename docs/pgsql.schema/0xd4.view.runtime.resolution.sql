@@ -47,12 +47,12 @@ CREATE FUNCTION view.resolveRuntimeToServer(rt uuid)
             CASE WHEN arep.rteID  IS NOT NULL THEN arep.rteID
                  ELSE null::uuid
             END,
-            CASE WHEN aoep.orchID IS NOT NULL THEN aoep.orchID
+            CASE WHEN aoem.orchID IS NOT NULL THEN aoem.orchID
                  ELSE null::uuid
             END,
             arep.parentServerID,
             CASE WHEN arep.parentRuntimeID IS NOT NULL THEN arep.parentRuntimeID
-                 WHEN aoep.parentRuntimeID IS NOT NULL THEN aoep.parentRuntimeID
+                 WHEN aoem.parentRuntimeID IS NOT NULL THEN aoem.parentRuntimeID
                  ELSE null::uuid
             END,
             arep.parentOrchestrationID,
@@ -73,9 +73,9 @@ CREATE FUNCTION view.resolveRuntimeToServer(rt uuid)
                    OR   rteID_B = t.parentruntimeID
               )
      LEFT   JOIN
-            asset.orchestration_environment_parent AS aoep
-       ON   t.parentOrchestrationID = aoep.orchID
-              OR aoep.orchID IN (
+            asset.orchestration_environment_mapping AS aoem
+       ON   t.parentOrchestrationID = aoem.orchID
+              OR aoem.orchID IN (
                 SELECT  orchID_A
                 FROM    asset.orchestration_environment_linking
                 WHERE   orchID_A = t.parentOrchestrationID
@@ -147,13 +147,13 @@ CREATE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
             CASE WHEN arep.rteID   IS NOT NULL THEN arep.rteID
                  ELSE null::uuid
             END,
-            CASE WHEN aoep.orchID  IS NOT NULL THEN aoep.orchID
+            CASE WHEN aoem.orchID  IS NOT NULL THEN aoem.orchID
                  ELSE null::uuid
             END,
             arep.parentServerID,
             CASE WHEN arep.parentRuntimeID IS NOT NULL THEN arep.parentRuntimeID
                  WHEN  asp.parentRuntimeID IS NOT NULL THEN  asp.parentRuntimeID
-                 WHEN aoep.parentRuntimeID IS NOT NULL THEN aoep.parentRuntimeID
+                 WHEN aoem.parentRuntimeID IS NOT NULL THEN aoem.parentRuntimeID
                  ELSE null::uuid
             END,
             arep.parentOrchestrationID,
@@ -188,9 +188,9 @@ CREATE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
                    OR   serverID_B = t.parentServerID
               )
      LEFT   JOIN
-            asset.orchestration_environment_parent AS aoep
-       ON   t.parentOrchestrationID = aoep.orchID
-              OR aoep.orchID IN (
+            asset.orchestration_environment_mapping AS aoem
+       ON   t.parentOrchestrationID = aoem.orchID
+              OR aoem.orchID IN (
                 SELECT  orchID_A
                 FROM    asset.orchestration_environment_linking
                 WHERE   orchID_A = t.parentOrchestrationID
