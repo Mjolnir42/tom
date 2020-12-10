@@ -172,12 +172,12 @@ VALUES
 (
     'yp',
     '20200917001',
-    'cleanup of relationship tables',
+    'cleanup of relationship tables'
 ),
 (
     'asset',
     '20200917001',
-    'cleanup of relationship tables',
+    'cleanup of relationship tables'
 ),
 (
     'ix',
