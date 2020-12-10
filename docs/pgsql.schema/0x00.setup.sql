@@ -28,6 +28,6 @@ CREATE SCHEMA IF NOT EXISTS asset;
 CREATE SCHEMA IF NOT EXISTS view; 
 CREATE SCHEMA IF NOT EXISTS bulk; 
 SET search_path TO ix, meta, filter, yp, asset, 'view', bulk;
-ALTER DATABASE ix SET search_path TO ix, meta, filter, yp, asset, 'view', bulk;
+ALTER DATABASE tom SET search_path TO ix, meta, filter, yp, asset, 'view', bulk;
 -- configure client session
 SET TIME ZONE 'UTC';
