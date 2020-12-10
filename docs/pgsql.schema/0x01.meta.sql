@@ -11,11 +11,17 @@ CREATE TABLE IF NOT EXISTS meta.dictionary (
     CONSTRAINT __pk_mdict         PRIMARY KEY ( dictionaryID ),
     CONSTRAINT __uniq_dictionary  UNIQUE ( name )
 );
+CREATE TABLE IF NOT EXISTS meta.attribute (
+    dictionaryID                  uuid        NOT NULL,
+    attribute                     text        NOT NULL,
+    CONSTRAINT __uniq_attr_name   UNIQUE      ( dictionaryID, attribute )
+);
 CREATE TABLE IF NOT EXISTS meta.standard_attribute (
     attributeID                   uuid        NOT NULL DEFAULT public.gen_random_uuid(),
     dictionaryID                  uuid        NOT NULL,
     attribute                     text        NOT NULL,
     CONSTRAINT __pk_msa           PRIMARY KEY ( attributeID ),
+    CONSTRAINT __fk_msa_attr      FOREIGN KEY ( dictionaryID, attribute ) REFERENCES meta.attribute ( dictionaryID, attribute ) ON DELETE CASCADE,
     CONSTRAINT __fk_msa_dictID    FOREIGN KEY ( dictionaryID ) REFERENCES meta.dictionary ( dictionaryID ) ON DELETE RESTRICT,
     CONSTRAINT __uniq_attribute   UNIQUE      ( dictionaryID, attribute ),
     CONSTRAINT __msa_fk_origin    UNIQUE      ( dictionaryID, attributeID )
@@ -25,6 +31,7 @@ CREATE TABLE IF NOT EXISTS meta.unique_attribute (
     dictionaryID                  uuid        NOT NULL,
     attribute                     text        NOT NULL,
     CONSTRAINT __pk_msqa          PRIMARY KEY ( attributeID ),
+    CONSTRAINT __fk_msqa_attr     FOREIGN KEY ( dictionaryID, attribute ) REFERENCES meta.attribute ( dictionaryID, attribute ) ON DELETE CASCADE,
     CONSTRAINT __fk_msqa_dictID   FOREIGN KEY ( dictionaryID ) REFERENCES meta.dictionary ( dictionaryID ) ON DELETE RESTRICT,
     CONSTRAINT __uniq_unique_attr UNIQUE      ( dictionaryID, attribute ),
     CONSTRAINT __msqa_fk_origin   UNIQUE      ( dictionaryID, attributeID )

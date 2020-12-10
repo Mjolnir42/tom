@@ -198,5 +198,10 @@ VALUES
     'filter',
     20201016001,
     'add container as filter-able entity'
+),
+(
+    'meta',
+    20201210001,
+    'add meta.attribute registry table'
 )
 ;
