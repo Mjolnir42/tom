@@ -1,16 +1,20 @@
 --
 --
 -- DATABASE SETUP --
-CREATE USER tom_owner WITH LOGIN;
+CREATE ROLE tom_owner WITH LOGIN PASSWORD 'xxx';
+CREATE ROLE tomsvc    WITH LOGIN PASSWORD 'xyz';
 CREATE DATABASE tom WITH OWNER tom_owner ENCODING UTF8 LC_COLLATE 'en_US.UTF-8' LC_CTYPE 'en_US.UTF-8' TEMPLATE template0;
-GRANT CONNECT ON DATABASE tom TO tom_owner;        
 \connect tom
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
--- update pg_hba.conf as required
--- local   tom  tom_owner   trust
+-- update pg_hba.conf as required:
+-- local   tom  tom_owner              password
+-- host    tom  tomsvc      samehost   password
 SELECT pg_reload_conf();
-\connect tom tom_owner;
+
+\connect tom tom_owner
+GRANT CONNECT ON DATABASE tom TO tom_owner;
+GRANT CONNECT ON DATABASE tom TO tomsvc;
 
 -- create required function to index on uuid columns
 CREATE OR REPLACE FUNCTION uuid_to_bytea(_uuid uuid) 
