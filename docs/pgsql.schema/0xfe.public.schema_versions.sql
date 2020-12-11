@@ -104,103 +104,83 @@ VALUES
     20191017001,
     'align table naming'
 ),
-(
-    'meta',
+(   'meta',
     20191022001,
     'fix constraint __mdq_temp_uniq'
 ),
-(
-    'asset',
+(   'asset',
     20191104001,
     'add server_parent table'
 ),
-(
-    'view',
+(   'view',
     20191104001,
     'add dictionary schema/definition functions'
 ),
-(
-    'view',
+(   'view',
     20191104002,
     'add resolveRuntimeTo.. functions'
 ),
-(
-    'filter',
+(   'filter',
     20191126001,
     'fully re-design filter schema'
 ),
-(
-    'asset',
+(   'asset',
     20200908001,
     'add tables for socket in schema asset'
 ),
-(
-    'ix',
+(   'ix',
     20200914001,
     'add endpoint tables'
 ),
-(
-    'filter',
+(   'filter',
     20200914001,
     'add endpoint as filter-able entity'
 ),
-(
-    'yp',
+(   'yp',
     20200915001,
     'rename schema tosm to yp'
 ),
-(
-    'yp',
+(   'yp',
     20200915002,
     'add service tables'
 ),
-(
-    'bulk',
+(   'bulk',
     20200915001,
     'rename instance data table'
 ),
-(
-    'asset',
+(   'asset',
     20200915001,
     'remove orchestration environments as possible socket parent'
 ),
-(
-    'ix',
+(   'ix',
     20200915001,
     'rename technical system services to technical services'
 ),
-(
-    'yp',
+(   'yp',
     '20200917001',
     'cleanup of relationship tables'
 ),
-(
-    'asset',
+(   'asset',
     '20200917001',
     'cleanup of relationship tables'
 ),
-(
-    'ix',
+(   'ix',
     20200917001,
     'cleanup of relationship tables'
 ),
-(
-    'asset',
+(   'asset',
     20201015001,
     'add container entity support'
 ),
-(
-    'yp',
+(   'yp',
     20201016001,
     'switch from service linking 1:n to mapping n:m'
 ),
-(
-    'filter',
+(   'filter',
     20201016001,
     'add container as filter-able entity'
 ),
-(
-    'meta',
+(   'meta',
     20201210001,
     'add meta.attribute registry table'
 )
