@@ -18,7 +18,7 @@ WITH ins_dct AS ( INSERT INTO meta.dictionary ( name )
      ins_reg AS ( INSERT INTO meta.attribute ( dictionaryID, attribute )
                   SELECT      dictID,
                               'dict_name'
-                  FROM        cte ),
+                  FROM        ins_dct ),
      ins_nam AS ( INSERT INTO meta.unique_attribute ( dictionaryID, attribute )
                   SELECT      dictID,
                               'dict_name'
