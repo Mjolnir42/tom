@@ -187,5 +187,9 @@ VALUES
 (   'inventory',
     20210105001,
     'add new namespace: inventory'
+),
+(   'meta',
+    20210105001,
+    'add inventory information'
 )
 ;
