@@ -48,12 +48,25 @@ func New(
 
 func (x *Rest) Run(rt *httprouter.Router) {
 	// TODO switch to new abortable interface
-	x.LM.GetLogger(`error`).Fatal(http.ListenAndServeTLS(
-		x.conf.Daemon[x.idx].URL.Host,
-		x.conf.Daemon[x.idx].Cert,
-		x.conf.Daemon[x.idx].Key,
-		rt,
-	))
+	switch x.conf.Daemon[x.idx].URL.Scheme {
+	case `http`:
+		x.LM.GetLogger(`error`).Fatal(http.ListenAndServe(
+			x.conf.Daemon[x.idx].URL.Host,
+			rt,
+		))
+	case `https`:
+		x.LM.GetLogger(`error`).Fatal(http.ListenAndServeTLS(
+			x.conf.Daemon[x.idx].URL.Host,
+			x.conf.Daemon[x.idx].Cert,
+			x.conf.Daemon[x.idx].Key,
+			rt,
+		))
+	default:
+		x.LM.GetLogger(`error`).Fatalf(
+			"Unsupported URL scheme: %s",
+			x.conf.Daemon[x.idx].URL.Scheme,
+		)
+	}
 }
 
 func PanicCatcher(w http.ResponseWriter, lm *lhm.LogHandleMap) {
