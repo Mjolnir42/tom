@@ -29,6 +29,10 @@ func (x *Core) Start() {
 			x.lm,
 		)
 		// start the handler in a goroutine
+		x.lm.GetLogger(`application`).Infof(
+			"Core running handler: %s",
+			handlerName,
+		)
 		x.hm.Run(handlerName)
 	}
 }

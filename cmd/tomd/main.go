@@ -98,9 +98,11 @@ func run() int {
 	go pingDatabase(lm, conn)
 
 	// start core application
+	lm.GetLogger(`application`).Infoln("Starting application core")
 	core := core.New(hm, lm, conn, &TomCfg)
 	core.Start()
 
+	lm.GetLogger(`application`).Infoln("Starting API interfaces")
 	for i := range TomCfg.Daemon {
 		dm := TomCfg.Daemon[i]
 		dm.URL = &url.URL{}
@@ -110,6 +112,11 @@ func run() int {
 		} else {
 			dm.URL.Scheme = `http`
 		}
+		lm.GetLogger(`application`).Infof(
+			"Building API router interface %d for %s",
+			i,
+			dm.URL.String(),
+		)
 		api := rest.New(func(q *msg.Request) bool { return true }, i, hm, lm, &TomCfg)
 		router := httprouter.New()
 
@@ -122,13 +129,22 @@ func run() int {
 		router = assetmodel.RouteRegisterRuntime(router)
 		router = assetmodel.RouteRegisterOrchestration(router)
 
+		lm.GetLogger(`application`).Infof(
+			"Running API router interface %d for %s",
+			i,
+			dm.URL.String(),
+		)
 		go api.Run(router)
+	}
+	if len(TomCfg.Daemon) == 0 {
+		lm.GetLogger(`application`).Infoln("No REST API interfaces configured")
 	}
 
 	// signal handler for shutdown
 	sigChanShutdown := make(chan os.Signal, 1)
 	signal.Notify(sigChanShutdown, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChanShutdown
+	lm.GetLogger(`application`).Infoln(`Shutdown signal received`)
 	return 0
 }
 
