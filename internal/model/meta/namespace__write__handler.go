@@ -66,7 +66,7 @@ func (h *NamespaceWriteHandler) Run() {
 		stmt.NamespaceTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
-			h.lm.GetLogger(`error`).Fatal(h.name, err, stmt.Name(statement))
+			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
 		}
 		defer (*prepared).Close()
 	}

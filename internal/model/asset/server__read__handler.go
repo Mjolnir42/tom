@@ -56,7 +56,7 @@ func (h *ServerReadHandler) Run() {
 		stmt.ServerParent:    &h.stmtParent,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
-			h.lm.GetLogger(`error`).Fatal(h.name, err, stmt.Name(statement))
+			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
 		}
 		defer (*prepared).Close()
 	}
