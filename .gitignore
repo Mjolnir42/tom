@@ -33,4 +33,6 @@ _testmain.go
 
 /vendor
 *.log
+*.log.*
 /cmd/tomd/tomd
+/cmd/tomd/tom.conf
