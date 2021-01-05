@@ -120,7 +120,7 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                       ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
                   WHERE        meta.standard_attribute.attribute = $2::text )
 UPDATE            meta.dictionary_standard_attribute_values
-   SET            meta.dictionary_standard_attribute_values.validity = tstzrange(lower(validity), now()::timestamptz(3), '[)')
+   SET            validity = tstzrange(lower(validity), now()::timestamptz(3), '[)')
 FROM              cte_dct
     CROSS JOIN    cte_att
 WHERE              meta.dictionary_standard_attribute_values.dictionaryID    = cte_dct.dictionaryID
@@ -178,7 +178,7 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                       ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
                   WHERE        meta.unique_attribute.attribute = $2::text )
 UPDATE            meta.dictionary_unique_attribute_values
-   SET            meta.dictionary_unique_attribute_values.validity = tstzrange(lower(validity), now()::timestamptz(3), '[)')
+   SET            validity = tstzrange(lower(validity), now()::timestamptz(3), '[)')
 FROM              cte_dct
     CROSS JOIN    cte_att
 WHERE              meta.dictionary_unique_attribute_values.dictionaryID    = cte_dct.dictionaryID
