@@ -154,6 +154,16 @@ BEGIN;
     '00000000-0000-0000-0000-000000000000'::uuid
   );
 
+  GRANT   USAGE
+     ON   SCHEMA inventory
+     TO   tomsvc;
+  GRANT   SELECT, INSERT, UPDATE, DELETE
+     ON   ALL TABLES IN SCHEMA inventory
+     TO   tomsvc;
+  GRANT   USAGE, SELECT
+     ON   ALL SEQUENCES IN SCHEMA inventory
+     TO   tomsvc;
+
   INSERT INTO public.schema_versions ( schema, version, description )
               VALUES ( 'inventory', 20210105001, 'add new namespace: inventory' );
 COMMIT;
