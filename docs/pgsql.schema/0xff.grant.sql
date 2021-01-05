@@ -4,6 +4,9 @@
 GRANT   SELECT
    ON   ALL TABLES IN SCHEMA view, public
    TO   tomsvc;
+GRANT   USAGE
+   ON   SCHEMA asset, bulk, filter, ix, meta, yp, view
+   TO   tomsvc;
 GRANT   SELECT,
         INSERT,
         UPDATE,
