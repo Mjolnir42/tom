@@ -112,6 +112,7 @@ func run() int {
 		} else {
 			dm.URL.Scheme = `http`
 		}
+		TomCfg.Daemon[i] = dm
 		lm.GetLogger(`application`).Infof(
 			"Building API router interface %d for %s",
 			i,
