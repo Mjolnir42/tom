@@ -19,10 +19,10 @@ import (
 // RouteRegisterOrchestration registers the runtime routes with the request
 // router
 func (m *Model) RouteRegisterOrchestration(rt *httprouter.Router) *httprouter.Router {
-	rt.GET(`/runtime/`, m.x.Authenticated(m.OrchestrationList))
-	rt.GET(`/runtime/:tomID`, m.x.Authenticated(m.OrchestrationShow))
-	rt.POST(`/runtime/`, m.x.Authenticated(m.OrchestrationAdd))
-	rt.DELETE(`/runtime/:tomID`, m.x.Authenticated(m.OrchestrationRemove))
+	rt.GET(`/orchestration/`, m.x.Authenticated(m.OrchestrationList))
+	rt.GET(`/orchestration/:tomID`, m.x.Authenticated(m.OrchestrationShow))
+	rt.POST(`/orchestration/`, m.x.Authenticated(m.OrchestrationAdd))
+	rt.DELETE(`/orchestration/:tomID`, m.x.Authenticated(m.OrchestrationRemove))
 	return rt
 }
 
