@@ -183,5 +183,9 @@ VALUES
 (   'meta',
     20201210001,
     'add meta.attribute registry table'
+),
+(   'inventory',
+    20210105001,
+    'add new namespace: inventory'
 )
 ;
