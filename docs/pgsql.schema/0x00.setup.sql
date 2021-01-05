@@ -23,14 +23,15 @@ CREATE OR REPLACE FUNCTION uuid_to_bytea(_uuid uuid)
   select decode(replace(_uuid::text, '-', ''), 'hex');
   $BODY$
   LANGUAGE sql IMMUTABLE;
-    
-CREATE SCHEMA IF NOT EXISTS ix;   
-CREATE SCHEMA IF NOT EXISTS meta;                         
+
+CREATE SCHEMA IF NOT EXISTS asset;
+CREATE SCHEMA IF NOT EXISTS bulk;
 CREATE SCHEMA IF NOT EXISTS filter;
+CREATE SCHEMA IF NOT EXISTS ix;
+CREATE SCHEMA IF NOT EXISTS meta;
+CREATE SCHEMA IF NOT EXISTS view;
 CREATE SCHEMA IF NOT EXISTS yp;
-CREATE SCHEMA IF NOT EXISTS asset;   
-CREATE SCHEMA IF NOT EXISTS view; 
-CREATE SCHEMA IF NOT EXISTS bulk; 
+
 SET search_path TO ix, meta, filter, yp, asset, 'view', bulk;
 ALTER DATABASE tom SET search_path TO ix, meta, filter, yp, asset, 'view', bulk;
 -- configure client session
