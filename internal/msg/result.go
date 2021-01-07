@@ -23,11 +23,11 @@ type Result struct {
 	Code       uint16
 	Err        error
 
-	Namespace     []proto.Namespace
+	Namespace       []proto.Namespace
 	NamespaceHeader []proto.NamespaceHeader
-	Orchestration []proto.Orchestration
-	Runtime       []proto.Runtime
-	Server        []proto.Server
+	Orchestration   []proto.Orchestration
+	Runtime         []proto.Runtime
+	Server          []proto.Server
 }
 
 func FromRequest(rq *Request) Result {
