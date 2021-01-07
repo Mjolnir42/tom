@@ -22,6 +22,8 @@ type Namespace struct {
 	PropertyMap  map[string]string     `json:"property"`
 	StdProperty  []Property            `json:"-"`
 	UniqProperty []Property            `json:"-"`
+	CreatedAt    string                `json:"createdAt"`
+	CreatedBy    string                `json:"createdBy"`
 }
 
 func (n *Namespace) SetTomID() Entity {
