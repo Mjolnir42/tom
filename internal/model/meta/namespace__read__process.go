@@ -5,15 +5,14 @@
  * that can be found in the LICENSE file.
  */
 
-package meta // // import "github.com/mjolnir42/tom/internal/model/meta"
+package meta // import "github.com/mjolnir42/tom/internal/model/meta"
 
 import (
-	//"database/sql"
+	"database/sql"
+	"time"
 
-	//	"github.com/mjolnir42/lhm"
-	//	"github.com/mjolnir42/tom/internal/handler"
 	"github.com/mjolnir42/tom/internal/msg"
-	//	"github.com/mjolnir42/tom/internal/stmt"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 // process is the request dispatcher
@@ -31,8 +30,41 @@ func (h *NamespaceReadHandler) process(q *msg.Request) {
 	q.Reply <- result
 }
 
-// list returns all servers
+// list returns all namespaces
 func (h *NamespaceReadHandler) list(q *msg.Request, mr *msg.Result) {
+	var (
+		dictionaryName, author string
+		creationTime           time.Time
+		rows                   *sql.Rows
+		err                    error
+	)
+
+	if rows, err = h.stmtList.Query(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&dictionaryName,
+			&creationTime,
+			&author,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			return
+		}
+		mr.NamespaceHeader = append(mr.NamespaceHeader, proto.NamespaceHeader{
+			Name:      dictionaryName,
+			CreatedAt: creationTime.Format(msg.RFC3339Milli),
+			CreatedBy: author,
+		})
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	mr.OK()
 }
 
 // show returns full details for a specific server
