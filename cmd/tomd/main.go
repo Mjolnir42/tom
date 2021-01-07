@@ -84,6 +84,9 @@ func run() int {
 	if err = lm.Open(`application`, logrus.InfoLevel); err != nil {
 		lm.GetLogger(`error`).Fatal(err)
 	}
+	if err = lm.Open(`request`, logrus.InfoLevel); err != nil {
+		lm.GetLogger(`error`).Fatal(err)
+	}
 
 	go lm.Reopen(``, func(e error) {
 		logrus.Error(e)
