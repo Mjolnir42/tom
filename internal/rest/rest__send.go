@@ -25,8 +25,21 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 	}
 
 	result.RequestID = r.ID.String()
-	result.Server = &[]proto.Server{}
-	*result.Server = append(*result.Server, r.Server...)
+	switch r.Section {
+	case msg.SectionNamespace:
+		switch r.Action {
+		case msg.ActionList:
+			result.NamespaceHeader = &[]proto.NamespaceHeader{}
+			*result.NamespaceHeader = append(*result.NamespaceHeader, r.NamespaceHeader...)
+		default:
+			result.Namespace = &[]proto.Namespace{}
+			*result.Namespace = append(*result.Namespace, r.Namespace...)
+		}
+
+	case msg.SectionServer:
+		result.Server = &[]proto.Server{}
+		*result.Server = append(*result.Server, r.Server...)
+	}
 
 	if bjson, err = json.Marshal(&result); err != nil {
 		x.hardServerError(w)
