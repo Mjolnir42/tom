@@ -24,6 +24,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		goto dispatchERROR
 	}
 
+	result.RequestID = r.ID.String()
 	result.Server = &[]proto.Server{}
 	*result.Server = append(*result.Server, r.Server...)
 

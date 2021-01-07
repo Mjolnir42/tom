@@ -9,6 +9,8 @@ package proto //
 
 // Result is the response wrapper of Tom's public API
 type Result struct {
+	RequestID string `json:"requestID"`
+
 	Container       *[]Container       `json:"container,omitempty"`
 	Namespace       *[]Namespace       `json:"namespace,omitempty"`
 	NamespaceHeader *[]NamespaceHeader `json:"namespace_list,omitempty"`
