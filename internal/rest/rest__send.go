@@ -21,8 +21,16 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 	var result proto.Result
 
 	if r.Code >= http.StatusBadRequest {
+		x.LM.GetLogger(`request`).Errorf(
+			"[RequestID] %s, [Section] %s, [Action] %s, [Code] %d, [Error] %s",
+			r.ID.String(), r.Section, r.Action, r.Code, r.Err.Error(),
+		)
 		goto dispatchERROR
 	}
+	x.LM.GetLogger(`request`).Infof(
+		"[RequestID] %s, [Section] %s, [Action] %s, [Code] %d",
+		r.ID.String(), r.Section, r.Action, r.Code,
+	)
 
 	result.RequestID = r.ID.String()
 	switch r.Section {
