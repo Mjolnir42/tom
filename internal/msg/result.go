@@ -24,6 +24,7 @@ type Result struct {
 	Err        error
 
 	Namespace     []proto.Namespace
+	NamespaceHeader []proto.NamespaceHeader
 	Orchestration []proto.Orchestration
 	Runtime       []proto.Runtime
 	Server        []proto.Server
@@ -45,6 +46,9 @@ func (r *Result) Clear(err ...error) {
 	}
 
 	switch r.Section {
+	case SectionNamespace:
+		r.Namespace = []proto.Namespace{}
+		r.NamespaceHeader = []proto.NamespaceHeader{}
 	case SectionOrchestration:
 		r.Orchestration = []proto.Orchestration{}
 	case SectionRuntime:

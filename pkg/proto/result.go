@@ -11,6 +11,7 @@ package proto //
 type Result struct {
 	Container     *[]Container     `json:"container,omitempty"`
 	Namespace     *[]Namespace     `json:"namespace,omitempty"`
+	NamespaceHeader *[]NamespaceHeader `json:"namespace_list,omitempty"`
 	Orchestration *[]Orchestration `json:"orchestration,omitempty"`
 	Runtime       *[]Runtime       `json:"runtime,omitempty"`
 	Server        *[]Server        `json:"server,omitempty"`

@@ -26,6 +26,13 @@ type Namespace struct {
 	CreatedBy    string                `json:"createdBy"`
 }
 
+// NamespaceHeader defines ...
+type NamespaceHeader struct {
+	Name      string `json:"name"`
+	CreatedAt string `json:"createdAt"`
+	CreatedBy string `json:"createdBy"`
+}
+
 func (n *Namespace) SetTomID() Entity {
 	n.TomID = n.FormatDNS()
 	return n
