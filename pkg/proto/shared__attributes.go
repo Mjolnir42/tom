@@ -13,8 +13,6 @@ import (
 	"strings"
 )
 
-type Property [2]string
-
 // PropertyDetail holds all the information about an object property
 type PropertyDetail struct {
 	Attribute  string `json:"attribute"`

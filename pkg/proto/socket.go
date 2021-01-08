@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -11,14 +11,16 @@ const EntitySocket = `socket`
 
 // Socket ...
 type Socket struct {
-	ID           string            `json:"-"`
-	TomID        string            `json:"-"`
-	Namespace    string            `json:"namespace"`
-	Name         string            `json:"name"`
-	Parent       string            `json:"parent"`
-	PropertyMap  map[string]string `json:"property"`
-	StdProperty  []Property        `json:"-"`
-	UniqProperty []Property        `json:"-"`
+	Namespace    string                    `json:"namespace"`
+	Name         string                    `json:"name"`
+	Parent       string                    `json:"parent"`
+	Property     map[string]PropertyDetail `json:"property"`
+	CreatedAt    string                    `json:"createdAt"`
+	CreatedBy    string                    `json:"createdBy"`
+	ID           string                    `json:"-"`
+	TomID        string                    `json:"-"`
+	StdProperty  []PropertyDetail          `json:"-"`
+	UniqProperty []PropertyDetail          `json:"-"`
 }
 
 func (s *Socket) SetTomID() Entity {
@@ -53,11 +55,11 @@ func (s *Socket) ParseTomID() error {
 	}
 }
 
-func (s *Socket) PropertyIterator() <-chan Property {
-	ret := make(chan Property)
+func (s *Socket) PropertyIterator() <-chan PropertyDetail {
+	ret := make(chan PropertyDetail)
 	go func() {
-		for key := range s.PropertyMap {
-			ret <- Property{key, s.PropertyMap[key]}
+		for key := range s.Property {
+			ret <- s.Property[key]
 		}
 		close(ret)
 	}()

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -11,16 +11,16 @@ const EntityContainer = `container`
 
 // Container ...
 type Container struct {
-	ID           string            `json:"-"`
-	TomID        string            `json:"-"`
-	Namespace    string            `json:"namespace"`
-	Name         string            `json:"name"`
-	Type         string            `json:"type"`
-	Parent       string            `json:"parent"`
-	Link         []string          `json:"link"`
-	PropertyMap  map[string]string `json:"property"`
-	StdProperty  []Property        `json:"-"`
-	UniqProperty []Property        `json:"-"`
+	ID           string                    `json:"-"`
+	TomID        string                    `json:"-"`
+	Namespace    string                    `json:"namespace"`
+	Name         string                    `json:"name"`
+	Type         string                    `json:"type"`
+	Parent       string                    `json:"parent"`
+	Link         []string                  `json:"link"`
+	Property     map[string]PropertyDetail `json:"property"`
+	StdProperty  []PropertyDetail          `json:"-"`
+	UniqProperty []PropertyDetail          `json:"-"`
 }
 
 func (c *Container) SetTomID() Entity {
@@ -55,11 +55,11 @@ func (c *Container) ParseTomID() error {
 	}
 }
 
-func (c *Container) PropertyIterator() <-chan Property {
-	ret := make(chan Property)
+func (c *Container) PropertyIterator() <-chan PropertyDetail {
+	ret := make(chan PropertyDetail)
 	go func() {
-		for key := range c.PropertyMap {
-			ret <- Property{key, c.PropertyMap[key]}
+		for key := range c.Property {
+			ret <- c.Property[key]
 		}
 		close(ret)
 	}()

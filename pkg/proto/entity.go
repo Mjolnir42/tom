@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -12,7 +12,7 @@ type Entity interface {
 	FormatDNS() string
 	FormatTomID() string
 	ParseTomID() error
-	PropertyIterator() <-chan Property
+	PropertyIterator() <-chan PropertyDetail
 	SetTomID() Entity
 }
 

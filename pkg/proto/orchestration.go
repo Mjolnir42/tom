@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -11,16 +11,18 @@ const EntityOrchestration = `orchestration`
 
 // Orchestration defines a orchestration environment within the asset model
 type Orchestration struct {
-	ID           string            `json:"-"`
-	TomID        string            `json:"-"`
-	Namespace    string            `json:"namespace"`
-	Name         string            `json:"name"`
-	Type         string            `json:"type"`
-	Parent       []string          `json:"parent"`
-	Link         []string          `json:"link"`
-	PropertyMap  map[string]string `json:"property"`
-	StdProperty  []Property        `json:"-"`
-	UniqProperty []Property        `json:"-"`
+	Namespace    string                    `json:"namespace"`
+	Name         string                    `json:"name"`
+	Type         string                    `json:"type"`
+	Parent       []string                  `json:"parent"`
+	Link         []string                  `json:"link"`
+	Property     map[string]PropertyDetail `json:"property"`
+	CreatedAt    string                    `json:"createdAt"`
+	CreatedBy    string                    `json:"createdBy"`
+	ID           string                    `json:"-"`
+	TomID        string                    `json:"-"`
+	StdProperty  []PropertyDetail          `json:"-"`
+	UniqProperty []PropertyDetail          `json:"-"`
 }
 
 func (o *Orchestration) SetTomID() Entity {
@@ -55,11 +57,11 @@ func (o *Orchestration) ParseTomID() error {
 	}
 }
 
-func (o *Orchestration) PropertyIterator() <-chan Property {
-	ret := make(chan Property)
+func (o *Orchestration) PropertyIterator() <-chan PropertyDetail {
+	ret := make(chan PropertyDetail)
 	go func() {
-		for key := range o.PropertyMap {
-			ret <- Property{key, o.PropertyMap[key]}
+		for key := range o.Property {
+			ret <- o.Property[key]
 		}
 		close(ret)
 	}()

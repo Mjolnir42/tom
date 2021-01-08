@@ -11,20 +11,19 @@ const EntityNamespace = `namespace`
 
 // Namespace defines ...
 type Namespace struct {
-	ID           string                    `json:"-"`
-	TomID        string                    `json:"-"`
 	Name         string                    `json:"name"`
 	Type         string                    `json:"type"`
 	LookupKey    string                    `json:"lookup-attribute-key"`
 	LookupURI    string                    `json:"lookup-uri"`
 	Constraint   []string                  `json:"entity-contraint-list"`
 	Attributes   []AttributeDefinition     `json:"attributes"`
-	PropertyMap  map[string]string         `json:"property,omitempty"`
-	PropertyData map[string]PropertyDetail `json:"property-data,omitempty"`
-	StdProperty  []Property                `json:"-"`
-	UniqProperty []Property                `json:"-"`
+	Property     map[string]PropertyDetail `json:"property,omitempty"`
 	CreatedAt    string                    `json:"createdAt"`
 	CreatedBy    string                    `json:"createdBy"`
+	ID           string                    `json:"-"`
+	TomID        string                    `json:"-"`
+	StdProperty  []PropertyDetail          `json:"-"`
+	UniqProperty []PropertyDetail          `json:"-"`
 }
 
 // NamespaceHeader defines ...
@@ -66,11 +65,11 @@ func (n *Namespace) ParseTomID() error {
 	}
 }
 
-func (n *Namespace) PropertyIterator() <-chan Property {
-	ret := make(chan Property)
+func (n *Namespace) PropertyIterator() <-chan PropertyDetail {
+	ret := make(chan PropertyDetail)
 	go func() {
-		for key := range n.PropertyMap {
-			ret <- Property{key, n.PropertyMap[key]}
+		for key := range n.Property {
+			ret <- n.Property[key]
 		}
 		close(ret)
 	}()
