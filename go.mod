@@ -10,4 +10,5 @@ require (
 	github.com/nahanni/go-ucl v0.0.0-20161122070711-3788fcf0dad8
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.7.0
+	github.com/urfave/cli/v2 v2.3.0
 )
