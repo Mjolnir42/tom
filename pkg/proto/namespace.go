@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -11,19 +11,20 @@ const EntityNamespace = `namespace`
 
 // Namespace defines ...
 type Namespace struct {
-	ID           string                `json:"-"`
-	TomID        string                `json:"-"`
-	Name         string                `json:"name"`
-	Type         string                `json:"type"`
-	LookupKey    string                `json:"lookup-attribute-key"`
-	LookupURI    string                `json:"lookup-uri"`
-	Constraint   []string              `json:"entity-contraint-list"`
-	Attributes   []AttributeDefinition `json:"attributes"`
-	PropertyMap  map[string]string     `json:"property"`
-	StdProperty  []Property            `json:"-"`
-	UniqProperty []Property            `json:"-"`
-	CreatedAt    string                `json:"createdAt"`
-	CreatedBy    string                `json:"createdBy"`
+	ID           string                    `json:"-"`
+	TomID        string                    `json:"-"`
+	Name         string                    `json:"name"`
+	Type         string                    `json:"type"`
+	LookupKey    string                    `json:"lookup-attribute-key"`
+	LookupURI    string                    `json:"lookup-uri"`
+	Constraint   []string                  `json:"entity-contraint-list"`
+	Attributes   []AttributeDefinition     `json:"attributes"`
+	PropertyMap  map[string]string         `json:"property,omitempty"`
+	PropertyData map[string]PropertyDetail `json:"property-data,omitempty"`
+	StdProperty  []Property                `json:"-"`
+	UniqProperty []Property                `json:"-"`
+	CreatedAt    string                    `json:"createdAt"`
+	CreatedBy    string                    `json:"createdBy"`
 }
 
 // NamespaceHeader defines ...

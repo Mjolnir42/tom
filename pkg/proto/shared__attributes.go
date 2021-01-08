@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -14,6 +14,16 @@ import (
 )
 
 type Property [2]string
+
+// PropertyDetail holds all the information about an object property
+type PropertyDetail struct {
+	Attribute  string `json:"attribute"`
+	Value      string `json:"value"`
+	ValidSince string `json:"validSince"`
+	ValidUntil string `json:"validUntil"`
+	CreatedAt  string `json:"createdAt"`
+	CreatedBy  string `json:"createdBy"`
+}
 
 type AttributeDefinition struct {
 	Key    string `json:"key"`
