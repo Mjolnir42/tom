@@ -25,6 +25,7 @@ type PropertyDetail struct {
 	CreatedBy  string `json:"createdBy"`
 }
 
+// AttributeDefinition holds the definition of a dictionary attribute
 type AttributeDefinition struct {
 	Key    string `json:"key"`
 	Unique bool   `json:"uniqueValueConstraint,omitempty"`
