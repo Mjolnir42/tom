@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -22,7 +22,9 @@ type NamespaceReadHandler struct {
 	name     string
 	conn     *sql.DB
 	lm       *lhm.LogHandleMap
+	stmtAttr *sql.Stmt
 	stmtList *sql.Stmt
+	stmtProp *sql.Stmt
 	stmtShow *sql.Stmt
 }
 

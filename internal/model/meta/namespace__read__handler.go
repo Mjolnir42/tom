@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -49,8 +49,10 @@ func (h *NamespaceReadHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.NamespaceList: &h.stmtList,
-		stmt.NamespaceShow: &h.stmtShow,
+		stmt.NamespaceList:               &h.stmtList,
+		stmt.NamespaceTxSelectAttributes: &h.stmtAttr,
+		stmt.NamespaceTxSelectProperties: &h.stmtProp,
+		stmt.NamespaceTxShow:             &h.stmtShow,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
