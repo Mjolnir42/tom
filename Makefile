@@ -1,7 +1,7 @@
 # vim: set ft=make ffs=unix fenc=utf8:
 # vim: set noet ts=4 sw=4 tw=72 list:
 #
-TOMVER != git describe --tags --abbrev=0 --exact-match
+TOMVER != git describe --tags --abbrev=0
 BRANCH != git rev-parse --symbolic-full-name --abbrev-ref HEAD
 GITHASH != git rev-parse --short HEAD
 
@@ -12,12 +12,15 @@ install: install_freebsd
 install_all: install_freebsd install_linux
 
 install_freebsd: generate
+	@echo "Building FreeBSD ...."
 	@env GOOS=freebsd GOARCH=amd64 go install -ldflags "-X main.tomVersion=$(TOMVER)-$(GITHASH)/$(BRANCH)" ./...
 
 install_linux: generate
+	@echo "Building Linux ...."
 	@env GOOS=linux GOARCH=amd64 go install -ldflags "-X main.tomVersion=$(TOMVER)-$(GITHASH)/$(BRANCH)" ./...
 
 generate: sanitize
+	@echo "Generating ...."
 	@go generate ./cmd/...
 
 sanitize: build check
@@ -25,7 +28,7 @@ sanitize: build check
 check: vet
 
 build:
-	@echo "Building ...."
+	@echo "Compiling ...."
 	@go build ./...
 
 vet:
