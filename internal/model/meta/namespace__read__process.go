@@ -113,8 +113,7 @@ func (h *NamespaceReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	// property-data = h.stmtProp(id, txTime)
-	ns.PropertyData = make(map[string]proto.PropertyDetail)
+	ns.Property = make(map[string]proto.PropertyDetail)
 	if rows, err = txProp.Query(
 		dictionaryID,
 		txTime,
@@ -142,7 +141,7 @@ func (h *NamespaceReadHandler) show(q *msg.Request, mr *msg.Result) {
 		prop.ValidSince = since.Format(msg.RFC3339Milli)
 		prop.ValidUntil = until.Format(msg.RFC3339Milli)
 		prop.CreatedAt = at.Format(msg.RFC3339Milli)
-		ns.PropertyData[prop.Attribute] = prop
+		ns.Property[prop.Attribute] = prop
 
 		// set sepcialty fields for well known namespace properties
 		switch prop.Attribute {
@@ -169,7 +168,6 @@ func (h *NamespaceReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	// attribute-data = h.stmtAttr(id)
 	ns.Attributes = []proto.AttributeDefinition{}
 	if rows, err = txAttr.Query(
 		dictionaryID,
