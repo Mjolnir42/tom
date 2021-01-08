@@ -1,0 +1,49 @@
+GET /namespace/?name=<name>
+GET /namespace/<tomID>
+
+RETURNS:
+  { "requestID": "UUID",
+    "namespace": [
+      { "name": "<name>",
+        "type": "<authoritative>|<referential>",
+        "lookup-attribute-key": "",
+        "lookup-uri": "",
+        "entity-contraint-list": [
+          "container",
+          "namespace",
+          "orchestration",
+          "runtime",
+          "server",
+          "socket"
+        ],
+        "attributes": [
+          { "key": "",
+            "uniqueValueConstraint": true|false
+          },
+          { "key": "",
+            "uniqueValueConstraint": true|false
+          },
+        ],
+        "property-data": {
+          "<attribute>": {
+            "attribute": "<attribute>",
+            "value": "<value>",
+            "validSince": "<timestamp>",
+            "validUntil": "<timestamp>",
+            "createdAt": "<timestamp>",
+            "createdBy": "<author>"
+          },
+          "<attribute>": {
+            "attribute": "<attribute>",
+            "value": "<value>",
+            "validSince": "<timestamp>",
+            "validUntil": "<timestamp>",
+            "createdAt": "<timestamp>",
+            "createdBy": "<author>"
+          }
+        },
+        "createdAt": "",
+        "createdBy": ""
+      }
+    ]
+  }
