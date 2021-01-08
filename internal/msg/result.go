@@ -67,6 +67,11 @@ func (r *Result) BadRequest(err ...error) {
 	r.Clear(err...)
 }
 
+func (r *Result) NotFound(err ...error) {
+	r.Code = http.StatusNotFound
+	r.Clear(err...)
+}
+
 func (r *Result) Forbidden(err ...error) {
 	r.Code = http.StatusForbidden
 	r.Clear(err...)
