@@ -24,7 +24,7 @@ RETURNS:
             "uniqueValueConstraint": true|false
           },
         ],
-        "property-data": {
+        "property": {
           "<attribute>": {
             "attribute": "<attribute>",
             "value": "<value>",
