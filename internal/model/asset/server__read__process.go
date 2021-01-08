@@ -187,12 +187,15 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		case key == `name`:
 			server.Name = value
 		default:
-			server.PropertyMap[key] = value
+			server.Property[key] = proto.PropertyDetail{
+				Attribute: key,
+				Value:     value,
+			}
 			switch attrTyp {
 			case `unique`:
-				server.UniqProperty = append(server.UniqProperty, [2]string{key, value})
+				server.UniqProperty = append(server.UniqProperty, server.Property[key])
 			case `standard`:
-				server.StdProperty = append(server.StdProperty, [2]string{key, value})
+				server.StdProperty = append(server.StdProperty, server.Property[key])
 			default:
 				rows.Close()
 				mr.ExpectationFailed(fmt.Errorf(`Received impossible attribute type`))
