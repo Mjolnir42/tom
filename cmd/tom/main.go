@@ -14,6 +14,9 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+//go:generate go run ../../script/render_markdown.go ../../docs/tom/cmd_ref ../../internal/cli/help/rendered
+//go:generate go-bindata -pkg help -ignore .gitignore -o ../../internal/cli/help/bindata.go -prefix "../../internal/cli/help/rendered/" ../../internal/cli/help/rendered/...
+
 // global variables
 var (
 	// populated via Makefile

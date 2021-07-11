@@ -4,6 +4,9 @@ go 1.15
 
 require (
 	github.com/droundy/goopt v0.0.0-20170604162106-0b8effe182da
+	github.com/gholt/blackfridaytext v0.0.0-20190816214545-16f7b9b9742e
+	github.com/gholt/brimtext v1.0.0
+	github.com/jteeuwen/go-bindata v3.0.7+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/lib/pq v1.8.0
 	github.com/mjolnir42/lhm v0.0.3
