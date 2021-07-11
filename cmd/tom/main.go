@@ -32,7 +32,7 @@ func main() {
 	app.Version = tomVersion
 	app.EnableBashCompletion = true
 
-	//app = registerCommands(*app)
+	app = registerCommands(*app)
 	//app = registerFlags(*app)
 
 	if err := app.Run(os.Args); err != nil {
