@@ -1,0 +1,44 @@
+POST /namespace/
+  { "namespace": {
+      "attributes": [
+        { "key": ....
+          "uniqueValueConstraint": true|false
+        },
+        { "key": ....
+          "uniqueValueConstraint": true|false
+        },
+      ],
+      "property": {
+        "dict_name": {
+          "attribute": dict_name
+          "value": ...
+          [ "validSince": ... ]
+          [ "validUntil": ... ]
+        },
+        "dict_type": {
+          "attribute": dict_type
+          "value": ...
+          [ "validSince": ... ]
+          [ "validUntil": ... ]
+        },
+        "dict_lookup": {
+          "attribute": dict_lookup
+          "value": ...
+          [ "validSince": ... ]
+          [ "validUntil": ... ]
+        },
+        "dict_uri": {
+          "attribute": dict_uri
+          "value": ...
+          [ "validSince": ... ]
+          [ "validUntil": ... ]
+        },
+        "dict_ntt_list": {
+          "attribute": dict_ntt_list
+          "value": ...
+          [ "validSince": ... ]
+          [ "validUntil": ... ]
+        },
+      },
+    }
+  }
