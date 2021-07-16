@@ -41,13 +41,80 @@ func (h *NamespaceWriteHandler) process(q *msg.Request) {
 
 // add creates a new namespace
 func (h *NamespaceWriteHandler) add(q *msg.Request, mr *msg.Result) {
-	// tx.Begin()
-	// stmt.NamespaceAdd(proto.Namespace.Name)
-	// stmt.NamespaceConfigure(proto.Namespace.Name, `dict_type`, proto.Namespace.Type
-	// stmt.NamespaceConfigure(proto.Namespace.Name, `dict_lookup`, proto.Namespace.LookupKey)
-	// stmt.NamespaceConfigure(proto.Namespace.Name, `dict_uri`, proto.Namespace.LookupURI)
-	// stmt.NamespaceConfigure(proto.Namespace.Name, `dict_ntt_list`, // proto.Namespace.Constraint[])
-	// tx.Commit()
+	var (
+		res sql.Result
+		err error
+		tx  *sql.Tx
+	)
+
+	//
+	if tx, err = h.conn.Begin(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	//
+	if res, err = tx.Stmt(h.stmtAdd).Exec(
+		q.Namespace.Property[`dict_name`].Value,
+	); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+	if !mr.CheckRowsAffected(res.RowsAffected()) {
+		tx.Rollback()
+		return
+	}
+
+	//
+	for property := range []string{`dict_type`, `dict_lookup`, `dict_uri`, `dict_ntt_list`} {
+		if _, ok := q.Namespace.Property[property]; ok {
+			if res, err = tx.Stmt(h.stmtConfig).Exec(
+				q.Namespace.Property[`dict_name`].Value,
+				property,
+				q.Namespace.Property[property].Value,
+			); err != nil {
+				mr.ServerError(err)
+				tx.Rollback()
+				return
+			}
+			if !mr.CheckRowsAffected(res.RowsAffected()) {
+				tx.Rollback()
+				return
+			}
+		}
+	}
+
+	//
+	for _, attribute := range q.Namespace.Attributes {
+		if attribute.Unique {
+			res, err = tx.Stmt(h.stmtAddUnqAdd).Exec(
+				q.Namespace.Property[`dict_name`].Value,
+				attribute.Key,
+			)
+		} else {
+			res, err = tx.Stmt(h.stmtAttStdAdd).Exec(
+				q.Namespace.Property[`dict_name`].Value,
+				attribute.Key,
+			)
+		}
+		if err != nil {
+			mr.ServerError(err)
+			tx.Rollback()
+			return
+		}
+		if !mr.CheckRowsAffected(res.RowsAffected()) {
+			tx.Rollback()
+			return
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	mr.Namespace = append(mr.Namespace, q.Namespace)
+	mr.OK()
 }
 
 // remove deletes a specific namespace
