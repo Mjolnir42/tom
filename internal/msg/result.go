@@ -97,4 +97,22 @@ func (r *Result) UnknownRequest(rq *Request) {
 		" %s/%s", rq.Section, rq.Action))
 }
 
+func (r *Result) CheckRowsAffected(i int64, err error) bool {
+	if err != nil {
+		r.ServerError(err)
+		return false
+	}
+	switch i {
+	case 0:
+		r.OK()
+		return true
+	case 1:
+		r.OK()
+		return true
+	default:
+		r.ServerError(fmt.Errorf("Too many rows affected: %d", i))
+		return false
+	}
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
