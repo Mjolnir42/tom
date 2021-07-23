@@ -119,7 +119,7 @@ func (h *NamespaceWriteHandler) add(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// remove deletes a specific namespace
+// remove deletes a specific namespace TODO
 func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 }
 
@@ -169,7 +169,7 @@ func (h *NamespaceWriteHandler) attributeAdd(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// attributeRemove ...
+// attributeRemove ... TODO
 func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) {
 }
 
