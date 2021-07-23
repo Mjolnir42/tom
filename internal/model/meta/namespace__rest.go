@@ -153,6 +153,11 @@ func (m *Model) NamespaceAttributeAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	request.Namespace = req
+	request.Namespace.TomID = params.ByName(`tomID`)
+	if err := request.Namespace.ParseTomID(); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
+	}
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -179,6 +184,11 @@ func (m *Model) NamespaceAttributeRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	request.Namespace = req
+	request.Namespace.TomID = params.ByName(`tomID`)
+	if err := request.Namespace.ParseTomID(); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
+	}
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -205,6 +215,11 @@ func (m *Model) NamespacePropertySet(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	request.Namespace = req
+	request.Namespace.TomID = params.ByName(`tomID`)
+	if err := request.Namespace.ParseTomID(); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
+	}
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -231,6 +246,11 @@ func (m *Model) NamespacePropertyUpdate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	request.Namespace = req
+	request.Namespace.TomID = params.ByName(`tomID`)
+	if err := request.Namespace.ParseTomID(); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
+	}
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
