@@ -111,6 +111,29 @@ FROM              meta.dictionary
 WHERE             meta.dictionary.name = $1::text
   AND             meta.attribute.attribute = $2::text;`
 
+	NamespaceAttributeDiscover = `
+SELECT            meta.attribute.attribute AS attributeName,
+                  'standard'::text AS attributeType
+FROM              meta.dictionary
+    JOIN          meta.attribute
+      ON          meta.dictionary.dictionaryID = meta.attribute.dictionaryID
+    JOIN          meta.standard_attribute
+      ON          meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+     AND          meta.attribute.attribute = meta.standard_attribute.attribute
+WHERE             meta.dictionary.name = $1::text
+  AND             meta.attribute.attribute NOT LIKE 'dict_%'
+UNION
+SELECT            meta.attribute.attribute AS attributeName,
+                  'unique'::text AS attributeType
+FROM              meta.dictionary
+    JOIN          meta.attribute
+      ON          meta.dictionary.dictionaryID = meta.attribute.dictionaryID
+    JOIN          meta.unique_attribute
+      ON          meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+     AND          meta.attribute.attribute = meta.unique_attribute.attribute
+WHERE             meta.dictionary.name = $1::text
+  AND             meta.attribute.attribute NOT LIKE 'dict_%';`
+
 	NamespaceTxStdPropertySelect = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.dictionary
@@ -233,6 +256,7 @@ func init() {
 	m[NamespaceAttributeAddStandard] = `NamespaceAttributeAddStandard`
 	m[NamespaceAttributeAddUnique] = `NamespaceAttributeAddUnique`
 	m[NamespaceAttributeQueryType] = `NamespaceAttributeQueryType`
+	m[NamespaceAttributeDiscover] = `NamespaceAttributeDiscover`
 	m[NamespaceConfigure] = `NamespaceConfigure`
 	m[NamespaceRemove] = `NamespaceRemove`
 	m[NamespaceTxStdPropertyAdd] = `NamespaceTxStdPropertyAdd`
