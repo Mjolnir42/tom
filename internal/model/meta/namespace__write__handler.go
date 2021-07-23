@@ -58,6 +58,7 @@ func (h *NamespaceWriteHandler) Run() {
 		stmt.NamespaceRemove:               &h.stmtRemove,
 		stmt.NamespaceAttributeAddStandard: &h.stmtAttStdAdd,
 		stmt.NamespaceAttributeAddUnique:   &h.stmtAttUnqAdd,
+		stmt.NamespaceAttributeQueryType:   &h.stmtAttQueryType,
 		stmt.NamespaceTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
 		stmt.NamespaceTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
 		stmt.NamespaceTxStdPropertySelect:  &h.stmtTxStdPropSelect,
