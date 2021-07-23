@@ -88,7 +88,7 @@ func (h *NamespaceWriteHandler) add(q *msg.Request, mr *msg.Result) {
 	//
 	for _, attribute := range q.Namespace.Attributes {
 		if attribute.Unique {
-			res, err = tx.Stmt(h.stmtAddUnqAdd).Exec(
+			res, err = tx.Stmt(h.stmtAttUnqAdd).Exec(
 				q.Namespace.Property[`dict_name`].Value,
 				attribute.Key,
 			)
@@ -138,7 +138,7 @@ func (h *NamespaceWriteHandler) attributeAdd(q *msg.Request, mr *msg.Result) {
 	//
 	for _, attribute := range q.Namespace.Attributes {
 		if attribute.Unique {
-			res, err = tx.Stmt(h.stmtAddUnqAdd).Exec(
+			res, err = tx.Stmt(h.stmtAttUnqAdd).Exec(
 				q.Namespace.Name,
 				attribute.Key,
 			)
