@@ -1,0 +1,12 @@
+POST /namespace/:tomID/attribute/
+  { "namespace": {
+      "attributes": [
+        { "key": ....
+          "uniqueValueConstraint": true|false
+        },
+        { "key": ....
+          "uniqueValueConstraint": true|false
+        },
+      ],
+    }
+  }
