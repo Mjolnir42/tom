@@ -69,7 +69,7 @@ func (h *NamespaceWriteHandler) add(q *msg.Request, mr *msg.Result) {
 	}
 
 	//
-	for property := range []string{`dict_type`, `dict_lookup`, `dict_uri`, `dict_ntt_list`} {
+	for _, property := range []string{`dict_type`, `dict_lookup`, `dict_uri`, `dict_ntt_list`} {
 		if _, ok := q.Namespace.Property[property]; ok {
 			if res, err = tx.Stmt(h.stmtConfig).Exec(
 				q.Namespace.Property[`dict_name`].Value,
