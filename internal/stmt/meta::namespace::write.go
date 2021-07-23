@@ -139,19 +139,19 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.dictionary
                   WHERE       meta.dictionary.name = $1::text ),
      cte_att AS ( SELECT      meta.standard_attribute.attributeID
-                   FROM        meta.standard_attribute
+                   FROM       meta.standard_attribute
                     JOIN      cte_dct
                       ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
-                  WHERE        meta.standard_attribute.attribute = $2::text )
+                  WHERE       meta.standard_attribute.attribute = $2::text )
 SELECT            value,
                   lower(validity),
                   upper(validity)
 FROM              meta.dictionary_standard_attribute_values
-    JOIN           cte_dct
-      ON           cte_dct.dictionaryID = meta.dictionary_standard_attribute_values.dictionaryID
+    JOIN          cte_dct
+      ON          cte_dct.dictionaryID = meta.dictionary_standard_attribute_values.dictionaryID
     JOIN          cte_att
-      ON           cte_att.attributeID = meta.dictionary_standard_attribute_values.attributeID
-   WHERE           now()::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity
+      ON          cte_att.attributeID = meta.dictionary_standard_attribute_values.attributeID
+   WHERE          now()::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity
    FOR UPDATE;`
 
 	NamespaceTxStdPropertyClamp = `
@@ -159,31 +159,31 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.dictionary
                   WHERE       meta.dictionary.name = $1::text ),
      cte_att AS ( SELECT      meta.standard_attribute.attributeID
-                   FROM        meta.standard_attribute
+                   FROM       meta.standard_attribute
                     JOIN      cte_dct
                       ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
-                  WHERE        meta.standard_attribute.attribute = $2::text )
+                  WHERE       meta.standard_attribute.attribute = $2::text )
 UPDATE            meta.dictionary_standard_attribute_values
    SET            validity = tstzrange(lower(validity), now()::timestamptz(3), '[)')
 FROM              cte_dct
     CROSS JOIN    cte_att
-WHERE              meta.dictionary_standard_attribute_values.dictionaryID    = cte_dct.dictionaryID
-  AND              meta.dictionary_standard_attribute_values.attributeID     = cte_att.attributeID
-  AND              meta.dictionary_standard_attribute_values.value            = $3::text
-  AND              lower(meta.dictionary_standard_attribute_values.validity) = $4::timestamptz(3)
-  AND              upper(meta.dictionary_standard_attribute_values.validity) = $5::timestamptz(3)
+WHERE             meta.dictionary_standard_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND             meta.dictionary_standard_attribute_values.attributeID     = cte_att.attributeID
+  AND             meta.dictionary_standard_attribute_values.value           = $3::text
+  AND             lower(meta.dictionary_standard_attribute_values.validity) = $4::timestamptz(3)
+  AND             upper(meta.dictionary_standard_attribute_values.validity) = $5::timestamptz(3)
   AND             now()::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity
-RETURNING          upper(meta.dictionary_standard_attribute_values.validity);`
+RETURNING         upper(meta.dictionary_standard_attribute_values.validity);`
 
 	NamespaceTxStdPropertyAdd = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.dictionary
                   WHERE       meta.dictionary.name = $1::text ),
      cte_att AS ( SELECT      meta.standard_attribute.attributeID
-                   FROM        meta.standard_attribute
+                   FROM       meta.standard_attribute
                     JOIN      cte_dct
                       ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
-                  WHERE        meta.standard_attribute.attribute = $2::text )
+                  WHERE       meta.standard_attribute.attribute = $2::text )
 INSERT INTO        meta.dictionary_standard_attribute_values ( dictionaryID, attributeID, value, validity )
 SELECT            cte_dct.dictionaryID,
                   cte_att.attributeID,
@@ -197,19 +197,19 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.dictionary
                   WHERE       meta.dictionary.name = $1::text ),
      cte_att AS ( SELECT      meta.unique_attribute.attributeID
-                   FROM        meta.unique_attribute
+                   FROM       meta.unique_attribute
                     JOIN      cte_dct
                       ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
-                  WHERE        meta.unique_attribute.attribute = $2::text )
+                  WHERE       meta.unique_attribute.attribute = $2::text )
 SELECT            value,
                   lower(validity),
                   upper(validity)
 FROM              meta.dictionary_unique_attribute_values
-    JOIN           cte_dct
-      ON           cte_dct.dictionaryID = meta.dictionary_unique_attribute_values.dictionaryID
+    JOIN          cte_dct
+      ON          cte_dct.dictionaryID = meta.dictionary_unique_attribute_values.dictionaryID
     JOIN          cte_att
-      ON           cte_att.attributeID = meta.dictionary_unique_attribute_values.attributeID
-   WHERE           now()::timestamptz(3) <@ meta.dictionary_unique_attribute_values.validity
+      ON          cte_att.attributeID = meta.dictionary_unique_attribute_values.attributeID
+   WHERE          now()::timestamptz(3) <@ meta.dictionary_unique_attribute_values.validity
    FOR UPDATE;`
 
 	NamespaceTxUniqPropertyClamp = `
@@ -217,21 +217,21 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.dictionary
                   WHERE       meta.dictionary.name = $1::text ),
      cte_att AS ( SELECT      meta.unique_attribute.attributeID
-                   FROM        meta.unique_attribute
+                   FROM       meta.unique_attribute
                     JOIN      cte_dct
                       ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
-                  WHERE        meta.unique_attribute.attribute = $2::text )
+                  WHERE       meta.unique_attribute.attribute = $2::text )
 UPDATE            meta.dictionary_unique_attribute_values
    SET            validity = tstzrange(lower(validity), now()::timestamptz(3), '[)')
 FROM              cte_dct
     CROSS JOIN    cte_att
-WHERE              meta.dictionary_unique_attribute_values.dictionaryID    = cte_dct.dictionaryID
-  AND              meta.dictionary_unique_attribute_values.attributeID     = cte_att.attributeID
-  AND              meta.dictionary_unique_attribute_values.value            = $3::text
-  AND              lower(meta.dictionary_unique_attribute_values.validity) = $4::timestamptz(3)
-  AND              upper(meta.dictionary_unique_attribute_values.validity) = $5::timestamptz(3)
+WHERE             meta.dictionary_unique_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND             meta.dictionary_unique_attribute_values.attributeID     = cte_att.attributeID
+  AND             meta.dictionary_unique_attribute_values.value           = $3::text
+  AND             lower(meta.dictionary_unique_attribute_values.validity) = $4::timestamptz(3)
+  AND             upper(meta.dictionary_unique_attribute_values.validity) = $5::timestamptz(3)
   AND             now()::timestamptz(3) <@ meta.dictionary_unique_attribute_values.validity
-RETURNING          upper(meta.dictionary_unique_attribute_values.validity);`
+RETURNING         upper(meta.dictionary_unique_attribute_values.validity);`
 
 	NamespaceTxUniqPropertyAdd = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
@@ -241,7 +241,7 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.unique_attribute
                     JOIN      cte_dct
                       ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
-                  WHERE        meta.unique_attribute.attribute = $2::text )
+                  WHERE       meta.unique_attribute.attribute = $2::text )
 INSERT INTO       meta.dictionary_unique_attribute_values ( dictionaryID, attributeID, value, validity )
 SELECT            cte_dct.dictionaryID,
                   cte_att.attributeID,
