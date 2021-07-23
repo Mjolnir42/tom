@@ -27,6 +27,7 @@ type NamespaceWriteHandler struct {
 	stmtRemove           *sql.Stmt
 	stmtAttStdAdd        *sql.Stmt
 	stmtAttUnqAdd        *sql.Stmt
+	stmtAttDiscover      *sql.Stmt
 	stmtAttQueryType     *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt

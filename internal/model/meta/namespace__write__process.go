@@ -183,6 +183,99 @@ func (h *NamespaceWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 	// forall Property currently set but not in Request
 	//		NamespaceTxStdPropertyClamp
 	// tx.Commit()
+	var (
+		err    error
+		tx     *sql.Tx
+		txTime time.Time
+		ok     bool
+		rows   *sql.Rows
+	)
+	txTime = time.Now().UTC()
+	attrMap := map[string]string{}
+
+	// tx.Begin()
+	if tx, err = h.conn.Begin(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	// discover all attributes
+	if rows, err = tx.Stmt(h.stmtAttDiscover).Query(
+		q.Namespace.Name,
+	); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+	for rows.Next() {
+		var attribute, typ string
+		if err = rows.Scan(
+			&attribute,
+			&typ,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			tx.Rollback()
+			return
+		}
+		attrMap[attribute] = typ
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+
+	// forall Property in Request
+	for key := range q.Namespace.Property {
+		if ok = h.txPropUpdate(
+			q, mr, tx, &txTime, q.Namespace.Property[key],
+		); !ok {
+			tx.Rollback()
+			return
+		}
+		// remove property contained in request from map of attributes
+		delete(attrMap, q.Namespace.Property[key].Attribute)
+	}
+
+	// forall Property not in request
+	for key := range attrMap {
+		var stmtSelect, stmtClamp *sql.Stmt
+
+		switch attrMap[key] {
+		case `standard`:
+			stmtSelect = tx.Stmt(h.stmtTxStdPropSelect)
+			stmtClamp = tx.Stmt(h.stmtTxStdPropClamp)
+		case `unique`:
+			stmtSelect = tx.Stmt(h.stmtTxUniqPropSelect)
+			stmtClamp = tx.Stmt(h.stmtTxUniqPropClamp)
+		default:
+			mr.ServerError()
+			tx.Rollback()
+			return
+		}
+
+		if ok, _ = h.txPropClamp(
+			q, mr, tx, &txTime, stmtSelect, stmtClamp,
+			proto.PropertyDetail{
+				Attribute: key,
+				Value:     txTime.Format(msg.RFC3339Milli) + key + `_clamp`,
+			},
+			txTime,
+			txTime,
+		); !ok {
+			tx.Rollback()
+			return
+		}
+	}
+
+	// tx.Commit()
+	if err = tx.Commit(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	mr.Namespace = append(mr.Namespace, q.Namespace)
+	mr.OK()
 }
 
 // propertyUpdate ...
