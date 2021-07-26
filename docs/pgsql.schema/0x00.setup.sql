@@ -12,9 +12,9 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- host    tom  tomsvc      samehost   password
 SELECT pg_reload_conf();
 
-\connect tom tom_owner
 GRANT CONNECT ON DATABASE tom TO tom_owner;
 GRANT CONNECT ON DATABASE tom TO tomsvc;
+\connect tom tom_owner
 
 -- create required function to index on uuid columns
 CREATE OR REPLACE FUNCTION uuid_to_bytea(_uuid uuid) 
