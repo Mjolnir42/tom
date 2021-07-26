@@ -191,5 +191,17 @@ VALUES
 (   'meta',
     20210105001,
     'add inventory information'
+),
+(   'ix',
+    20210726001,
+    'add inventory information'
+),
+(   'yp',
+    20210726001,
+    'add inventory information'
+),
+(   'asset',
+    20210726001,
+    'add inventory information'
 )
 ;
