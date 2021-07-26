@@ -314,6 +314,7 @@ func (h *NamespaceWriteHandler) propertyUpdate(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
+// txPropUpdate ...
 func (h *NamespaceWriteHandler) txPropUpdate(
 	q *msg.Request,
 	mr *msg.Result,
@@ -420,6 +421,7 @@ func (h *NamespaceWriteHandler) txPropUpdate(
 	return true
 }
 
+// txAttrQueryType ...
 func (h *NamespaceWriteHandler) txAttrQueryType(
 	q *msg.Request,
 	mr *msg.Result,
@@ -442,6 +444,7 @@ func (h *NamespaceWriteHandler) txAttrQueryType(
 	return
 }
 
+// txPropSetValue ...
 func (h *NamespaceWriteHandler) txPropSetValue(
 	q *msg.Request,
 	mr *msg.Result,
@@ -469,6 +472,7 @@ func (h *NamespaceWriteHandler) txPropSetValue(
 	return true
 }
 
+// txPropClamp ...
 func (h *NamespaceWriteHandler) txPropClamp(
 	q *msg.Request,
 	mr *msg.Result,
