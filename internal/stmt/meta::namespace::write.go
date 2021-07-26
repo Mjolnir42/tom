@@ -68,7 +68,7 @@ WITH cte     AS ( SELECT      dictionaryID AS dictID
                   SELECT      dictID,
                               $2::text
                   FROM        cte )
-INSERT INTO        meta.standard_attribute ( dictionaryID, attribute )
+INSERT INTO       meta.standard_attribute ( dictionaryID, attribute )
 SELECT            cte.dictID,
                   v.value
 FROM              cte
@@ -83,7 +83,7 @@ WITH cte     AS ( SELECT      dictionaryID AS dictID
                   SELECT      dictID,
                               $2::text
                   FROM        cte )
-INSERT INTO        meta.unique_attribute ( dictionaryID, attribute )
+INSERT INTO       meta.unique_attribute ( dictionaryID, attribute )
 SELECT            cte.dictID,
                   v.value
 FROM              cte
@@ -183,7 +183,7 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                     JOIN      cte_dct
                       ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
                   WHERE       meta.standard_attribute.attribute = $2::text )
-INSERT INTO        meta.dictionary_standard_attribute_values ( dictionaryID, attributeID, value, validity )
+INSERT INTO       meta.dictionary_standard_attribute_values ( dictionaryID, attributeID, value, validity )
 SELECT            cte_dct.dictionaryID,
                   cte_att.attributeID,
                   $3::text,
