@@ -203,5 +203,13 @@ VALUES
 (   'asset',
     20210726001,
     'add inventory information'
+),
+(   'bulk',
+    20210727001,
+    'add inventory information'
+),
+(   'filter',
+    20210727001,
+    'add inventory information'
 )
 ;
