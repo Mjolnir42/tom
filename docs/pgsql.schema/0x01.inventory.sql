@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS inventory.user (
     CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ) DEFERRABLE,
     CONSTRAINT __uniq_iu_empNum   UNIQUE          ( identityLibraryID, employeeNumber ) DEFERRABLE,
     CONSTRAINT __uniq_iu_extID    UNIQUE          ( identityLibraryID, externalID ) DEFERRABLE,
-    CONSTRAINT __uniq_iu_uid      UNIQUE          ( uid ) DEFERRABLE,
+    CONSTRAINT __uniq_iu_uid      UNIQUE          ( identityLibraryID, uid ) DEFERRABLE,
     CONSTRAINT __iu_fk_origin     UNIQUE          ( identityLibraryID, userID ),
     CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' )
 );
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS inventory.team (
     CONSTRAINT __pk_it            PRIMARY KEY     ( teamID ),
     CONSTRAINT __fk_it_idLibID    FOREIGN KEY     ( identityLibraryID ) REFERENCES inventory.identity_library ( identityLibraryID ) DEFERRABLE,
     CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ) DEFERRABLE,
-    CONSTRAINT __uniq_it_name     UNIQUE          ( name ) DEFERRABLE,
+    CONSTRAINT __uniq_it_name     UNIQUE          ( identityLibraryID, name ) DEFERRABLE,
     CONSTRAINT __uniq_it_extID    UNIQUE          ( identityLibraryID, externalID ) DEFERRABLE,
     CONSTRAINT __it_fk_origin     UNIQUE          ( identityLibraryID, teamID ),
     CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' )

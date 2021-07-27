@@ -215,5 +215,9 @@ VALUES
 (   'inventory',
     20210727001,
     'make user attributes optional'
+),
+(   'inventory',
+    20210727002,
+    'make inventory names unique per library'
 )
 ;
