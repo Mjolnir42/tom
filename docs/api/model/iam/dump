@@ -1,0 +1,46 @@
+Model IAM
+
+  iam::library:add
+  POST /idlib/
+
+  iam::library:list
+  iam::library:remove
+  iam::library:show
+
+  iam::user:add
+  POST /idlib/:lib/user/
+
+  iam::user:list
+  iam::user:remove
+  iam::user:show
+  iam::user:update
+
+  iam::team:add
+  POST /idlib/:lib/team/
+
+  iam::team:list
+  iam::team:remove
+  iam::team:show
+  iam::team:update
+
+  iam::team:headof.set
+  POST /idlib/:lib/team/:team/headof/
+  iam::team:headof.unset
+  iam::team:headof.update
+
+  iam::team:member.add
+  POST /idlib/:lib/team/:team/member/
+  iam::team:member.list
+  iam::team:member.remove
+
+URI Characters:
+  ALNUM       abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+  UNRESERVED  -_.~
+  RESERVED    !*'();:@&=+$,/?%#[]
+
+
+Valid name characters:  ALNUM+UNRESERVED except ~
+
+  library: servers
+  uid: foobar
+  => servers~foobar
