@@ -211,5 +211,9 @@ VALUES
 (   'filter',
     20210727001,
     'add inventory information'
+),
+(   'inventory',
+    20210727001,
+    'make user attributes optional'
 )
 ;
