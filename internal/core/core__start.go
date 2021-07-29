@@ -9,11 +9,15 @@ package core // import "github.com/mjolnir42/tom/internal/core/"
 
 import (
 	"github.com/mjolnir42/tom/internal/model/asset"
+	"github.com/mjolnir42/tom/internal/model/iam"
 	"github.com/mjolnir42/tom/internal/model/meta"
 )
 
 // Start launches all application handlers
 func (x *Core) Start() {
+	x.hm.Add(iam.NewLibraryReadHandler(x.conf.QueueLen))
+	x.hm.Add(iam.NewLibraryWriteHandler(x.conf.QueueLen))
+
 	x.hm.Add(meta.NewNamespaceReadHandler(x.conf.QueueLen))
 	x.hm.Add(meta.NewNamespaceWriteHandler(x.conf.QueueLen))
 

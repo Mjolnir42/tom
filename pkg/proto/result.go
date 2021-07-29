@@ -12,6 +12,7 @@ type Result struct {
 	RequestID string `json:"requestID"`
 
 	Container       *[]Container       `json:"container,omitempty"`
+	Library         *[]Library         `json:"library,omitempty"`
 	Namespace       *[]Namespace       `json:"namespace,omitempty"`
 	NamespaceHeader *[]NamespaceHeader `json:"namespace-list,omitempty"`
 	Orchestration   *[]Orchestration   `json:"orchestration,omitempty"`

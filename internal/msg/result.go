@@ -23,6 +23,7 @@ type Result struct {
 	Code       uint16
 	Err        error
 
+	Library         []proto.Library
 	Namespace       []proto.Namespace
 	NamespaceHeader []proto.NamespaceHeader
 	Orchestration   []proto.Orchestration

@@ -1,0 +1,3 @@
+iam::library:remove
+
+DELETE /idlib/:lib

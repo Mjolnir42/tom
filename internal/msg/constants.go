@@ -26,6 +26,11 @@ const (
 )
 
 const (
+	CategoryIAM    = `iam`
+	SectionLibrary = proto.EntityLibrary
+)
+
+const (
 	ActionAdd        = `add`
 	ActionAttrAdd    = `attribute.add`
 	ActionAttrRemove = `attribute.remove`

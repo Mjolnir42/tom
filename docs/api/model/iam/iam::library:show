@@ -1,0 +1,4 @@
+iam::library:show
+
+GET /idlib/:lib
+GET /idlib/?name=....

@@ -1,0 +1,7 @@
+iam::library:add
+
+POST /idlib/
+{ "library": {
+    "name": ...
+  }
+}
