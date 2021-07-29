@@ -24,11 +24,14 @@ type Request struct {
 	RequestURI string
 	Reply      chan Result `json:"-"`
 
+	Update UpdateData
+
 	Library       proto.Library
 	Namespace     proto.Namespace
 	Orchestration proto.Orchestration
 	Runtime       proto.Runtime
 	Server        proto.Server
+	User          proto.User
 }
 
 // New returns a Request
@@ -41,6 +44,10 @@ func New(r *http.Request, params httprouter.Params) Request {
 		AuthUser:   authUser(params),
 		Reply:      returnChannel,
 	}
+}
+
+type UpdateData struct {
+	User proto.User
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

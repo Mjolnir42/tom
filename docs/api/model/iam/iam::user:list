@@ -1,0 +1,3 @@
+iam::user:list
+
+GET /idlib/:lib/user/

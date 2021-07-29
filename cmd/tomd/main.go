@@ -128,6 +128,7 @@ func run() int {
 		// create datamodels
 		iammodel := iam.New(api)
 		router = iammodel.RouteRegisterLibrary(router)
+		router = iammodel.RouteRegisterUser(router)
 
 		metamodel := meta.New(api)
 		router = metamodel.RouteRegisterNamespace(router)

@@ -15,8 +15,11 @@ import (
 
 // Start launches all application handlers
 func (x *Core) Start() {
+	// IAM Model
 	x.hm.Add(iam.NewLibraryReadHandler(x.conf.QueueLen))
 	x.hm.Add(iam.NewLibraryWriteHandler(x.conf.QueueLen))
+	x.hm.Add(iam.NewUserReadHandler(x.conf.QueueLen))
+	x.hm.Add(iam.NewUserWriteHandler(x.conf.QueueLen))
 
 	x.hm.Add(meta.NewNamespaceReadHandler(x.conf.QueueLen))
 	x.hm.Add(meta.NewNamespaceWriteHandler(x.conf.QueueLen))

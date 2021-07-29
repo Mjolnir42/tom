@@ -1,13 +1,5 @@
 Model IAM
 
-  iam::user:add
-  POST /idlib/:lib/user/
-
-  iam::user:list
-  iam::user:remove
-  iam::user:show
-  iam::user:update
-
   iam::team:add
   POST /idlib/:lib/team/
 

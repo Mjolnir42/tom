@@ -1,0 +1,3 @@
+iam::user:remove
+
+DELETE /idlib/:lib/user/:user

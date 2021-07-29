@@ -1,0 +1,4 @@
+iam::user:show
+
+GET /idlib/:lib/user/:user
+GET /idlib/:lib/user/?name=user

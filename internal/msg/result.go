@@ -29,6 +29,7 @@ type Result struct {
 	Orchestration   []proto.Orchestration
 	Runtime         []proto.Runtime
 	Server          []proto.Server
+	User            []proto.User
 }
 
 func FromRequest(rq *Request) Result {

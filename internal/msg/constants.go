@@ -28,6 +28,7 @@ const (
 const (
 	CategoryIAM    = `iam`
 	SectionLibrary = proto.EntityLibrary
+	SectionUser    = proto.EntityUser
 )
 
 const (
@@ -39,6 +40,7 @@ const (
 	ActionPropUpdate = `property.update`
 	ActionRemove     = `remove`
 	ActionShow       = `show`
+	ActionUpdate     = `update`
 )
 
 const (
