@@ -1,0 +1,23 @@
+Object        Field            Charset
+------------+----------------+------------------------
+Library     | Name           | URI-Restricted
+------------+----------------+------------------------
+User        | LibraryName    | URI-Restricted
+User        | FirstName      | UTF-8
+User        | LastName       | UTF-8
+User        | UserName       | URI-Restricted
+User        | EmployeeNumber | Numeric
+User        | MailAddress    | UTF-8
+User        | ExternalID     | UTF-8
+------------+----------------+------------------------
+Team        | LibraryName    | URI-Restricted
+Team        | TeamName       | URI-Restricted
+Team        | ExternalID     | UTF-8
+------------+----------------+------------------------
+
+Numeric         0-9
+URI-Restricted  abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.
+
+Absolute addressing of identities:
+  schema:   LibraryName~UserName
+  example:  ui~jpernfuss
