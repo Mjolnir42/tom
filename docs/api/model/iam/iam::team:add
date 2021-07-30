@@ -1,0 +1,16 @@
+iam::team:add
+
+POST /idlib/:lib/team/
+{ "team": {
+    "team-name": ....
+    "external-ref": ....
+    "team-lead": {
+      "user-name": ....
+    }
+    "team-member": [
+      { "user-name": .... },
+      { "user-name": .... },
+      ....
+    ]
+  }
+}

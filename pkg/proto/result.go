@@ -19,6 +19,7 @@ type Result struct {
 	Runtime         *[]Runtime         `json:"runtime,omitempty"`
 	Server          *[]Server          `json:"server,omitempty"`
 	Socket          *[]Socket          `json:"socket,omitempty"`
+	Team            *[]Team            `json:"team,omitempty"`
 	User            *[]User            `json:"user,omitempty"`
 }
 

@@ -28,6 +28,7 @@ const (
 const (
 	CategoryIAM    = `iam`
 	SectionLibrary = proto.EntityLibrary
+	SectionTeam    = proto.EntityTeam
 	SectionUser    = proto.EntityUser
 )
 
@@ -35,7 +36,13 @@ const (
 	ActionAdd        = `add`
 	ActionAttrAdd    = `attribute.add`
 	ActionAttrRemove = `attribute.remove`
+	ActionHdSet      = `headof.set`
+	ActionHdUnset    = `headof.unset`
 	ActionList       = `list`
+	ActionMbrAdd     = `member.add`
+	ActionMbrList    = `member.list`
+	ActionMbrRemove  = `member.remove`
+	ActionMbrSet     = `member.set`
 	ActionPropSet    = `property.set`
 	ActionPropUpdate = `property.update`
 	ActionRemove     = `remove`

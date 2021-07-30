@@ -1,0 +1,3 @@
+iam::team:list
+
+GET /idlib/:lib/team/

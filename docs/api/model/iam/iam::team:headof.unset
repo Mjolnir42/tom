@@ -1,0 +1,3 @@
+iam::team:headof.unset
+
+DELETE /idlib/:lib/team/:team/headof

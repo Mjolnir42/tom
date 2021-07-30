@@ -29,6 +29,7 @@ type Result struct {
 	Orchestration   []proto.Orchestration
 	Runtime         []proto.Runtime
 	Server          []proto.Server
+	Team            []proto.Team
 	User            []proto.User
 }
 

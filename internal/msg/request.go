@@ -31,6 +31,7 @@ type Request struct {
 	Orchestration proto.Orchestration
 	Runtime       proto.Runtime
 	Server        proto.Server
+	Team          proto.Team
 	User          proto.User
 }
 
@@ -47,6 +48,7 @@ func New(r *http.Request, params httprouter.Params) Request {
 }
 
 type UpdateData struct {
+	Team proto.Team
 	User proto.User
 }
 

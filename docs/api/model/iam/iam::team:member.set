@@ -1,0 +1,11 @@
+iam::team:member.set
+
+PUT /idlib/:lib/team/:team/member/
+{ "team": {
+    "team-member": [
+      { "user-name": ...
+      },
+      ....
+    ]
+  }
+}

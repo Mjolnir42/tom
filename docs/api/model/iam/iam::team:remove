@@ -1,0 +1,3 @@
+iam::team:remove
+
+DELETE /idlib/:lib/team/:team

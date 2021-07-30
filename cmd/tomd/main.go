@@ -129,6 +129,7 @@ func run() int {
 		iammodel := iam.New(api)
 		router = iammodel.RouteRegisterLibrary(router)
 		router = iammodel.RouteRegisterUser(router)
+		router = iammodel.RouteRegisterTeam(router)
 
 		metamodel := meta.New(api)
 		router = metamodel.RouteRegisterNamespace(router)

@@ -1,0 +1,10 @@
+iam::team:member.add
+
+PATCH /idlib/:lib/team/:team/member/
+{ "team": {
+    "team-member": [
+      { "user-name": ...
+      },
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+iam::team:member.remove
+
+DELETE /idlib/:lib/team/:team/member/
+{ "team": {
+    "team-member": [
+      { "user-name": ....
+      },
+      { "user-name": ....
+      },
+      ....
+    ]
+  }
+}

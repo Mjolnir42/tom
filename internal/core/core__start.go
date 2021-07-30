@@ -20,6 +20,8 @@ func (x *Core) Start() {
 	x.hm.Add(iam.NewLibraryWriteHandler(x.conf.QueueLen))
 	x.hm.Add(iam.NewUserReadHandler(x.conf.QueueLen))
 	x.hm.Add(iam.NewUserWriteHandler(x.conf.QueueLen))
+	x.hm.Add(iam.NewTeamReadHandler(x.conf.QueueLen))
+	x.hm.Add(iam.NewTeamWriteHandler(x.conf.QueueLen))
 
 	x.hm.Add(meta.NewNamespaceReadHandler(x.conf.QueueLen))
 	x.hm.Add(meta.NewNamespaceWriteHandler(x.conf.QueueLen))
