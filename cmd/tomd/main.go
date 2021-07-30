@@ -122,6 +122,7 @@ func run() int {
 			i,
 			dm.URL.String(),
 		)
+		// anonymous function is IsAuthorized? authorizationFunction
 		api := rest.New(func(q *msg.Request) bool { return true }, i, hm, lm, &TomCfg)
 		router := httprouter.New()
 
