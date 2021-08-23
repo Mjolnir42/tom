@@ -20,6 +20,7 @@ type Request struct {
 	Section    string
 	Action     string
 	RemoteAddr string
+	UserIDLib  string
 	AuthUser   string
 	RequestURI string
 	Reply      chan Result `json:"-"`
@@ -38,11 +39,13 @@ type Request struct {
 // New returns a Request
 func New(r *http.Request, params httprouter.Params) Request {
 	returnChannel := make(chan Result, 1)
+	identity := authUser(params)
 	return Request{
 		ID:         requestID(params),
 		RequestURI: requestURI(params),
 		RemoteAddr: remoteAddr(r),
-		AuthUser:   authUser(params),
+		UserIDLib:  identity[0],
+		AuthUser:   identity[1],
 		Reply:      returnChannel,
 	}
 }

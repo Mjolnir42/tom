@@ -23,8 +23,8 @@ func requestID(params httprouter.Params) (id uuid.UUID) {
 }
 
 // authUser extracts the AuthenticatedUser set by Basic Authentication
-func authUser(params httprouter.Params) string {
-	return params.ByName(`AuthenticatedUser`)
+func authUser(params httprouter.Params) []string {
+	return strings.Split(params.ByName(`AuthenticatedUser`), `~`)
 }
 
 // remoteAddr extracts the IP address part of the IP:port string
