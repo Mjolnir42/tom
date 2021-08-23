@@ -95,6 +95,14 @@ func (x *Rest) basicAuth(h httprouter.Handle) httprouter.Handle {
 					goto unauthorized
 				}
 			}
+		} else {
+			// XXX no Authorization header configured
+			ps = append(ps, httprouter.Param{
+				Key:   `AuthenticatedUser`,
+				Value: `system~nobody`,
+			})
+			h(w, r, ps)
+			return
 		}
 	unauthorized:
 		w.Header().Set(`WWW-Authenticate`, `Basic realm=Restricted`)
