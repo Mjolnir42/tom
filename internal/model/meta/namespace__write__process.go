@@ -58,6 +58,8 @@ func (h *NamespaceWriteHandler) add(q *msg.Request, mr *msg.Result) {
 	//
 	if res, err = tx.Stmt(h.stmtAdd).Exec(
 		q.Namespace.Property[`dict_name`].Value,
+		q.UserIDLib,
+		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err)
 		tx.Rollback()
@@ -75,6 +77,8 @@ func (h *NamespaceWriteHandler) add(q *msg.Request, mr *msg.Result) {
 				q.Namespace.Property[`dict_name`].Value,
 				property,
 				q.Namespace.Property[property].Value,
+				q.UserIDLib,
+				q.AuthUser,
 			); err != nil {
 				mr.ServerError(err)
 				tx.Rollback()
@@ -93,11 +97,15 @@ func (h *NamespaceWriteHandler) add(q *msg.Request, mr *msg.Result) {
 			res, err = tx.Stmt(h.stmtAttUnqAdd).Exec(
 				q.Namespace.Property[`dict_name`].Value,
 				attribute.Key,
+				q.UserIDLib,
+				q.AuthUser,
 			)
 		} else {
 			res, err = tx.Stmt(h.stmtAttStdAdd).Exec(
 				q.Namespace.Property[`dict_name`].Value,
 				attribute.Key,
+				q.UserIDLib,
+				q.AuthUser,
 			)
 		}
 		if err != nil {
@@ -144,11 +152,15 @@ func (h *NamespaceWriteHandler) attributeAdd(q *msg.Request, mr *msg.Result) {
 			res, err = tx.Stmt(h.stmtAttUnqAdd).Exec(
 				q.Namespace.Name,
 				attribute.Key,
+				q.UserIDLib,
+				q.AuthUser,
 			)
 		} else {
 			res, err = tx.Stmt(h.stmtAttStdAdd).Exec(
 				q.Namespace.Name,
 				attribute.Key,
+				q.UserIDLib,
+				q.AuthUser,
 			)
 		}
 		if err != nil {
@@ -462,6 +474,8 @@ func (h *NamespaceWriteHandler) txPropSetValue(
 		prop.Value,
 		reqValidSince.Format(msg.RFC3339Milli),
 		reqValidUntil.Format(msg.RFC3339Milli),
+		q.UserIDLib,
+		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err)
 		return false
