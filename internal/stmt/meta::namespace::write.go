@@ -225,10 +225,10 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
      cte_att AS ( SELECT      meta.standard_attribute.attributeID
                    FROM       meta.standard_attribute
                     JOIN      cte_dct
-                      ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
+                      ON      cte_dct.dictID = meta.standard_attribute.dictionaryID
                   WHERE       meta.standard_attribute.attribute = $2::text )
 INSERT INTO       meta.dictionary_standard_attribute_values ( dictionaryID, attributeID, value, validity, createdBy )
-SELECT            cte_dct.dictionaryID,
+SELECT            cte_dct.dictID,
                   cte_att.attributeID,
                   $3::text,
                   tstzrange($4::timestamptz(3), $5::timestamptz(4), '[]'),
@@ -290,10 +290,10 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
      cte_att AS ( SELECT      meta.unique_attribute.attributeID
                   FROM        meta.unique_attribute
                     JOIN      cte_dct
-                      ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
+                      ON      cte_dct.dictID = meta.unique_attribute.dictionaryID
                   WHERE       meta.unique_attribute.attribute = $2::text )
 INSERT INTO       meta.dictionary_unique_attribute_values ( dictionaryID, attributeID, value, validity, createdBy )
-SELECT            cte_dct.dictionaryID,
+SELECT            cte_dct.dictID,
                   cte_att.attributeID,
                   $3::text,
                   tstzrange($4::timestamptz(3), $5::timestamptz(3), '[]'),
