@@ -9,7 +9,12 @@ package proto //
 
 // Result is the response wrapper of Tom's public API
 type Result struct {
-	RequestID string `json:"requestID"`
+	RequestID  string `json:"requestID"`
+	StatusCode uint16 `json:"status"`
+	ErrorText  string `json:"error"`
+	// Job information is set for StatusCode 202 (async processing)
+	JobID   string `json:"jobId,omitempty"`
+	JobType string `json:"jobType,omitempty"`
 
 	Container       *[]Container       `json:"container,omitempty"`
 	Library         *[]Library         `json:"library,omitempty"`
