@@ -26,6 +26,12 @@ type Namespace struct {
 	UniqProperty []PropertyDetail          `json:"-"`
 }
 
+func NewNamespaceRequest() Request {
+	return Request{
+		Namespace: &Namespace{},
+	}
+}
+
 // NamespaceHeader defines ...
 type NamespaceHeader struct {
 	Name      string `json:"name"`
