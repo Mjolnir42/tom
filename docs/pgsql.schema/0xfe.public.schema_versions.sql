@@ -219,5 +219,10 @@ VALUES
 (   'inventory',
     20210727002,
     'make inventory names unique per library'
+),
+(
+    'inventory',
+    20210824001,
+    'add user system~nobody'
 )
 ;
