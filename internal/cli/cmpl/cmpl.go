@@ -12,14 +12,13 @@ package cmpl
 
 import (
 	"fmt"
+
 	"github.com/urfave/cli/v2"
 )
 
-func In(c *cli.Context) {
-	Generic(c, []string{`in`})
-}
+func GenericMulti(c *cli.Context, singlewords, multiwords []string) {
+	keywords := append(singlewords, multiwords...)
 
-func Generic(c *cli.Context, keywords []string) {
 	switch {
 	case c.NArg() == 0:
 		return
@@ -46,10 +45,13 @@ func Generic(c *cli.Context, keywords []string) {
 	if skip > 0 {
 		return
 	}
-	for _, t := range keywords {
+	for _, t := range singlewords {
 		if !match[t] {
 			fmt.Println(t)
 		}
+	}
+	for _, t := range multiwords {
+		fmt.Println(t)
 	}
 }
 
