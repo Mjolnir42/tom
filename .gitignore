@@ -30,6 +30,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
+*._
 
 /vendor
 *.log
