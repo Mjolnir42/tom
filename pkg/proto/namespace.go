@@ -8,6 +8,7 @@
 package proto //
 
 const EntityNamespace = `namespace`
+const CmdNamespaceAdd = `meta::` + EntityNamespace + `:add`
 
 // Namespace defines ...
 type Namespace struct {
