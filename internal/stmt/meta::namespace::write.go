@@ -87,7 +87,7 @@ WITH cte     AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                         JOIN  inventory.identity_library
                           ON  inventory.identity_library.identityLibraryID
                            =  inventory.user.identityLibraryID
-                  WHERE       name = $1::text
+                  WHERE       meta.dictionary.name = $1::text
                     AND       inventory.user.uid = $4::text
                     AND       inventory.identity_library.name = $3::text),
      ins_reg AS ( INSERT INTO meta.attribute ( dictionaryID, attribute, createdBy )
@@ -111,7 +111,7 @@ WITH cte     AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                         JOIN  inventory.identity_library
                           ON  inventory.identity_library.identityLibraryID
                            =  inventory.user.identityLibraryID
-                  WHERE       name = $1::text
+                  WHERE       meta.dictionary.name = $1::text
                     AND       inventory.user.uid = $4::text
                     AND       inventory.identity_library.name = $3::text),
      ins_reg AS ( INSERT INTO meta.attribute ( dictionaryID, attribute, createdBy )
