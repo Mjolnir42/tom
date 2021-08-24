@@ -8,8 +8,17 @@
 package meta // import "github.com/mjolnir42/tom/internal/model/meta"
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/rest"
 )
+
+var registry = make([]function, 0, 12)
+
+type function struct {
+	method string
+	path   string
+	handle func(*Model) httprouter.Handle
+}
 
 type Model struct {
 	x *rest.Rest

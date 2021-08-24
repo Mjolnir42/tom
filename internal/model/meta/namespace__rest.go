@@ -21,7 +21,6 @@ import (
 func (m *Model) RouteRegisterNamespace(rt *httprouter.Router) *httprouter.Router {
 	rt.GET(`/namespace/`, m.x.Authenticated(m.NamespaceList))
 	rt.GET(`/namespace/:tomID`, m.x.Authenticated(m.NamespaceShow))
-	rt.POST(`/namespace/`, m.x.Authenticated(m.NamespaceAdd))
 	rt.DELETE(`/namespace/:tomID`, m.x.Authenticated(m.NamespaceRemove))
 
 	rt.POST(`/namespace/:tomID/attribute/`, m.x.Authenticated(m.NamespaceAttributeAdd))
@@ -29,6 +28,24 @@ func (m *Model) RouteRegisterNamespace(rt *httprouter.Router) *httprouter.Router
 
 	rt.PUT(`/namespace/:tomID/property/`, m.x.Authenticated(m.NamespacePropertySet))
 	rt.PATCH(`/namespace/:tomID/property/`, m.x.Authenticated(m.NamespacePropertyUpdate))
+
+	for _, f := range registry {
+		switch f.method {
+		case rest.MethodDELETE:
+			rt.DELETE(f.path, f.handle(m))
+		case rest.MethodGET:
+			rt.GET(f.path, f.handle(m))
+		case rest.MethodHEAD:
+			rt.HEAD(f.path, f.handle(m))
+		case rest.MethodPATCH:
+			rt.PATCH(f.path, f.handle(m))
+		case rest.MethodPOST:
+			rt.POST(f.path, f.handle(m))
+		case rest.MethodPUT:
+			rt.PUT(f.path, f.handle(m))
+		}
+	}
+
 	return rt
 }
 
@@ -75,32 +92,6 @@ func (m *Model) NamespaceShow(w http.ResponseWriter, r *http.Request,
 			return
 		}
 	}
-
-	if !m.x.IsAuthorized(&request) {
-		m.x.ReplyForbidden(&w, &request)
-		return
-	}
-
-	m.x.HM.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
-	m.x.Send(&w, &result)
-}
-
-// NamespaceAdd function
-func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer rest.PanicCatcher(w, m.x.LM)
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionNamespace
-	request.Action = msg.ActionAdd
-
-	req := proto.Namespace{}
-	if err := rest.DecodeJSONBody(r, &req); err != nil {
-		m.x.ReplyBadRequest(&w, &request, err)
-		return
-	}
-	request.Namespace = req
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
