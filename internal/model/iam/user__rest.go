@@ -28,6 +28,11 @@ func (m *Model) RouteRegisterUser(rt *httprouter.Router) *httprouter.Router {
 	return rt
 }
 
+func exportUser(result *proto.Result, r *msg.Result) {
+	result.User = &[]proto.User{}
+	*result.User = append(*result.User, r.User...)
+}
+
 // UserList function
 func (m *Model) UserList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

@@ -49,6 +49,16 @@ func (m *Model) RouteRegisterNamespace(rt *httprouter.Router) *httprouter.Router
 	return rt
 }
 
+func exportNamespace(result *proto.Result, r *msg.Result) {
+	result.Namespace = &[]proto.Namespace{}
+	*result.Namespace = append(*result.Namespace, r.Namespace...)
+}
+
+func exportNamespaceList(result *proto.Result, r *msg.Result) {
+	result.NamespaceHeader = &[]proto.NamespaceHeader{}
+	*result.NamespaceHeader = append(*result.NamespaceHeader, r.NamespaceHeader...)
+}
+
 // NamespaceList function
 func (m *Model) NamespaceList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

@@ -26,6 +26,11 @@ func (m *Model) RouteRegisterOrchestration(rt *httprouter.Router) *httprouter.Ro
 	return rt
 }
 
+func exportOrchestration(result *proto.Result, r *msg.Result) {
+	result.Orchestration = &[]proto.Orchestration{}
+	*result.Orchestration = append(*result.Orchestration, r.Orchestration...)
+}
+
 // OrchestrationList function
 func (m *Model) OrchestrationList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

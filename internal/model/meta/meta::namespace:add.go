@@ -29,6 +29,11 @@ func namespaceAdd(m *Model) httprouter.Handle {
 	return m.x.Authenticated(m.NamespaceAdd)
 }
 
+func exportNamespaceAdd(result *proto.Result, r *msg.Result) {
+	result.Namespace = &[]proto.Namespace{}
+	*result.Namespace = append(*result.Namespace, r.Namespace...)
+}
+
 // NamespaceAdd function
 func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

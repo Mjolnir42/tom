@@ -26,6 +26,11 @@ func (m *Model) RouteRegisterRuntime(rt *httprouter.Router) *httprouter.Router {
 	return rt
 }
 
+func exportRuntime(result *proto.Result, r *msg.Result) {
+	result.Runtime = &[]proto.Runtime{}
+	*result.Runtime = append(*result.Runtime, r.Runtime...)
+}
+
 // RuntimeList function
 func (m *Model) RuntimeList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

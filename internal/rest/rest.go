@@ -22,6 +22,8 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
+type ExportFunc func(pub *proto.Result, internal *msg.Result)
+
 type Rest struct {
 	isAuthorized func(*msg.Request) bool
 	conf         *config.Configuration

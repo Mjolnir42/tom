@@ -37,6 +37,11 @@ func (m *Model) RouteRegisterTeam(rt *httprouter.Router) *httprouter.Router {
 	return rt
 }
 
+func exportTeam(result *proto.Result, r *msg.Result) {
+	result.Team = &[]proto.Team{}
+	*result.Team = append(*result.Team, r.Team...)
+}
+
 // TeamList function
 func (m *Model) TeamList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

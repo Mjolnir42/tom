@@ -26,6 +26,11 @@ func (m *Model) RouteRegisterServer(rt *httprouter.Router) *httprouter.Router {
 	return rt
 }
 
+func exportServer(result *proto.Result, r *msg.Result) {
+	result.Server = &[]proto.Server{}
+	*result.Server = append(*result.Server, r.Server...)
+}
+
 // ServerList function
 func (m *Model) ServerList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

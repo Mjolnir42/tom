@@ -27,6 +27,11 @@ func (m *Model) RouteRegisterLibrary(rt *httprouter.Router) *httprouter.Router {
 	return rt
 }
 
+func exportLibrary(result *proto.Result, r *msg.Result) {
+	result.Library = &[]proto.Library{}
+	*result.Library = append(*result.Library, r.Library...)
+}
+
 // LibraryList function
 func (m *Model) LibraryList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
