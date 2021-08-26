@@ -33,43 +33,6 @@ func (h *NamespaceReadHandler) process(q *msg.Request) {
 	q.Reply <- result
 }
 
-// list returns all namespaces
-func (h *NamespaceReadHandler) list(q *msg.Request, mr *msg.Result) {
-	var (
-		dictionaryName, author string
-		creationTime           time.Time
-		rows                   *sql.Rows
-		err                    error
-	)
-
-	if rows, err = h.stmtList.Query(); err != nil {
-		mr.ServerError(err)
-		return
-	}
-
-	for rows.Next() {
-		if err = rows.Scan(
-			&dictionaryName,
-			&creationTime,
-			&author,
-		); err != nil {
-			rows.Close()
-			mr.ServerError(err)
-			return
-		}
-		mr.NamespaceHeader = append(mr.NamespaceHeader, proto.NamespaceHeader{
-			Name:      dictionaryName,
-			CreatedAt: creationTime.Format(msg.RFC3339Milli),
-			CreatedBy: author,
-		})
-	}
-	if err = rows.Err(); err != nil {
-		mr.ServerError(err)
-		return
-	}
-	mr.OK()
-}
-
 // show returns full details for a specific server
 func (h *NamespaceReadHandler) show(q *msg.Request, mr *msg.Result) {
 	var (

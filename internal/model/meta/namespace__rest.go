@@ -19,7 +19,6 @@ import (
 // RouteRegisterNamespace registers the namespace routes with the
 // request router
 func (m *Model) RouteRegisterNamespace(rt *httprouter.Router) *httprouter.Router {
-	rt.GET(`/namespace/`, m.x.Authenticated(m.NamespaceList))
 	rt.GET(`/namespace/:tomID`, m.x.Authenticated(m.NamespaceShow))
 	rt.DELETE(`/namespace/:tomID`, m.x.Authenticated(m.NamespaceRemove))
 
@@ -64,36 +63,6 @@ func (m *Model) RouteRegisterNamespace(rt *httprouter.Router) *httprouter.Router
 func exportNamespace(result *proto.Result, r *msg.Result) {
 	result.Namespace = &[]proto.Namespace{}
 	*result.Namespace = append(*result.Namespace, r.Namespace...)
-}
-
-func exportNamespaceList(result *proto.Result, r *msg.Result) {
-	result.NamespaceHeader = &[]proto.NamespaceHeader{}
-	*result.NamespaceHeader = append(*result.NamespaceHeader, r.NamespaceHeader...)
-}
-
-// NamespaceList function
-func (m *Model) NamespaceList(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-
-	// if ?name is set as query paramaters, the namespace is uniquely
-	// identified. Process this as NamespaceShow request
-	if r.URL.Query().Get(`name`) != `` {
-		m.NamespaceShow(w, r, params)
-		return
-	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionNamespace
-	request.Action = msg.ActionList
-
-	if !m.x.IsAuthorized(&request) {
-		m.x.ReplyForbidden(&w, &request)
-		return
-	}
-
-	m.x.HM.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
-	m.x.Send(&w, &result, exportNamespaceList)
 }
 
 // NamespaceShow function
