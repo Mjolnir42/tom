@@ -15,6 +15,7 @@ import (
 var registry = make([]function, 0, 12)
 
 type function struct {
+	cmd    string
 	method string
 	path   string
 	handle func(*Model) httprouter.Handle

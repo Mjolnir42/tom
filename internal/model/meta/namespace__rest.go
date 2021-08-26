@@ -30,6 +30,12 @@ func (m *Model) RouteRegisterNamespace(rt *httprouter.Router) *httprouter.Router
 	rt.PATCH(`/namespace/:tomID/property/`, m.x.Authenticated(m.NamespacePropertyUpdate))
 
 	for _, f := range registry {
+		m.x.LM.GetLogger(`application`).Infof(
+			"Registering handle for %s at route %s|%s",
+			f.cmd,
+			f.method,
+			f.path,
+		)
 		switch f.method {
 		case rest.MethodDELETE:
 			rt.DELETE(f.path, f.handle(m))
@@ -43,6 +49,12 @@ func (m *Model) RouteRegisterNamespace(rt *httprouter.Router) *httprouter.Router
 			rt.POST(f.path, f.handle(m))
 		case rest.MethodPUT:
 			rt.PUT(f.path, f.handle(m))
+		default:
+			m.x.x.LM.GetLogger(`error`).Errorf(
+				"Error registering route for %s using unknown method %s",
+				f.cmd,
+				f.method,
+			)
 		}
 	}
 
