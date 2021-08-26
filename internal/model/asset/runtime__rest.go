@@ -95,12 +95,12 @@ func (m *Model) RuntimeAdd(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionRuntime
 	request.Action = msg.ActionAdd
 
-	req := proto.Runtime{}
+	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Runtime = req
+	request.Runtime = req.Runtime
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)

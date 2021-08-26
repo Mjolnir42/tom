@@ -43,12 +43,12 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionNamespace
 	request.Action = msg.ActionAdd
 
-	req := proto.Namespace{}
+	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Namespace = req
+	request.Namespace = *req.Namespace
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)

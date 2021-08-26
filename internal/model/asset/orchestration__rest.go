@@ -95,12 +95,12 @@ func (m *Model) OrchestrationAdd(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionOrchestration
 	request.Action = msg.ActionAdd
 
-	req := proto.Orchestration{}
+	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Orchestration = req
+	request.Orchestration = req.Orchestration
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)

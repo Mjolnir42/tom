@@ -148,12 +148,12 @@ func (m *Model) NamespaceAttributeAdd(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionNamespace
 	request.Action = msg.ActionAttrAdd
 
-	req := proto.Namespace{}
+	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Namespace = req
+	request.Namespace = *req.Namespace
 	request.Namespace.TomID = params.ByName(`tomID`)
 	if err := request.Namespace.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
@@ -179,12 +179,12 @@ func (m *Model) NamespaceAttributeRemove(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionNamespace
 	request.Action = msg.ActionAttrRemove
 
-	req := proto.Namespace{}
+	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Namespace = req
+	request.Namespace = *req.Namespace
 	request.Namespace.TomID = params.ByName(`tomID`)
 	if err := request.Namespace.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
@@ -210,12 +210,12 @@ func (m *Model) NamespacePropertySet(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionNamespace
 	request.Action = msg.ActionPropSet
 
-	req := proto.Namespace{}
+	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Namespace = req
+	request.Namespace = *req.Namespace
 	request.Namespace.TomID = params.ByName(`tomID`)
 	if err := request.Namespace.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
@@ -241,12 +241,12 @@ func (m *Model) NamespacePropertyUpdate(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionNamespace
 	request.Action = msg.ActionPropUpdate
 
-	req := proto.Namespace{}
+	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Namespace = req
+	request.Namespace = *req.Namespace
 	request.Namespace.TomID = params.ByName(`tomID`)
 	if err := request.Namespace.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)

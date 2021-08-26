@@ -95,12 +95,12 @@ func (m *Model) ServerAdd(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionAdd
 
-	req := proto.Server{}
+	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Server = req
+	request.Server = req.Server
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
