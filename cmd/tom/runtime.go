@@ -14,8 +14,22 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+func initCommon(c *cli.Context) error {
+
+	cfg, err := configSetup(c)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func runtime(action cli.ActionFunc) cli.ActionFunc {
 	return func(c *cli.Context) error {
+
+		if err := initCommon(c); err != nil {
+			return err
+		}
 		return action(c)
 	}
 }
