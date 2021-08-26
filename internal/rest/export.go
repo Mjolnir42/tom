@@ -13,8 +13,8 @@ import (
 	"github.com/mjolnir42/tom/internal/msg"
 )
 
-func (x *Rest) Send(w *http.ResponseWriter, r *msg.Result) {
-	x.send(w, r)
+func (x *Rest) Send(w *http.ResponseWriter, r *msg.Result, e ExportFunc) {
+	x.send(w, r, e)
 }
 
 const (

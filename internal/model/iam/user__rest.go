@@ -58,7 +58,7 @@ func (m *Model) UserList(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportUser)
 }
 
 // UserShow function
@@ -86,7 +86,7 @@ func (m *Model) UserShow(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportUser)
 }
 
 // UserAdd function
@@ -113,7 +113,7 @@ func (m *Model) UserAdd(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportUser)
 }
 
 // UserRemove function
@@ -140,7 +140,7 @@ func (m *Model) UserRemove(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportUser)
 }
 
 // UserUpdate function
@@ -170,7 +170,7 @@ func (m *Model) UserUpdate(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportUser)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

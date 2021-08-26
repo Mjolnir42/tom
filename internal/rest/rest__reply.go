@@ -11,24 +11,28 @@ import (
 	"net/http"
 
 	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
+
+func nopExport(res *proto.Result, r *msg.Result) {
+}
 
 func (x *Rest) replyBadRequestDispatch(w *http.ResponseWriter, q *msg.Request, err error) {
 	result := msg.FromRequest(q)
 	result.BadRequest(err)
-	x.send(w, &result)
+	x.send(w, &result, nopExport)
 }
 
 func (x *Rest) replyForbiddenDispatch(w *http.ResponseWriter, q *msg.Request) {
 	result := msg.FromRequest(q)
 	result.Forbidden()
-	x.send(w, &result)
+	x.send(w, &result, nopExport)
 }
 
 func (x *Rest) replyServerError(w *http.ResponseWriter, q *msg.Request, err error) {
 	result := msg.FromRequest(q)
 	result.ServerError()
-	x.send(w, &result)
+	x.send(w, &result, nopExport)
 }
 
 func (x *Rest) hardServerError(w *http.ResponseWriter) {

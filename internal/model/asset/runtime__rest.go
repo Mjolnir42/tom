@@ -53,7 +53,7 @@ func (m *Model) RuntimeList(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportRuntime)
 }
 
 // RuntimeShow function
@@ -83,7 +83,7 @@ func (m *Model) RuntimeShow(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportRuntime)
 }
 
 // RuntimeAdd function
@@ -109,7 +109,7 @@ func (m *Model) RuntimeAdd(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportRuntime)
 }
 
 // RuntimeRemove function
@@ -137,7 +137,7 @@ func (m *Model) RuntimeRemove(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportRuntime)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

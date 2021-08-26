@@ -67,7 +67,7 @@ func (m *Model) TeamList(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // TeamShow function
@@ -95,7 +95,7 @@ func (m *Model) TeamShow(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // TeamAdd function
@@ -122,7 +122,7 @@ func (m *Model) TeamAdd(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // TeamRemove function
@@ -144,7 +144,7 @@ func (m *Model) TeamRemove(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // TeamUpdate function
@@ -174,7 +174,7 @@ func (m *Model) TeamUpdate(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // TeamHeadOfSet ...
@@ -207,7 +207,7 @@ func (m *Model) TeamHeadOfSet(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // TeamHeadOfUnset ...
@@ -229,7 +229,7 @@ func (m *Model) TeamHeadOfUnset(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // TeamMemberAdd ...
@@ -266,7 +266,7 @@ func (m *Model) TeamMemberAdd(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // TeamMemberSet ...
@@ -303,7 +303,7 @@ func (m *Model) TeamMemberSet(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // TeamMemberList ...
@@ -325,7 +325,7 @@ func (m *Model) TeamMemberList(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // TeamMemberRemove ...
@@ -362,7 +362,7 @@ func (m *Model) TeamMemberRemove(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportTeam)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

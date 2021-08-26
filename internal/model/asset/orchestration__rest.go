@@ -53,7 +53,7 @@ func (m *Model) OrchestrationList(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportOrchestration)
 }
 
 // OrchestrationShow function
@@ -83,7 +83,7 @@ func (m *Model) OrchestrationShow(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportOrchestration)
 }
 
 // OrchestrationAdd function
@@ -109,7 +109,7 @@ func (m *Model) OrchestrationAdd(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportOrchestration)
 }
 
 // OrchestrationRemove function
@@ -137,7 +137,7 @@ func (m *Model) OrchestrationRemove(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportOrchestration)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

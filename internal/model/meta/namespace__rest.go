@@ -81,7 +81,7 @@ func (m *Model) NamespaceList(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportNamespaceList)
 }
 
 // NamespaceShow function
@@ -110,7 +110,7 @@ func (m *Model) NamespaceShow(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportNamespace)
 }
 
 // NamespaceRemove function
@@ -136,7 +136,7 @@ func (m *Model) NamespaceRemove(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportNamespace)
 }
 
 // NamespaceAttributeAdd function
@@ -167,7 +167,7 @@ func (m *Model) NamespaceAttributeAdd(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportNamespace)
 }
 
 // NamespaceAttributeRemove function
@@ -198,7 +198,7 @@ func (m *Model) NamespaceAttributeRemove(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportNamespace)
 }
 
 // NamespacePropertySet function
@@ -229,7 +229,7 @@ func (m *Model) NamespacePropertySet(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportNamespace)
 }
 
 // NamespacePropertyUpdate function
@@ -260,7 +260,7 @@ func (m *Model) NamespacePropertyUpdate(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportNamespace)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -15,7 +15,7 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
+func (x *Rest) send(w *http.ResponseWriter, r *msg.Result, dataExport ExportFunc) {
 	var bjson []byte
 	var err error
 	var result proto.Result
@@ -33,21 +33,9 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 	)
 
 	result.RequestID = r.ID.String()
-	switch r.Section {
-	case msg.SectionNamespace:
-		switch r.Action {
-		case msg.ActionList:
-			result.NamespaceHeader = &[]proto.NamespaceHeader{}
-			*result.NamespaceHeader = append(*result.NamespaceHeader, r.NamespaceHeader...)
-		default:
-			result.Namespace = &[]proto.Namespace{}
-			*result.Namespace = append(*result.Namespace, r.Namespace...)
-		}
-
-	case msg.SectionServer:
-		result.Server = &[]proto.Server{}
-		*result.Server = append(*result.Server, r.Server...)
-	}
+	// handover to provided dataExport function that copies disclosed
+	// data into the reply
+	dataExport(&result, r)
 
 	if bjson, err = json.Marshal(&result); err != nil {
 		x.hardServerError(w)

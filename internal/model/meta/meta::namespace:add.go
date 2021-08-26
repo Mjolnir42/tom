@@ -57,7 +57,7 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result)
+	m.x.Send(&w, &result, exportNamespaceAdd)
 }
 
 // add creates a new namespace
