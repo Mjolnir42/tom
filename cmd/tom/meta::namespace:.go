@@ -26,10 +26,10 @@ func registerMetaNamespace(app cli.App) *cli.App {
 				Subcommands: []*cli.Command{
 					{
 						Name:         `add`,
-						Usage:        ``,
+						Usage:        `Create a new namespace`,
 						Description:  help.Text(`meta::namespace:add`),
 						Action:       runtime(cmdMetaNamespaceAdd),
-						BashComplete: cmpl.In,
+						BashComplete: cmpl.NamespaceAdd,
 					},
 				},
 			},
