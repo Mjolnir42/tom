@@ -16,15 +16,13 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// RouteRegisterLibrary registers the library routes with the
+// routeRegisterLibrary registers the library routes with the
 // request router
-func (m *Model) RouteRegisterLibrary(rt *httprouter.Router) *httprouter.Router {
+func (m *Model) routeRegisterLibrary(rt *httprouter.Router) {
 	rt.GET(`/idlib/`, m.x.Authenticated(m.LibraryList))
 	rt.GET(`/idlib/:lib`, m.x.Authenticated(m.LibraryShow))
 	rt.POST(`/idlib/`, m.x.Authenticated(m.LibraryAdd))
 	rt.DELETE(`/idlib/:lib`, m.x.Authenticated(m.LibraryRemove))
-
-	return rt
 }
 
 func exportLibrary(result *proto.Result, r *msg.Result) {

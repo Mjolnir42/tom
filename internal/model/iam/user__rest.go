@@ -16,16 +16,14 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// RouteRegisterUser registers the library routes with the
+// routeRegisterUser registers the library routes with the
 // request router
-func (m *Model) RouteRegisterUser(rt *httprouter.Router) *httprouter.Router {
+func (m *Model) routeRegisterUser(rt *httprouter.Router) {
 	rt.DELETE(`/idlib/:lib/user/:user`, m.x.Authenticated(m.UserRemove))
 	rt.GET(`/idlib/:lib/user/:user`, m.x.Authenticated(m.UserShow))
 	rt.GET(`/idlib/:lib/user/`, m.x.Authenticated(m.UserList))
 	rt.PATCH(`/idlib/:lib/user/:user`, m.x.Authenticated(m.UserUpdate))
 	rt.POST(`/idlib/:lib/user/`, m.x.Authenticated(m.UserAdd))
-
-	return rt
 }
 
 func exportUser(result *proto.Result, r *msg.Result) {

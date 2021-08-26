@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -16,14 +16,13 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// RouteRegisterOrchestration registers the runtime routes with the request
+// routeRegisterOrchestration registers the runtime routes with the request
 // router
-func (m *Model) RouteRegisterOrchestration(rt *httprouter.Router) *httprouter.Router {
+func (m *Model) routeRegisterOrchestration(rt *httprouter.Router) {
 	rt.GET(`/orchestration/`, m.x.Authenticated(m.OrchestrationList))
 	rt.GET(`/orchestration/:tomID`, m.x.Authenticated(m.OrchestrationShow))
 	rt.POST(`/orchestration/`, m.x.Authenticated(m.OrchestrationAdd))
 	rt.DELETE(`/orchestration/:tomID`, m.x.Authenticated(m.OrchestrationRemove))
-	return rt
 }
 
 func exportOrchestration(result *proto.Result, r *msg.Result) {

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -16,9 +16,9 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// RouteRegisterNamespace registers the namespace routes with the
+// routeRegisterNamespace registers the namespace routes with the
 // request router
-func (m *Model) RouteRegisterNamespace(rt *httprouter.Router) *httprouter.Router {
+func (m *Model) routeRegisterNamespace(rt *httprouter.Router) {
 	rt.DELETE(`/namespace/:tomID`, m.x.Authenticated(m.NamespaceRemove))
 
 	rt.POST(`/namespace/:tomID/attribute/`, m.x.Authenticated(m.NamespaceAttributeAdd))
@@ -55,8 +55,6 @@ func (m *Model) RouteRegisterNamespace(rt *httprouter.Router) *httprouter.Router
 			)
 		}
 	}
-
-	return rt
 }
 
 func exportNamespace(result *proto.Result, r *msg.Result) {

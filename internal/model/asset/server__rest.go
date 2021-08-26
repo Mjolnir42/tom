@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -16,14 +16,13 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// RouteRegisterServer registers the server routes with the request
+// routeRegisterServer registers the server routes with the request
 // router
-func (m *Model) RouteRegisterServer(rt *httprouter.Router) *httprouter.Router {
+func (m *Model) routeRegisterServer(rt *httprouter.Router) {
 	rt.GET(`/server/`, m.x.Authenticated(m.ServerList))
 	rt.GET(`/server/:tomID`, m.x.Authenticated(m.ServerShow))
 	rt.POST(`/server/`, m.x.Authenticated(m.ServerAdd))
 	rt.DELETE(`/server/:tomID`, m.x.Authenticated(m.ServerRemove))
-	return rt
 }
 
 func exportServer(result *proto.Result, r *msg.Result) {

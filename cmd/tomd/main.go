@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -127,18 +127,9 @@ func run() int {
 		router := httprouter.New()
 
 		// create datamodels
-		iammodel := iam.New(api)
-		router = iammodel.RouteRegisterLibrary(router)
-		router = iammodel.RouteRegisterUser(router)
-		router = iammodel.RouteRegisterTeam(router)
-
-		metamodel := meta.New(api)
-		router = metamodel.RouteRegisterNamespace(router)
-
-		assetmodel := asset.New(api)
-		router = assetmodel.RouteRegisterServer(router)
-		router = assetmodel.RouteRegisterRuntime(router)
-		router = assetmodel.RouteRegisterOrchestration(router)
+		iam.New(api).RouteRegister(router)
+		meta.New(api).RouteRegister(router)
+		asset.New(api).RouteRegister(router)
 
 		lm.GetLogger(`application`).Infof(
 			"Running API router interface %d for %s",

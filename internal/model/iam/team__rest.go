@@ -17,9 +17,9 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// RouteRegisterTeam registers the team routes with the
+// routeRegisterTeam registers the team routes with the
 // request router
-func (m *Model) RouteRegisterTeam(rt *httprouter.Router) *httprouter.Router {
+func (m *Model) routeRegisterTeam(rt *httprouter.Router) {
 	rt.DELETE(`/idlib/:lib/team/:team`, m.x.Authenticated(m.TeamRemove))
 	rt.GET(`/idlib/:lib/team/:team`, m.x.Authenticated(m.TeamShow))
 	rt.GET(`/idlib/:lib/team/`, m.x.Authenticated(m.TeamList))
@@ -33,8 +33,6 @@ func (m *Model) RouteRegisterTeam(rt *httprouter.Router) *httprouter.Router {
 	rt.GET(`/idlib/:lib/team/:team/member/`, m.x.Authenticated(m.TeamMemberList))
 	rt.PATCH(`/idlib/:lib/team/:team/member/`, m.x.Authenticated(m.TeamMemberAdd))
 	rt.PUT(`/idlib/:lib/team/:team/member/`, m.x.Authenticated(m.TeamMemberSet))
-
-	return rt
 }
 
 func exportTeam(result *proto.Result, r *msg.Result) {
