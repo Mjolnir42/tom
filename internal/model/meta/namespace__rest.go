@@ -50,7 +50,7 @@ func (m *Model) RouteRegisterNamespace(rt *httprouter.Router) *httprouter.Router
 		case rest.MethodPUT:
 			rt.PUT(f.path, f.handle(m))
 		default:
-			m.x.x.LM.GetLogger(`error`).Errorf(
+			m.x.LM.GetLogger(`error`).Errorf(
 				"Error registering route for %s using unknown method %s",
 				f.cmd,
 				f.method,
