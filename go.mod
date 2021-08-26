@@ -12,6 +12,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/lib/pq v1.8.0
 	github.com/mattn/go-shellwords v1.0.12
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mjolnir42/lhm v0.0.3
 	github.com/nahanni/go-ucl v0.0.0-20161122070711-3788fcf0dad8
 	github.com/satori/go.uuid v1.2.0
