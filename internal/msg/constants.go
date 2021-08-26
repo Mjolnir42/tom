@@ -12,12 +12,12 @@ import (
 )
 
 const (
-	CategoryMeta     = `meta`
+	CategoryMeta     = proto.ModelMeta
 	SectionNamespace = proto.EntityNamespace
 )
 
 const (
-	CategoryAsset        = `asset`
+	CategoryAsset        = proto.ModelAsset
 	SectionContainer     = proto.EntityContainer
 	SectionOrchestration = proto.EntityOrchestration
 	SectionRuntime       = proto.EntityRuntime
@@ -26,28 +26,28 @@ const (
 )
 
 const (
-	CategoryIAM    = `iam`
+	CategoryIAM    = proto.ModelIAM
 	SectionLibrary = proto.EntityLibrary
 	SectionTeam    = proto.EntityTeam
 	SectionUser    = proto.EntityUser
 )
 
 const (
-	ActionAdd        = `add`
-	ActionAttrAdd    = `attribute.add`
-	ActionAttrRemove = `attribute.remove`
-	ActionHdSet      = `headof.set`
-	ActionHdUnset    = `headof.unset`
-	ActionList       = `list`
-	ActionMbrAdd     = `member.add`
-	ActionMbrList    = `member.list`
-	ActionMbrRemove  = `member.remove`
-	ActionMbrSet     = `member.set`
-	ActionPropSet    = `property.set`
-	ActionPropUpdate = `property.update`
-	ActionRemove     = `remove`
-	ActionShow       = `show`
-	ActionUpdate     = `update`
+	ActionAdd        = proto.ActionAdd
+	ActionAttrAdd    = proto.ActionAttrAdd
+	ActionAttrRemove = proto.ActionAttrRemove
+	ActionHdSet      = proto.ActionHdSet
+	ActionHdUnset    = proto.ActionHdUnset
+	ActionList       = proto.ActionList
+	ActionMbrAdd     = proto.ActionMbrAdd
+	ActionMbrList    = proto.ActionMbrList
+	ActionMbrRemove  = proto.ActionMbrRemove
+	ActionMbrSet     = proto.ActionMbrSet
+	ActionPropSet    = proto.ActionPropSet
+	ActionPropUpdate = proto.ActionPropUpdate
+	ActionRemove     = proto.ActionRemove
+	ActionShow       = proto.ActionShow
+	ActionUpdate     = proto.ActionUpdate
 )
 
 const (

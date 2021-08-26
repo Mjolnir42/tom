@@ -7,8 +7,6 @@
 
 package proto //
 
-const EntityTeam = `team`
-
 // User ...
 type Team struct {
 	LibraryName string  `json:"library-name"`

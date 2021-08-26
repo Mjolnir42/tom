@@ -7,8 +7,6 @@
 
 package proto //
 
-const EntityContainer = `container`
-
 // Container ...
 type Container struct {
 	ID           string                    `json:"-"`

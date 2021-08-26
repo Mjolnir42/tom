@@ -7,8 +7,6 @@
 
 package proto //
 
-const EntityServer = `server`
-
 // Server defines a server within the asset model
 type Server struct {
 	Namespace    string                    `json:"namespace"`

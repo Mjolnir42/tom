@@ -7,8 +7,6 @@
 
 package proto //
 
-const EntityLibrary = `library`
-
 // Library ...
 type Library struct {
 	ID        string `json:"-"`

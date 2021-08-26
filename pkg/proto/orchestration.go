@@ -7,8 +7,6 @@
 
 package proto //
 
-const EntityOrchestration = `orchestration`
-
 // Orchestration defines a orchestration environment within the asset model
 type Orchestration struct {
 	Namespace    string                    `json:"namespace"`

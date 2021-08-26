@@ -7,8 +7,6 @@
 
 package proto //
 
-const EntityRuntime = `runtime`
-
 // Runtime defines a runtime within the asset model
 type Runtime struct {
 	Namespace    string                    `json:"namespace"`

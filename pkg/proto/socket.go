@@ -7,8 +7,6 @@
 
 package proto //
 
-const EntitySocket = `socket`
-
 // Socket ...
 type Socket struct {
 	Namespace    string                    `json:"namespace"`
