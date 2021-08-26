@@ -8,11 +8,14 @@
 package main
 
 import (
-	//"fmt"
-	//"os"
+	"fmt"
 
+	"github.com/go-resty/resty/v2"
+	"github.com/mjolnir42/tom/internal/cli/adm"
 	"github.com/urfave/cli/v2"
 )
+
+var client *resty.Client
 
 func initCommon(c *cli.Context) error {
 
@@ -20,6 +23,15 @@ func initCommon(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	client = resty.New().
+		SetDisableWarn(true).
+		SetHeader(`User-Agent`, fmt.Sprintf("%s %s", c.App.Name, c.App.Version)).
+		SetHostURL(cfg.Run.API.String())
+
+	// configure adm client library
+	adm.ConfigureClient(client)
+	adm.ConfigureJSONPostProcessor(cfg.ProcJSON)
 
 	return nil
 }
