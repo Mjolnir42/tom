@@ -20,11 +20,15 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result, dataExport ExportFunc
 	var err error
 	var result proto.Result
 
+	result.RequestID = r.ID.String()
+	result.StatusCode = r.Code
+
 	if r.Code >= http.StatusBadRequest {
 		x.LM.GetLogger(`request`).Errorf(
 			"[RequestID] %s, [Section] %s, [Action] %s, [Code] %d, [Error] %s",
 			r.ID.String(), r.Section, r.Action, r.Code, r.Err.Error(),
 		)
+		result.ErrorText = r.Err.Error()
 		goto dispatchERROR
 	}
 	x.LM.GetLogger(`request`).Infof(
@@ -32,22 +36,16 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result, dataExport ExportFunc
 		r.ID.String(), r.Section, r.Action, r.Code,
 	)
 
-	result.RequestID = r.ID.String()
 	// handover to provided dataExport function that copies disclosed
 	// data into the reply
 	dataExport(&result, r)
 
+dispatchERROR:
 	if bjson, err = json.Marshal(&result); err != nil {
 		x.hardServerError(w)
 		return
 	}
-	goto sendJSON
 
-dispatchERROR:
-	x.writeError(w, r.Code)
-	return
-
-sendJSON:
 	x.writeReplyJSON(w, &bjson)
 	return
 }
