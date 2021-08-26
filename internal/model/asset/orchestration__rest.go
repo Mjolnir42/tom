@@ -100,7 +100,7 @@ func (m *Model) OrchestrationAdd(w http.ResponseWriter, r *http.Request,
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Orchestration = req.Orchestration
+	request.Orchestration = *req.Orchestration
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)

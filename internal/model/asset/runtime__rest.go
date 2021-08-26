@@ -100,7 +100,7 @@ func (m *Model) RuntimeAdd(w http.ResponseWriter, r *http.Request,
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Runtime = req.Runtime
+	request.Runtime = *req.Runtime
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)

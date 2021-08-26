@@ -100,7 +100,7 @@ func (m *Model) ServerAdd(w http.ResponseWriter, r *http.Request,
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Server = req.Server
+	request.Server = *req.Server
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
