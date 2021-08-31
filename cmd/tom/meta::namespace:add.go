@@ -8,7 +8,7 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	//"os"
 
 	"github.com/mjolnir42/tom/internal/cli/adm"
@@ -59,6 +59,16 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 			Attribute: `dict_ntt_list`,
 			Value:     opts[`entities`][0],
 		}
+	}
+
+	// client-side input validation
+	switch (req.Namespace.Property[`dict_type`]).Value {
+	case `authoritative`:
+	case `referential`:
+	default:
+		return fmt.Errorf("Invalid type %s",
+			(req.Namespace.Property[`dict_type`]).Value,
+		)
 	}
 
 	// optional arguments that can each be given multiple times

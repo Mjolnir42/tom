@@ -9,6 +9,7 @@ package meta // // import "github.com/mjolnir42/tom/internal/model/meta"
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -52,6 +53,23 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	request.Namespace = *req.Namespace
+
+	if _, ok := request.Namespace.Property[`dict_type`]; !ok {
+		m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
+			`Missing mandatory property dict_type`,
+		))
+		return
+	}
+
+	switch request.Namespace.Property[`dict_type`].Value {
+	case `authoritative`:
+	case `referential`:
+	default:
+		m.x.ReplyBadRequest(&w, &request, fmt.Errorf("Invalid type %s",
+			request.Namespace.Property[`dict_type`].Value,
+		))
+		return
+	}
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
