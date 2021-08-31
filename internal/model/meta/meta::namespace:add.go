@@ -24,8 +24,6 @@ func init() {
 
 	registry = append(registry, function{
 		cmd:    proto.CmdNamespaceAdd,
-		method: (proto.Commands[proto.CmdNamespaceAdd]).Method,
-		path:   (proto.Commands[proto.CmdNamespaceAdd]).Path,
 		handle: namespaceAdd,
 	})
 }

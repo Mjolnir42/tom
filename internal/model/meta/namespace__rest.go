@@ -31,22 +31,22 @@ func (m *Model) routeRegisterNamespace(rt *httprouter.Router) {
 		m.x.LM.GetLogger(`application`).Infof(
 			"Registering handle for %s at route %s|%s",
 			f.cmd,
-			f.method,
-			f.path,
+			proto.Commands[f.cmd].Method,
+			proto.Commands[f.cmd].Path,
 		)
-		switch f.method {
+		switch proto.Commands[f.cmd].Method {
 		case proto.MethodDELETE:
-			rt.DELETE(f.path, f.handle(m))
+			rt.DELETE(proto.Commands[f.cmd].Path, f.handle(m))
 		case proto.MethodGET:
-			rt.GET(f.path, f.handle(m))
+			rt.GET(proto.Commands[f.cmd].Path, f.handle(m))
 		case proto.MethodHEAD:
-			rt.HEAD(f.path, f.handle(m))
+			rt.HEAD(proto.Commands[f.cmd].Path, f.handle(m))
 		case proto.MethodPATCH:
-			rt.PATCH(f.path, f.handle(m))
+			rt.PATCH(proto.Commands[f.cmd].Path, f.handle(m))
 		case proto.MethodPOST:
-			rt.POST(f.path, f.handle(m))
+			rt.POST(proto.Commands[f.cmd].Path, f.handle(m))
 		case proto.MethodPUT:
-			rt.PUT(f.path, f.handle(m))
+			rt.PUT(proto.Commands[f.cmd].Path, f.handle(m))
 		default:
 			m.x.LM.GetLogger(`error`).Errorf(
 				"Error registering route for %s using unknown method %s",
