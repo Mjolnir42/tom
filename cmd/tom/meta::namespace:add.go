@@ -93,7 +93,7 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 		for _, uniq := range opts[`uniq-attr`] {
 			req.Namespace.Attributes = append(
 				req.Namespace.Attributes,
-				proto.AttributeDefinition{Key: uniq, Unique: false},
+				proto.AttributeDefinition{Key: uniq, Unique: true},
 			)
 		}
 	}
