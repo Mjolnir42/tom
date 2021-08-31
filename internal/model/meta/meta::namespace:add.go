@@ -64,6 +64,11 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 	switch request.Namespace.Property[`dict_type`].Value {
 	case `authoritative`:
 	case `referential`:
+		if _, ok := request.Namespace.Property[`dict_lookup`]; !ok {
+			// the lookup key is mandatory for referential namepaces
+			m.x.ReplyBadRequest(&w, &request, fmt.Errorf(`Missing argument lookup-key`))
+			return
+		}
 	default:
 		m.x.ReplyBadRequest(&w, &request, fmt.Errorf("Invalid type %s",
 			request.Namespace.Property[`dict_type`].Value,

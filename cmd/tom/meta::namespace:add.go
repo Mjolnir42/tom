@@ -65,6 +65,10 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 	switch (req.Namespace.Property[`dict_type`]).Value {
 	case `authoritative`:
 	case `referential`:
+		if _, ok := req.Namespace.Property[`dict_lookup`]; !ok {
+			// the lookup key is mandatory for referential namepaces
+			return fmt.Errorf(`Missing argument lookup-key`)
+		}
 	default:
 		return fmt.Errorf("Invalid type %s",
 			(req.Namespace.Property[`dict_type`]).Value,
