@@ -17,15 +17,6 @@ func (x *Rest) Send(w *http.ResponseWriter, r *msg.Result, e ExportFunc) {
 	x.send(w, r, e)
 }
 
-const (
-	MethodDELETE = `DELETE`
-	MethodGET    = `GET`
-	MethodHEAD   = `HEAD`
-	MethodPATCH  = `PATCH`
-	MethodPOST   = `POST`
-	MethodPUT    = `PUT`
-)
-
 func (x *Rest) IsAuthorized(q *msg.Request) bool {
 	return x.isAuthorized(q)
 }

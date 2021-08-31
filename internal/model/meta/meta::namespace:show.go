@@ -16,7 +16,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
-	"github.com/mjolnir42/tom/internal/rest"
 	"github.com/mjolnir42/tom/internal/stmt"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
@@ -24,7 +23,7 @@ import (
 func init() {
 	registry = append(registry, function{
 		cmd:    proto.CmdNamespaceShow,
-		method: rest.MethodGET,
+		method: proto.MethodGET,
 		path:   `/namespace/:tomID`,
 		handle: namespaceShow,
 	})

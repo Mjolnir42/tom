@@ -35,17 +35,17 @@ func (m *Model) routeRegisterNamespace(rt *httprouter.Router) {
 			f.path,
 		)
 		switch f.method {
-		case rest.MethodDELETE:
+		case proto.MethodDELETE:
 			rt.DELETE(f.path, f.handle(m))
-		case rest.MethodGET:
+		case proto.MethodGET:
 			rt.GET(f.path, f.handle(m))
-		case rest.MethodHEAD:
+		case proto.MethodHEAD:
 			rt.HEAD(f.path, f.handle(m))
-		case rest.MethodPATCH:
+		case proto.MethodPATCH:
 			rt.PATCH(f.path, f.handle(m))
-		case rest.MethodPOST:
+		case proto.MethodPOST:
 			rt.POST(f.path, f.handle(m))
-		case rest.MethodPUT:
+		case proto.MethodPUT:
 			rt.PUT(f.path, f.handle(m))
 		default:
 			m.x.LM.GetLogger(`error`).Errorf(

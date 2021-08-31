@@ -47,6 +47,15 @@ const (
 )
 
 const (
+	MethodDELETE = `DELETE`
+	MethodGET    = `GET`
+	MethodHEAD   = `HEAD`
+	MethodPATCH  = `PATCH`
+	MethodPOST   = `POST`
+	MethodPUT    = `PUT`
+)
+
+const (
 	CmdNamespaceAdd        = ModelMeta + `::` + EntityNamespace + `:` + ActionAdd
 	CmdNamespaceAttrAdd    = ModelMeta + `::` + EntityNamespace + `:` + ActionAttrAdd
 	CmdNamespaceAttrRemove = ModelMeta + `::` + EntityNamespace + `:` + ActionAttrRemove
