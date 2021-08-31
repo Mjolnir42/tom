@@ -51,7 +51,7 @@ func (m *Model) routeRegisterNamespace(rt *httprouter.Router) {
 			m.x.LM.GetLogger(`error`).Errorf(
 				"Error registering route for %s using unknown method %s",
 				f.cmd,
-				f.method,
+				proto.Commands[f.cmd].Method,
 			)
 		}
 	}
