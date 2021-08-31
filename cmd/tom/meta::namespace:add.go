@@ -66,7 +66,7 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 	}
 
 	// client-side input validation
-	switch (req.Namespace.Property[`dict_type`]).Value {
+	switch req.Namespace.Property[`dict_type`].Value {
 	case `authoritative`:
 	case `referential`:
 		if _, ok := req.Namespace.Property[`dict_lookup`]; !ok {
@@ -75,7 +75,7 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 		}
 	default:
 		return fmt.Errorf("Invalid type %s",
-			(req.Namespace.Property[`dict_type`]).Value,
+			req.Namespace.Property[`dict_type`].Value,
 		)
 	}
 
