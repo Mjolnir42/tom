@@ -20,8 +20,8 @@ import (
 func init() {
 	registry = append(registry, function{
 		cmd:    proto.CmdNamespaceList,
-		method: proto.MethodGET,
-		path:   `/namespace/`,
+		method: (proto.Commands[proto.CmdNamespaceList]).Method,
+		path:   (proto.Commands[proto.CmdNamespaceList]).Path,
 		handle: namespaceList,
 	})
 }

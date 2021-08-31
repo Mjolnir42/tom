@@ -23,8 +23,8 @@ import (
 func init() {
 	registry = append(registry, function{
 		cmd:    proto.CmdNamespaceShow,
-		method: proto.MethodGET,
-		path:   `/namespace/:tomID`,
+		method: (proto.Commands[proto.CmdNamespaceShow]).Method,
+		path:   (proto.Commands[proto.CmdNamespaceShow]).Path,
 		handle: namespaceShow,
 	})
 }
