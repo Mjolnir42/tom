@@ -11,6 +11,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
@@ -59,6 +60,15 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 			`Missing mandatory property dict_type`,
 		))
 		return
+	}
+
+	if _, ok := request.Namespace.Property[`dict_uri`]; ok {
+		if !strings.Contains(request.Namespace.Property[`dict_uri`].Value, `{{LOOKUP}}`) {
+			m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
+				`dict_uri value must contain {{LOOKUP}} placeholder`,
+			))
+			return
+		}
 	}
 
 	switch request.Namespace.Property[`dict_type`].Value {

@@ -9,7 +9,7 @@ package main
 
 import (
 	"fmt"
-	//"os"
+	"strings"
 
 	"github.com/mjolnir42/tom/internal/cli/adm"
 	"github.com/mjolnir42/tom/pkg/proto"
@@ -44,6 +44,10 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 		req.Namespace.Property[`dict_uri`] = proto.PropertyDetail{
 			Attribute: `dict_uri`,
 			Value:     opts[`lookup-uri`][0],
+		}
+
+		if !strings.Contains(opts[`lookup-uri`][0], `{{LOOKUP}}`) {
+			return fmt.Errorf(`lookup-uri argument must contain {{LOOKUP}} placeholder`)
 		}
 	}
 	// optional at-most-once argument
