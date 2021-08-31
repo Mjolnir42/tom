@@ -34,26 +34,26 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 		Value:     c.Args().First(),
 	}
 
-	// mandatory unique argument
+	// mandatory at-most-once argument
 	req.Namespace.Property[`dict_type`] = proto.PropertyDetail{
 		Attribute: `dict_type`,
 		Value:     opts[`type`][0],
 	}
-	// unique argument
+	// optional at-most-once argument
 	if _, ok := opts[`lookup-uri`]; ok {
 		req.Namespace.Property[`dict_uri`] = proto.PropertyDetail{
 			Attribute: `dict_uri`,
 			Value:     opts[`lookup-uri`][0],
 		}
 	}
-	// unique argument
+	// optional at-most-once argument
 	if _, ok := opts[`lookup-key`]; ok {
 		req.Namespace.Property[`dict_lookup`] = proto.PropertyDetail{
 			Attribute: `dict_lookup`,
 			Value:     opts[`lookup-key`][0],
 		}
 	}
-	// unique argument
+	// optional at-most-once argument
 	if _, ok := opts[`entities`]; ok {
 		req.Namespace.Property[`dict_ntt_list`] = proto.PropertyDetail{
 			Attribute: `dict_ntt_list`,
@@ -61,7 +61,7 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 		}
 	}
 
-	// multi attribute
+	// optional arguments that can each be given multiple times
 	req.Namespace.Attributes = make([]proto.AttributeDefinition, 0)
 	if _, ok := opts[`std-attr`]; ok {
 		for _, std := range opts[`std-attr`] {
