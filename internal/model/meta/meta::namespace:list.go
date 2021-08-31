@@ -18,6 +18,8 @@ import (
 )
 
 func init() {
+	proto.AssertCommandIsDefined(proto.CmdNamespaceList)
+
 	registry = append(registry, function{
 		cmd:    proto.CmdNamespaceList,
 		method: (proto.Commands[proto.CmdNamespaceList]).Method,
