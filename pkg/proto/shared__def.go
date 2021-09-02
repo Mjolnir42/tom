@@ -59,7 +59,7 @@ func AssertCommandIsDefined(c string) {
 
 // OnlyUnreserved checks that s only contains charcters from proto.CharUnreserved
 func OnlyUnreserved(s string) error {
-	for b := range []byte(s) {
+	for _, b := range []byte(s) {
 		if !strings.Contains(CharUnreserved, string(b)) {
 			return fmt.Errorf(
 				"String <%s> contains illegal character <%s>",
