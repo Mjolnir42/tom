@@ -5,7 +5,7 @@
  * that can be found in the LICENSE file.
  */
 
-package main
+package meta // import "github.com/mjolnir42/tom/internal/cli/model/meta"
 
 import (
 	"fmt"

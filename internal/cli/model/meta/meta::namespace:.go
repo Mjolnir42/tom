@@ -5,18 +5,15 @@
  * that can be found in the LICENSE file.
  */
 
-package main
+package meta // import "github.com/mjolnir42/tom/internal/cli/model/meta"
 
 import (
-	//"fmt"
-	//"os"
-
 	"github.com/mjolnir42/tom/internal/cli/cmpl"
 	"github.com/mjolnir42/tom/internal/cli/help"
 	"github.com/urfave/cli/v2"
 )
 
-func registerMetaNamespace(app cli.App) *cli.App {
+func registerMetaNamespace(app cli.App, run Runtime) *cli.App {
 	app.Commands = append(app.Commands,
 		[]*cli.Command{
 			{
@@ -28,7 +25,7 @@ func registerMetaNamespace(app cli.App) *cli.App {
 						Name:         `add`,
 						Usage:        `Create a new namespace`,
 						Description:  help.Text(`meta::namespace:add`),
-						Action:       runtime(cmdMetaNamespaceAdd),
+						Action:       run(cmdMetaNamespaceAdd),
 						BashComplete: cmpl.NamespaceAdd,
 					},
 				},
