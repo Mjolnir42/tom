@@ -26,7 +26,7 @@ type PropertyDetail struct {
 // AttributeDefinition holds the definition of a dictionary attribute
 type AttributeDefinition struct {
 	Key    string `json:"key"`
-	Unique bool   `json:"uniqueValueConstraint,omitempty"`
+	Unique bool   `json:"uniqueValueConstraint"`
 }
 
 const (
