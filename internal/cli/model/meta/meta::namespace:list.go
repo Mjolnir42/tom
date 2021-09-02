@@ -9,6 +9,7 @@ package meta // import "github.com/mjolnir42/tom/internal/cli/model/meta"
 
 import (
 	"github.com/mjolnir42/tom/internal/cli/adm"
+	"github.com/mjolnir42/tom/pkg/proto"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,7 +18,10 @@ func cmdMetaNamespaceList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/namespace/`, `list`, nil, c)
+	spec := adm.Specification{
+		Name: proto.CmdNamespaceList,
+	}
+	return adm.Perform(spec, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

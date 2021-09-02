@@ -98,7 +98,11 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 		}
 	}
 
-	return adm.Perform(`postbody`, `/namespace/`, `command`, req, c)
+	spec := adm.Specification{
+		Name: proto.CmdNamespaceAdd,
+		Body: req,
+	}
+	return adm.Perform(spec, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

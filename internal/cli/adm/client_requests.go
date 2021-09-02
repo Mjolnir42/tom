@@ -31,40 +31,99 @@ type Specification struct {
 // Exported functions
 
 // WRAPPER
-func Perform(rqType, path, tmpl string, body interface{}, c *cli.Context) error {
+func Perform(cmd Specification, c *cli.Context) error {
 	var (
 		err  error
+		path string
 		resp *resty.Response
 	)
 
-	if strings.HasSuffix(rqType, `body`) && body == nil {
-		goto noattachment
+	if _, ok := proto.Commands[cmd.Name]; !ok {
+		goto unknownCommand
 	}
 
-	switch rqType {
-	case `get`:
+	if proto.Commands[cmd.Name].Body && cmd.Body == nil {
+		goto missingBody
+	}
+
+	switch {
+	case proto.Commands[cmd.Name].Placeholder != proto.PlHoldNone:
+		if cmd.Placeholder == nil {
+			goto improperSpec
+		}
+
+		path = strings.Replace(
+			proto.Commands[cmd.Name].Path,
+			proto.Commands[cmd.Name].Placeholder,
+			cmd.Placeholder[proto.Commands[cmd.Name].Placeholder],
+			1,
+		)
+	default:
+		path = proto.Commands[cmd.Name].Path
+	}
+
+	switch proto.Commands[cmd.Name].Method {
+	case proto.MethodGET:
 		resp, err = GetReq(path)
-	case `head`:
+	case proto.MethodHEAD:
 		resp, err = HeadReq(path)
-	case `delete`:
-		resp, err = DeleteReq(path)
-	case `deletebody`:
-		resp, err = DeleteReqBody(body, path)
-	case `putbody`:
-		resp, err = PutReqBody(body, path)
-	case `postbody`:
-		resp, err = PostReqBody(body, path)
-	case `patchbody`:
-		resp, err = PatchReqBody(body, path)
+	case proto.MethodDELETE:
+		switch {
+		case proto.Commands[cmd.Name].Body:
+			resp, err = DeleteReqBody(cmd.Body, path)
+		default:
+			resp, err = DeleteReq(path)
+		}
+	case proto.MethodPUT:
+		switch {
+		case proto.Commands[cmd.Name].Body:
+			resp, err = PutReqBody(cmd.Body, path)
+		default:
+			goto unhandledMethod
+		}
+	case proto.MethodPOST:
+		switch {
+		case proto.Commands[cmd.Name].Body:
+			resp, err = PostReqBody(cmd.Body, path)
+		default:
+			goto unhandledMethod
+		}
+	case proto.MethodPATCH:
+		switch {
+		case proto.Commands[cmd.Name].Body:
+			resp, err = PatchReqBody(cmd.Body, path)
+		default:
+			goto unhandledMethod
+		}
+	default:
+		goto unhandledMethod
 	}
 
 	if err != nil {
 		return err
 	}
-	return FormatOut(c, resp.Body(), tmpl)
+	return FormatOut(c, resp.Body(), proto.Commands[cmd.Name].ResultTmpl)
 
-noattachment:
-	return fmt.Errorf(`Missing body to client request that requires it.`)
+unknownCommand:
+	return fmt.Errorf("Unknown command definition requested: %s",
+		cmd.Name,
+	)
+
+missingBody:
+	return fmt.Errorf(
+		`Missing body to client request that requires it.`,
+	)
+
+unhandledMethod:
+	return fmt.Errorf("Unhandled: Method:%s/Body:%t",
+		proto.Commands[cmd.Name].Method,
+		proto.Commands[cmd.Name].Body,
+	)
+
+improperSpec:
+	return fmt.Errorf(
+		`Specification contains uninitialized Placeholder map.`,
+	)
 }
 
 func MockOK(tmpl string, c *cli.Context) error {
