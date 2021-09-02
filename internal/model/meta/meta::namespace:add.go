@@ -67,6 +67,13 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
+	for _, attribute := range request.Namespace.Attributes {
+		if err := proto.OnlyUnreserved(attribute.Key); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+	}
+
 	if _, ok := request.Namespace.Property[`dict_uri`]; ok {
 		if !strings.Contains(request.Namespace.Property[`dict_uri`].Value, `{{LOOKUP}}`) {
 			m.x.ReplyBadRequest(&w, &request, fmt.Errorf(

@@ -58,6 +58,13 @@ func (m *Model) NamespaceAttrAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
+	for _, attribute := range request.Namespace.Attributes {
+		if err := proto.OnlyUnreserved(attribute.Key); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+	}
+
 	if err := proto.OnlyUnreserved(request.Namespace.Name); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return

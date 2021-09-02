@@ -40,6 +40,10 @@ func cmdMetaNamespaceAttrAdd(c *cli.Context) error {
 	req.Namespace.Attributes = make([]proto.AttributeDefinition, 0)
 	if _, ok := opts[`std-attr`]; ok {
 		for _, std := range opts[`std-attr`] {
+			if err := proto.OnlyUnreserved(std); err != nil {
+				return err
+			}
+
 			req.Namespace.Attributes = append(
 				req.Namespace.Attributes,
 				proto.AttributeDefinition{Key: std, Unique: false},
@@ -48,6 +52,10 @@ func cmdMetaNamespaceAttrAdd(c *cli.Context) error {
 	}
 	if _, ok := opts[`uniq-attr`]; ok {
 		for _, uniq := range opts[`uniq-attr`] {
+			if err := proto.OnlyUnreserved(uniq); err != nil {
+				return err
+			}
+
 			req.Namespace.Attributes = append(
 				req.Namespace.Attributes,
 				proto.AttributeDefinition{Key: uniq, Unique: true},
