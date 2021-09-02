@@ -53,6 +53,13 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 	}
 	request.Namespace = *req.Namespace
 
+	if err := proto.OnlyUnreserved(
+		request.Namespace.Property[`dict_name`].Value,
+	); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
+	}
+
 	if _, ok := request.Namespace.Property[`dict_type`]; !ok {
 		m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
 			`Missing mandatory property dict_type`,

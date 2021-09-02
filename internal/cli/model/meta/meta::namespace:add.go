@@ -30,6 +30,10 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 		return err
 	}
 
+	if err := proto.OnlyUnreserved(c.Args().First()); err != nil {
+		return err
+	}
+
 	req := proto.NewNamespaceRequest()
 	req.Namespace.Property = make(map[string]proto.PropertyDetail)
 	// set the namespace name

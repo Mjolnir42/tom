@@ -7,6 +7,11 @@
 
 package proto //
 
+import (
+	"fmt"
+	"strings"
+)
+
 type CmdDef struct {
 	Method      string
 	Path        string
@@ -43,6 +48,20 @@ func AssertCommandIsDefined(c string) {
 	if _, ok := Commands[c]; !ok {
 		panic(c)
 	}
+}
+
+// OnlyUnreserved checks that s only contains charcters from proto.CharUnreserved
+func OnlyUnreserved(s string) error {
+	for b := range []byte(s) {
+		if !strings.Contains(CharUnreserved, string(b)) {
+			return fmt.Errorf(
+				"String <%s> contains illegal character <%s>",
+				s,
+				string(b),
+			)
+		}
+	}
+	return nil
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

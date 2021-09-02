@@ -77,4 +77,11 @@ const (
 	PlHoldTomID = `:tomID`
 )
 
+const (
+	CharAlpha       = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	CharDigit       = `0123456789`
+	CharPunctuation = `-_.`
+	CharUnreserved  = CharAlpha + CharDigit + CharPunctuation
+)
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
