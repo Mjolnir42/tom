@@ -22,6 +22,12 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+type Specification struct {
+	Name        string
+	Placeholder map[string]string
+	Body        interface{}
+}
+
 // Exported functions
 
 // WRAPPER
