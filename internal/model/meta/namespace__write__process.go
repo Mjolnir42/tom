@@ -46,56 +46,6 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 	mr.NotImplemented() // TODO
 }
 
-// attributeAdd ...
-func (h *NamespaceWriteHandler) attributeAdd(q *msg.Request, mr *msg.Result) {
-	var (
-		res sql.Result
-		err error
-		tx  *sql.Tx
-	)
-
-	//
-	if tx, err = h.conn.Begin(); err != nil {
-		mr.ServerError(err)
-		return
-	}
-
-	//
-	for _, attribute := range q.Namespace.Attributes {
-		if attribute.Unique {
-			res, err = tx.Stmt(h.stmtAttUnqAdd).Exec(
-				q.Namespace.Name,
-				attribute.Key,
-				q.UserIDLib,
-				q.AuthUser,
-			)
-		} else {
-			res, err = tx.Stmt(h.stmtAttStdAdd).Exec(
-				q.Namespace.Name,
-				attribute.Key,
-				q.UserIDLib,
-				q.AuthUser,
-			)
-		}
-		if err != nil {
-			mr.ServerError(err)
-			tx.Rollback()
-			return
-		}
-		if !mr.CheckRowsAffected(res.RowsAffected()) {
-			tx.Rollback()
-			return
-		}
-	}
-
-	if err = tx.Commit(); err != nil {
-		mr.ServerError(err)
-		return
-	}
-	mr.Namespace = append(mr.Namespace, q.Namespace)
-	mr.OK()
-}
-
 // attributeRemove ...
 func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) {
 	mr.NotImplemented() // TODO

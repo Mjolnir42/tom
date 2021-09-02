@@ -43,6 +43,20 @@ func registerMetaNamespace(app cli.App, run Runtime) *cli.App {
 						Action:       run(cmdMetaNamespaceShow),
 						BashComplete: cmpl.NamespaceShow,
 					},
+					{
+						Name:        `attribute`,
+						Usage:       `Section for attribute commands`,
+						Description: help.Text(proto.CmdNamespace),
+						Subcommands: []*cli.Command{
+							{
+								Name:         `add`,
+								Usage:        `Add new attributes to a namespace`,
+								Description:  help.Text(proto.CmdNamespaceAttrAdd),
+								Action:       run(cmdMetaNamespaceAttrAdd),
+								BashComplete: cmpl.NamespaceAttrAdd,
+							},
+						},
+					},
 				},
 			},
 		}...,

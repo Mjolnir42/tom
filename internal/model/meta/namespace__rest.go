@@ -21,7 +21,6 @@ import (
 func (m *Model) routeRegisterNamespace(rt *httprouter.Router) {
 	rt.DELETE(`/namespace/:tomID`, m.x.Authenticated(m.NamespaceRemove))
 
-	rt.POST(`/namespace/:tomID/attribute/`, m.x.Authenticated(m.NamespaceAttributeAdd))
 	rt.DELETE(`/namespace/:tomID/attribute/`, m.x.Authenticated(m.NamespaceAttributeRemove))
 
 	rt.PUT(`/namespace/:tomID/property/`, m.x.Authenticated(m.NamespacePropertySet))
@@ -73,37 +72,6 @@ func (m *Model) NamespaceRemove(w http.ResponseWriter, r *http.Request,
 		TomID: params.ByName(`tomID`),
 	}
 
-	if err := request.Namespace.ParseTomID(); err != nil {
-		m.x.ReplyBadRequest(&w, &request, err)
-		return
-	}
-
-	if !m.x.IsAuthorized(&request) {
-		m.x.ReplyForbidden(&w, &request)
-		return
-	}
-
-	m.x.HM.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
-	m.x.Send(&w, &result, exportNamespace)
-}
-
-// NamespaceAttributeAdd function
-func (m *Model) NamespaceAttributeAdd(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer rest.PanicCatcher(w, m.x.LM)
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionNamespace
-	request.Action = msg.ActionAttrAdd
-
-	req := proto.Request{}
-	if err := rest.DecodeJSONBody(r, &req); err != nil {
-		m.x.ReplyBadRequest(&w, &request, err)
-		return
-	}
-	request.Namespace = *req.Namespace
-	request.Namespace.TomID = params.ByName(`tomID`)
 	if err := request.Namespace.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return

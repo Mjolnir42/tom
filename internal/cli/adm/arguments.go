@@ -197,6 +197,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 	switch s {
 	case proto.CmdNamespaceAdd:
 		return []string{`std-attr`, `uniq-attr`}, []string{`type`, `lookup-uri`, `lookup-key`}, []string{`type`}
+	case proto.CmdNamespaceAttrAdd:
+		return []string{`std-attr`, `uniq-attr`}, []string{}, []string{}
 	default:
 		return []string{}, []string{}, []string{}
 	}
