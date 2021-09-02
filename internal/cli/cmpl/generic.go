@@ -19,6 +19,9 @@ func In(c *cli.Context) {
 	Generic(c, []string{`in`})
 }
 
+func None(c *cli.Context) {
+}
+
 func Generic(c *cli.Context, keywords []string) {
 	switch {
 	case c.NArg() == 0:

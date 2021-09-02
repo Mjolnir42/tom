@@ -28,6 +28,13 @@ func registerMetaNamespace(app cli.App, run Runtime) *cli.App {
 						Action:       run(cmdMetaNamespaceAdd),
 						BashComplete: cmpl.NamespaceAdd,
 					},
+					{
+						Name:         `list`,
+						Usage:        `List all existing namespaces`,
+						Description:  help.Text(`meta::namespace:list`),
+						Action:       run(cmdMetaNamespaceList),
+						BashComplete: cmpl.NamespaceList,
+					},
 				},
 			},
 		}...,
