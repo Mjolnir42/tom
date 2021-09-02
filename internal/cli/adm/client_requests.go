@@ -47,17 +47,23 @@ func Perform(cmd Specification, c *cli.Context) error {
 	}
 
 	switch {
-	case proto.Commands[cmd.Name].Placeholder != proto.PlHoldNone:
+	case len(proto.Commands[cmd.Name].Placeholder) != 0:
 		if cmd.Placeholder == nil {
 			goto improperSpec
 		}
 
-		path = strings.Replace(
-			proto.Commands[cmd.Name].Path,
-			proto.Commands[cmd.Name].Placeholder,
-			cmd.Placeholder[proto.Commands[cmd.Name].Placeholder],
-			1,
-		)
+		for _, ph := range proto.Commands[cmd.Name].Placeholder {
+			if _, ok := cmd.Placeholder[ph]; !ok {
+				goto improperSpec
+			}
+
+			path = strings.Replace(
+				proto.Commands[cmd.Name].Path,
+				ph,
+				cmd.Placeholder[ph],
+				1,
+			)
+		}
 	default:
 		path = proto.Commands[cmd.Name].Path
 	}

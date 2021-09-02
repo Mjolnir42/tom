@@ -17,7 +17,7 @@ type CmdDef struct {
 	Path        string
 	Body        bool
 	ResultTmpl  string
-	Placeholder string
+	Placeholder []string
 }
 
 var Commands = map[string]CmdDef{
@@ -26,21 +26,21 @@ var Commands = map[string]CmdDef{
 		Path:        `/namespace/`,
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
-		Placeholder: PlHoldNone,
+		Placeholder: []string{},
 	},
 	CmdNamespaceList: {
 		Method:      MethodGET,
 		Path:        `/namespace/`,
 		Body:        false,
 		ResultTmpl:  TemplateList,
-		Placeholder: PlHoldNone,
+		Placeholder: []string{},
 	},
 	CmdNamespaceShow: {
 		Method:      MethodGET,
 		Path:        `/namespace/` + PlHoldTomID,
 		Body:        false,
 		ResultTmpl:  TemplateDetail,
-		Placeholder: PlHoldTomID,
+		Placeholder: []string{PlHoldTomID},
 	},
 }
 
