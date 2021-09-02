@@ -63,6 +63,20 @@ func (m *Model) NamespaceAttrAdd(w http.ResponseWriter, r *http.Request,
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}
+
+		if strings.HasPrefix(attribute.Key, `dict_`) {
+			switch attribute.Key {
+			case `dict_lookup`:
+			case `dict_uri`:
+			case `dict_ntt_list`:
+			default:
+				m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
+					"Invalid namespace self-attribute: %s",
+					attribute.Key,
+				))
+				return
+			}
+		}
 	}
 
 	if err := proto.OnlyUnreserved(request.Namespace.Name); err != nil {
@@ -96,6 +110,31 @@ func (h *NamespaceWriteHandler) attributeAdd(q *msg.Request, mr *msg.Result) {
 
 	//
 	for _, attribute := range q.Namespace.Attributes {
+		if strings.HasPrefix(attribute.Key, `dict_`) {
+			switch attribute.Key {
+			case `dict_lookup`:
+				fallthrough
+			case `dict_uri`:
+				fallthrough
+			case `dict_ntt_list`:
+				if attribute.Unique {
+					mr.BadRequest(fmt.Errorf(
+						"Invalid unique namespace self-attribute: %s",
+						attribute.Key,
+					))
+					tx.Rollback()
+					return
+				}
+			default:
+				mr.BadRequest(fmt.Errorf(
+					"Invalid namespace self-attribute: %s",
+					attribute.Key,
+				))
+				tx.Rollback()
+				return
+			}
+		}
+
 		if attribute.Unique {
 			res, err = tx.Stmt(h.stmtAttUnqAdd).Exec(
 				q.Namespace.Name,

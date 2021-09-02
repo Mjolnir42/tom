@@ -95,6 +95,10 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 				return err
 			}
 
+			if strings.HasPrefix(std, `dict_`) {
+				return fmt.Errorf("Invalid namespace self-attribute: %s", std)
+			}
+
 			req.Namespace.Attributes = append(
 				req.Namespace.Attributes,
 				proto.AttributeDefinition{Key: std, Unique: false},
@@ -105,6 +109,10 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 		for _, uniq := range opts[`uniq-attr`] {
 			if err := proto.OnlyUnreserved(uniq); err != nil {
 				return err
+			}
+
+			if strings.HasPrefix(uniq, `dict_`) {
+				return fmt.Errorf("Invalid namespace self-attribute: %s", std)
 			}
 
 			req.Namespace.Attributes = append(

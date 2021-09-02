@@ -72,6 +72,22 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}
+
+		if strings.HasPrefix(attribute.Key, `dict_`) {
+			switch attribute.Key {
+			case `dict_name`:
+			case `dict_type`:
+			case `dict_lookup`:
+			case `dict_uri`:
+			case `dict_ntt_list`:
+			default:
+				m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
+					"Invalid namespace self-attribute: %s",
+					attribute.Key,
+				))
+				return
+			}
+		}
 	}
 
 	if _, ok := request.Namespace.Property[`dict_uri`]; ok {
@@ -165,6 +181,23 @@ func (h *NamespaceWriteHandler) add(q *msg.Request, mr *msg.Result) {
 
 	// create configured namespace attributes
 	for _, attribute := range q.Namespace.Attributes {
+		if strings.HasPrefix(attribute.Key, `dict_`) {
+			switch attribute.Key {
+			case `dict_name`:
+			case `dict_type`:
+			case `dict_lookup`:
+			case `dict_uri`:
+			case `dict_ntt_list`:
+			default:
+				mr.BadRequest(fmt.Errorf(
+					"Invalid namespace self-attribute: %s",
+					attribute.Key,
+				))
+				tx.Rollback()
+				return
+			}
+		}
+
 		if attribute.Unique {
 			res, err = tx.Stmt(h.stmtAttUnqAdd).Exec(
 				q.Namespace.Property[`dict_name`].Value,
