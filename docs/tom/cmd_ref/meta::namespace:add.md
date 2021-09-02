@@ -34,11 +34,11 @@ Argument | Type | Description | Default Value | Optional
  ------- | ---- | ----------- | ------------- | --------
 name | string | name of the namespace | | no
 type | string | type of the namespace | | no
-lookup-uri | string | URI to use for lookups | | yes
-lookup-key | string | Unique attribute used for lookups | | yes
-entities | list | UNSUPPORTED | | yes
-std-attr | string | Standard attribute of the namespace | | yes
-uniq-attr | string | Unique attribute of the namespace | | yes
+uri | string | URI to use for lookups | | yes
+key | string | Unique attribute used for lookups | | yes
+ntt | list | UNSUPPORTED | | yes
+std | string | Standard attribute for the namespace | | yes
+uniq | string | Unique attribute for the namespace | | yes
 
 # PERMISSIONS
 

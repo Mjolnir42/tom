@@ -1,0 +1,14 @@
+DELETE /namespace/:tomID/attribute/
+  { "namespace": {
+      "name": ....
+      "attributes": [
+        { "key": ....
+          "uniqueValueConstraint": true|false
+        },
+        { "key": ....
+          "uniqueValueConstraint": true|false
+        },
+        ....
+      ],
+    }
+  }
