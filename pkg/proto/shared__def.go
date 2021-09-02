@@ -8,26 +8,34 @@
 package proto //
 
 type CmdDef struct {
-	Method string
-	Path   string
-	Body   bool
+	Method      string
+	Path        string
+	Body        bool
+	ResultTmpl  string
+	Placeholder string
 }
 
 var Commands = map[string]CmdDef{
 	CmdNamespaceAdd: {
-		Method: MethodPOST,
-		Path:   `/namespace/`,
-		Body:   true,
+		Method:      MethodPOST,
+		Path:        `/namespace/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: PlHoldNone,
 	},
 	CmdNamespaceList: {
-		Method: MethodGET,
-		Path:   `/namespace/`,
-		Body:   false,
+		Method:      MethodGET,
+		Path:        `/namespace/`,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: PlHoldNone,
 	},
 	CmdNamespaceShow: {
-		Method: MethodGET,
-		Path:   `/namespace/:tomID`,
-		Body:   false,
+		Method:      MethodGET,
+		Path:        `/namespace/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateDetail,
+		Placeholder: PlHoldTomID,
 	},
 }
 
