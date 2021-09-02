@@ -13,6 +13,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+func init() {
+	proto.AssertCommandIsDefined(proto.CmdNamespaceList)
+}
+
 func cmdMetaNamespaceList(c *cli.Context) error {
 	if err := adm.VerifyNoArgument(c); err != nil {
 		return err

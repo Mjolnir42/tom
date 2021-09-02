@@ -16,6 +16,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+func init() {
+	proto.AssertCommandIsDefined(proto.CmdNamespaceAdd)
+}
+
 func cmdMetaNamespaceAdd(c *cli.Context) error {
 	opts := map[string][]string{}
 	if err := adm.VariadicArguments(
