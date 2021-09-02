@@ -15,11 +15,23 @@ SELECT      'Server.ADD';`
 
 	ServerRemove = `
 SELECT      'Server.REMOVE';`
+
+	ServerStdAttrRemove = `
+DELETE FROM       asset.server_standard_attribute_values
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	ServerUniqAttrRemove = `
+DELETE FROM       asset.server_unique_attribute_values
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
 )
 
 func init() {
 	m[ServerAdd] = `ServerAdd`
 	m[ServerRemove] = `ServerRemove`
+	m[ServerStdAttrRemove] = `ServerStdAttrRemove`
+	m[ServerUniqAttrRemove] = `ServerUniqAttrRemove`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -85,9 +85,35 @@ FROM        meta.dictionary
     JOIN    inventory.user
       ON    meta.standard_attribute.createdBy =  inventory.user.userID
 WHERE       meta.dictionary.dictionaryID = $1::uuid;`
+
+	NamespaceAttributeSelect = `
+SELECT            meta.standard_attribute.attributeID,
+                  meta.standard_attribute.dictionaryID,
+                  'standard'::text AS attributeType
+FROM              meta.dictionary
+    JOIN          meta.attribute
+      ON          meta.dictionary.dictionaryID = meta.attribute.dictionaryID
+    JOIN          meta.standard_attribute
+      ON          meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+     AND          meta.attribute.attribute = meta.standard_attribute.attribute
+WHERE             meta.dictionary.name = $1::text
+  AND             meta.attribute.attribute = $2::text
+UNION
+SELECT            meta.unique_attribute.attributeID,
+                  meta.unique_attribute.dictionaryID,
+                  'unique'::text AS attributeType
+FROM              meta.dictionary
+    JOIN          meta.attribute
+      ON          meta.dictionary.dictionaryID = meta.attribute.dictionaryID
+    JOIN          meta.unique_attribute
+      ON          meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+     AND          meta.attribute.attribute = meta.unique_attribute.attribute
+WHERE             meta.dictionary.name = $1::text
+  AND             meta.attribute.attribute = $2::text;`
 )
 
 func init() {
+	m[NamespaceAttributeSelect] = `NamespaceAttributeSelect`
 	m[NamespaceList] = `NamespaceList`
 	m[NamespaceTxSelectAttributes] = `NamespaceTxSelectAttributes`
 	m[NamespaceTxSelectProperties] = `NamespaceTxSelectProperties`

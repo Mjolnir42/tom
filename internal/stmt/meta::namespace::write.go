@@ -171,6 +171,31 @@ FROM              meta.dictionary
 WHERE             meta.dictionary.name = $1::text
   AND             meta.attribute.attribute NOT LIKE 'dict_%';`
 
+	NamespaceStdAttrRemoveValue = `
+DELETE FROM       meta.dictionary_standard_attribute_values
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	NamespaceUniqAttrRemoveValue = `
+DELETE FROM       meta.dictionary_unique_attribute_values
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	NamespaceStdAttrRemove = `
+DELETE FROM       meta.standard_attribute
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	NamespaceUniqAttrRemove = `
+DELETE FROM       meta.unique_attribute
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	NamespaceAttrRemove = `
+DELETE FROM       meta.attribute
+WHERE             attribute = $1::text
+  AND             dictionaryID = $2::uuid;`
+
 	NamespaceTxStdPropertySelect = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.dictionary
@@ -304,18 +329,23 @@ FROM              cte_dct
 
 func init() {
 	m[NamespaceAdd] = `NamespaceAdd`
+	m[NamespaceAttrRemove] = `NamespaceAttrRemove`
 	m[NamespaceAttributeAddStandard] = `NamespaceAttributeAddStandard`
 	m[NamespaceAttributeAddUnique] = `NamespaceAttributeAddUnique`
 	m[NamespaceAttributeDiscover] = `NamespaceAttributeDiscover`
 	m[NamespaceAttributeQueryType] = `NamespaceAttributeQueryType`
 	m[NamespaceConfigure] = `NamespaceConfigure`
 	m[NamespaceRemove] = `NamespaceRemove`
+	m[NamespaceStdAttrRemoveValue] = `NamespaceStdAttrRemoveValue`
+	m[NamespaceStdAttrRemove] = `NamespaceStdAttrRemove`
 	m[NamespaceTxStdPropertyAdd] = `NamespaceTxStdPropertyAdd`
 	m[NamespaceTxStdPropertyClamp] = `NamespaceTxStdPropertyClamp`
 	m[NamespaceTxStdPropertySelect] = `NamespaceTxStdPropertySelect`
 	m[NamespaceTxUniqPropertyAdd] = `NamespaceTxUniqPropertyAdd`
 	m[NamespaceTxUniqPropertyClamp] = `NamespaceTxUniqPropertyClamp`
 	m[NamespaceTxUniqPropertySelect] = `NamespaceTxUniqPropertySelect`
+	m[NamespaceUniqAttrRemoveValue] = `NamespaceUniqAttrRemoveValue`
+	m[NamespaceUniqAttrRemove] = `NamespaceUniqAttrRemove`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

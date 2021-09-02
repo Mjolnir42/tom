@@ -46,11 +46,6 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 	mr.NotImplemented() // TODO
 }
 
-// attributeRemove ...
-func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) {
-	mr.NotImplemented() // TODO
-}
-
 // propertySet ...
 func (h *NamespaceWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 	// tx.Begin()
