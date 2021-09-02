@@ -35,6 +35,13 @@ func registerMetaNamespace(app cli.App, run Runtime) *cli.App {
 						Action:       run(cmdMetaNamespaceList),
 						BashComplete: cmpl.NamespaceList,
 					},
+					{
+						Name:         `show`,
+						Usage:        `Show details about a namespaces`,
+						Description:  help.Text(`meta::namespace:show`),
+						Action:       run(cmdMetaNamespaceShow),
+						BashComplete: cmpl.NamespaceShow,
+					},
 				},
 			},
 		}...,

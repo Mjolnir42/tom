@@ -23,4 +23,8 @@ func NamespaceList(c *cli.Context) {
 	None(c)
 }
 
+func NamespaceShow(c *cli.Context) {
+	None(c)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

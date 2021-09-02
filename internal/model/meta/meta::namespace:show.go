@@ -204,6 +204,7 @@ func (h *NamespaceReadHandler) show(q *msg.Request, mr *msg.Result) {
 		mr.ServerError(err)
 		return
 	}
+	mr.Namespace = append(mr.Namespace, ns)
 	mr.OK()
 }
 
