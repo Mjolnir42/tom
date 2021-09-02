@@ -9,6 +9,7 @@ package meta // import "github.com/mjolnir42/tom/internal/cli/model/meta"
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/mjolnir42/tom/internal/cli/adm"
 	"github.com/mjolnir42/tom/pkg/proto"
@@ -70,7 +71,7 @@ func cmdMetaNamespaceAttrAdd(c *cli.Context) error {
 			}
 
 			if strings.HasPrefix(uniq, `dict_`) {
-				return fmt.Errorf("Invalid namespace self-attribute: %s", std)
+				return fmt.Errorf("Invalid namespace self-attribute: %s", uniq)
 			}
 
 			req.Namespace.Attributes = append(

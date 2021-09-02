@@ -112,7 +112,7 @@ func cmdMetaNamespaceAdd(c *cli.Context) error {
 			}
 
 			if strings.HasPrefix(uniq, `dict_`) {
-				return fmt.Errorf("Invalid namespace self-attribute: %s", std)
+				return fmt.Errorf("Invalid namespace self-attribute: %s", uniq)
 			}
 
 			req.Namespace.Attributes = append(

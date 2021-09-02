@@ -306,8 +306,8 @@ func init() {
 	m[NamespaceAdd] = `NamespaceAdd`
 	m[NamespaceAttributeAddStandard] = `NamespaceAttributeAddStandard`
 	m[NamespaceAttributeAddUnique] = `NamespaceAttributeAddUnique`
-	m[NamespaceAttributeQueryType] = `NamespaceAttributeQueryType`
 	m[NamespaceAttributeDiscover] = `NamespaceAttributeDiscover`
+	m[NamespaceAttributeQueryType] = `NamespaceAttributeQueryType`
 	m[NamespaceConfigure] = `NamespaceConfigure`
 	m[NamespaceRemove] = `NamespaceRemove`
 	m[NamespaceTxStdPropertyAdd] = `NamespaceTxStdPropertyAdd`
