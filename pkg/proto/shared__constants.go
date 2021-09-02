@@ -56,6 +56,7 @@ const (
 )
 
 const (
+	CmdNamespace           = ModelMeta + `::` + EntityNamespace + `:`
 	CmdNamespaceAdd        = ModelMeta + `::` + EntityNamespace + `:` + ActionAdd
 	CmdNamespaceAttrAdd    = ModelMeta + `::` + EntityNamespace + `:` + ActionAttrAdd
 	CmdNamespaceAttrRemove = ModelMeta + `::` + EntityNamespace + `:` + ActionAttrRemove

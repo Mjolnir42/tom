@@ -10,6 +10,7 @@ package meta // import "github.com/mjolnir42/tom/internal/cli/model/meta"
 import (
 	"github.com/mjolnir42/tom/internal/cli/cmpl"
 	"github.com/mjolnir42/tom/internal/cli/help"
+	"github.com/mjolnir42/tom/pkg/proto"
 	"github.com/urfave/cli/v2"
 )
 
@@ -19,26 +20,26 @@ func registerMetaNamespace(app cli.App, run Runtime) *cli.App {
 			{
 				Name:        `namespace`,
 				Usage:       `Commands for maintaining namespaces`,
-				Description: help.Text(`meta::namespace:`),
+				Description: help.Text(proto.CmdNamespace),
 				Subcommands: []*cli.Command{
 					{
 						Name:         `add`,
 						Usage:        `Create a new namespace`,
-						Description:  help.Text(`meta::namespace:add`),
+						Description:  help.Text(proto.CmdNamespaceAdd),
 						Action:       run(cmdMetaNamespaceAdd),
 						BashComplete: cmpl.NamespaceAdd,
 					},
 					{
 						Name:         `list`,
 						Usage:        `List all existing namespaces`,
-						Description:  help.Text(`meta::namespace:list`),
+						Description:  help.Text(proto.CmdNamespaceList),
 						Action:       run(cmdMetaNamespaceList),
 						BashComplete: cmpl.NamespaceList,
 					},
 					{
 						Name:         `show`,
 						Usage:        `Show details about a namespaces`,
-						Description:  help.Text(`meta::namespace:show`),
+						Description:  help.Text(proto.CmdNamespaceShow),
 						Action:       run(cmdMetaNamespaceShow),
 						BashComplete: cmpl.NamespaceShow,
 					},
