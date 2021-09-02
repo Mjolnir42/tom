@@ -64,34 +64,34 @@ func Perform(cmd Specification, c *cli.Context) error {
 
 	switch proto.Commands[cmd.Name].Method {
 	case proto.MethodGET:
-		resp, err = GetReq(path)
+		resp, err = getReq(path)
 	case proto.MethodHEAD:
-		resp, err = HeadReq(path)
+		resp, err = headReq(path)
 	case proto.MethodDELETE:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = DeleteReqBody(cmd.Body, path)
+			resp, err = deleteReqBody(cmd.Body, path)
 		default:
-			resp, err = DeleteReq(path)
+			resp, err = deleteReq(path)
 		}
 	case proto.MethodPUT:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = PutReqBody(cmd.Body, path)
+			resp, err = putReqBody(cmd.Body, path)
 		default:
 			goto unhandledMethod
 		}
 	case proto.MethodPOST:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = PostReqBody(cmd.Body, path)
+			resp, err = postReqBody(cmd.Body, path)
 		default:
 			goto unhandledMethod
 		}
 	case proto.MethodPATCH:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = PatchReqBody(cmd.Body, path)
+			resp, err = patchReqBody(cmd.Body, path)
 		default:
 			goto unhandledMethod
 		}
@@ -138,49 +138,49 @@ func DecodedResponse(resp *resty.Response, res *proto.Result) error {
 	return checkApplicationError(res)
 }
 
+// Private functions
+
 // DELETE
-func DeleteReq(p string) (*resty.Response, error) {
+func deleteReq(p string) (*resty.Response, error) {
 	return handleRequestOptions(client.R().Delete(p))
 }
 
-func DeleteReqBody(body interface{}, p string) (*resty.Response, error) {
+func deleteReqBody(body interface{}, p string) (*resty.Response, error) {
 	return handleRequestOptions(
 		client.R().SetBody(body).SetContentLength(true).Delete(p))
 }
 
 // GET
-func GetReq(p string) (*resty.Response, error) {
+func getReq(p string) (*resty.Response, error) {
 	return handleRequestOptions(client.R().Get(p))
 }
 
 // HEAD
-func HeadReq(p string) (*resty.Response, error) {
+func headReq(p string) (*resty.Response, error) {
 	return handleRequestOptions(client.R().Head(p))
 }
 
 // PATCH
-func PatchReqBody(body interface{}, p string) (*resty.Response, error) {
+func patchReqBody(body interface{}, p string) (*resty.Response, error) {
 	return handleRequestOptions(
 		client.R().SetBody(body).SetContentLength(true).Patch(p))
 }
 
 // POST
-func PostReqBody(body interface{}, p string) (*resty.Response, error) {
+func postReqBody(body interface{}, p string) (*resty.Response, error) {
 	return handleRequestOptions(
 		client.R().SetBody(body).SetContentLength(true).Post(p))
 }
 
 // PUT
-func PutReq(p string) (*resty.Response, error) {
+func putReq(p string) (*resty.Response, error) {
 	return handleRequestOptions(client.R().Put(p))
 }
 
-func PutReqBody(body interface{}, p string) (*resty.Response, error) {
+func putReqBody(body interface{}, p string) (*resty.Response, error) {
 	return handleRequestOptions(
 		client.R().SetBody(body).SetContentLength(true).Put(p))
 }
-
-// Private functions
 
 func handleRequestOptions(resp *resty.Response, err error) (*resty.Response, error) {
 	if err != nil {
@@ -219,7 +219,7 @@ func asyncWait(result *proto.Result) {
 
 	if result.StatusCode == 202 && result.JobID != "" {
 		fmt.Fprintf(os.Stderr, "Waiting for job: %s\n", result.JobID)
-		_, err := GetReq(fmt.Sprintf("/job/byID/%s/_processed", result.JobID))
+		_, err := getReq(fmt.Sprintf("/job/byID/%s/_processed", result.JobID))
 		if err != nil && err != io.EOF {
 			fmt.Fprintf(os.Stderr, "Wait error: %s\n", err.Error())
 		}
