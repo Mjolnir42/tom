@@ -256,7 +256,7 @@ INSERT INTO       meta.dictionary_standard_attribute_values ( dictionaryID, attr
 SELECT            cte_dct.dictID,
                   cte_att.attributeID,
                   $3::text,
-                  tstzrange($4::timestamptz(3), $5::timestamptz(4), '[]'),
+                  tstzrange($4::timestamptz(3), $5::timestamptz(3), '[]'),
                   cte_dct.userID
 FROM              cte_dct
     CROSS JOIN    cte_att;`

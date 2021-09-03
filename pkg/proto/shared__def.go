@@ -56,6 +56,13 @@ var Commands = map[string]CmdDef{
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	},
+	CmdNamespacePropSet: {
+		Method:      MethodPUT,
+		Path:        `/namespace/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	},
 }
 
 func AssertCommandIsDefined(c string) {

@@ -18,6 +18,11 @@ import (
 	"github.com/mjolnir42/tom/internal/stmt"
 )
 
+func init() {
+	// enable handling of infinity timestamps
+	pq.EnableInfinityTs(msg.NegTimeInf, msg.PosTimeInf)
+}
+
 func connectToDatabase(lm *lhm.LogHandleMap) *sql.DB {
 	var err error
 	var conn *sql.DB
@@ -34,9 +39,6 @@ func connectToDatabase(lm *lhm.LogHandleMap) *sql.DB {
 		TomCfg.Database.TLSMode,
 		TomCfg.Database.Timeout,
 	)
-
-	// enable handling of infinity timestamps
-	pq.EnableInfinityTs(msg.NegTimeInf, msg.PosTimeInf)
 
 	if conn, err = sql.Open(driver, connect); err != nil {
 		lm.GetLogger(`error`).Fatal(err)
