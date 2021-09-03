@@ -39,7 +39,7 @@ func NamespaceAttrRemove(c *cli.Context) {
 
 func NamespacePropSet(c *cli.Context) {
 	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdNamespacePropSet)
-	GenericMultiTriple(c, uniq, multi)
+	GenericPropertyChain(c, uniq, multi)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
