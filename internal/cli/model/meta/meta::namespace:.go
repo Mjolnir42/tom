@@ -71,7 +71,7 @@ func registerMetaNamespace(app cli.App, run Runtime) *cli.App {
 						Subcommands: []*cli.Command{
 							{
 								Name:         `set`,
-								Usage:        `Set all properties of an namespace`,
+								Usage:        `Set all properties of a namespace`,
 								Description:  help.Text(proto.CmdNamespacePropSet),
 								Action:       run(cmdMetaNamespacePropSet),
 								BashComplete: cmpl.NamespacePropSet,
