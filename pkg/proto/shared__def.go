@@ -63,6 +63,13 @@ var Commands = map[string]CmdDef{
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	},
+	CmdNamespacePropUpdate: {
+		Method:      MethodPATCH,
+		Path:        `/namespace/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	},
 }
 
 func AssertCommandIsDefined(c string) {
@@ -81,6 +88,39 @@ func OnlyUnreserved(s string) error {
 				string(b),
 			)
 		}
+	}
+	return nil
+}
+
+// ValidNamespace checks that s only contains characters and structure suitable
+// for a namespace name
+func ValidNamespace(s string) error {
+	for _, b := range []byte(s) {
+		if !strings.Contains(CharNamespace, string(b)) {
+			return fmt.Errorf(
+				"String <%s> contains illegal character <%s>",
+				s,
+				string(b),
+			)
+		}
+	}
+	switch strings.Count(s, `~`) {
+	case 0:
+	case 1:
+		switch {
+		case strings.HasPrefix(s, `tool~`):
+		case strings.HasPrefix(s, `team~`):
+		default:
+			return fmt.Errorf(
+				"Unknown namespace prefix: %s",
+				strings.Split(s, `~`)[1],
+			)
+		}
+	default:
+		return fmt.Errorf(
+			"Character <~> matches %d times but is only allowed once as prefix separator",
+			strings.Count(s, `~`),
+		)
 	}
 	return nil
 }

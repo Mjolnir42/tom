@@ -8,9 +8,6 @@
 package meta // // import "github.com/mjolnir42/tom/internal/model/meta"
 
 import (
-	"database/sql"
-	"time"
-
 	"github.com/mjolnir42/tom/internal/msg"
 )
 
@@ -40,40 +37,6 @@ func (h *NamespaceWriteHandler) process(q *msg.Request) {
 // remove deletes a specific namespace
 func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 	mr.NotImplemented() // TODO
-}
-
-// propertyUpdate ...
-func (h *NamespaceWriteHandler) propertyUpdate(q *msg.Request, mr *msg.Result) {
-	var (
-		err    error
-		tx     *sql.Tx
-		txTime time.Time
-		ok     bool
-	)
-	txTime = time.Now().UTC()
-
-	// tx.Begin()
-	if tx, err = h.conn.Begin(); err != nil {
-		mr.ServerError(err)
-		return
-	}
-
-	// forall Property in Request
-	for key := range q.Namespace.Property {
-		if ok = h.txPropUpdate(
-			q, mr, tx, &txTime, q.Namespace.Property[key],
-		); !ok {
-			tx.Rollback()
-			return
-		}
-	}
-	// tx.Commit()
-	if err = tx.Commit(); err != nil {
-		mr.ServerError(err)
-		return
-	}
-	mr.Namespace = append(mr.Namespace, q.Namespace)
-	mr.OK()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

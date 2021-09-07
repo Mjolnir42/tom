@@ -42,4 +42,9 @@ func NamespacePropSet(c *cli.Context) {
 	GenericPropertyChain(c, uniq, multi)
 }
 
+func NamespacePropUpdate(c *cli.Context) {
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdNamespacePropUpdate)
+	GenericPropertyChain(c, uniq, multi)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -83,6 +83,7 @@ const (
 	CharDigit       = `0123456789`
 	CharPunctuation = `-_.`
 	CharUnreserved  = CharAlpha + CharDigit + CharPunctuation
+	CharNamespace   = CharAlpha + CharDigit + CharPunctuation + `~`
 )
 
 const (

@@ -12,7 +12,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
-	"github.com/mjolnir42/tom/internal/rest"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
@@ -20,8 +19,6 @@ import (
 // request router
 func (m *Model) routeRegisterNamespace(rt *httprouter.Router) {
 	rt.DELETE(`/namespace/:tomID`, m.x.Authenticated(m.NamespaceRemove))
-
-	rt.PATCH(`/namespace/:tomID/property/`, m.x.Authenticated(m.NamespacePropertyUpdate))
 
 	for _, f := range registry {
 		m.x.LM.GetLogger(`application`).Infof(
@@ -69,37 +66,6 @@ func (m *Model) NamespaceRemove(w http.ResponseWriter, r *http.Request,
 		TomID: params.ByName(`tomID`),
 	}
 
-	if err := request.Namespace.ParseTomID(); err != nil {
-		m.x.ReplyBadRequest(&w, &request, err)
-		return
-	}
-
-	if !m.x.IsAuthorized(&request) {
-		m.x.ReplyForbidden(&w, &request)
-		return
-	}
-
-	m.x.HM.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
-	m.x.Send(&w, &result, exportNamespace)
-}
-
-// NamespacePropertyUpdate function
-func (m *Model) NamespacePropertyUpdate(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer rest.PanicCatcher(w, m.x.LM)
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionNamespace
-	request.Action = msg.ActionPropUpdate
-
-	req := proto.Request{}
-	if err := rest.DecodeJSONBody(r, &req); err != nil {
-		m.x.ReplyBadRequest(&w, &request, err)
-		return
-	}
-	request.Namespace = *req.Namespace
-	request.Namespace.TomID = params.ByName(`tomID`)
 	if err := request.Namespace.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
