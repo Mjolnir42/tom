@@ -190,7 +190,7 @@ func (h *NamespaceReadHandler) show(q *msg.Request, mr *msg.Result) {
 		}
 
 		switch typ {
-		case `unique`:
+		case proto.AttributeUnique:
 			attr.Unique = true
 		}
 		ns.Attributes = append(ns.Attributes, attr)

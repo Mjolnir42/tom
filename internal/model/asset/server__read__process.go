@@ -192,9 +192,9 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 				Value:     value,
 			}
 			switch attrTyp {
-			case `unique`:
+			case proto.AttributeUnique:
 				server.UniqProperty = append(server.UniqProperty, server.Property[key])
-			case `standard`:
+			case proto.AttributeStandard:
 				server.StdProperty = append(server.StdProperty, server.Property[key])
 			default:
 				rows.Close()

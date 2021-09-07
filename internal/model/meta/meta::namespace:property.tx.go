@@ -83,11 +83,11 @@ func (h *NamespaceWriteHandler) txPropUpdate(
 	// select standard|unique
 	var stmtSelect, stmtClamp, stmtAdd *sql.Stmt
 	switch attributeType {
-	case `standard`:
+	case proto.AttributeStandard:
 		stmtSelect = tx.Stmt(h.stmtTxStdPropSelect)
 		stmtClamp = tx.Stmt(h.stmtTxStdPropClamp)
 		stmtAdd = tx.Stmt(h.stmtTxStdPropAdd)
-	case `unique`:
+	case proto.AttributeUnique:
 		stmtSelect = tx.Stmt(h.stmtTxUniqPropSelect)
 		stmtClamp = tx.Stmt(h.stmtTxUniqPropClamp)
 		stmtAdd = tx.Stmt(h.stmtTxUniqPropAdd)

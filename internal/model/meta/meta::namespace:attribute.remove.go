@@ -115,8 +115,8 @@ func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) 
 			return
 		}
 		switch {
-		case attrType == `unique` && attribute.Unique:
-		case attrType == `standard` && !attribute.Unique:
+		case attrType == proto.AttributeUnique && attribute.Unique:
+		case attrType == proto.AttributeStandard && !attribute.Unique:
 		default:
 			mr.ServerError(
 				fmt.Errorf("Mismatched attribute type: %s",
@@ -127,7 +127,7 @@ func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) 
 		}
 
 		switch attrType {
-		case `unique`:
+		case proto.AttributeUnique:
 			for _, statement := range []string{
 				stmt.ContainerStdAttrRemove,
 				stmt.OrchestrationStdAttrRemove,
@@ -156,7 +156,7 @@ func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) 
 					return
 				}
 			}
-		case `standard`:
+		case proto.AttributeStandard:
 			for _, statement := range []string{
 				stmt.ContainerUniqAttrRemove,
 				stmt.OrchestrationUniqAttrRemove,
