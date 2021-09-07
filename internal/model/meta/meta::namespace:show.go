@@ -34,7 +34,8 @@ func namespaceShow(m *Model) httprouter.Handle {
 }
 
 func exportNamespaceShow(result *proto.Result, r *msg.Result) {
-	exportNamespace(result, r)
+	result.Namespace = &[]proto.Namespace{}
+	*result.Namespace = append(*result.Namespace, r.Namespace...)
 }
 
 // NamespaceShow function

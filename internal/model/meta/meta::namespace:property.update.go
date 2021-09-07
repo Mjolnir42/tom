@@ -87,7 +87,7 @@ func (m *Model) NamespacePropertyUpdate(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result, exportNamespace)
+	m.x.Send(&w, &result, exportNamespacePropertyUpdate)
 }
 
 // propertyUpdate updates the specified properties of a namespace.
