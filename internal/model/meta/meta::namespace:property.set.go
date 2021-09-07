@@ -162,12 +162,10 @@ func (h *NamespaceWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 		// add newly created attribute to map
 		attrMap[key] = proto.AttributeStandard
 	}
-	fmt.Println("CREATED ATTRIBUTES")
 
 	// for all properties specified in the request, update the value.
 	// this transparently creates missing entries.
 	for key := range q.Namespace.Property {
-		fmt.Printf("UPDATING %s\n", key)
 		if ok = h.txPropUpdate(
 			q, mr, tx, &txTime, q.Namespace.Property[key],
 		); !ok {
