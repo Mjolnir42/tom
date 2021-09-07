@@ -77,7 +77,9 @@ FROM              cte
 ON CONFLICT       ON CONSTRAINT __mda_temporal DO NOTHING;`
 
 	NamespaceRemove = `
-SELECT      'Namespace.REMOVE(TODO)';`
+DELETE FROM       meta.dictionary
+WHERE             dictionaryID = $1::uuid
+  AND             name = $2::text;`
 
 	NamespaceAttributeAddStandard = `
 WITH cte     AS ( SELECT      meta.dictionary.dictionaryID AS dictID,

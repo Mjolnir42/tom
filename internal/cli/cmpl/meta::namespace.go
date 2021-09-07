@@ -19,6 +19,10 @@ func NamespaceAdd(c *cli.Context) {
 	GenericMulti(c, uniq, multi)
 }
 
+func NamespaceRemove(c *cli.Context) {
+	None(c)
+}
+
 func NamespaceList(c *cli.Context) {
 	None(c)
 }

@@ -92,6 +92,13 @@ func registerMetaNamespace(app cli.App, run Runtime) *cli.App {
 							},
 						},
 					},
+					{
+						Name:         `remove`,
+						Usage:        `Remove a namespace`,
+						Description:  help.Text(proto.CmdNamespaceRemove),
+						Action:       run(cmdMetaNamespaceRemove),
+						BashComplete: cmpl.NamespaceRemove,
+					},
 				},
 			},
 		}...,

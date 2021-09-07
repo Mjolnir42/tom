@@ -11,6 +11,7 @@ tom namespace list
 tom namespace show ${name}
 tom namespace attribute add ${name} [std-attr ${std}] [uniq-attr ${uniq}]
 tom namespace attribute remove ${name} [std-attr ${std}] [uniq-attr ${uniq}]
+tom namespace remove ${name}
 ```
 
 See `tom namespace help ${command}` for detailed help.

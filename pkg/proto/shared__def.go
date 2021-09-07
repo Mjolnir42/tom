@@ -77,6 +77,13 @@ var Commands = map[string]CmdDef{
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	},
+	CmdNamespaceRemove: {
+		Method:      MethodDELETE,
+		Path:        `/namespace/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	},
 }
 
 func AssertCommandIsDefined(c string) {
