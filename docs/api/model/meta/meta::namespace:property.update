@@ -1,32 +1,14 @@
 PATCH /namespace/:tomID/property/
   { "namespace": {
       "property": {
-        "dict_name": {
-          "attribute": dict_name
+        $attribute1: {
+          "attribute": $attribute1
           "value": ...
           [ "validSince": ... ]
           [ "validUntil": ... ]
         },
-        "dict_type": {
-          "attribute": dict_type
-          "value": ...
-          [ "validSince": ... ]
-          [ "validUntil": ... ]
-        },
-        "dict_lookup": {
-          "attribute": dict_lookup
-          "value": ...
-          [ "validSince": ... ]
-          [ "validUntil": ... ]
-        },
-        "dict_uri": {
-          "attribute": dict_uri
-          "value": ...
-          [ "validSince": ... ]
-          [ "validUntil": ... ]
-        },
-        "dict_ntt_list": {
-          "attribute": dict_ntt_list
+        $attribute2: {
+          "attribute": $attribute2
           "value": ...
           [ "validSince": ... ]
           [ "validUntil": ... ]

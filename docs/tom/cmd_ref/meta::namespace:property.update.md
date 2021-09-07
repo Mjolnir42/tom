@@ -54,6 +54,6 @@ omnipotence | | | no | yes
 # EXAMPLES
 
 ```
-tom namespace property set inventory property foobar value since always until 2021-10-31T09:57:03.000+02:00
-tom namespace property set inventory property foobar value test1 property barfoo value test2
+tom namespace property update inventory property foobar value since always until 2021-10-31T09:57:03.000+02:00
+tom namespace property update inventory property foobar value test1 property barfoo value test2
 ```
