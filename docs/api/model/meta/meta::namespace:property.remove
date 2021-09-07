@@ -1,0 +1,13 @@
+DELETE /namespace/:tomID/property/
+  { "namespace": {
+      "property": {
+        $attribute1: {
+          "attribute": $attribute1
+        },
+        $attribute2: {
+          "attribute": $attribute2
+        },
+        ....
+      },
+    }
+  }

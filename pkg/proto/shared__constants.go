@@ -39,6 +39,7 @@ const (
 	ActionMbrList    = `member.list`
 	ActionMbrRemove  = `member.remove`
 	ActionMbrSet     = `member.set`
+	ActionPropRemove = `property.remove`
 	ActionPropSet    = `property.set`
 	ActionPropUpdate = `property.update`
 	ActionRemove     = `remove`
@@ -61,6 +62,7 @@ const (
 	CmdNamespaceAttrAdd    = ModelMeta + `::` + EntityNamespace + `:` + ActionAttrAdd
 	CmdNamespaceAttrRemove = ModelMeta + `::` + EntityNamespace + `:` + ActionAttrRemove
 	CmdNamespaceList       = ModelMeta + `::` + EntityNamespace + `:` + ActionList
+	CmdNamespacePropRemove = ModelMeta + `::` + EntityNamespace + `:` + ActionPropRemove
 	CmdNamespacePropSet    = ModelMeta + `::` + EntityNamespace + `:` + ActionPropSet
 	CmdNamespacePropUpdate = ModelMeta + `::` + EntityNamespace + `:` + ActionPropUpdate
 	CmdNamespaceRemove     = ModelMeta + `::` + EntityNamespace + `:` + ActionRemove

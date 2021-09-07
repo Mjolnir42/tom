@@ -47,4 +47,9 @@ func NamespacePropUpdate(c *cli.Context) {
 	GenericPropertyChain(c, uniq, multi)
 }
 
+func NamespacePropRemove(c *cli.Context) {
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdNamespacePropRemove)
+	GenericMulti(c, uniq, multi)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

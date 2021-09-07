@@ -29,6 +29,8 @@ func (h *NamespaceWriteHandler) process(q *msg.Request) {
 		h.propertySet(q, &result)
 	case proto.ActionPropUpdate:
 		h.propertyUpdate(q, &result)
+	case proto.ActionPropRemove:
+		h.propertyRemove(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
