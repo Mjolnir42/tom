@@ -53,7 +53,7 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 	}
 	request.Namespace = *req.Namespace
 
-	if err := proto.OnlyUnreserved(
+	if err := proto.ValidNamespace(
 		request.Namespace.Property[`dict_name`].Value,
 	); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)

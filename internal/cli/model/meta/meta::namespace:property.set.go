@@ -32,7 +32,7 @@ func cmdMetaNamespacePropSet(c *cli.Context) error {
 		return err
 	}
 
-	if err := proto.OnlyUnreserved(c.Args().First()); err != nil {
+	if err := proto.ValidNamespace(c.Args().First()); err != nil {
 		return err
 	}
 

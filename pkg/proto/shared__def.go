@@ -78,7 +78,7 @@ func AssertCommandIsDefined(c string) {
 	}
 }
 
-// OnlyUnreserved checks that s only contains charcters from proto.CharUnreserved
+// OnlyUnreserved checks that s only contains characters from proto.CharUnreserved
 func OnlyUnreserved(s string) error {
 	for _, b := range []byte(s) {
 		if !strings.Contains(CharUnreserved, string(b)) {

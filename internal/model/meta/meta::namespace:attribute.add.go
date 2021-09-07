@@ -79,7 +79,7 @@ func (m *Model) NamespaceAttrAdd(w http.ResponseWriter, r *http.Request,
 		}
 	}
 
-	if err := proto.OnlyUnreserved(request.Namespace.Name); err != nil {
+	if err := proto.ValidNamespace(request.Namespace.Name); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
