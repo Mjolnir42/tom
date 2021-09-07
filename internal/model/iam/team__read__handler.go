@@ -14,6 +14,7 @@ import (
 	"github.com/mjolnir42/tom/internal/handler"
 	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/stmt"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 // Implementation of the handler.Handler interface
@@ -37,9 +38,9 @@ func (h *TeamReadHandler) PriorityIntake() chan msg.Request {
 // Register the handlername for the requests it wants to receive
 func (h *TeamReadHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
-		msg.ActionList,
-		msg.ActionMbrList,
-		msg.ActionShow,
+		proto.ActionList,
+		proto.ActionMbrList,
+		proto.ActionShow,
 	} {
 		hm.Request(msg.SectionTeam, action, h.name)
 	}

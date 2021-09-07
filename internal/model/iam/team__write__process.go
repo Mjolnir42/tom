@@ -9,6 +9,7 @@ package iam // import "github.com/mjolnir42/tom/internal/model/iam"
 
 import (
 	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 // process is the request dispatcher
@@ -16,19 +17,19 @@ func (h *TeamWriteHandler) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case msg.ActionAdd:
+	case proto.ActionAdd:
 		h.add(q, &result)
-	case msg.ActionRemove:
+	case proto.ActionRemove:
 		h.remove(q, &result)
-	case msg.ActionUpdate:
+	case proto.ActionUpdate:
 		h.update(q, &result)
-	case msg.ActionHdSet:
+	case proto.ActionHdSet:
 		h.headOfSet(q, &result)
-	case msg.ActionHdUnset:
+	case proto.ActionHdUnset:
 		h.headOfUnset(q, &result)
-	case msg.ActionMbrAdd:
+	case proto.ActionMbrAdd:
 		h.memberAdd(q, &result)
-	case msg.ActionMbrRemove:
+	case proto.ActionMbrRemove:
 		h.memberRemove(q, &result)
 	default:
 		result.UnknownRequest(q)

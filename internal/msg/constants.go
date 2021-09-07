@@ -33,24 +33,6 @@ const (
 )
 
 const (
-	ActionAdd        = proto.ActionAdd
-	ActionAttrAdd    = proto.ActionAttrAdd
-	ActionAttrRemove = proto.ActionAttrRemove
-	ActionHdSet      = proto.ActionHdSet
-	ActionHdUnset    = proto.ActionHdUnset
-	ActionList       = proto.ActionList
-	ActionMbrAdd     = proto.ActionMbrAdd
-	ActionMbrList    = proto.ActionMbrList
-	ActionMbrRemove  = proto.ActionMbrRemove
-	ActionMbrSet     = proto.ActionMbrSet
-	ActionPropSet    = proto.ActionPropSet
-	ActionPropUpdate = proto.ActionPropUpdate
-	ActionRemove     = proto.ActionRemove
-	ActionShow       = proto.ActionShow
-	ActionUpdate     = proto.ActionUpdate
-)
-
-const (
 	// RFC3339Milli is a format string for millisecond precision RFC3339
 	RFC3339Milli string = `2006-01-02T15:04:05.000Z07:00`
 )

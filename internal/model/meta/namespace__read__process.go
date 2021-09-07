@@ -9,6 +9,7 @@ package meta // import "github.com/mjolnir42/tom/internal/model/meta"
 
 import (
 	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 // process is the request dispatcher
@@ -16,9 +17,9 @@ func (h *NamespaceReadHandler) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case msg.ActionList:
+	case proto.ActionList:
 		h.list(q, &result)
-	case msg.ActionShow:
+	case proto.ActionShow:
 		h.show(q, &result)
 	default:
 		result.UnknownRequest(q)

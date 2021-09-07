@@ -13,7 +13,7 @@ import (
 
 	"github.com/mjolnir42/tom/internal/msg"
 	//	"github.com/mjolnir42/tom/internal/stmt"
-	//	"github.com/mjolnir42/tom/pkg/proto"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 // process is the request dispatcher
@@ -22,9 +22,9 @@ func (h *ServerWriteHandler) process(q *msg.Request) {
 	//	logRequest(h.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionAdd:
+	case proto.ActionAdd:
 		h.add(q, &result)
-	case msg.ActionRemove:
+	case proto.ActionRemove:
 		h.remove(q, &result)
 	default:
 		result.UnknownRequest(q)

@@ -43,7 +43,7 @@ func (m *Model) ServerList(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionServer
-	request.Action = msg.ActionList
+	request.Action = proto.ActionList
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -61,7 +61,7 @@ func (m *Model) ServerShow(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionServer
-	request.Action = msg.ActionShow
+	request.Action = proto.ActionShow
 	request.Server = proto.Server{
 		TomID:     params.ByName(`tomID`),
 		Namespace: r.URL.Query().Get(`namespace`),
@@ -92,7 +92,7 @@ func (m *Model) ServerAdd(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionServer
-	request.Action = msg.ActionAdd
+	request.Action = proto.ActionAdd
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -117,7 +117,7 @@ func (m *Model) ServerRemove(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionServer
-	request.Action = msg.ActionRemove
+	request.Action = proto.ActionRemove
 	request.Server = proto.Server{
 		TomID: params.ByName(`tomID`),
 	}

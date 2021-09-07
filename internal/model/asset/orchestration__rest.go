@@ -43,7 +43,7 @@ func (m *Model) OrchestrationList(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionOrchestration
-	request.Action = msg.ActionList
+	request.Action = proto.ActionList
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -61,7 +61,7 @@ func (m *Model) OrchestrationShow(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionOrchestration
-	request.Action = msg.ActionShow
+	request.Action = proto.ActionShow
 	request.Orchestration = proto.Orchestration{
 		TomID:     params.ByName(`tomID`),
 		Namespace: r.URL.Query().Get(`namespace`),
@@ -92,7 +92,7 @@ func (m *Model) OrchestrationAdd(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionOrchestration
-	request.Action = msg.ActionAdd
+	request.Action = proto.ActionAdd
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -117,7 +117,7 @@ func (m *Model) OrchestrationRemove(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionOrchestration
-	request.Action = msg.ActionRemove
+	request.Action = proto.ActionRemove
 	request.Orchestration = proto.Orchestration{
 		TomID: params.ByName(`tomID`),
 	}

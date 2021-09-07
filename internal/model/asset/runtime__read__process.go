@@ -13,7 +13,7 @@ import (
 
 	"github.com/mjolnir42/tom/internal/msg"
 	//	"github.com/mjolnir42/tom/internal/stmt"
-	//	"github.com/mjolnir42/tom/pkg/proto"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 // process is the request dispatcher
@@ -22,9 +22,9 @@ func (h *RuntimeReadHandler) process(q *msg.Request) {
 	//	logRequest(h.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionList:
+	case proto.ActionList:
 		h.list(q, &result)
-	case msg.ActionShow:
+	case proto.ActionShow:
 		h.show(q, &result)
 	default:
 		result.UnknownRequest(q)

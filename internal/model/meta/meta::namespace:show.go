@@ -44,7 +44,7 @@ func (m *Model) NamespaceShow(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionNamespace
-	request.Action = msg.ActionShow
+	request.Action = proto.ActionShow
 	request.Namespace = proto.Namespace{
 		TomID: params.ByName(`tomID`),
 		Name:  r.URL.Query().Get(`name`),

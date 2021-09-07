@@ -9,6 +9,7 @@ package iam // import "github.com/mjolnir42/tom/internal/model/iam"
 
 import (
 	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 // process is the request dispatcher
@@ -16,9 +17,9 @@ func (h *LibraryWriteHandler) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case msg.ActionAdd:
+	case proto.ActionAdd:
 		h.add(q, &result)
-	case msg.ActionRemove:
+	case proto.ActionRemove:
 		h.remove(q, &result)
 	default:
 		result.UnknownRequest(q)

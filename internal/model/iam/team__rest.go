@@ -53,7 +53,7 @@ func (m *Model) TeamList(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionList
+	request.Action = proto.ActionList
 	request.Team = proto.Team{
 		LibraryName: params.ByName(`lib`),
 	}
@@ -74,7 +74,7 @@ func (m *Model) TeamShow(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionShow
+	request.Action = proto.ActionShow
 	request.Team = proto.Team{
 		LibraryName: params.ByName(`lib`),
 	}
@@ -103,7 +103,7 @@ func (m *Model) TeamAdd(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionAdd
+	request.Action = proto.ActionAdd
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -129,7 +129,7 @@ func (m *Model) TeamRemove(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionRemove
+	request.Action = proto.ActionRemove
 	request.Team = proto.Team{
 		LibraryName: params.ByName(`lib`),
 		TeamName:    params.ByName(`team`),
@@ -151,7 +151,7 @@ func (m *Model) TeamUpdate(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionUpdate
+	request.Action = proto.ActionUpdate
 	request.Team = proto.Team{
 		LibraryName: params.ByName(`lib`),
 		TeamName:    params.ByName(`team`),
@@ -181,7 +181,7 @@ func (m *Model) TeamHeadOfSet(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionHdSet
+	request.Action = proto.ActionHdSet
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -214,7 +214,7 @@ func (m *Model) TeamHeadOfUnset(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionHdUnset
+	request.Action = proto.ActionHdUnset
 	request.Team = proto.Team{
 		LibraryName: params.ByName(`lib`),
 		TeamName:    params.ByName(`team`),
@@ -236,7 +236,7 @@ func (m *Model) TeamMemberAdd(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionMbrAdd
+	request.Action = proto.ActionMbrAdd
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -273,7 +273,7 @@ func (m *Model) TeamMemberSet(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionMbrSet
+	request.Action = proto.ActionMbrSet
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -310,7 +310,7 @@ func (m *Model) TeamMemberList(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionMbrList
+	request.Action = proto.ActionMbrList
 	request.Team = proto.Team{
 		LibraryName: params.ByName(`lib`),
 		TeamName:    params.ByName(`team`),
@@ -332,7 +332,7 @@ func (m *Model) TeamMemberRemove(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
-	request.Action = msg.ActionMbrRemove
+	request.Action = proto.ActionMbrRemove
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

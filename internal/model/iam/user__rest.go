@@ -44,7 +44,7 @@ func (m *Model) UserList(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionUser
-	request.Action = msg.ActionList
+	request.Action = proto.ActionList
 	request.User = proto.User{
 		LibraryName: params.ByName(`lib`),
 	}
@@ -65,7 +65,7 @@ func (m *Model) UserShow(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionUser
-	request.Action = msg.ActionShow
+	request.Action = proto.ActionShow
 	request.User = proto.User{
 		LibraryName: params.ByName(`lib`),
 	}
@@ -94,7 +94,7 @@ func (m *Model) UserAdd(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionUser
-	request.Action = msg.ActionAdd
+	request.Action = proto.ActionAdd
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -120,7 +120,7 @@ func (m *Model) UserRemove(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionUser
-	request.Action = msg.ActionRemove
+	request.Action = proto.ActionRemove
 	request.User = proto.User{
 		LibraryName: params.ByName(`lib`),
 		UserName:    params.ByName(`user`),
@@ -147,7 +147,7 @@ func (m *Model) UserUpdate(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionUser
-	request.Action = msg.ActionRemove
+	request.Action = proto.ActionRemove
 	request.User = proto.User{
 		LibraryName: params.ByName(`lib`),
 		UserName:    params.ByName(`user`),

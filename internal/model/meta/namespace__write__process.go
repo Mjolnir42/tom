@@ -9,6 +9,7 @@ package meta // import "github.com/mjolnir42/tom/internal/model/meta"
 
 import (
 	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 // process is the request dispatcher
@@ -16,17 +17,17 @@ func (h *NamespaceWriteHandler) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case msg.ActionAdd:
+	case proto.ActionAdd:
 		h.add(q, &result)
-	case msg.ActionRemove:
+	case proto.ActionRemove:
 		h.remove(q, &result)
-	case msg.ActionAttrAdd:
+	case proto.ActionAttrAdd:
 		h.attributeAdd(q, &result)
-	case msg.ActionAttrRemove:
+	case proto.ActionAttrRemove:
 		h.attributeRemove(q, &result)
-	case msg.ActionPropSet:
+	case proto.ActionPropSet:
 		h.propertySet(q, &result)
-	case msg.ActionPropUpdate:
+	case proto.ActionPropUpdate:
 		h.propertyUpdate(q, &result)
 	default:
 		result.UnknownRequest(q)

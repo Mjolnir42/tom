@@ -43,7 +43,7 @@ func (m *Model) LibraryList(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionLibrary
-	request.Action = msg.ActionList
+	request.Action = proto.ActionList
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -61,7 +61,7 @@ func (m *Model) LibraryShow(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionLibrary
-	request.Action = msg.ActionShow
+	request.Action = proto.ActionShow
 	request.Library = proto.Library{}
 
 	switch {
@@ -88,7 +88,7 @@ func (m *Model) LibraryAdd(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionLibrary
-	request.Action = msg.ActionAdd
+	request.Action = proto.ActionAdd
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -113,7 +113,7 @@ func (m *Model) LibraryRemove(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionLibrary
-	request.Action = msg.ActionRemove
+	request.Action = proto.ActionRemove
 	request.Library = proto.Library{
 		Name: params.ByName(`lib`),
 	}

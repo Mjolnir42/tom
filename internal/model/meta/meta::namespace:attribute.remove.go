@@ -44,7 +44,7 @@ func (m *Model) NamespaceAttrRemove(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionNamespace
-	request.Action = msg.ActionAttrRemove
+	request.Action = proto.ActionAttrRemove
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

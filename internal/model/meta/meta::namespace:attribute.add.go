@@ -44,7 +44,7 @@ func (m *Model) NamespaceAttrAdd(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionNamespace
-	request.Action = msg.ActionAttrAdd
+	request.Action = proto.ActionAttrAdd
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
