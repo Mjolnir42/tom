@@ -67,7 +67,8 @@ func (m *Model) NamespacePropertyUpdate(w http.ResponseWriter, r *http.Request,
 	// check property structure is setup
 	if request.Namespace.Property == nil {
 		m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
-			"Invalid property.set request without properties",
+			"Invalid %s request without properties",
+			proto.ActionPropUpdate,
 		))
 		return
 	}
