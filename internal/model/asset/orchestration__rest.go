@@ -16,15 +16,6 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// routeRegisterOrchestration registers the runtime routes with the request
-// router
-func (m *Model) routeRegisterOrchestration(rt *httprouter.Router) {
-	rt.GET(`/orchestration/`, m.x.Authenticated(m.OrchestrationList))
-	rt.GET(`/orchestration/:tomID`, m.x.Authenticated(m.OrchestrationShow))
-	rt.POST(`/orchestration/`, m.x.Authenticated(m.OrchestrationAdd))
-	rt.DELETE(`/orchestration/:tomID`, m.x.Authenticated(m.OrchestrationRemove))
-}
-
 func exportOrchestration(result *proto.Result, r *msg.Result) {
 	result.Orchestration = &[]proto.Orchestration{}
 	*result.Orchestration = append(*result.Orchestration, r.Orchestration...)

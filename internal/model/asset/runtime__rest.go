@@ -16,15 +16,6 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// routeRegisterRuntime registers the runtime routes with the request
-// router
-func (m *Model) routeRegisterRuntime(rt *httprouter.Router) {
-	rt.GET(`/runtime/`, m.x.Authenticated(m.RuntimeList))
-	rt.GET(`/runtime/:tomID`, m.x.Authenticated(m.RuntimeShow))
-	rt.POST(`/runtime/`, m.x.Authenticated(m.RuntimeAdd))
-	rt.DELETE(`/runtime/:tomID`, m.x.Authenticated(m.RuntimeRemove))
-}
-
 func exportRuntime(result *proto.Result, r *msg.Result) {
 	result.Runtime = &[]proto.Runtime{}
 	*result.Runtime = append(*result.Runtime, r.Runtime...)

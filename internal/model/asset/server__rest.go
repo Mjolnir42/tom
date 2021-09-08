@@ -16,15 +16,6 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// routeRegisterServer registers the server routes with the request
-// router
-func (m *Model) routeRegisterServer(rt *httprouter.Router) {
-	rt.GET(`/server/`, m.x.Authenticated(m.ServerList))
-	rt.GET(`/server/:tomID`, m.x.Authenticated(m.ServerShow))
-	rt.POST(`/server/`, m.x.Authenticated(m.ServerAdd))
-	rt.DELETE(`/server/:tomID`, m.x.Authenticated(m.ServerRemove))
-}
-
 func exportServer(result *proto.Result, r *msg.Result) {
 	result.Server = &[]proto.Server{}
 	*result.Server = append(*result.Server, r.Server...)
