@@ -8,6 +8,9 @@
 package proto //
 
 import (
+	"bytes"
+	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"strings"
 )
@@ -135,6 +138,43 @@ func ValidNamespace(s string) error {
 			"Character <~> matches %d times but is only allowed once as prefix separator",
 			strings.Count(s, `~`),
 		)
+	}
+	return nil
+}
+
+// CheckPropertyConstraints checks that if the property attribute end
+// with one of the suffixes _list, _json or _xml, then the value must
+// decode appropriately.
+func CheckPropertyConstraints(prop *PropertyDetail) error {
+	if strings.HasSuffix(prop.Attribute, `_list`) {
+		jl := &[]string{}
+		if err := json.NewDecoder(bytes.NewBufferString(prop.Value)).Decode(jl); err != nil {
+			return fmt.Errorf("Property %s is not a valid list: %s",
+				prop.Attribute,
+				err.Error(),
+			)
+		}
+		return nil
+	}
+	if strings.HasSuffix(prop.Attribute, `_json`) {
+		var j interface{}
+		if err := json.NewDecoder(bytes.NewBufferString(prop.Value)).Decode(j); err != nil {
+			return fmt.Errorf("Property %s is not valid JSON: %s",
+				prop.Attribute,
+				err.Error(),
+			)
+		}
+		return nil
+	}
+	if strings.HasSuffix(prop.Attribute, `_xml`) {
+		var x interface{}
+		if err := xml.NewDecoder(bytes.NewBufferString(prop.Value)).Decode(x); err != nil {
+			return fmt.Errorf("Property %s is not supported XML: %s",
+				prop.Attribute,
+				err.Error(),
+			)
+		}
+		return nil
 	}
 	return nil
 }

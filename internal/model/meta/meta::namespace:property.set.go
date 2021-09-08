@@ -73,8 +73,12 @@ func (m *Model) NamespacePropertySet(w http.ResponseWriter, r *http.Request,
 	}
 
 	// check property names are all valid
-	for prop := range request.Namespace.Property {
+	for prop, obj := range request.Namespace.Property {
 		if err := proto.OnlyUnreserved(prop); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+		if err := proto.CheckPropertyConstraints(&obj); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}

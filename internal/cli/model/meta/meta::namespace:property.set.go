@@ -45,6 +45,10 @@ func cmdMetaNamespacePropSet(c *cli.Context) error {
 			return err
 		}
 
+		if err := proto.CheckPropertyConstraints(&prop); err != nil {
+			return err
+		}
+
 		req.Namespace.Property[prop.Attribute] = prop
 	}
 
