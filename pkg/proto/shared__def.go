@@ -158,7 +158,7 @@ func CheckPropertyConstraints(prop *PropertyDetail) error {
 	}
 	if strings.HasSuffix(prop.Attribute, `_json`) {
 		var j interface{}
-		if err := json.NewDecoder(bytes.NewBufferString(prop.Value)).Decode(j); err != nil {
+		if err := json.NewDecoder(bytes.NewBufferString(prop.Value)).Decode(&j); err != nil {
 			return fmt.Errorf("Property %s is not valid JSON: %s",
 				prop.Attribute,
 				err.Error(),
@@ -168,7 +168,7 @@ func CheckPropertyConstraints(prop *PropertyDetail) error {
 	}
 	if strings.HasSuffix(prop.Attribute, `_xml`) {
 		var x interface{}
-		if err := xml.NewDecoder(bytes.NewBufferString(prop.Value)).Decode(x); err != nil {
+		if err := xml.Unmarshal([]byte(prop.Value), &x); err != nil {
 			return fmt.Errorf("Property %s is not supported XML: %s",
 				prop.Attribute,
 				err.Error(),
