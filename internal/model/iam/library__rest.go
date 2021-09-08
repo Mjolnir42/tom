@@ -16,15 +16,6 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// routeRegisterLibrary registers the library routes with the
-// request router
-func (m *Model) routeRegisterLibrary(rt *httprouter.Router) {
-	rt.GET(`/idlib/`, m.x.Authenticated(m.LibraryList))
-	rt.GET(`/idlib/:lib`, m.x.Authenticated(m.LibraryShow))
-	rt.POST(`/idlib/`, m.x.Authenticated(m.LibraryAdd))
-	rt.DELETE(`/idlib/:lib`, m.x.Authenticated(m.LibraryRemove))
-}
-
 func exportLibrary(result *proto.Result, r *msg.Result) {
 	result.Library = &[]proto.Library{}
 	*result.Library = append(*result.Library, r.Library...)

@@ -17,24 +17,6 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// routeRegisterTeam registers the team routes with the
-// request router
-func (m *Model) routeRegisterTeam(rt *httprouter.Router) {
-	rt.DELETE(`/idlib/:lib/team/:team`, m.x.Authenticated(m.TeamRemove))
-	rt.GET(`/idlib/:lib/team/:team`, m.x.Authenticated(m.TeamShow))
-	rt.GET(`/idlib/:lib/team/`, m.x.Authenticated(m.TeamList))
-	rt.PATCH(`/idlib/:lib/team/:team`, m.x.Authenticated(m.TeamUpdate))
-	rt.POST(`/idlib/:lib/team/`, m.x.Authenticated(m.TeamAdd))
-
-	rt.DELETE(`/idlib/:lib/team/:team/headof`, m.x.Authenticated(m.TeamHeadOfUnset))
-	rt.PUT(`/idlib/:lib/team/:team/headof`, m.x.Authenticated(m.TeamHeadOfSet))
-
-	rt.DELETE(`/idlib/:lib/team/:team/member/:user`, m.x.Authenticated(m.TeamMemberRemove))
-	rt.GET(`/idlib/:lib/team/:team/member/`, m.x.Authenticated(m.TeamMemberList))
-	rt.PATCH(`/idlib/:lib/team/:team/member/`, m.x.Authenticated(m.TeamMemberAdd))
-	rt.PUT(`/idlib/:lib/team/:team/member/`, m.x.Authenticated(m.TeamMemberSet))
-}
-
 func exportTeam(result *proto.Result, r *msg.Result) {
 	result.Team = &[]proto.Team{}
 	*result.Team = append(*result.Team, r.Team...)

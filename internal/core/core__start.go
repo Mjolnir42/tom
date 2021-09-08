@@ -21,10 +21,8 @@ func (x *Core) Start() {
 	// meta Model
 	meta.HandleRegister(x.hm, x.conf.QueueLen)
 
-	x.hm.Add(asset.NewServerReadHandler(x.conf.QueueLen))
-	x.hm.Add(asset.NewServerWriteHandler(x.conf.QueueLen))
-	x.hm.Add(asset.NewRuntimeReadHandler(x.conf.QueueLen))
-	x.hm.Add(asset.NewRuntimeWriteHandler(x.conf.QueueLen))
+	// asset model
+	asset.HandleRegister(x.hm, x.conf.QueueLen)
 
 	for handlerName := range x.hm.Range() {
 		x.hm.Configure(
