@@ -55,6 +55,7 @@ func (h *NamespaceWriteHandler) Register(hm *handler.Map) {
 		proto.ActionAdd,
 		proto.ActionAttrAdd,
 		proto.ActionAttrRemove,
+		proto.ActionPropRemove,
 		proto.ActionPropSet,
 		proto.ActionPropUpdate,
 		proto.ActionRemove,

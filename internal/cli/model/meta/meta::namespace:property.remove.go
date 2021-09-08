@@ -20,7 +20,7 @@ func init() {
 func cmdMetaNamespacePropRemove(c *cli.Context) error {
 	opts := map[string][]string{}
 	if err := adm.VariadicArguments(
-		proto.CmdNamespaceAttrAdd,
+		proto.CmdNamespacePropRemove,
 		c,
 		&opts,
 	); err != nil {
