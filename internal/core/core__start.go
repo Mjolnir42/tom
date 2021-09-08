@@ -23,8 +23,8 @@ func (x *Core) Start() {
 	x.hm.Add(iam.NewTeamReadHandler(x.conf.QueueLen))
 	x.hm.Add(iam.NewTeamWriteHandler(x.conf.QueueLen))
 
-	x.hm.Add(meta.NewNamespaceReadHandler(x.conf.QueueLen))
-	x.hm.Add(meta.NewNamespaceWriteHandler(x.conf.QueueLen))
+	// meta Model
+	meta.HandleRegister(x.hm, x.conf.QueueLen)
 
 	x.hm.Add(asset.NewServerReadHandler(x.conf.QueueLen))
 	x.hm.Add(asset.NewServerWriteHandler(x.conf.QueueLen))

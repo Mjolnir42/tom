@@ -5,7 +5,7 @@
  * that can be found in the LICENSE file.
  */
 
-package meta // // import "github.com/mjolnir42/tom/internal/model/meta"
+package meta // import "github.com/mjolnir42/tom/internal/model/meta"
 
 import (
 	"database/sql"
@@ -17,7 +17,53 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// Implementation of the handler.Handler interface
+// NamespaceReadHandler is the handler for read requests returning
+// namespace information
+type NamespaceReadHandler struct {
+	Input    chan msg.Request
+	Shutdown chan struct{}
+	name     string
+	conn     *sql.DB
+	lm       *lhm.LogHandleMap
+	stmtAttr *sql.Stmt
+	stmtList *sql.Stmt
+	stmtProp *sql.Stmt
+	stmtShow *sql.Stmt
+}
+
+// NewNamespaceReadHandler returns a new handler instance
+func NewNamespaceReadHandler(length int) (string, *NamespaceReadHandler) {
+	h := &NamespaceReadHandler{}
+	h.name = handler.GenerateName(msg.CategoryMeta+`::`+msg.SectionNamespace) + `/read`
+	h.Input = make(chan msg.Request, length)
+	h.Shutdown = make(chan struct{})
+	return h.name, h
+}
+
+// Register the handlername for the requests it wants to receive
+func (h *NamespaceReadHandler) Register(hm *handler.Map) {
+	for _, action := range []string{
+		proto.ActionList,
+		proto.ActionShow,
+	} {
+		hm.Request(msg.SectionNamespace, action, h.name)
+	}
+}
+
+// process is the request dispatcher
+func (h *NamespaceReadHandler) process(q *msg.Request) {
+	result := msg.FromRequest(q)
+
+	switch q.Action {
+	case proto.ActionList:
+		h.list(q, &result)
+	case proto.ActionShow:
+		h.show(q, &result)
+	default:
+		result.UnknownRequest(q)
+	}
+	q.Reply <- result
+}
 
 // Configure injects the handler with db connection and logging
 func (h *NamespaceReadHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
@@ -33,16 +79,6 @@ func (h *NamespaceReadHandler) Intake() chan msg.Request {
 // PriorityIntake aliases Intake as part of the handler interface
 func (h *NamespaceReadHandler) PriorityIntake() chan msg.Request {
 	return h.Intake()
-}
-
-// Register the handlername for the requests it wants to receive
-func (h *NamespaceReadHandler) Register(hm *handler.Map) {
-	for _, action := range []string{
-		proto.ActionList,
-		proto.ActionShow,
-	} {
-		hm.Request(msg.SectionNamespace, action, h.name)
-	}
 }
 
 // Run is the event loop for NamespaceReadHandler

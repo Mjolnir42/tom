@@ -9,6 +9,7 @@ package meta // import "github.com/mjolnir42/tom/internal/model/meta"
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/tom/internal/handler"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
@@ -43,6 +44,13 @@ func (m *Model) routeRegisterNamespace(rt *httprouter.Router) {
 			)
 		}
 	}
+}
+
+// handleRegisterNamespace registers namespace application core handlers
+// in the provided handlermap
+func handleRegisterNamespace(hm *handler.Map, length int) {
+	hm.Add(NewNamespaceReadHandler(length))
+	hm.Add(NewNamespaceWriteHandler(length))
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
