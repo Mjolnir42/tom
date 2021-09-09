@@ -11,9 +11,9 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type Runtime func(cli.ActionFunc) cli.ActionFunc
+type ActionFunc func(cli.ActionFunc) cli.ActionFunc
 
-func Register(app cli.App, run Runtime) *cli.App {
+func Register(app cli.App, run ActionFunc) *cli.App {
 	return registerMetaNamespace(app, run)
 }
 

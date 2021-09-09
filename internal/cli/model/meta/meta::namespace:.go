@@ -14,7 +14,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func registerMetaNamespace(app cli.App, run Runtime) *cli.App {
+func registerMetaNamespace(app cli.App, run ActionFunc) *cli.App {
 	app.Commands = append(app.Commands,
 		[]*cli.Command{
 			{
