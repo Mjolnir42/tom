@@ -67,6 +67,23 @@ const (
 	CmdNamespacePropUpdate = ModelMeta + `::` + EntityNamespace + `:` + ActionPropUpdate
 	CmdNamespaceRemove     = ModelMeta + `::` + EntityNamespace + `:` + ActionRemove
 	CmdNamespaceShow       = ModelMeta + `::` + EntityNamespace + `:` + ActionShow
+
+	CmdServer            = ModelAsset + `::` + EntityServer + `:`
+	CmdServerAdd         = ModelAsset + `::` + EntityServer + `:` + ActionAdd
+	CmdServerList        = ModelAsset + `::` + EntityServer + `:` + ActionList
+	CmdServerPropRemove  = ModelAsset + `::` + EntityServer + `:` + ActionPropRemove
+	CmdServerPropSet     = ModelAsset + `::` + EntityServer + `:` + ActionPropSet
+	CmdServerPropUpdate  = ModelAsset + `::` + EntityServer + `:` + ActionPropUpdate
+	CmdServerRemove      = ModelAsset + `::` + EntityServer + `:` + ActionRemove
+	CmdServerShow        = ModelAsset + `::` + EntityServer + `:` + ActionShow
+	CmdRuntime           = ModelAsset + `::` + EntityRuntime + `:`
+	CmdRuntimeAdd        = ModelAsset + `::` + EntityRuntime + `:` + ActionAdd
+	CmdRuntimeList       = ModelAsset + `::` + EntityRuntime + `:` + ActionList
+	CmdRuntimePropRemove = ModelAsset + `::` + EntityRuntime + `:` + ActionPropRemove
+	CmdRuntimePropSet    = ModelAsset + `::` + EntityRuntime + `:` + ActionPropSet
+	CmdRuntimePropUpdate = ModelAsset + `::` + EntityRuntime + `:` + ActionPropUpdate
+	CmdRuntimeRemove     = ModelAsset + `::` + EntityRuntime + `:` + ActionRemove
+	CmdRuntimeShow       = ModelAsset + `::` + EntityRuntime + `:` + ActionShow
 )
 
 const (

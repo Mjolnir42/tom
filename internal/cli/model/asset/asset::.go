@@ -5,19 +5,17 @@
  * that can be found in the LICENSE file.
  */
 
-package main
+package asset // import "github.com/mjolnir42/tom/internal/cli/model/asset"
 
 import (
-	"github.com/mjolnir42/tom/internal/cli/model/asset"
-	"github.com/mjolnir42/tom/internal/cli/model/meta"
 	"github.com/urfave/cli/v2"
 )
 
-func registerCommands(app cli.App) *cli.App {
+type ActionFunc func(cli.ActionFunc) cli.ActionFunc
 
-	app = *meta.Register(app, runtime)
-	app = *asset.Register(app, runtime)
-
+func Register(app cli.App, run ActionFunc) *cli.App {
+	app = *registerAssetServer(app, run)
+	app = *registerAssetRuntime(app, run)
 	return &app
 }
 
