@@ -567,6 +567,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		return []string{`std-attr`, `uniq-attr`}, []string{}, []string{}
 	case proto.CmdNamespacePropSet, proto.CmdNamespacePropUpdate, proto.CmdNamespacePropRemove:
 		return []string{`property`}, []string{}, []string{`property`}
+	case proto.CmdRuntimeAdd:
+		return []string{}, []string{`namespace`, `type`, `since`, `until`}, []string{`namespace`, `type`}
 	default:
 		return []string{}, []string{}, []string{}
 	}

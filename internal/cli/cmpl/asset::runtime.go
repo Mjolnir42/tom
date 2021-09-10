@@ -9,13 +9,14 @@
 package cmpl
 
 import (
-	//"github.com/mjolnir42/tom/internal/cli/adm"
-	//"github.com/mjolnir42/tom/pkg/proto"
+	"github.com/mjolnir42/tom/internal/cli/adm"
+	"github.com/mjolnir42/tom/pkg/proto"
 	"github.com/urfave/cli/v2"
 )
 
 func RuntimeAdd(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdRuntimeAdd)
+	GenericMulti(c, uniq, multi)
 }
 
 func RuntimeRemove(c *cli.Context) {

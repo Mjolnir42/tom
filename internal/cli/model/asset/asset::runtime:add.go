@@ -11,7 +11,7 @@ import (
 	//	"fmt"
 	//	"strings"
 
-	//	"github.com/mjolnir42/tom/internal/cli/adm"
+	"github.com/mjolnir42/tom/internal/cli/adm"
 	"github.com/mjolnir42/tom/pkg/proto"
 	"github.com/urfave/cli/v2"
 )
@@ -21,7 +21,53 @@ func init() {
 }
 
 func cmdAssetRuntimeAdd(c *cli.Context) error {
-	return nil
+	opts := map[string][]string{}
+	if err := adm.VariadicArguments(
+		proto.CmdRuntimeAdd,
+		c,
+		&opts,
+	); err != nil {
+		return err
+	}
+
+	req := proto.NewRuntimeRequest()
+	if err := proto.ValidNamespace(opts[`namespace`][0]); err != nil {
+		return err
+	}
+	req.Runtime.Namespace = opts[`namespace`][0]
+	req.Runtime.Property = make(map[string]proto.PropertyDetail)
+	if err := proto.OnlyUnreserved(c.Args().First()); err != nil {
+		return err
+	}
+	req.Runtime.Property[`name`] = proto.PropertyDetail{
+		Attribute: `name`,
+		Value:     c.Args().First(),
+	}
+
+	if _, ok := opts[`since`]; ok {
+		prop := req.Runtime.Property[`name`]
+		prop.ValidSince = opts[`since`][0]
+		req.Runtime.Property[`name`] = prop
+	}
+
+	if _, ok := opts[`until`]; ok {
+		prop := req.Runtime.Property[`name`]
+		prop.ValidUntil = opts[`until`][0]
+		req.Runtime.Property[`name`] = prop
+	}
+
+	req.Runtime.Property[`type`] = proto.PropertyDetail{
+		Attribute:  `type`,
+		Value:      opts[`type`][0],
+		ValidSince: `perpetual`,
+		ValidUntil: `perpetual`,
+	}
+
+	spec := adm.Specification{
+		Name: proto.CmdRuntimeAdd,
+		Body: req,
+	}
+	return adm.Perform(spec, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

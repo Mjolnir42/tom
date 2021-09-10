@@ -17,7 +17,51 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// Implementation of the handler.Handler interface
+// RuntimeWriteHandler ...
+type RuntimeWriteHandler struct {
+	Input      chan msg.Request
+	Shutdown   chan struct{}
+	name       string
+	conn       *sql.DB
+	lm         *lhm.LogHandleMap
+	stmtAdd    *sql.Stmt
+	stmtRemove *sql.Stmt
+}
+
+// NewRuntimeWriteHandler returns a new handler instance
+func NewRuntimeWriteHandler(length int) (string, *RuntimeWriteHandler) {
+	h := &RuntimeWriteHandler{}
+	h.name = handler.GenerateName(msg.CategoryAsset+`::`+msg.SectionRuntime) + `/write`
+	h.Input = make(chan msg.Request, length)
+	h.Shutdown = make(chan struct{})
+	return h.name, h
+}
+
+// Register the handlername for the requests it wants to receive
+func (h *RuntimeWriteHandler) Register(hm *handler.Map) {
+	for _, action := range []string{
+		proto.ActionAdd,
+		proto.ActionRemove,
+	} {
+		hm.Request(msg.SectionRuntime, action, h.name)
+	}
+}
+
+// process is the request dispatcher
+func (h *RuntimeWriteHandler) process(q *msg.Request) {
+	result := msg.FromRequest(q)
+	//	logRequest(h.reqLog, q)
+
+	switch q.Action {
+	case proto.ActionAdd:
+		h.add(q, &result)
+	case proto.ActionRemove:
+		h.remove(q, &result)
+	default:
+		result.UnknownRequest(q)
+	}
+	q.Reply <- result
+}
 
 // Configure injects the handler with db connection and logging
 func (h *RuntimeWriteHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
@@ -33,16 +77,6 @@ func (h *RuntimeWriteHandler) Intake() chan msg.Request {
 // PriorityIntake aliases Intake as part of the handler interface
 func (h *RuntimeWriteHandler) PriorityIntake() chan msg.Request {
 	return h.Intake()
-}
-
-// Register the handlername for the requests it wants to receive
-func (h *RuntimeWriteHandler) Register(hm *handler.Map) {
-	for _, action := range []string{
-		proto.ActionAdd,
-		proto.ActionRemove,
-	} {
-		hm.Request(msg.SectionRuntime, action, h.name)
-	}
 }
 
 // Run is the event loop for RuntimeWriteHandler
