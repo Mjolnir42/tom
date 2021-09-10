@@ -70,7 +70,7 @@ func ParseVariadicArguments(
 			}
 
 			// append value of current keyword into result map
-			result[val] = append(result[val], args[pos+1])
+			result[val] = append(result[val], strings.Trim(args[pos+1], `'"%`))
 			skip = true
 			continue
 		}
@@ -154,7 +154,10 @@ func ParseVariadicTriples(
 
 			// append values of current keyword into result map
 			result[val] = append(result[val],
-				[2]string{args[pos+1], args[pos+2]})
+				[2]string{
+					strings.Trim(args[pos+1], `'"%`),
+					args[pos+2],
+				})
 			skip = true
 			skipcount = 2
 			continue
@@ -275,7 +278,7 @@ argloop:
 
 				// consume attribute name
 				prop := proto.PropertyDetail{
-					Attribute: args[pos+1],
+					Attribute: strings.Trim(args[pos+1], `'"%`),
 				}
 				skip = true
 				skipcount = 1
