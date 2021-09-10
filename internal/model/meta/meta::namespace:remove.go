@@ -123,6 +123,9 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 		var attr string
 		if err = rows.Scan(
 			&attr,
+			&attrType,
+			&createdAt,
+			&userUID,
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err)
@@ -161,35 +164,6 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 		switch attrType {
 		case proto.AttributeUnique:
 			for _, statement := range []string{
-				stmt.ContainerStdAttrRemove,
-				stmt.OrchestrationStdAttrRemove,
-				stmt.RuntimeStdAttrRemove,
-				stmt.ServerStdAttrRemove,
-				stmt.SocketStdAttrRemove,
-				stmt.NamespaceStdAttrRemoveValue,
-				// TODO ix.deployment_group_unique_attribute_values
-				// TODO ix.endpoint_unique_attribute_values
-				// TODO ix.functional_component_unique_attribute_values
-				// TODO ix.product_unique_attribute_values
-				// TODO ix.technical_service_unique_attribute_values
-				// TODO ix.top_level_service_unique_attribute_values
-				// TODO yp.corporate_domain_unique_attribute_values
-				// TODO yp.domain_unique_attribute_values
-				// TODO yp.information_system_unique_attribute_values
-				// TODO yp.service_unique_attribute_values
-			} {
-				if _, err = tx.Exec(
-					statement,
-					attrID,
-					dictID,
-				); err != nil {
-					mr.ServerError(err)
-					tx.Rollback()
-					return
-				}
-			}
-		case proto.AttributeStandard:
-			for _, statement := range []string{
 				stmt.ContainerUniqAttrRemove,
 				stmt.OrchestrationUniqAttrRemove,
 				stmt.RuntimeUniqAttrRemove,
@@ -206,6 +180,35 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 				// TODO yp.domain_standard_attribute_values
 				// TODO yp.information_system_standard_attribute_values
 				// TODO yp.service_standard_attribute_values
+			} {
+				if _, err = tx.Exec(
+					statement,
+					attrID,
+					dictID,
+				); err != nil {
+					mr.ServerError(err)
+					tx.Rollback()
+					return
+				}
+			}
+		case proto.AttributeStandard:
+			for _, statement := range []string{
+				stmt.ContainerStdAttrRemove,
+				stmt.OrchestrationStdAttrRemove,
+				stmt.RuntimeStdAttrRemove,
+				stmt.ServerStdAttrRemove,
+				stmt.SocketStdAttrRemove,
+				stmt.NamespaceStdAttrRemoveValue,
+				// TODO ix.deployment_group_unique_attribute_values
+				// TODO ix.endpoint_unique_attribute_values
+				// TODO ix.functional_component_unique_attribute_values
+				// TODO ix.product_unique_attribute_values
+				// TODO ix.technical_service_unique_attribute_values
+				// TODO ix.top_level_service_unique_attribute_values
+				// TODO yp.corporate_domain_unique_attribute_values
+				// TODO yp.domain_unique_attribute_values
+				// TODO yp.information_system_unique_attribute_values
+				// TODO yp.service_unique_attribute_values
 			} {
 				if _, err = tx.Exec(
 					statement,
@@ -243,9 +246,8 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 			}
 		}
 		// remove attribute from meta.attribute
-		if _, err = tx.Stmt(
-			h.stmtRemove,
-		).Exec(
+		if _, err = tx.Exec(
+			stmt.NamespaceAttrRemove,
 			attribute,
 			dictID,
 		); err != nil {
@@ -276,8 +278,9 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 	}
 
 	// remove the namespace
-	if _, err = tx.Exec(
-		stmt.NamespaceRemove,
+	if _, err = tx.Stmt(
+		h.stmtRemove,
+	).Exec(
 		dictID,
 		q.Namespace.Name,
 	); err != nil {
