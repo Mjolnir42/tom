@@ -38,6 +38,9 @@ func initCommon(c *cli.Context) error {
 
 func runtime(action cli.ActionFunc) cli.ActionFunc {
 	return func(c *cli.Context) error {
+		// global variable in main, make context available for client
+		// error formatting
+		errorContext = c
 
 		if err := initCommon(c); err != nil {
 			return err

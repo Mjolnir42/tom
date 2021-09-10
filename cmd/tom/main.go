@@ -8,9 +8,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
+	"github.com/mjolnir42/tom/internal/cli/adm"
+	"github.com/mjolnir42/tom/pkg/proto"
+	"github.com/satori/go.uuid"
 	"github.com/urfave/cli/v2"
 )
 
@@ -21,6 +25,11 @@ import (
 var (
 	// populated via Makefile
 	tomVersion string
+	// used for generating the RequestID for client errors
+	namespaceTom = uuid.Must(uuid.FromString(`ffffffff-0000-5000-0000-ffffffffffff`))
+	// setup by runtime function to provide cli arguments to error
+	// output processing
+	errorContext *cli.Context
 )
 
 func main() {
@@ -36,8 +45,24 @@ func main() {
 	//app = registerFlags(*app)
 
 	if err := app.Run(os.Args); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		data, jsonError := json.Marshal(&proto.Result{
+			StatusCode: 400,
+			RequestID:  uuid.NewV5(namespaceTom, app.Name+tomVersion).String(),
+			ErrorText:  err.Error(),
+		})
+		if jsonError != nil {
+			// dual errors: bail on formatted error output
+			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintln(os.Stderr, jsonError)
+			os.Exit(2)
+		}
+
+		if formatError := adm.FormatOut(errorContext, data, proto.TemplateCommand); formatError != nil {
+			// dual errors: bail on formatted error output
+			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintln(os.Stderr, formatError)
+			os.Exit(2)
+		}
 	}
 }
 

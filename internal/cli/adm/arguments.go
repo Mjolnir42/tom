@@ -508,14 +508,14 @@ func checkStringNotAKeyword(s string, keys []string) error {
 }
 
 // combineStrings takes an arbitrary number of strings and combines them
-// into one, separated by `.\n`
+// into one, separated by space.
 func combineStrings(s ...string) string {
 	var out string
 	spacer := ``
 	for _, in := range s {
 		// ensure a single trailing .
 		out = fmt.Sprintf("%s%s", out+spacer, strings.TrimRight(in, `.`)+`.`)
-		spacer = "\n"
+		spacer = ` `
 	}
 	return out
 }
