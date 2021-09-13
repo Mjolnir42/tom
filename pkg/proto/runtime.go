@@ -29,6 +29,14 @@ func NewRuntimeRequest() Request {
 	}
 }
 
+// RuntimeHeader defines ....
+type RuntimeHeader struct {
+	Namespace string `json:"namespace"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"createdAt"`
+	CreatedBy string `json:"createdBy"`
+}
+
 func (r *Runtime) SetTomID() Entity {
 	r.TomID = r.FormatDNS()
 	return r

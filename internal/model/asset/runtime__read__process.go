@@ -32,10 +32,6 @@ func (h *RuntimeReadHandler) process(q *msg.Request) {
 	q.Reply <- result
 }
 
-// list returns all servers
-func (h *RuntimeReadHandler) list(q *msg.Request, mr *msg.Result) {
-}
-
 // show returns full details for a specific server
 func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 }

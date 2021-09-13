@@ -8,7 +8,9 @@
 package asset // import "github.com/mjolnir42/tom/internal/model/asset/"
 
 import (
+	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
@@ -29,8 +31,8 @@ func runtimeList(m *Model) httprouter.Handle {
 }
 
 func exportRuntimeList(result *proto.Result, r *msg.Result) {
-	result.Runtime = &[]proto.Runtime{}
-	*result.Runtime = append(*result.Runtime, r.Runtime...)
+	result.RuntimeHeader = &[]proto.RuntimeHeader{}
+	*result.RuntimeHeader = append(*result.RuntimeHeader, r.RuntimeHeader...)
 }
 
 // RuntimeList function
@@ -52,10 +54,64 @@ func (m *Model) RuntimeList(w http.ResponseWriter, r *http.Request,
 		m.x.ReplyForbidden(&w, &request)
 		return
 	}
+	if r.URL.Query().Get(`namespace`) != `` {
+		request.Namespace.Name = r.URL.Query().Get(`namespace`)
+		if err := proto.ValidNamespace(request.Namespace.Name); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+	}
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	m.x.Send(&w, &result, exportRuntimeList)
+}
+
+// list returns all servers
+func (h *RuntimeReadHandler) list(q *msg.Request, mr *msg.Result) {
+	var (
+		dictionaryName, runtimeName, author string
+		creationTime                        time.Time
+		namespace                           sql.NullString
+		rows                                *sql.Rows
+		err                                 error
+	)
+
+	if q.Namespace.Name != `` {
+		namespace.String = q.Namespace.Name
+		namespace.Valid = true
+	}
+
+	if rows, err = h.stmtList.Query(
+		namespace,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&dictionaryName,
+			&runtimeName,
+			&author,
+			&creationTime,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			return
+		}
+		mr.RuntimeHeader = append(mr.RuntimeHeader, proto.RuntimeHeader{
+			Namespace: dictionaryName,
+			Name:      runtimeName,
+			CreatedAt: creationTime.Format(msg.RFC3339Milli),
+			CreatedBy: author,
+		})
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	mr.OK()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -22,6 +22,7 @@ type Result struct {
 	NamespaceHeader *[]NamespaceHeader `json:"namespace-list,omitempty"`
 	Orchestration   *[]Orchestration   `json:"orchestration,omitempty"`
 	Runtime         *[]Runtime         `json:"runtime,omitempty"`
+	RuntimeHeader   *[]RuntimeHeader   `json:"runtime-list,omitempty"`
 	Server          *[]Server          `json:"server,omitempty"`
 	Socket          *[]Socket          `json:"socket,omitempty"`
 	Team            *[]Team            `json:"team,omitempty"`

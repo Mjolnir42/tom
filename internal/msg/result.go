@@ -28,6 +28,7 @@ type Result struct {
 	NamespaceHeader []proto.NamespaceHeader
 	Orchestration   []proto.Orchestration
 	Runtime         []proto.Runtime
+	RuntimeHeader   []proto.RuntimeHeader
 	Server          []proto.Server
 	Team            []proto.Team
 	User            []proto.User

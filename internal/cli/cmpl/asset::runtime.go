@@ -24,7 +24,8 @@ func RuntimeRemove(c *cli.Context) {
 }
 
 func RuntimeList(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdRuntimeList)
+	DirectMulti(c, uniq, multi)
 }
 
 func RuntimeShow(c *cli.Context) {
