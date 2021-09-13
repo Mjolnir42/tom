@@ -25,6 +25,7 @@ import (
 type Specification struct {
 	Name        string
 	Placeholder map[string]string
+	QueryParams *map[string]string
 	Body        interface{}
 }
 
@@ -70,7 +71,7 @@ func Perform(cmd Specification, c *cli.Context) error {
 
 	switch proto.Commands[cmd.Name].Method {
 	case proto.MethodGET:
-		resp, err = getReq(path)
+		resp, err = getReq(path, cmd.QueryParams)
 	case proto.MethodHEAD:
 		resp, err = headReq(path)
 	case proto.MethodDELETE:
@@ -157,8 +158,13 @@ func deleteReqBody(body interface{}, p string) (*resty.Response, error) {
 }
 
 // GET
-func getReq(p string) (*resty.Response, error) {
-	return handleRequestOptions(client.R().Get(p))
+func getReq(p string, q *map[string]string) (*resty.Response, error) {
+	switch q {
+	case nil:
+		return handleRequestOptions(client.R().Get(p))
+	default:
+		return handleRequestOptions(client.R().SetQueryParams(*q).Get(p))
+	}
 }
 
 // HEAD
@@ -225,7 +231,7 @@ func asyncWait(result *proto.Result) {
 
 	if result.StatusCode == 202 && result.JobID != "" {
 		fmt.Fprintf(os.Stderr, "Waiting for job: %s\n", result.JobID)
-		_, err := getReq(fmt.Sprintf("/job/byID/%s/_processed", result.JobID))
+		_, err := getReq(fmt.Sprintf("/job/byID/%s/_processed", result.JobID), nil)
 		if err != nil && err != io.EOF {
 			fmt.Fprintf(os.Stderr, "Wait error: %s\n", err.Error())
 		}
