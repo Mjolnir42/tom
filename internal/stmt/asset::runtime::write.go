@@ -61,12 +61,135 @@ DELETE FROM       asset.runtime_environment_unique_attribute_values
 WHERE             attributeID = $1::uuid
   AND             dictionaryID = $2::uuid;`
 
-	RuntimeTxStdPropertyAdd     = `SELECT 'RuntimeTxStdPropertyAdd';`
-	RuntimeTxStdPropertyClamp   = `SELECT 'RuntimeTxStdPropertyClamp';`
-	RuntimeTxStdPropertySelect  = `SELECT 'RuntimeTxStdPropertySelect';`
-	RuntimeTxUniqPropertyAdd    = `SELECT 'RuntimeTxUniqPropertyAdd';`
-	RuntimeTxUniqPropertyClamp  = `SELECT 'RuntimeTxUniqPropertyClamp';`
-	RuntimeTxUniqPropertySelect = `SELECT 'RuntimeTxUniqPropertySelect';`
+	RuntimeTxStdPropertyAdd     = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
+                              inventory.user.userID AS userID
+                  FROM        meta.dictionary
+                  CROSS JOIN  inventory.user
+                        JOIN  inventory.identity_library
+                          ON  inventory.identity_library.identityLibraryID
+                           =  inventory.user.identityLibraryID
+                  WHERE       meta.dictionary.name = $1::text
+                    AND       inventory.user.uid = $7::text
+                    AND       inventory.identity_library.name = $6::text),
+     cte_att AS ( SELECT      meta.standard_attribute.attributeID
+                   FROM       meta.standard_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictID = meta.standard_attribute.dictionaryID
+                  WHERE       meta.standard_attribute.attribute = $2::text )
+INSERT INTO       asset.runtime_environment_standard_attribute_values ( dictionaryID, attributeID, value, validity, createdBy )
+SELECT            cte_dct.dictID,
+                  cte_att.attributeID,
+                  $3::text,
+                  tstzrange($4::timestamptz(3), $5::timestamptz(3), '[]'),
+                  cte_dct.userID
+FROM              cte_dct
+    CROSS JOIN    cte_att;`
+
+	RuntimeTxStdPropertyClamp   = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.standard_attribute.attributeID
+                   FROM       meta.standard_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
+                  WHERE       meta.standard_attribute.attribute = $2::text )
+UPDATE            asset.runtime_environment_standard_attribute_values
+   SET            validity = tstzrange(lower(validity), $7::timestamptz(3), '[)')
+FROM              cte_dct
+    CROSS JOIN    cte_att
+WHERE             asset.runtime_environment_standard_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND             asset.runtime_environment_standard_attribute_values.attributeID     = cte_att.attributeID
+  AND             asset.runtime_environment_standard_attribute_values.value           = $3::text
+  AND             lower(asset.runtime_environment_standard_attribute_values.validity) = $4::timestamptz(3)
+  AND             upper(asset.runtime_environment_standard_attribute_values.validity) = $5::timestamptz(3)
+  AND             $6::timestamptz(3) <@ asset.runtime_environment_standard_attribute_values.validity;`
+
+	RuntimeTxStdPropertySelect  = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.standard_attribute.attributeID
+                   FROM       meta.standard_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
+                  WHERE       meta.standard_attribute.attribute = $2::text )
+SELECT            value,
+                  lower(validity),
+                  upper(validity)
+FROM              asset.runtime_environment_standard_attribute_values
+    JOIN          cte_dct
+      ON          cte_dct.dictionaryID = asset.runtime_environment_standard_attribute_values.dictionaryID
+    JOIN          cte_att
+      ON          cte_att.attributeID = asset.runtime_environment_standard_attribute_values.attributeID
+   WHERE          $3::timestamptz(3) <@ asset.runtime_environment_standard_attribute_values.validity
+   FOR UPDATE;`
+
+	RuntimeTxUniqPropertyAdd    = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
+                              inventory.user.userID AS userID
+                  FROM        meta.dictionary
+                  CROSS JOIN  inventory.user
+                        JOIN  inventory.identity_library
+                          ON  inventory.identity_library.identityLibraryID
+                           =  inventory.user.identityLibraryID
+                  WHERE       meta.dictionary.name = $1::text
+                    AND       inventory.user.uid = $7::text
+                    AND       inventory.identity_library.name = $6::text),
+     cte_att AS ( SELECT      meta.unique_attribute.attributeID
+                   FROM       meta.unique_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictID = meta.unique_attribute.dictionaryID
+                  WHERE       meta.unique_attribute.attribute = $2::text )
+INSERT INTO       asset.runtime_environment_unique_attribute_values ( dictionaryID, attributeID, value, validity, createdBy )
+SELECT            cte_dct.dictID,
+                  cte_att.attributeID,
+                  $3::text,
+                  tstzrange($4::timestamptz(3), $5::timestamptz(3), '[]'),
+                  cte_dct.userID
+FROM              cte_dct
+    CROSS JOIN    cte_att;`
+
+	RuntimeTxUniqPropertyClamp  = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.unique_attribute.attributeID
+                   FROM       meta.unique_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
+                  WHERE       meta.unique_attribute.attribute = $2::text )
+UPDATE            asset.runtime_environment_unique_attribute_values
+   SET            validity = tstzrange(lower(validity), $7::timestamptz(3), '[)')
+FROM              cte_dct
+    CROSS JOIN    cte_att
+WHERE             asset.runtime_environment_unique_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND             asset.runtime_environment_unique_attribute_values.attributeID     = cte_att.attributeID
+  AND             asset.runtime_environment_unique_attribute_values.value           = $3::text
+  AND             lower(asset.runtime_environment_unique_attribute_values.validity) = $4::timestamptz(3)
+  AND             upper(asset.runtime_environment_unique_attribute_values.validity) = $5::timestamptz(3)
+  AND             $6::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
+
+	RuntimeTxUniqPropertySelect = `
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.unique_attribute.attributeID
+                   FROM       meta.unique_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
+                  WHERE       meta.unique_attribute.attribute = $2::text )
+SELECT            value,
+                  lower(validity),
+                  upper(validity)
+FROM              asset.runtime_environment_unique_attribute_values
+    JOIN          cte_dct
+      ON          cte_dct.dictionaryID = asset.runtime_environment_unique_attribute_values.dictionaryID
+    JOIN          cte_att
+      ON          cte_att.attributeID = asset.runtime_environment_unique_attribute_values.attributeID
+   WHERE          $3::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity
+   FOR UPDATE;`
 )
 
 func init() {
