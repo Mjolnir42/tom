@@ -534,6 +534,25 @@ func VariadicArguments(command string, c *cli.Context, result *map[string][]stri
 	)
 }
 
+func VariadicDirect(command string, c *cli.Context, result *map[string][]string) error {
+
+	multipleAllowed, uniqueOptions, mandatoryOptions := ArgumentsForCommand(command)
+	var args []string
+	// for no arguments, c.Args().First() will return an empty string. A
+	// slice of strings with an empty string inside is not the same as
+	// an empty slice of strings
+	if c.Args().First() != `` {
+		args = append([]string{c.Args().First()}, c.Args().Tail()...)
+	}
+	return ParseVariadicArguments(
+		*result,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		args,
+	)
+}
+
 // VariadicTriples calls ParseVariadicTriples with a predefined
 // argument configuration suitable for a given command
 func VariadicTriples(command string, c *cli.Context, result *map[string][][2]string) error {
