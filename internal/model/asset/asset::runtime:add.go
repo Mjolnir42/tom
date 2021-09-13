@@ -15,6 +15,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/rest"
+	"github.com/mjolnir42/tom/internal/stmt"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
@@ -59,11 +60,21 @@ func (m *Model) RuntimeAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if err := proto.OnlyUnreserved(
-		request.Runtime.Name,
-	); err != nil {
-		m.x.ReplyBadRequest(&w, &request, err)
+	// at least the name property must be filled in
+	if request.Runtime.Property == nil {
+		m.x.ReplyBadRequest(&w, &request, nil)
 		return
+	}
+
+	for prop, obj := range request.Namespace.Property {
+		if err := proto.OnlyUnreserved(prop); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+		if err := proto.CheckPropertyConstraints(&obj); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
 	}
 
 	if !m.x.IsAuthorized(&request) {
@@ -83,8 +94,11 @@ func (h *RuntimeWriteHandler) add(q *msg.Request, mr *msg.Result) {
 		err                            error
 		tx                             *sql.Tx
 		txTime, validSince, validUntil time.Time
+		rows                           *sql.Rows
+		ok                             bool
 	)
-
+	// setup a consistent transaction time timestamp that is used for all
+	// records
 	txTime = time.Now().UTC()
 
 	switch q.Runtime.Property[`name`].ValidSince {
@@ -127,6 +141,57 @@ func (h *RuntimeWriteHandler) add(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
+	// discover all attributes and record them with their type
+	attrMap := map[string]string{}
+	if rows, err = tx.Query(
+		stmt.NamespaceAttributeDiscover,
+		q.Runtime.Namespace,
+	); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+	for rows.Next() {
+		var attribute, typ string
+		if err = rows.Scan(
+			&attribute,
+			&typ,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			tx.Rollback()
+			return
+		}
+		attrMap[attribute] = typ
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+
+	// for all properties specified in the request, check that the attribute
+	// exists and create missing attributes
+	for key := range q.Runtime.Property {
+		if _, ok = attrMap[key]; !ok {
+			if res, err = tx.Exec(
+				stmt.NamespaceAttributeAddStandard,
+				q.Runtime.Namespace,
+				key,
+				q.UserIDLib,
+				q.AuthUser,
+			); err != nil {
+				mr.ServerError(err)
+				tx.Rollback()
+				return
+			}
+			if !mr.CheckRowsAffected(res.RowsAffected()) {
+				tx.Rollback()
+				return
+			}
+		}
+	}
+
 	// create named runtime environment in specified namespace
 	if res, err = tx.Stmt(h.stmtAdd).Exec(
 		q.Runtime.Namespace,
@@ -143,6 +208,20 @@ func (h *RuntimeWriteHandler) add(q *msg.Request, mr *msg.Result) {
 	if !mr.CheckRowsAffected(res.RowsAffected()) {
 		tx.Rollback()
 		return
+	}
+
+	// for all properties specified in the request, update the value.
+	// this transparently creates missing entries.
+	for key := range q.Runtime.Property {
+		if key == `name` {
+			continue
+		}
+		if ok = h.txPropUpdate(
+			q, mr, tx, &txTime, q.Runtime.Property[key],
+		); !ok {
+			tx.Rollback()
+			return
+		}
 	}
 
 	if err = tx.Commit(); err != nil {

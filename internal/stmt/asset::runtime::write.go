@@ -60,12 +60,25 @@ WHERE             attributeID = $1::uuid
 DELETE FROM       asset.runtime_environment_unique_attribute_values
 WHERE             attributeID = $1::uuid
   AND             dictionaryID = $2::uuid;`
+
+	RuntimeTxStdPropertyAdd     = `SELECT 'RuntimeTxStdPropertyAdd';`
+	RuntimeTxStdPropertyClamp   = `SELECT 'RuntimeTxStdPropertyClamp';`
+	RuntimeTxStdPropertySelect  = `SELECT 'RuntimeTxStdPropertySelect';`
+	RuntimeTxUniqPropertyAdd    = `SELECT 'RuntimeTxUniqPropertyAdd';`
+	RuntimeTxUniqPropertyClamp  = `SELECT 'RuntimeTxUniqPropertyClamp';`
+	RuntimeTxUniqPropertySelect = `SELECT 'RuntimeTxUniqPropertySelect';`
 )
 
 func init() {
 	m[RuntimeAdd] = `RuntimeAdd`
 	m[RuntimeRemove] = `RuntimeRemove`
 	m[RuntimeStdAttrRemove] = `RuntimeStdAttrRemove`
+	m[RuntimeTxStdPropertyAdd] = `RuntimeTxStdPropertyAdd`
+	m[RuntimeTxStdPropertyClamp] = `RuntimeTxStdPropertyClamp`
+	m[RuntimeTxStdPropertySelect] = `RuntimeTxStdPropertySelect`
+	m[RuntimeTxUniqPropertyAdd] = `RuntimeTxUniqPropertyAdd`
+	m[RuntimeTxUniqPropertyClamp] = `RuntimeTxUniqPropertyClamp`
+	m[RuntimeTxUniqPropertySelect] = `RuntimeTxUniqPropertySelect`
 	m[RuntimeUniqAttrRemove] = `RuntimeUniqAttrRemove`
 }
 

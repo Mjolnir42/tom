@@ -16,7 +16,7 @@ import (
 
 func RuntimeAdd(c *cli.Context) {
 	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdRuntimeAdd)
-	GenericMulti(c, uniq, multi)
+	GenericMultiWithProperty(c, uniq, multi)
 }
 
 func RuntimeRemove(c *cli.Context) {

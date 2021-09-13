@@ -19,13 +19,20 @@ import (
 
 // RuntimeWriteHandler ...
 type RuntimeWriteHandler struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	name       string
-	conn       *sql.DB
-	lm         *lhm.LogHandleMap
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
+	Input                chan msg.Request
+	Shutdown             chan struct{}
+	name                 string
+	conn                 *sql.DB
+	lm                   *lhm.LogHandleMap
+	stmtAdd              *sql.Stmt
+	stmtAttQueryType     *sql.Stmt
+	stmtRemove           *sql.Stmt
+	stmtTxStdPropAdd     *sql.Stmt
+	stmtTxStdPropClamp   *sql.Stmt
+	stmtTxStdPropSelect  *sql.Stmt
+	stmtTxUniqPropAdd    *sql.Stmt
+	stmtTxUniqPropClamp  *sql.Stmt
+	stmtTxUniqPropSelect *sql.Stmt
 }
 
 // NewRuntimeWriteHandler returns a new handler instance
@@ -84,8 +91,15 @@ func (h *RuntimeWriteHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.RuntimeAdd:    &h.stmtAdd,
-		stmt.RuntimeRemove: &h.stmtRemove,
+		stmt.NamespaceAttributeQueryType: &h.stmtAttQueryType,
+		stmt.RuntimeTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
+		stmt.RuntimeTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
+		stmt.RuntimeTxStdPropertySelect:  &h.stmtTxStdPropSelect,
+		stmt.RuntimeTxUniqPropertyAdd:    &h.stmtTxUniqPropAdd,
+		stmt.RuntimeTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
+		stmt.RuntimeTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
+		stmt.RuntimeAdd:                  &h.stmtAdd,
+		stmt.RuntimeRemove:               &h.stmtRemove,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

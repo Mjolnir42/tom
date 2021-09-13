@@ -22,13 +22,27 @@ func init() {
 
 func cmdAssetRuntimeAdd(c *cli.Context) error {
 	opts := map[string][]string{}
-	if err := adm.VariadicArguments(
-		proto.CmdRuntimeAdd,
-		c,
-		&opts,
+	props := []proto.PropertyDetail{}
+	variable, once, required := adm.ArgumentsForCommand(proto.CmdRuntimeAdd)
+	if err := adm.ParsePropertyArguments(
+		opts,
+		&props,
+		c.Args().Tail(),
+		variable,
+		once,
+		required,
 	); err != nil {
 		return err
 	}
+	/*
+		if err := adm.VariadicArguments(
+			proto.CmdRuntimeAdd,
+			c,
+			&opts,
+		); err != nil {
+			return err
+		}
+	*/
 
 	req := proto.NewRuntimeRequest()
 	if err := proto.ValidNamespace(opts[`namespace`][0]); err != nil {
@@ -36,6 +50,13 @@ func cmdAssetRuntimeAdd(c *cli.Context) error {
 	}
 	req.Runtime.Namespace = opts[`namespace`][0]
 	req.Runtime.Property = make(map[string]proto.PropertyDetail)
+	for _, prop := range props {
+		if err := proto.OnlyUnreserved(prop.Attribute); err != nil {
+			return err
+		}
+		req.Runtime.Property[prop.Attribute] = prop
+	}
+
 	if err := proto.OnlyUnreserved(c.Args().First()); err != nil {
 		return err
 	}
