@@ -36,6 +36,10 @@ const (
 	tomIDNamespURI = `^tom:///(:?namespace)/name=(:?[^[:space:]]+)$`
 )
 
+func IsTomID(s string) bool {
+	return isTomIDFormatDNS(s) || isTomIDFormatURI(s)
+}
+
 func isTomIDFormatDNS(s string) bool {
 	re := regexp.MustCompile(fmt.Sprintf("%s|%s", tomIDFormatDNS, tomIDNamespDNS))
 	return re.MatchString(s)
