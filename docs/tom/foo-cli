@@ -1,0 +1,41 @@
+tom query tomID
+tom query ${name}.${namespace}.${entity}.tom.
+
+tom query server.tom.
+
+tom query inventory.server.tom.
+
+tom query $name.inventory.server.tom.
+
+tom query %.inventory.%.tom.
+
+==============================
+tom runtime add ${name} namespace ${space} type ${typ}
+            remove ${name} namespace ${space}
+            list namespace ${space}
+            show ${name} namespace ${space}
+            property update
+            property set
+            property remove
+            link ${tomID} is-equal ${tomID}
+            stack ${name} namespace ${space} runs-on ${tomID}
+            socket list ${name} namespace ${space}
+
+tom server add ${name} namespace ${space} type ${typ}
+           remove ${name} namespace ${space}
+           list namespace ${space}
+           show ${name} namespace ${space}
+           property update
+           property set
+           property remove
+           link ${tomID} is-equal ${tomID}
+           stack ${name} namespace ${space} provided-by ${tomID}
+
+tom socket list ${name} namespace ${space}
+tom socket list ${tomID}
+
+tom endpoint  add ${name} namespace owner nwspec_list yp_serID
+              remove
+              list
+              show
+              relation ${tomID} provided-by ${tomID}
