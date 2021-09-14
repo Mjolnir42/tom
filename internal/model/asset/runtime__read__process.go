@@ -32,8 +32,4 @@ func (h *RuntimeReadHandler) process(q *msg.Request) {
 	q.Reply <- result
 }
 
-// show returns full details for a specific server
-func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
-}
-
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

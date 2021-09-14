@@ -50,8 +50,9 @@ func (h *RuntimeReadHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.RuntimeList: &h.stmtList,
-		stmt.RuntimeShow: &h.stmtShow,
+		stmt.RuntimeList:             &h.stmtList,
+		stmt.RuntimeTxShow:           &h.stmtShow,
+		stmt.RuntimeTxShowProperties: &h.stmtProp,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

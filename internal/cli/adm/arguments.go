@@ -588,7 +588,7 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		return []string{`property`}, []string{}, []string{`property`}
 	case proto.CmdRuntimeAdd:
 		return []string{`property`}, []string{`namespace`, `type`, `since`, `until`}, []string{`namespace`, `type`}
-	case proto.CmdRuntimeList:
+	case proto.CmdRuntimeList, proto.CmdRuntimeShow:
 		return []string{}, []string{`namespace`}, []string{}
 	default:
 		return []string{}, []string{}, []string{}

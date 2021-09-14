@@ -24,6 +24,7 @@ type RuntimeReadHandler struct {
 	lm       *lhm.LogHandleMap
 	stmtList *sql.Stmt
 	stmtShow *sql.Stmt
+	stmtProp *sql.Stmt
 }
 
 func NewRuntimeReadHandler(length int) (string, *RuntimeReadHandler) {
