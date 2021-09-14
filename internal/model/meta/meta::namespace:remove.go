@@ -166,7 +166,7 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 			for _, statement := range []string{
 				stmt.ContainerUniqAttrRemove,
 				stmt.OrchestrationUniqAttrRemove,
-				stmt.RuntimeUniqAttrRemove,
+				stmt.RuntimeDelNamespaceUniqValues,
 				stmt.ServerUniqAttrRemove,
 				stmt.SocketUniqAttrRemove,
 				stmt.NamespaceUniqAttrRemoveValue,
@@ -195,7 +195,7 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 			for _, statement := range []string{
 				stmt.ContainerStdAttrRemove,
 				stmt.OrchestrationStdAttrRemove,
-				stmt.RuntimeStdAttrRemove,
+				stmt.RuntimeDelNamespaceStdValues,
 				stmt.ServerStdAttrRemove,
 				stmt.SocketStdAttrRemove,
 				stmt.NamespaceStdAttrRemoveValue,
@@ -263,7 +263,9 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 		stmt.ContainerNamespaceRemoveParent,
 		stmt.ContainerNamespaceRemove,
 		// TODO asset.Orchestration
-		// TODO asset.Runtime
+		stmt.RuntimeDelNamespaceLinking,
+		stmt.RuntimeDelNamespaceParent,
+		stmt.RuntimeDelNamespace,
 		// TODO asset.Server
 		// TODO asset.Socket
 	} {

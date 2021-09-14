@@ -52,16 +52,6 @@ RETURNING         rteID;`
 	RuntimeRemove = `
 SELECT      'Runtime.REMOVE';`
 
-	RuntimeStdAttrRemove = `
-DELETE FROM       asset.runtime_environment_standard_attribute_values
-WHERE             attributeID = $1::uuid
-  AND             dictionaryID = $2::uuid;`
-
-	RuntimeUniqAttrRemove = `
-DELETE FROM       asset.runtime_environment_unique_attribute_values
-WHERE             attributeID = $1::uuid
-  AND             dictionaryID = $2::uuid;`
-
 	RuntimeTxStdPropertyAdd = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                               inventory.user.userID AS userID
@@ -197,19 +187,47 @@ FROM              asset.runtime_environment_unique_attribute_values
    WHERE          $3::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity
      AND          asset.runtime_environment_unique_attribute_values.rteID = $4::uuid
    FOR UPDATE;`
+
+	RuntimeDelNamespaceStdValues = `
+DELETE FROM       asset.runtime_environment_standard_attribute_values
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	RuntimeDelNamespaceUniqValues = `
+DELETE FROM       asset.runtime_environment_unique_attribute_values
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	RuntimeDelNamespace = `
+DELETE FROM       asset.runtime_environment
+WHERE             dictionaryID = $1::uuid;`
+
+	RuntimeDelNamespaceLinking = `
+DELETE FROM       asset.runtime_environment_linking
+WHERE             dictionaryID_A = $1::uuid
+   OR             dictionaryID_B = $1::uuid;`
+
+	RuntimeDelNamespaceParent = `
+DELETE FROM       asset.runtime_environment_parent
+USING             asset.runtime_environment
+WHERE             asset.runtime_environment_parent.rteID = asset.runtime_environment.rteID
+  AND             asset.runtime_environment.dictionaryID = $1::uuid;`
 )
 
 func init() {
 	m[RuntimeAdd] = `RuntimeAdd`
+	m[RuntimeDelNamespaceLinking] = `RuntimeDelNamespaceLinking`
+	m[RuntimeDelNamespaceParent] = `RuntimeDelNamespaceParent`
+	m[RuntimeDelNamespaceStdValues] = `RuntimeDelNamespaceStdValues`
+	m[RuntimeDelNamespaceUniqValues] = `RuntimeDelNamespaceUniqValues`
+	m[RuntimeDelNamespace] = `RuntimeDelNamespace`
 	m[RuntimeRemove] = `RuntimeRemove`
-	m[RuntimeStdAttrRemove] = `RuntimeStdAttrRemove`
 	m[RuntimeTxStdPropertyAdd] = `RuntimeTxStdPropertyAdd`
 	m[RuntimeTxStdPropertyClamp] = `RuntimeTxStdPropertyClamp`
 	m[RuntimeTxStdPropertySelect] = `RuntimeTxStdPropertySelect`
 	m[RuntimeTxUniqPropertyAdd] = `RuntimeTxUniqPropertyAdd`
 	m[RuntimeTxUniqPropertyClamp] = `RuntimeTxUniqPropertyClamp`
 	m[RuntimeTxUniqPropertySelect] = `RuntimeTxUniqPropertySelect`
-	m[RuntimeUniqAttrRemove] = `RuntimeUniqAttrRemove`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -131,7 +131,7 @@ func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) 
 			for _, statement := range []string{
 				stmt.ContainerStdAttrRemove,
 				stmt.OrchestrationStdAttrRemove,
-				stmt.RuntimeStdAttrRemove,
+				stmt.RuntimeDelNamespaceUniqValues,
 				stmt.ServerStdAttrRemove,
 				stmt.SocketStdAttrRemove,
 				stmt.NamespaceStdAttrRemoveValue,
