@@ -129,12 +129,12 @@ func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) 
 		switch attrType {
 		case proto.AttributeUnique:
 			for _, statement := range []string{
-				stmt.ContainerStdAttrRemove,
-				stmt.OrchestrationStdAttrRemove,
+				stmt.ContainerUniqAttrRemove,
+				stmt.OrchestrationUniqAttrRemove,
 				stmt.RuntimeDelNamespaceUniqValues,
-				stmt.ServerStdAttrRemove,
-				stmt.SocketStdAttrRemove,
-				stmt.NamespaceStdAttrRemoveValue,
+				stmt.ServerUniqAttrRemove,
+				stmt.SocketUniqAttrRemove,
+				stmt.NamespaceUniqAttrRemoveValue,
 				// TODO ix.deployment_group_unique_attribute_values
 				// TODO ix.endpoint_unique_attribute_values
 				// TODO ix.functional_component_unique_attribute_values
@@ -158,12 +158,12 @@ func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) 
 			}
 		case proto.AttributeStandard:
 			for _, statement := range []string{
-				stmt.ContainerUniqAttrRemove,
-				stmt.OrchestrationUniqAttrRemove,
-				stmt.RuntimeUniqAttrRemove,
-				stmt.ServerUniqAttrRemove,
-				stmt.SocketUniqAttrRemove,
-				stmt.NamespaceUniqAttrRemoveValue,
+				stmt.ContainerStdAttrRemove,
+				stmt.OrchestrationStdAttrRemove,
+				stmt.RuntimeDelNamespaceStdValues,
+				stmt.ServerStdAttrRemove,
+				stmt.SocketStdAttrRemove,
+				stmt.NamespaceStdAttrRemoveValue,
 				// TODO ix.deployment_group_standard_attribute_values
 				// TODO ix.endpoint_standard_attribute_values
 				// TODO ix.functional_component_standard_attribute_values
