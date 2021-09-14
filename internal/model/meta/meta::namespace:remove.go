@@ -170,16 +170,16 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 				stmt.ServerUniqAttrRemove,
 				stmt.SocketUniqAttrRemove,
 				stmt.NamespaceUniqAttrRemoveValue,
-				// TODO ix.deployment_group_standard_attribute_values
-				// TODO ix.endpoint_standard_attribute_values
-				// TODO ix.functional_component_standard_attribute_values
-				// TODO ix.product_standard_attribute_values
-				// TODO ix.technical_service_standard_attribute_values
-				// TODO ix.top_level_service_standard_attribute_values
-				// TODO yp.corporate_domain_standard_attribute_values
-				// TODO yp.domain_standard_attribute_values
-				// TODO yp.information_system_standard_attribute_values
-				// TODO yp.service_standard_attribute_values
+				// TODO ix.deployment_group_unique_attribute_values
+				// TODO ix.endpoint_unique_attribute_values
+				// TODO ix.functional_component_unique_attribute_values
+				// TODO ix.product_unique_attribute_values
+				// TODO ix.technical_service_unique_attribute_values
+				// TODO ix.top_level_service_unique_attribute_values
+				// TODO yp.corporate_domain_unique_attribute_values
+				// TODO yp.domain_unique_attribute_values
+				// TODO yp.information_system_unique_attribute_values
+				// TODO yp.service_unique_attribute_values
 			} {
 				if _, err = tx.Exec(
 					statement,
@@ -199,16 +199,16 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 				stmt.ServerStdAttrRemove,
 				stmt.SocketStdAttrRemove,
 				stmt.NamespaceStdAttrRemoveValue,
-				// TODO ix.deployment_group_unique_attribute_values
-				// TODO ix.endpoint_unique_attribute_values
-				// TODO ix.functional_component_unique_attribute_values
-				// TODO ix.product_unique_attribute_values
-				// TODO ix.technical_service_unique_attribute_values
-				// TODO ix.top_level_service_unique_attribute_values
-				// TODO yp.corporate_domain_unique_attribute_values
-				// TODO yp.domain_unique_attribute_values
-				// TODO yp.information_system_unique_attribute_values
-				// TODO yp.service_unique_attribute_values
+				// TODO ix.deployment_group_standard_attribute_values
+				// TODO ix.endpoint_standard_attribute_values
+				// TODO ix.functional_component_standard_attribute_values
+				// TODO ix.product_standard_attribute_values
+				// TODO ix.technical_service_standard_attribute_values
+				// TODO ix.top_level_service_standard_attribute_values
+				// TODO yp.corporate_domain_standard_attribute_values
+				// TODO yp.domain_standard_attribute_values
+				// TODO yp.information_system_standard_attribute_values
+				// TODO yp.service_standard_attribute_values
 			} {
 				if _, err = tx.Exec(
 					statement,
@@ -259,6 +259,7 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 
 	// remove all containers in the namespace
 	for _, statement := range []string{
+		// TODO asset.Socket
 		stmt.ContainerNamespaceRemoveLinking,
 		stmt.ContainerNamespaceRemoveParent,
 		stmt.ContainerNamespaceRemove,
@@ -267,7 +268,6 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 		stmt.RuntimeDelNamespaceParent,
 		stmt.RuntimeDelNamespace,
 		// TODO asset.Server
-		// TODO asset.Socket
 	} {
 		if _, err = tx.Exec(
 			statement,
