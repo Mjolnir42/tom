@@ -74,9 +74,9 @@ func parseTomIDFormatURI(s string) (name, namespace, entity string) {
 	parts := strings.Split(s, `/`)
 	switch {
 	case reCommon.MatchString(s):
-		return strings.TrimPrefix(parts[len(parts)-1], `name=`), ``, parts[len(parts)-2]
-	case reNamespace.MatchString(s):
 		return strings.TrimPrefix(parts[len(parts)-1], `name=`), parts[len(parts)-3], parts[len(parts)-2]
+	case reNamespace.MatchString(s):
+		return strings.TrimPrefix(parts[len(parts)-1], `name=`), ``, parts[len(parts)-2]
 	default:
 		return ``, ``, ``
 	}
