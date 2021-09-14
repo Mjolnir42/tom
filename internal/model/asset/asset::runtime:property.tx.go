@@ -29,6 +29,7 @@ func (h *RuntimeWriteHandler) txPropUpdate(
 	tx *sql.Tx,
 	txTime *time.Time,
 	prop proto.PropertyDetail,
+	rteID string,
 ) bool {
 	var (
 		attributeType string
@@ -45,7 +46,7 @@ func (h *RuntimeWriteHandler) txPropUpdate(
 
 	var reqValidSince, reqValidUntil time.Time
 	switch prop.ValidSince {
-	case `always`:
+	case `always`, `perpetual`:
 		reqValidSince = msg.NegTimeInf
 	case `forever`:
 		mr.BadRequest()
@@ -66,7 +67,7 @@ func (h *RuntimeWriteHandler) txPropUpdate(
 	case `always`:
 		mr.BadRequest()
 		return false
-	case `forever`:
+	case `forever`, `perpetual`:
 		reqValidUntil = msg.PosTimeInf
 	case ``:
 		reqValidUntil = msg.PosTimeInf
@@ -76,6 +77,20 @@ func (h *RuntimeWriteHandler) txPropUpdate(
 			prop.ValidUntil,
 		); err != nil {
 			mr.BadRequest(err)
+			return false
+		}
+	}
+
+	// check the use of the perpetual keyword
+	if prop.ValidSince == `perpetual` || prop.ValidUntil == `perpetual` {
+		// both Since and Until must be set to perpetual
+		if prop.ValidSince != prop.ValidUntil {
+			mr.BadRequest()
+			return false
+		}
+		// only the `type` property is perpetual
+		if prop.Attribute != `type` {
+			mr.BadRequest()
 			return false
 		}
 	}
@@ -109,6 +124,7 @@ func (h *RuntimeWriteHandler) txPropUpdate(
 		prop,
 		reqValidSince,
 		reqValidUntil,
+		rteID,
 	); !ok {
 		return false
 	}
@@ -127,6 +143,7 @@ func (h *RuntimeWriteHandler) txPropUpdate(
 		prop,
 		reqValidSince,
 		reqValidUntil,
+		rteID,
 	); !ok {
 		return false
 	}
@@ -152,6 +169,7 @@ func (h *RuntimeWriteHandler) txPropClamp(
 	prop proto.PropertyDetail,
 	reqValidSince time.Time,
 	reqValidUntil time.Time,
+	rteID string,
 ) (ok bool, done bool) {
 	var (
 		value                 string
@@ -165,6 +183,7 @@ func (h *RuntimeWriteHandler) txPropClamp(
 		q.Namespace.Name,
 		prop.Attribute,
 		txTime.Format(msg.RFC3339Milli),
+		rteID,
 	).Scan(
 		&value,
 		&validFrom,
@@ -209,6 +228,8 @@ func (h *RuntimeWriteHandler) txPropClamp(
 		// update upper validity of the existing record to lower validity
 		// of the new record
 		reqValidSince,
+		// ID of the runtime environment
+		rteID,
 	); err != nil {
 		mr.ServerError(err)
 		return false, false
@@ -228,12 +249,12 @@ func (h *RuntimeWriteHandler) txAttrQueryType(
 	prop proto.PropertyDetail,
 ) (typ string, ok bool) {
 	if err := tx.Stmt(h.stmtAttQueryType).QueryRow(
-		q.Namespace.Name,
+		q.Runtime.Namespace,
 		prop.Attribute,
 	).Scan(
 		&typ,
 	); err == sql.ErrNoRows {
-		mr.ServerError(err)
+		mr.NotFound(err)
 		return
 	} else if err != nil {
 		mr.ServerError(err)
@@ -250,18 +271,20 @@ func (h *RuntimeWriteHandler) txPropSetValue(
 	stmt *sql.Stmt,
 	prop proto.PropertyDetail,
 	reqValidSince, reqValidUntil time.Time,
+	rteID string,
 ) bool {
 	var res sql.Result
 	var err error
 
 	if res, err = stmt.Exec(
-		q.Namespace.Name,
+		q.Runtime.Namespace,
 		prop.Attribute,
 		prop.Value,
 		reqValidSince,
 		reqValidUntil,
 		q.UserIDLib,
 		q.AuthUser,
+		rteID,
 	); err != nil {
 		mr.ServerError(err)
 		return false

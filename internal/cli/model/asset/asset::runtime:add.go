@@ -34,15 +34,6 @@ func cmdAssetRuntimeAdd(c *cli.Context) error {
 	); err != nil {
 		return err
 	}
-	/*
-		if err := adm.VariadicArguments(
-			proto.CmdRuntimeAdd,
-			c,
-			&opts,
-		); err != nil {
-			return err
-		}
-	*/
 
 	req := proto.NewRuntimeRequest()
 	if err := proto.ValidNamespace(opts[`namespace`][0]); err != nil {

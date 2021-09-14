@@ -96,13 +96,14 @@ func (h *RuntimeWriteHandler) add(q *msg.Request, mr *msg.Result) {
 		txTime, validSince, validUntil time.Time
 		rows                           *sql.Rows
 		ok                             bool
+		rteID                          string
 	)
 	// setup a consistent transaction time timestamp that is used for all
 	// records
 	txTime = time.Now().UTC()
 
 	switch q.Runtime.Property[`name`].ValidSince {
-	case `always`, `perpetual`:
+	case `always`:
 		validSince = msg.NegTimeInf
 	case `forever`:
 		mr.BadRequest()
@@ -122,7 +123,7 @@ func (h *RuntimeWriteHandler) add(q *msg.Request, mr *msg.Result) {
 	case `always`:
 		mr.BadRequest()
 		return
-	case `forever`, `perpetual`:
+	case `forever`:
 		validUntil = msg.PosTimeInf
 	case ``:
 		validUntil = msg.PosTimeInf
@@ -192,20 +193,25 @@ func (h *RuntimeWriteHandler) add(q *msg.Request, mr *msg.Result) {
 		}
 	}
 
-	// create named runtime environment in specified namespace
-	if res, err = tx.Stmt(h.stmtAdd).Exec(
+	// create named runtime environment in specified namespace,
+	// this is an INSERT statement with a RETURNING clause, thus
+	// requires .QueryRow instead of .Exec
+	if err = tx.Stmt(h.stmtAdd).QueryRow(
 		q.Runtime.Namespace,
 		q.UserIDLib,
 		q.AuthUser,
 		q.Runtime.Property[`name`].Value,
 		validSince,
 		validUntil,
-	); err != nil {
+	).Scan(
+		&rteID,
+	); err == sql.ErrNoRows {
+		// query did not return the generated rteID
 		mr.ServerError(err)
 		tx.Rollback()
 		return
-	}
-	if !mr.CheckRowsAffected(res.RowsAffected()) {
+	} else if err != nil {
+		mr.ServerError(err)
 		tx.Rollback()
 		return
 	}
@@ -217,7 +223,7 @@ func (h *RuntimeWriteHandler) add(q *msg.Request, mr *msg.Result) {
 			continue
 		}
 		if ok = h.txPropUpdate(
-			q, mr, tx, &txTime, q.Runtime.Property[key],
+			q, mr, tx, &txTime, q.Runtime.Property[key], rteID,
 		); !ok {
 			tx.Rollback()
 			return

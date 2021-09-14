@@ -46,7 +46,8 @@ SELECT            ins_rte.rteID,
                   ins_rte.userID
 FROM              ins_rte
   CROSS JOIN      sel_att
-  CROSS JOIN      sel_dct;`
+  CROSS JOIN      sel_dct
+RETURNING         rteID;`
 
 	RuntimeRemove = `
 SELECT      'Runtime.REMOVE';`
@@ -61,7 +62,7 @@ DELETE FROM       asset.runtime_environment_unique_attribute_values
 WHERE             attributeID = $1::uuid
   AND             dictionaryID = $2::uuid;`
 
-	RuntimeTxStdPropertyAdd     = `
+	RuntimeTxStdPropertyAdd = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                               inventory.user.userID AS userID
                   FROM        meta.dictionary
@@ -77,8 +78,9 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                     JOIN      cte_dct
                       ON      cte_dct.dictID = meta.standard_attribute.dictionaryID
                   WHERE       meta.standard_attribute.attribute = $2::text )
-INSERT INTO       asset.runtime_environment_standard_attribute_values ( dictionaryID, attributeID, value, validity, createdBy )
-SELECT            cte_dct.dictID,
+INSERT INTO       asset.runtime_environment_standard_attribute_values ( rteID, dictionaryID, attributeID, value, validity, createdBy )
+SELECT            $8::uuid,
+                  cte_dct.dictID,
                   cte_att.attributeID,
                   $3::text,
                   tstzrange($4::timestamptz(3), $5::timestamptz(3), '[]'),
@@ -86,7 +88,7 @@ SELECT            cte_dct.dictID,
 FROM              cte_dct
     CROSS JOIN    cte_att;`
 
-	RuntimeTxStdPropertyClamp   = `
+	RuntimeTxStdPropertyClamp = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.dictionary
                   WHERE       meta.dictionary.name = $1::text ),
@@ -104,9 +106,10 @@ WHERE             asset.runtime_environment_standard_attribute_values.dictionary
   AND             asset.runtime_environment_standard_attribute_values.value           = $3::text
   AND             lower(asset.runtime_environment_standard_attribute_values.validity) = $4::timestamptz(3)
   AND             upper(asset.runtime_environment_standard_attribute_values.validity) = $5::timestamptz(3)
+  AND             asset.runtime_environment_standard_attribute_values.rteID           = $8::uuid
   AND             $6::timestamptz(3) <@ asset.runtime_environment_standard_attribute_values.validity;`
 
-	RuntimeTxStdPropertySelect  = `
+	RuntimeTxStdPropertySelect = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.dictionary
                   WHERE       meta.dictionary.name = $1::text ),
@@ -124,9 +127,10 @@ FROM              asset.runtime_environment_standard_attribute_values
     JOIN          cte_att
       ON          cte_att.attributeID = asset.runtime_environment_standard_attribute_values.attributeID
    WHERE          $3::timestamptz(3) <@ asset.runtime_environment_standard_attribute_values.validity
+     AND          asset.runtime_environment_standard_attribute_values.rteID = $4::uuid
    FOR UPDATE;`
 
-	RuntimeTxUniqPropertyAdd    = `
+	RuntimeTxUniqPropertyAdd = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                               inventory.user.userID AS userID
                   FROM        meta.dictionary
@@ -142,8 +146,9 @@ WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                     JOIN      cte_dct
                       ON      cte_dct.dictID = meta.unique_attribute.dictionaryID
                   WHERE       meta.unique_attribute.attribute = $2::text )
-INSERT INTO       asset.runtime_environment_unique_attribute_values ( dictionaryID, attributeID, value, validity, createdBy )
-SELECT            cte_dct.dictID,
+INSERT INTO       asset.runtime_environment_unique_attribute_values ( rteID, dictionaryID, attributeID, value, validity, createdBy )
+SELECT            $8::uuid,
+                  cte_dct.dictID,
                   cte_att.attributeID,
                   $3::text,
                   tstzrange($4::timestamptz(3), $5::timestamptz(3), '[]'),
@@ -151,7 +156,7 @@ SELECT            cte_dct.dictID,
 FROM              cte_dct
     CROSS JOIN    cte_att;`
 
-	RuntimeTxUniqPropertyClamp  = `
+	RuntimeTxUniqPropertyClamp = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
                   FROM        meta.dictionary
                   WHERE       meta.dictionary.name = $1::text ),
@@ -169,6 +174,7 @@ WHERE             asset.runtime_environment_unique_attribute_values.dictionaryID
   AND             asset.runtime_environment_unique_attribute_values.value           = $3::text
   AND             lower(asset.runtime_environment_unique_attribute_values.validity) = $4::timestamptz(3)
   AND             upper(asset.runtime_environment_unique_attribute_values.validity) = $5::timestamptz(3)
+  AND             asset.runtime_environment_unique_attribute_values.rteID           = $8::uuid
   AND             $6::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
 
 	RuntimeTxUniqPropertySelect = `
@@ -189,6 +195,7 @@ FROM              asset.runtime_environment_unique_attribute_values
     JOIN          cte_att
       ON          cte_att.attributeID = asset.runtime_environment_unique_attribute_values.attributeID
    WHERE          $3::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity
+     AND          asset.runtime_environment_unique_attribute_values.rteID = $4::uuid
    FOR UPDATE;`
 )
 
