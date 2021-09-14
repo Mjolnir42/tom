@@ -16,35 +16,35 @@ import (
 )
 
 func init() {
-	proto.AssertCommandIsDefined(proto.CmdRuntimeRemove)
+	proto.AssertCommandIsDefined(proto.CmdOrchestrationRemove)
 
 	registry = append(registry, function{
-		cmd:    proto.CmdRuntimeRemove,
-		handle: runtimeRemove,
+		cmd:    proto.CmdOrchestrationRemove,
+		handle: orchestrationRemove,
 	})
 }
 
-func runtimeRemove(m *Model) httprouter.Handle {
-	return m.x.Authenticated(m.RuntimeRemove)
+func orchestrationRemove(m *Model) httprouter.Handle {
+	return m.x.Authenticated(m.OrchestrationRemove)
 }
 
-func exportRuntimeRemove(result *proto.Result, r *msg.Result) {
-	result.Runtime = &[]proto.Runtime{}
-	*result.Runtime = append(*result.Runtime, r.Runtime...)
+func exportOrchestrationRemove(result *proto.Result, r *msg.Result) {
+	result.Orchestration = &[]proto.Orchestration{}
+	*result.Orchestration = append(*result.Orchestration, r.Orchestration...)
 }
 
-// RuntimeRemove function
-func (m *Model) RuntimeRemove(w http.ResponseWriter, r *http.Request,
+// OrchestrationRemove function
+func (m *Model) OrchestrationRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
 	request := msg.New(r, params)
-	request.Section = msg.SectionRuntime
+	request.Section = msg.SectionOrchestration
 	request.Action = proto.ActionRemove
-	request.Runtime = proto.Runtime{
+	request.Orchestration = proto.Orchestration{
 		TomID: params.ByName(`tomID`),
 	}
 
-	if err := request.Runtime.ParseTomID(); err != nil {
+	if err := request.Orchestration.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
@@ -58,13 +58,7 @@ func (m *Model) RuntimeRemove(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result, exportRuntimeRemove)
-}
-
-// remove ...
-func (h *RuntimeWriteHandler) remove(q *msg.Request, mr *msg.Result) {
-	// TODO
-	mr.NotImplemented()
+	m.x.Send(&w, &result, exportOrchestrationRemove)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

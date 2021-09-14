@@ -85,6 +85,24 @@ const (
 	CmdRuntimePropUpdate = ModelAsset + `::` + EntityRuntime + `:` + ActionPropUpdate
 	CmdRuntimeRemove     = ModelAsset + `::` + EntityRuntime + `:` + ActionRemove
 	CmdRuntimeShow       = ModelAsset + `::` + EntityRuntime + `:` + ActionShow
+
+	CmdOrchestration           = ModelAsset + `::` + EntityOrchestration + `:`
+	CmdOrchestrationAdd        = ModelAsset + `::` + EntityOrchestration + `:` + ActionAdd
+	CmdOrchestrationList       = ModelAsset + `::` + EntityOrchestration + `:` + ActionList
+	CmdOrchestrationPropRemove = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropRemove
+	CmdOrchestrationPropSet    = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropSet
+	CmdOrchestrationPropUpdate = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropUpdate
+	CmdOrchestrationRemove     = ModelAsset + `::` + EntityOrchestration + `:` + ActionRemove
+	CmdOrchestrationShow       = ModelAsset + `::` + EntityOrchestration + `:` + ActionShow
+
+	CmdContainer           = ModelAsset + `::` + EntityContainer + `:`
+	CmdContainerAdd        = ModelAsset + `::` + EntityContainer + `:` + ActionAdd
+	CmdContainerList       = ModelAsset + `::` + EntityContainer + `:` + ActionList
+	CmdContainerPropRemove = ModelAsset + `::` + EntityContainer + `:` + ActionPropRemove
+	CmdContainerPropSet    = ModelAsset + `::` + EntityContainer + `:` + ActionPropSet
+	CmdContainerPropUpdate = ModelAsset + `::` + EntityContainer + `:` + ActionPropUpdate
+	CmdContainerRemove     = ModelAsset + `::` + EntityContainer + `:` + ActionRemove
+	CmdContainerShow       = ModelAsset + `::` + EntityContainer + `:` + ActionShow
 )
 
 const (

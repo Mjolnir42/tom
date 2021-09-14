@@ -23,6 +23,13 @@ type Server struct {
 	UniqProperty []PropertyDetail          `json:"-"`
 }
 
+type ServerHeader struct {
+	Namespace string `json:"namespace"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"createdAt"`
+	CreatedBy string `json:"createdBy"`
+}
+
 func (s *Server) SetTomID() Entity {
 	s.TomID = s.FormatDNS()
 	return s

@@ -16,22 +16,6 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// process is the request dispatcher
-func (h *ServerReadHandler) process(q *msg.Request) {
-	result := msg.FromRequest(q)
-	//	logRequest(h.reqLog, q)
-
-	switch q.Action {
-	case proto.ActionList:
-		h.list(q, &result)
-	case proto.ActionShow:
-		h.show(q, &result)
-	default:
-		result.UnknownRequest(q)
-	}
-	q.Reply <- result
-}
-
 // list returns all servers
 func (h *ServerReadHandler) list(q *msg.Request, mr *msg.Result) {
 	var (

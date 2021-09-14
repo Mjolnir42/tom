@@ -48,6 +48,9 @@ func NewRuntimeWriteHandler(length int) (string, *RuntimeWriteHandler) {
 func (h *RuntimeWriteHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionAdd,
+		proto.ActionPropRemove,
+		proto.ActionPropSet,
+		proto.ActionPropUpdate,
 		proto.ActionRemove,
 	} {
 		hm.Request(msg.SectionRuntime, action, h.name)
@@ -62,6 +65,12 @@ func (h *RuntimeWriteHandler) process(q *msg.Request) {
 	switch q.Action {
 	case proto.ActionAdd:
 		h.add(q, &result)
+	case proto.ActionPropRemove:
+		h.propRemove(q, &result)
+	case proto.ActionPropSet:
+		h.propSet(q, &result)
+	case proto.ActionPropUpdate:
+		h.propUpdate(q, &result)
 	case proto.ActionRemove:
 		h.remove(q, &result)
 	default:

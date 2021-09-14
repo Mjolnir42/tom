@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -17,7 +17,52 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// Implementation of the handler.Handler interface
+// RuntimeReadHandler ...
+type RuntimeReadHandler struct {
+	Input    chan msg.Request
+	Shutdown chan struct{}
+	name     string
+	conn     *sql.DB
+	lm       *lhm.LogHandleMap
+	stmtList *sql.Stmt
+	stmtShow *sql.Stmt
+	stmtProp *sql.Stmt
+}
+
+// NewRuntimeReadHandler returns a new handler instance
+func NewRuntimeReadHandler(length int) (string, *RuntimeReadHandler) {
+	h := &RuntimeReadHandler{}
+	h.name = handler.GenerateName(msg.CategoryAsset+`::`+msg.SectionRuntime) + `/read`
+	h.Input = make(chan msg.Request, length)
+	h.Shutdown = make(chan struct{})
+	return h.name, h
+}
+
+// Register the handlername for the requests it wants to receive
+func (h *RuntimeReadHandler) Register(hm *handler.Map) {
+	for _, action := range []string{
+		proto.ActionList,
+		proto.ActionShow,
+	} {
+		hm.Request(msg.SectionRuntime, action, h.name)
+	}
+}
+
+// process is the request dispatcher
+func (h *RuntimeReadHandler) process(q *msg.Request) {
+	result := msg.FromRequest(q)
+	//	logRequest(h.reqLog, q)
+
+	switch q.Action {
+	case proto.ActionList:
+		h.list(q, &result)
+	case proto.ActionShow:
+		h.show(q, &result)
+	default:
+		result.UnknownRequest(q)
+	}
+	q.Reply <- result
+}
 
 // Configure injects the handler with db connection and logging
 func (h *RuntimeReadHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
@@ -33,16 +78,6 @@ func (h *RuntimeReadHandler) Intake() chan msg.Request {
 // PriorityIntake aliases Intake as part of the handler interface
 func (h *RuntimeReadHandler) PriorityIntake() chan msg.Request {
 	return h.Intake()
-}
-
-// Register the handlername for the requests it wants to receive
-func (h *RuntimeReadHandler) Register(hm *handler.Map) {
-	for _, action := range []string{
-		proto.ActionList,
-		proto.ActionShow,
-	} {
-		hm.Request(msg.SectionRuntime, action, h.name)
-	}
 }
 
 // Run is the event loop for RuntimeReadHandler

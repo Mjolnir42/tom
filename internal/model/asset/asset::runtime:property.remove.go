@@ -16,30 +16,30 @@ import (
 )
 
 func init() {
-	proto.AssertCommandIsDefined(proto.CmdRuntimeRemove)
+	proto.AssertCommandIsDefined(proto.CmdRuntimePropRemove)
 
 	registry = append(registry, function{
-		cmd:    proto.CmdRuntimeRemove,
-		handle: runtimeRemove,
+		cmd:    proto.CmdRuntimePropRemove,
+		handle: runtimePropRemove,
 	})
 }
 
-func runtimeRemove(m *Model) httprouter.Handle {
-	return m.x.Authenticated(m.RuntimeRemove)
+func runtimePropRemove(m *Model) httprouter.Handle {
+	return m.x.Authenticated(m.RuntimePropRemove)
 }
 
-func exportRuntimeRemove(result *proto.Result, r *msg.Result) {
+func exportRuntimePropRemove(result *proto.Result, r *msg.Result) {
 	result.Runtime = &[]proto.Runtime{}
 	*result.Runtime = append(*result.Runtime, r.Runtime...)
 }
 
-// RuntimeRemove function
-func (m *Model) RuntimeRemove(w http.ResponseWriter, r *http.Request,
+// RuntimePropRemove function
+func (m *Model) RuntimePropRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionRuntime
-	request.Action = proto.ActionRemove
+	request.Action = proto.ActionPropRemove
 	request.Runtime = proto.Runtime{
 		TomID: params.ByName(`tomID`),
 	}
@@ -58,11 +58,11 @@ func (m *Model) RuntimeRemove(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result, exportRuntimeRemove)
+	m.x.Send(&w, &result, exportRuntimePropRemove)
 }
 
-// remove ...
-func (h *RuntimeWriteHandler) remove(q *msg.Request, mr *msg.Result) {
+// propRemove ...
+func (h *RuntimeWriteHandler) propRemove(q *msg.Request, mr *msg.Result) {
 	// TODO
 	mr.NotImplemented()
 }

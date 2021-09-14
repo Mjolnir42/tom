@@ -7,6 +7,37 @@
 
 package proto //
 
+func init() {
+	Commands[CmdOrchestrationAdd] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/orchestration/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{},
+	}
+	Commands[CmdOrchestrationList] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/orchestration/`,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{},
+	}
+	Commands[CmdOrchestrationShow] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/orchestration/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateDetail,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdOrchestrationRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/orchestration/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+}
+
 // Orchestration defines a orchestration environment within the asset model
 type Orchestration struct {
 	Namespace    string                    `json:"namespace"`
@@ -21,6 +52,14 @@ type Orchestration struct {
 	TomID        string                    `json:"-"`
 	StdProperty  []PropertyDetail          `json:"-"`
 	UniqProperty []PropertyDetail          `json:"-"`
+}
+
+// OrchestrationHeader defines ....
+type OrchestrationHeader struct {
+	Namespace string `json:"namespace"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"createdAt"`
+	CreatedBy string `json:"createdBy"`
 }
 
 func (o *Orchestration) SetTomID() Entity {

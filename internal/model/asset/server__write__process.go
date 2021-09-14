@@ -13,24 +13,7 @@ import (
 
 	"github.com/mjolnir42/tom/internal/msg"
 	//	"github.com/mjolnir42/tom/internal/stmt"
-	"github.com/mjolnir42/tom/pkg/proto"
 )
-
-// process is the request dispatcher
-func (h *ServerWriteHandler) process(q *msg.Request) {
-	result := msg.FromRequest(q)
-	//	logRequest(h.reqLog, q)
-
-	switch q.Action {
-	case proto.ActionAdd:
-		h.add(q, &result)
-	case proto.ActionRemove:
-		h.remove(q, &result)
-	default:
-		result.UnknownRequest(q)
-	}
-	q.Reply <- result
-}
 
 // add ...
 func (h *ServerWriteHandler) add(q *msg.Request, mr *msg.Result) {

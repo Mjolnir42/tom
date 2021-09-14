@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -17,7 +17,53 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// Implementation of the handler.Handler interface
+// ServerReadHandler ...
+type ServerReadHandler struct {
+	Input         chan msg.Request
+	Shutdown      chan struct{}
+	name          string
+	conn          *sql.DB
+	lm            *lhm.LogHandleMap
+	stmtAttribute *sql.Stmt
+	stmtFind      *sql.Stmt
+	stmtList      *sql.Stmt
+	stmtParent    *sql.Stmt
+	stmtLink      *sql.Stmt
+}
+
+// NewServerReadHandler returns a new handler instance
+func NewServerReadHandler(length int) (string, *ServerReadHandler) {
+	h := &ServerReadHandler{}
+	h.name = handler.GenerateName(msg.CategoryAsset+`::`+msg.SectionServer) + `/read`
+	h.Input = make(chan msg.Request, length)
+	h.Shutdown = make(chan struct{})
+	return h.name, h
+}
+
+// Register the handlername for the requests it wants to receive
+func (h *ServerReadHandler) Register(hm *handler.Map) {
+	for _, action := range []string{
+		proto.ActionList,
+		proto.ActionShow,
+	} {
+		hm.Request(msg.SectionServer, action, h.name)
+	}
+}
+
+// process is the request dispatcher
+func (h *ServerReadHandler) process(q *msg.Request) {
+	result := msg.FromRequest(q)
+
+	switch q.Action {
+	case proto.ActionList:
+		h.list(q, &result)
+	case proto.ActionShow:
+		h.show(q, &result)
+	default:
+		result.UnknownRequest(q)
+	}
+	q.Reply <- result
+}
 
 // Configure injects the handler with db connection and logging
 func (h *ServerReadHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
@@ -33,16 +79,6 @@ func (h *ServerReadHandler) Intake() chan msg.Request {
 // PriorityIntake aliases Intake as part of the handler interface
 func (h *ServerReadHandler) PriorityIntake() chan msg.Request {
 	return h.Intake()
-}
-
-// Register the handlername for the requests it wants to receive
-func (h *ServerReadHandler) Register(hm *handler.Map) {
-	for _, action := range []string{
-		proto.ActionList,
-		proto.ActionShow,
-	} {
-		hm.Request(msg.SectionServer, action, h.name)
-	}
 }
 
 // Run is the event loop for ServerReadHandler

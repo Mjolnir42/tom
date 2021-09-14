@@ -16,17 +16,20 @@ type Result struct {
 	JobID   string `json:"jobId,omitempty"`
 	JobType string `json:"jobType,omitempty"`
 
-	Container       *[]Container       `json:"container,omitempty"`
-	Library         *[]Library         `json:"library,omitempty"`
-	Namespace       *[]Namespace       `json:"namespace,omitempty"`
-	NamespaceHeader *[]NamespaceHeader `json:"namespace-list,omitempty"`
-	Orchestration   *[]Orchestration   `json:"orchestration,omitempty"`
-	Runtime         *[]Runtime         `json:"runtime,omitempty"`
-	RuntimeHeader   *[]RuntimeHeader   `json:"runtime-list,omitempty"`
-	Server          *[]Server          `json:"server,omitempty"`
-	Socket          *[]Socket          `json:"socket,omitempty"`
-	Team            *[]Team            `json:"team,omitempty"`
-	User            *[]User            `json:"user,omitempty"`
+	Container           *[]Container           `json:"container,omitempty"`
+	ContainerHeader     *[]ContainerHeader     `json:"container-list,omitempty"`
+	Library             *[]Library             `json:"library,omitempty"`
+	Namespace           *[]Namespace           `json:"namespace,omitempty"`
+	NamespaceHeader     *[]NamespaceHeader     `json:"namespace-list,omitempty"`
+	Orchestration       *[]Orchestration       `json:"orchestration,omitempty"`
+	OrchestrationHeader *[]OrchestrationHeader `json:"orchestration-list,omitempty"`
+	Runtime             *[]Runtime             `json:"runtime,omitempty"`
+	RuntimeHeader       *[]RuntimeHeader       `json:"runtime-list,omitempty"`
+	Server              *[]Server              `json:"server,omitempty"`
+	ServerHeader        *[]ServerHeader        `json:"server-list,omitempty"`
+	Socket              *[]Socket              `json:"socket,omitempty"`
+	Team                *[]Team                `json:"team,omitempty"`
+	User                *[]User                `json:"user,omitempty"`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
