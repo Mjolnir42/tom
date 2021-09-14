@@ -30,10 +30,10 @@ type AttributeDefinition struct {
 }
 
 const (
-	tomIDFormatDNS = `^(:?[^[:space:]])\.(:?[^[:space:]]+)\.(:?server|runtime|orchestration)\.tom\.?$`
-	tomIDNamespDNS = `^(:?[^[:space:]]+)\.(:?namespace)\.tom\.?$`
-	tomIDFormatURI = `^tom://(:?[^[:space:]]+)/(:?server|runtime|orchestration)/name=(:?[^[:space:]]+)$`
-	tomIDNamespURI = `^tom:///(:?namespace)/name=(:?[^[:space:]]+)$`
+	tomIDFormatDNS = `^(:?[` + CharUnreserved + `]+)\.(:?[` + CharNamespace + `]+)\.(:?server|runtime|orchestration)\.tom\.?$`
+	tomIDNamespDNS = `^(:?[` + CharNamespace + `]+)\.(:?namespace)\.tom\.?$`
+	tomIDFormatURI = `^tom://(:?[` + CharNamespace + `]+)/(:?server|runtime|orchestration)/name=(:?[` + CharUnreserved + `]+)$`
+	tomIDNamespURI = `^tom:///(:?namespace)/name=(:?[` + CharNamespace + `]+)$`
 )
 
 func IsTomID(s string) bool {
