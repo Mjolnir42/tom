@@ -25,8 +25,8 @@ Argument | Type | Description | Default Value | Optional
 name | string | name of the namespace | | no
 attr | string | name of the property attribute | | no
 val | string | value of the property | | no
-since | string | since when the value is valid for the property | now | yes
-until | string | until when the value is valid for the property | forever | yes
+since | timestamp | since when the value is valid for the property | now | yes
+until | timestamp | until when the value is valid for the property | forever | yes
 
 # NOTES
 

@@ -18,6 +18,20 @@ name | string | name of the namespace | | no
 std | string | Standard attribute for the namespace | | yes
 uniq | string | Unique attribute for the namespace | | yes
 
+# NOTES
+
+If the name of the attribute ends in the suffix `_list`, then
+its value must be decodeable by GoLang's encoding/json package
+as array of strings.
+
+If the name of the attribute ends in the suffix `_json`, then
+its value must be decodeable by GoLang's encoding/json package
+as a generic, arbitrary JSON.
+
+If the name of the attribute ends in the suffix `_xml`, then
+its value must be decodeable by GoLang's encoding/xml package.
+as a generic, arbitrary XML.
+
 # PERMISSIONS
 
 The request is authorized if the user either has at least one
