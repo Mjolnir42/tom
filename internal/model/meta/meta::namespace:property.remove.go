@@ -141,8 +141,8 @@ func (h *NamespaceWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
 	// for all properties specified in the request, check that the attribute
 	// exists and record its type
 	for key := range q.Namespace.Property {
-		if _, ok = attrMap[key]; ok {
-			reqMap[key] = attrMap[key]
+		if _, ok = attrMap[q.Namespace.Property[key].Attribute]; ok {
+			reqMap[q.Namespace.Property[key].Attribute] = attrMap[q.Namespace.Property[key].Attribute]
 		} else {
 			mr.BadRequest(fmt.Errorf(
 				"Specified property attribute <%s> does not exist.",
