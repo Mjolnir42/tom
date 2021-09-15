@@ -31,31 +31,31 @@ WHERE             (meta.dictionary.name = $1::text OR $1::text IS NULL)
   AND             now()::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
 
 	RuntimeTxShow = `
-SELECT      			asset.runtime_environment.rteID,
+SELECT            asset.runtime_environment.rteID,
                   asset.runtime_environment.dictionaryID,
-									asset.runtime_environment.createdAt,
-									creator.uid AS createdBy,
-									lower(asset.runtime_environment_unique_attribute_values.validity) AS validSince,
-									upper(asset.runtime_environment_unique_attribute_values.validity) AS validUntil,
-									asset.runtime_environment_unique_attribute_values.createdAt AS namedAt,
-									namegiver.uid AS namedBy
+                  asset.runtime_environment.createdAt,
+                  creator.uid AS createdBy,
+                  lower(asset.runtime_environment_unique_attribute_values.validity) AS validSince,
+                  upper(asset.runtime_environment_unique_attribute_values.validity) AS validUntil,
+                  asset.runtime_environment_unique_attribute_values.createdAt AS namedAt,
+                  namegiver.uid AS namedBy
 FROM              meta.dictionary
     JOIN          asset.runtime_environment
         ON        meta.dictionary.dictionaryID = asset.runtime_environment.dictionaryID
-    JOIN    			inventory.user AS creator
+    JOIN          inventory.user AS creator
         ON        asset.runtime_environment.createdBy = creator.userID
-		JOIN          meta.unique_attribute
-		    ON        meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
-		JOIN          asset.runtime_environment_unique_attribute_values
-		    ON        meta.dictionary.dictionaryID = asset.runtime_environment_unique_attribute_values.dictionaryID
-				AND       asset.runtime_environment.rteID = asset.runtime_environment_unique_attribute_values.rteID
-				AND       meta.unique_attribute.attributeID = asset.runtime_environment_unique_attribute_values.attributeID
-	  JOIN          inventory.user AS namegiver
-		    ON        asset.runtime_environment_unique_attribute_values.createdBy = namegiver.userID
+    JOIN          meta.unique_attribute
+        ON        meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN          asset.runtime_environment_unique_attribute_values
+        ON        meta.dictionary.dictionaryID = asset.runtime_environment_unique_attribute_values.dictionaryID
+        AND       asset.runtime_environment.rteID = asset.runtime_environment_unique_attribute_values.rteID
+        AND       meta.unique_attribute.attributeID = asset.runtime_environment_unique_attribute_values.attributeID
+    JOIN          inventory.user AS namegiver
+        ON        asset.runtime_environment_unique_attribute_values.createdBy = namegiver.userID
 WHERE             meta.dictionary.name = $1::text
      AND          meta.unique_attribute.attribute = 'name'::text
-		 AND          asset.runtime_environment_unique_attribute_values.value = $2::text
-		 AND          $3::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
+     AND          asset.runtime_environment_unique_attribute_values.value = $2::text
+     AND          $3::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
 
 	RuntimeTxShowProperties = `
 SELECT      meta.unique_attribute.attribute AS attribute,

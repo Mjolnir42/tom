@@ -15,7 +15,7 @@ SELECT      asset.server.serverID,
             meta.dictionary.name,
             meta.standard_attribute.attribute,
             asset.server_standard_attribute_values.value,
-			'standard'::text AS type
+            'standard'::text AS type
 FROM        asset.server
     JOIN    meta.dictionary
       ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
@@ -32,7 +32,7 @@ SELECT      asset.server.serverID,
             meta.dictionary.name,
             meta.unique_attribute.attribute,
             asset.server_unique_attribute_values.value,
-			'unique'::text AS type
+            'unique'::text AS type
 FROM        asset.server
     JOIN    meta.dictionary
       ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
