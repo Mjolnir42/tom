@@ -7,7 +7,10 @@
 
 package msg // import "github.com/mjolnir42/tom/internal/msg"
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 var (
 	// this will be used as mapping for the PostgreSQL time value
@@ -24,6 +27,8 @@ var (
 	//
 	// RFC: 293888-01-01T00:00:00Z
 	PosTimeInf = time.Date(293888, time.January, 1, 0, 0, 0, 0, time.UTC)
+	//
+	ErrInvalidValidity = errors.New(`msg: invalid lower or upper validity boundary`)
 )
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
