@@ -61,8 +61,8 @@ func (m *Model) RuntimePropUpdate(w http.ResponseWriter, r *http.Request,
 	m.x.Send(&w, &result, exportRuntimePropUpdate)
 }
 
-// propUpdate ...
-func (h *RuntimeWriteHandler) propUpdate(q *msg.Request, mr *msg.Result) {
+// propertyUpdate ...
+func (h *RuntimeWriteHandler) propertyUpdate(q *msg.Request, mr *msg.Result) {
 	// TODO
 	mr.NotImplemented()
 }

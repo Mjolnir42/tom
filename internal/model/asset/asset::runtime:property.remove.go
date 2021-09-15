@@ -61,8 +61,8 @@ func (m *Model) RuntimePropRemove(w http.ResponseWriter, r *http.Request,
 	m.x.Send(&w, &result, exportRuntimePropRemove)
 }
 
-// propRemove ...
-func (h *RuntimeWriteHandler) propRemove(q *msg.Request, mr *msg.Result) {
+// propertyRemove ...
+func (h *RuntimeWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
 	// TODO
 	mr.NotImplemented()
 }

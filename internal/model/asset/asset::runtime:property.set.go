@@ -61,8 +61,8 @@ func (m *Model) RuntimePropSet(w http.ResponseWriter, r *http.Request,
 	m.x.Send(&w, &result, exportRuntimePropSet)
 }
 
-// propSet ...
-func (h *RuntimeWriteHandler) propSet(q *msg.Request, mr *msg.Result) {
+// propertySet ...
+func (h *RuntimeWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 	// TODO
 	mr.NotImplemented()
 }

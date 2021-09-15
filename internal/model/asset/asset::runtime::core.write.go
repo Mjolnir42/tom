@@ -66,11 +66,11 @@ func (h *RuntimeWriteHandler) process(q *msg.Request) {
 	case proto.ActionAdd:
 		h.add(q, &result)
 	case proto.ActionPropRemove:
-		h.propRemove(q, &result)
+		h.propertyRemove(q, &result)
 	case proto.ActionPropSet:
-		h.propSet(q, &result)
+		h.propertySet(q, &result)
 	case proto.ActionPropUpdate:
-		h.propUpdate(q, &result)
+		h.propertyUpdate(q, &result)
 	case proto.ActionRemove:
 		h.remove(q, &result)
 	default:
