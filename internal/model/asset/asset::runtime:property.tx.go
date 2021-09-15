@@ -180,7 +180,7 @@ func (h *RuntimeWriteHandler) txPropClamp(
 
 	// query if the attribute has a value that is valid at transaction time
 	if err := stmtSelect.QueryRow(
-		q.Namespace.Name,
+		q.Runtime.Namespace,
 		prop.Attribute,
 		txTime.Format(msg.RFC3339Milli),
 		rteID,
