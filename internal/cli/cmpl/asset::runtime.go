@@ -29,19 +29,23 @@ func RuntimeList(c *cli.Context) {
 }
 
 func RuntimeShow(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdRuntimeShow)
+	GenericMulti(c, uniq, multi)
 }
 
 func RuntimePropSet(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdRuntimePropSet)
+	GenericPropertyChain(c, uniq, multi)
 }
 
 func RuntimePropUpdate(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdRuntimePropUpdate)
+	GenericPropertyChain(c, uniq, multi)
 }
 
 func RuntimePropRemove(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdRuntimePropRemove)
+	GenericMulti(c, uniq, multi)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

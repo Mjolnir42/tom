@@ -214,7 +214,7 @@ func (h *RuntimeWriteHandler) txPropClamp(
 
 	if res, err = stmtClamp.Exec(
 		// name of the namespace
-		q.Namespace.Name,
+		q.Runtime.Namespace,
 		// name of the attribute
 		prop.Attribute,
 		// current value, required for row confirmation

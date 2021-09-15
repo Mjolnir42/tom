@@ -55,8 +55,8 @@ func (m *Model) RuntimeList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	if r.URL.Query().Get(`namespace`) != `` {
-		request.Namespace.Name = r.URL.Query().Get(`namespace`)
-		if err := proto.ValidNamespace(request.Namespace.Name); err != nil {
+		request.Runtime.Namespace = r.URL.Query().Get(`namespace`)
+		if err := proto.ValidNamespace(request.Runtime.Namespace); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}
@@ -77,8 +77,8 @@ func (h *RuntimeReadHandler) list(q *msg.Request, mr *msg.Result) {
 		err                                 error
 	)
 
-	if q.Namespace.Name != `` {
-		namespace.String = q.Namespace.Name
+	if q.Runtime.Namespace != `` {
+		namespace.String = q.Runtime.Namespace
 		namespace.Valid = true
 	}
 
