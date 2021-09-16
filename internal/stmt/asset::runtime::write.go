@@ -212,6 +212,30 @@ DELETE FROM       asset.runtime_environment_parent
 USING             asset.runtime_environment
 WHERE             asset.runtime_environment_parent.rteID = asset.runtime_environment.rteID
   AND             asset.runtime_environment.dictionaryID = $1::uuid;`
+
+	RuntimeLink = `
+WITH sel_uid AS ( SELECT inventory.user.userID
+                  FROM   inventory.user
+                  JOIN   inventory.identity_library
+                    ON   inventory.identity_library.identityLibraryID
+                    =    inventory.user.identityLibraryID
+                  WHERE  inventory.user.uid = $5::text
+                    AND  inventory.identity_library.name = $6::text)
+INSERT INTO       asset.runtime_environment_linking (
+                         rteID_A,
+                         dictionaryID_A,
+                         rteID_B,
+                         dictionaryID_B,
+                         createdBy,
+                         createdAt,
+                  )
+SELECT            $1::uuid,
+                  $2::uuid,
+                  $3::uuid,
+                  $4::uuid,
+                  sel_uid.userID,
+                  $7::timestamptz(3)
+FROM              sel_uid;`
 )
 
 func init() {
@@ -221,6 +245,7 @@ func init() {
 	m[RuntimeDelNamespaceStdValues] = `RuntimeDelNamespaceStdValues`
 	m[RuntimeDelNamespaceUniqValues] = `RuntimeDelNamespaceUniqValues`
 	m[RuntimeDelNamespace] = `RuntimeDelNamespace`
+	m[RuntimeLink] = `RuntimeLink`
 	m[RuntimeRemove] = `RuntimeRemove`
 	m[RuntimeTxStdPropertyAdd] = `RuntimeTxStdPropertyAdd`
 	m[RuntimeTxStdPropertyClamp] = `RuntimeTxStdPropertyClamp`

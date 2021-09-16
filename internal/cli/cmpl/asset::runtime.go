@@ -48,4 +48,9 @@ func RuntimePropRemove(c *cli.Context) {
 	GenericMulti(c, uniq, multi)
 }
 
+func RuntimeLink(c *cli.Context) {
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdRuntimeLink)
+	GenericMulti(c, uniq, multi)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

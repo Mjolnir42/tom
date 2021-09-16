@@ -26,6 +26,7 @@ type RuntimeWriteHandler struct {
 	lm                   *lhm.LogHandleMap
 	stmtAdd              *sql.Stmt
 	stmtAttQueryType     *sql.Stmt
+	stmtLink             *sql.Stmt
 	stmtRemove           *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
@@ -48,6 +49,7 @@ func NewRuntimeWriteHandler(length int) (string, *RuntimeWriteHandler) {
 func (h *RuntimeWriteHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionAdd,
+		proto.ActionLink,
 		proto.ActionPropRemove,
 		proto.ActionPropSet,
 		proto.ActionPropUpdate,
@@ -65,6 +67,8 @@ func (h *RuntimeWriteHandler) process(q *msg.Request) {
 	switch q.Action {
 	case proto.ActionAdd:
 		h.add(q, &result)
+	case proto.ActionLink:
+		h.link(q, &result)
 	case proto.ActionPropRemove:
 		h.propertyRemove(q, &result)
 	case proto.ActionPropSet:
@@ -101,6 +105,7 @@ func (h *RuntimeWriteHandler) Run() {
 
 	for statement, prepared := range map[string]**sql.Stmt{
 		stmt.NamespaceAttributeQueryType: &h.stmtAttQueryType,
+		stmt.RuntimeLink:                 &h.stmtLink,
 		stmt.RuntimeTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
 		stmt.RuntimeTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
 		stmt.RuntimeTxStdPropertySelect:  &h.stmtTxStdPropSelect,

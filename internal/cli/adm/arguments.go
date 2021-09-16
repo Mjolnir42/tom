@@ -592,6 +592,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		return []string{}, []string{`namespace`}, []string{}
 	case proto.CmdRuntimePropSet, proto.CmdRuntimePropUpdate, proto.CmdRuntimePropRemove:
 		return []string{`property`}, []string{`namespace`}, []string{`property`, `namespace`}
+	case proto.CmdRuntimeLink:
+		return []string{`is-equal`}, []string{}, []string{`is-equal`}
 	default:
 		return []string{}, []string{}, []string{}
 	}

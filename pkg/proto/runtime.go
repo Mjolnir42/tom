@@ -7,6 +7,16 @@
 
 package proto //
 
+func init() {
+	Commands[CmdRuntimeLink] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/runtime/` + PlHoldTomID + `/link/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+}
+
 // Runtime defines a runtime within the asset model
 type Runtime struct {
 	Namespace    string                    `json:"namespace"`

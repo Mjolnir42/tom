@@ -78,6 +78,13 @@ func registerAssetRuntime(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetRuntimeRemove),
 						BashComplete: cmpl.RuntimeRemove,
 					},
+					{
+						Name:         `link`,
+						Usage:        `Link two runtime environments as referring to the same entity`,
+						Description:  help.Text(proto.CmdRuntimeLink),
+						Action:       run(cmdAssetRuntimeLink),
+						BashComplete: cmpl.RuntimeLink,
+					},
 				},
 			},
 		}...,
