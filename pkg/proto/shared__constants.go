@@ -35,6 +35,7 @@ const (
 	ActionHdSet      = `headof.set`
 	ActionHdUnset    = `headof.unset`
 	ActionList       = `list`
+	ActionLink       = `link`
 	ActionMbrAdd     = `member.add`
 	ActionMbrList    = `member.list`
 	ActionMbrRemove  = `member.remove`
@@ -80,6 +81,7 @@ const (
 	CmdRuntime           = ModelAsset + `::` + EntityRuntime + `:`
 	CmdRuntimeAdd        = ModelAsset + `::` + EntityRuntime + `:` + ActionAdd
 	CmdRuntimeList       = ModelAsset + `::` + EntityRuntime + `:` + ActionList
+	CmdRuntimeLink       = ModelAsset + `::` + EntityRuntime + `:` + ActionLink
 	CmdRuntimePropRemove = ModelAsset + `::` + EntityRuntime + `:` + ActionPropRemove
 	CmdRuntimePropSet    = ModelAsset + `::` + EntityRuntime + `:` + ActionPropSet
 	CmdRuntimePropUpdate = ModelAsset + `::` + EntityRuntime + `:` + ActionPropUpdate
@@ -112,8 +114,9 @@ const (
 )
 
 const (
-	PlHoldNone  = ``
-	PlHoldTomID = `:tomID`
+	PlHoldNone     = ``
+	PlHoldTomID    = `:tomID`
+	PlHoldTargetID = `:targetID`
 )
 
 const (
