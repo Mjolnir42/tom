@@ -105,15 +105,15 @@ func (h *RuntimeWriteHandler) Run() {
 
 	for statement, prepared := range map[string]**sql.Stmt{
 		stmt.NamespaceAttributeQueryType: &h.stmtAttQueryType,
+		stmt.RuntimeAdd:                  &h.stmtAdd,
 		stmt.RuntimeLink:                 &h.stmtLink,
+		stmt.RuntimeRemove:               &h.stmtRemove,
 		stmt.RuntimeTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
 		stmt.RuntimeTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
 		stmt.RuntimeTxStdPropertySelect:  &h.stmtTxStdPropSelect,
 		stmt.RuntimeTxUniqPropertyAdd:    &h.stmtTxUniqPropAdd,
 		stmt.RuntimeTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
 		stmt.RuntimeTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
-		stmt.RuntimeAdd:                  &h.stmtAdd,
-		stmt.RuntimeRemove:               &h.stmtRemove,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
