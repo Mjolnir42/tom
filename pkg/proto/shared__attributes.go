@@ -21,6 +21,7 @@ type PropertyDetail struct {
 	ValidUntil string `json:"validUntil"`
 	CreatedAt  string `json:"createdAt"`
 	CreatedBy  string `json:"createdBy"`
+	Namespace  string `json:"namespace"`
 }
 
 // AttributeDefinition holds the definition of a dictionary attribute

@@ -170,6 +170,7 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 		prop.ValidSince = since.Format(msg.RFC3339Milli)
 		prop.ValidUntil = until.Format(msg.RFC3339Milli)
 		prop.CreatedAt = at.Format(msg.RFC3339Milli)
+		prop.Namespace = q.Runtime.Namespace
 
 		// set specialty fields
 		switch prop.Attribute {
