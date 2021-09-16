@@ -55,14 +55,21 @@ func (n *Namespace) FormatTomID() string {
 }
 
 func (n *Namespace) ParseTomID() error {
+	var ntt string
 	switch {
 	case n.TomID == ``:
 		return ErrEmptyTomID
 	case isTomIDFormatDNS(n.TomID):
-		n.Name, _, _ = parseTomIDFormatDNS(n.TomID)
+		n.Name, _, ntt = parseTomIDFormatDNS(n.TomID)
+		if ntt != EntityNamespace {
+			return ErrInvalidTomID
+		}
 		return nil
 	case isTomIDFormatURI(n.TomID):
-		n.Name, _, _ = parseTomIDFormatURI(n.TomID)
+		n.Name, _, ntt = parseTomIDFormatURI(n.TomID)
+		if ntt != EntityNamespace {
+			return ErrInvalidTomID
+		}
 		return nil
 	default:
 		return ErrInvalidTomID
