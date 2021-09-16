@@ -227,7 +227,7 @@ INSERT INTO       asset.runtime_environment_linking (
                          rteID_B,
                          dictionaryID_B,
                          createdBy,
-                         createdAt,
+                         createdAt
                   )
 SELECT            $1::uuid,
                   $2::uuid,
