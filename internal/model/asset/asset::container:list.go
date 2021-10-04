@@ -71,10 +71,10 @@ func (m *Model) ContainerList(w http.ResponseWriter, r *http.Request,
 func (h *ContainerReadHandler) list(q *msg.Request, mr *msg.Result) {
 	var (
 		dictionaryName, containerName, author string
-		creationTime                        time.Time
-		namespace                           sql.NullString
-		rows                                *sql.Rows
-		err                                 error
+		creationTime                          time.Time
+		namespace                             sql.NullString
+		rows                                  *sql.Rows
+		err                                   error
 	)
 
 	if q.Container.Namespace != `` {
