@@ -16,14 +16,14 @@ import (
 
 // PropertyDetail holds all the information about an object property
 type PropertyDetail struct {
-	Attribute  string `json:"attribute"`
-	Value      string `json:"value"`
+	Attribute  string          `json:"attribute"`
+	Value      string          `json:"value"`
 	Raw        json.RawMessage `json:"structuredValue,omitempty"`
-	ValidSince string `json:"validSince"`
-	ValidUntil string `json:"validUntil"`
-	CreatedAt  string `json:"createdAt"`
-	CreatedBy  string `json:"createdBy"`
-	Namespace  string `json:"namespace"`
+	ValidSince string          `json:"validSince"`
+	ValidUntil string          `json:"validUntil"`
+	CreatedAt  string          `json:"createdAt"`
+	CreatedBy  string          `json:"createdBy"`
+	Namespace  string          `json:"namespace"`
 }
 
 // AttributeDefinition holds the definition of a dictionary attribute
