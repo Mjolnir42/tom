@@ -57,6 +57,47 @@ WHERE             meta.dictionary.name = $1::text
      AND          asset.runtime_environment_unique_attribute_values.value = $2::text
      AND          $3::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
 
+	RuntimeListLinked = `
+WITH sel_rte AS ( SELECT linkedViaA.rteID_B AS linkedRteID,
+                         linkedViaA.dictionaryID_B AS linkedDictID
+                  FROM   asset.runtime_environment
+                  JOIN   asset.runtime_environment_linking AS linkedViaA
+                    ON   asset.runtime_environment.rteID = linkedViaA.rteID_A
+                  WHERE  asset.runtime_environment.rteID = $1::uuid
+                    AND  asset.runtime_environment.dictionaryID = $2::uuid
+                  UNION
+                  SELECT linkedViaB.rteID_A AS linkedRteID,
+                         linkedViaB.dictionaryID_A AS linkedDictID
+                  FROM   asset.runtime_environment
+                  JOIN   asset.runtime_environment_linking AS linkedViaB
+                    ON   asset.runtime_environment.rteID = linkedViaB.rteID_B
+                  WHERE  asset.runtime_environment.rteID = $1::uuid
+                    AND  asset.runtime_environment.dictionaryID = $2::uuid)
+SELECT            sel_rte.linkedRteID AS rteID,
+                  sel_rte.linkedDictID AS dictionaryID,
+                  asset.runtime_environment_unique_attribute_values.value AS name,
+                  meta.dictionary.name AS namespace
+FROM              sel_rte
+JOIN              asset.runtime_environment
+  ON              sel_rte.linkedRteID
+   =              asset.runtime_environment.rteID
+ AND              sel_rte.linkedDictID
+   =              asset.runtime_environment.dictionaryID
+JOIN              meta.unique_attribute
+  ON              asset.runtime_environment.dictionaryID
+   =              meta.unique_attribute.dictionaryID
+JOIN              asset.runtime_environment_unique_attribute_values
+  ON              sel_rte.linkedRteID
+   =              asset.runtime_environment_unique_attribute_values.rteID
+ AND              sel_rte.linkedDictID
+   =              asset.runtime_environment_unique_attribute_values.dictionaryID
+ AND              meta.unique_attribute.attributeID
+   =              asset.runtime_environment_unique_attribute_values.attributeID
+JOIN              meta.dictionary
+  ON              sel_rte.linkedDictID = meta.dictionary.dictionaryID
+WHERE             meta.unique_attribute.attribute = 'name'::text
+  AND             $3::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
+
 	RuntimeTxShowProperties = `
 SELECT      meta.unique_attribute.attribute AS attribute,
             asset.runtime_environment_unique_attribute_values.value AS value,
@@ -97,6 +138,7 @@ WHERE       meta.dictionary.dictionaryID = $1::uuid
 
 func init() {
 	m[RuntimeList] = `RuntimeList`
+	m[RuntimeListLinked] = `RuntimeListLinked`
 	m[RuntimeTxShow] = `RuntimeTxShow`
 	m[RuntimeTxShowProperties] = `RuntimeTxShowProperties`
 }

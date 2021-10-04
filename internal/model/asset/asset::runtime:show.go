@@ -81,7 +81,7 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 	var (
 		rteID, dictionaryID string
 		tx                  *sql.Tx
-		rows                *sql.Rows
+		rows, links, lprops *sql.Rows
 		err                 error
 	)
 
@@ -135,9 +135,11 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 	name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
 	name.ValidSince = since.Format(msg.RFC3339Milli)
 	name.ValidUntil = until.Format(msg.RFC3339Milli)
+	name.Namespace = q.Runtime.Namespace
 	rte.Property = make(map[string]proto.PropertyDetail)
-	rte.Property[`name`] = name
+	rte.Property[q.Runtime.Namespace+`::name`] = name
 
+	// fetch runtime properties
 	if rows, err = txProp.Query(
 		dictionaryID,
 		rteID,
@@ -163,10 +165,6 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		if prop.Attribute == `name` {
-			// name has already been set
-			continue
-		}
 		prop.ValidSince = since.Format(msg.RFC3339Milli)
 		prop.ValidUntil = until.Format(msg.RFC3339Milli)
 		prop.CreatedAt = at.Format(msg.RFC3339Milli)
@@ -189,13 +187,90 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 		case `name`:
 			// name attribute has already been added
 		default:
-			rte.Property[prop.Attribute] = prop
+			rte.Property[prop.Namespace+`::`+prop.Attribute] = prop
 		}
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err)
 		return
 	}
+
+	// fetch linked runtimes
+	linklist := [][]string{}
+	if links, err = tx.Stmt(h.stmtLinked).Query(
+		rteID,
+		dictionaryID,
+		txTime,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	for links.Next() {
+		var linkedRteID, linkedDictID, linkedRteName, linkedDictName string
+		if err = links.Scan(
+			&linkedRteID,
+			&linkedDictID,
+			&linkedRteName,
+			&linkedDictName,
+		); err != nil {
+			links.Close()
+			mr.ServerError(err)
+			return
+		}
+		rte.Link = append(rte.Link, linkedRteName+`.`+linkedDictName+`.runtime.tom`)
+		linklist = append(linklist, []string{
+			linkedRteID,
+			linkedDictID,
+			linkedRteName,
+			linkedDictName,
+		})
+	}
+	if err = links.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	for i := range linklist {
+		// fetch properties from linked runtime
+		if lprops, err = tx.Query(
+			stmt.RuntimeTxShowProperties,
+			linklist[i][1],
+			linklist[i][0],
+			txTime,
+		); err != nil {
+			mr.ServerError(err)
+			return
+		}
+
+		for lprops.Next() {
+			prop := proto.PropertyDetail{}
+			var since, until, at time.Time
+
+			if err = lprops.Scan(
+				&prop.Attribute,
+				&prop.Value,
+				&since,
+				&until,
+				&at,
+				&prop.CreatedBy,
+			); err != nil {
+				lprops.Close()
+				mr.ServerError(err)
+				return
+			}
+			prop.ValidSince = since.Format(msg.RFC3339Milli)
+			prop.ValidUntil = until.Format(msg.RFC3339Milli)
+			prop.CreatedAt = at.Format(msg.RFC3339Milli)
+			prop.Namespace = linklist[i][3]
+
+			rte.Property[prop.Namespace+`::`+prop.Attribute] = prop
+		}
+		if err = lprops.Err(); err != nil {
+			mr.ServerError(err)
+			return
+		}
+	}
+
 	// close transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err)
