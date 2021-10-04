@@ -11,6 +11,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -170,6 +171,13 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 		prop.CreatedAt = at.Format(msg.RFC3339Milli)
 		prop.Namespace = q.Runtime.Namespace
 
+		switch {
+		case strings.HasSuffix(prop.Attribute, `_json`):
+			fallthrough
+		case strings.HasSuffix(prop.Attribute, `_list`):
+			prop.Raw = []byte(prop.Value)
+		}
+
 		// set specialty fields
 		switch prop.Attribute {
 		case `name`:
@@ -262,6 +270,13 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 			prop.ValidUntil = until.Format(msg.RFC3339Milli)
 			prop.CreatedAt = at.Format(msg.RFC3339Milli)
 			prop.Namespace = linklist[i][3] // linkedDictName
+
+			switch {
+			case strings.HasSuffix(prop.Attribute, `_json`):
+				fallthrough
+			case strings.HasSuffix(prop.Attribute, `_list`):
+				prop.Raw = []byte(prop.Value)
+			}
 
 			// linklist[i][2] is linkedRteName
 			rte.Property[prop.Namespace+`::`+linklist[i][2]+`::`+prop.Attribute] = prop

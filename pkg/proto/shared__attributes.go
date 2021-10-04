@@ -8,6 +8,7 @@
 package proto //
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -17,6 +18,7 @@ import (
 type PropertyDetail struct {
 	Attribute  string `json:"attribute"`
 	Value      string `json:"value"`
+	Raw        json.RawMessage `json:"structuredValue,omitempty"`
 	ValidSince string `json:"validSince"`
 	ValidUntil string `json:"validUntil"`
 	CreatedAt  string `json:"createdAt"`
