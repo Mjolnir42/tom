@@ -106,13 +106,13 @@ func (m *Model) ContainerLink(w http.ResponseWriter, r *http.Request,
 // link ...
 func (h *ContainerWriteHandler) link(q *msg.Request, mr *msg.Result) {
 	var (
-		txTime                                           time.Time
-		rteID, dictionaryID, linkRteID, linkDictID       string
-		createdAt, createdBy                             string
-		nameValidSince, nameValidUntil, namedAt, namedBy string
-		err                                              error
-		tx                                               *sql.Tx
-		res                                              sql.Result
+		txTime                                            time.Time
+		containerID, dictionaryID, linkContID, linkDictID string
+		createdAt, createdBy                              string
+		nameValidSince, nameValidUntil, namedAt, namedBy  string
+		err                                               error
+		tx                                                *sql.Tx
+		res                                               sql.Result
 	)
 	// setup a consistent transaction time timestamp that is used for all
 	// records
@@ -124,7 +124,7 @@ func (h *ContainerWriteHandler) link(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	// discover rteID at the start of the transaction, as the property
+	// discover containerID at the start of the transaction, as the property
 	// updates might include a name change
 	if err = tx.QueryRow(
 		stmt.ContainerTxShow,
@@ -132,7 +132,7 @@ func (h *ContainerWriteHandler) link(q *msg.Request, mr *msg.Result) {
 		q.Container.Name,
 		txTime,
 	).Scan(
-		&rteID,
+		&containerID,
 		&dictionaryID,
 		&createdAt,
 		&createdBy,
@@ -153,10 +153,10 @@ func (h *ContainerWriteHandler) link(q *msg.Request, mr *msg.Result) {
 	// for all properties specified in the request, update the value.
 	// this transparently creates missing entries.
 	for key := range q.Container.Property {
-		rte := proto.Container{
+		ct := proto.Container{
 			TomID: q.Container.Property[key].Value,
 		}
-		if err = rte.ParseTomID(); err != nil {
+		if err = ct.ParseTomID(); err != nil {
 			mr.BadRequest(err)
 			tx.Rollback()
 			return
@@ -164,11 +164,11 @@ func (h *ContainerWriteHandler) link(q *msg.Request, mr *msg.Result) {
 		// query IDs for link target
 		if err = tx.QueryRow(
 			stmt.ContainerTxShow,
-			rte.Namespace,
-			rte.Name,
+			ct.Namespace,
+			ct.Name,
 			txTime,
 		).Scan(
-			&linkRteID,
+			&linkContID,
 			&linkDictID,
 			&createdAt,
 			&createdBy,
@@ -186,27 +186,27 @@ func (h *ContainerWriteHandler) link(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		// convert UUID strings to UUID objects to access their byte arrays
-		var rteUUID, linkUUID uuid.UUID
-		if rteUUID, err = uuid.FromString(rteID); err != nil {
+		var contUUID, linkUUID uuid.UUID
+		if contUUID, err = uuid.FromString(containerID); err != nil {
 			mr.ServerError(err)
 			tx.Rollback()
 			return
 		}
-		if linkUUID, err = uuid.FromString(linkRteID); err != nil {
+		if linkUUID, err = uuid.FromString(linkContID); err != nil {
 			mr.ServerError(err)
 			tx.Rollback()
 			return
 		}
-		switch bytes.Compare(rteUUID.Bytes(), linkUUID.Bytes()) {
-		case 0: // rteUUID == linkUUID
+		switch bytes.Compare(contUUID.Bytes(), linkUUID.Bytes()) {
+		case 0: // contUUID == linkUUID
 			mr.ServerError(fmt.Errorf("Cannot link container environments to itself."))
 			tx.Rollback()
 			return
-		case -1: // rteUUID < linkUUID
+		case -1: // contUUID < linkUUID
 			if res, err = tx.Stmt(h.stmtLink).Exec(
-				linkRteID,
+				linkContID,
 				linkDictID,
-				rteID,
+				containerID,
 				dictionaryID,
 				q.AuthUser,
 				q.UserIDLib,
@@ -216,11 +216,11 @@ func (h *ContainerWriteHandler) link(q *msg.Request, mr *msg.Result) {
 				tx.Rollback()
 				return
 			}
-		case 1: // linkUUID < rteUUID
+		case 1: // linkUUID < contUUID
 			if res, err = tx.Stmt(h.stmtLink).Exec(
-				rteID,
+				containerID,
 				dictionaryID,
-				linkRteID,
+				linkContID,
 				linkDictID,
 				q.AuthUser,
 				q.UserIDLib,

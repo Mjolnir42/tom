@@ -98,7 +98,7 @@ func (m *Model) ContainerPropUpdate(w http.ResponseWriter, r *http.Request,
 func (h *ContainerWriteHandler) propertyUpdate(q *msg.Request, mr *msg.Result) {
 	var (
 		txTime                                           time.Time
-		rteID, dictionaryID, createdAt, createdBy        string
+		containerID, dictionaryID, createdAt, createdBy  string
 		nameValidSince, nameValidUntil, namedAt, namedBy string
 		err                                              error
 		rows                                             *sql.Rows
@@ -116,7 +116,7 @@ func (h *ContainerWriteHandler) propertyUpdate(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	// discover rteID at the start of the transaction, as the property
+	// discover containerID at the start of the transaction, as the property
 	// updates might include a name change
 	if err = tx.QueryRow(
 		stmt.ContainerTxShow,
@@ -124,7 +124,7 @@ func (h *ContainerWriteHandler) propertyUpdate(q *msg.Request, mr *msg.Result) {
 		q.Container.Name,
 		txTime,
 	).Scan(
-		&rteID,
+		&containerID,
 		&dictionaryID,
 		&createdAt,
 		&createdBy,
@@ -200,7 +200,7 @@ func (h *ContainerWriteHandler) propertyUpdate(q *msg.Request, mr *msg.Result) {
 			continue
 		}
 		if ok = h.txPropUpdate(
-			q, mr, tx, &txTime, q.Container.Property[key], rteID,
+			q, mr, tx, &txTime, q.Container.Property[key], containerID,
 		); !ok {
 			tx.Rollback()
 			return

@@ -99,7 +99,7 @@ func (m *Model) ContainerPropSet(w http.ResponseWriter, r *http.Request,
 func (h *ContainerWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 	var (
 		txTime                                           time.Time
-		rteID, dictionaryID, createdAt, createdBy        string
+		containerID, dictionaryID, createdAt, createdBy  string
 		nameValidSince, nameValidUntil, namedAt, namedBy string
 		err                                              error
 		rows                                             *sql.Rows
@@ -117,7 +117,7 @@ func (h *ContainerWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	// discover rteID at the start of the transaction, as the property
+	// discover containerID at the start of the transaction, as the property
 	// updates might include a name change
 	if err = tx.QueryRow(
 		stmt.ContainerTxShow,
@@ -125,7 +125,7 @@ func (h *ContainerWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 		q.Container.Name,
 		txTime,
 	).Scan(
-		&rteID,
+		&containerID,
 		&dictionaryID,
 		&createdAt,
 		&createdBy,
@@ -201,7 +201,7 @@ func (h *ContainerWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 			continue
 		}
 		if ok = h.txPropUpdate(
-			q, mr, tx, &txTime, q.Container.Property[key], rteID,
+			q, mr, tx, &txTime, q.Container.Property[key], containerID,
 		); !ok {
 			tx.Rollback()
 			return
@@ -257,7 +257,7 @@ func (h *ContainerWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 			// to determine if the record needs clamping
 			txTime,
 			// the ID of the container being edited
-			rteID,
+			containerID,
 		); !ok {
 			// appropriate error function is already called by h.txPropClamp
 			tx.Rollback()
@@ -273,7 +273,7 @@ func (h *ContainerWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 				},
 				txTime,
 				txTime,
-				rteID,
+				containerID,
 			); !ok {
 				tx.Rollback()
 				return

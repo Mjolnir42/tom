@@ -29,7 +29,7 @@ func (h *ContainerWriteHandler) txPropUpdate(
 	tx *sql.Tx,
 	txTime *time.Time,
 	prop proto.PropertyDetail,
-	rteID string,
+	containerID string,
 ) bool {
 	var (
 		attributeType string
@@ -124,7 +124,7 @@ func (h *ContainerWriteHandler) txPropUpdate(
 		prop,
 		reqValidSince,
 		reqValidUntil,
-		rteID,
+		containerID,
 	); !ok {
 		return false
 	}
@@ -143,7 +143,7 @@ func (h *ContainerWriteHandler) txPropUpdate(
 		prop,
 		reqValidSince,
 		reqValidUntil,
-		rteID,
+		containerID,
 	); !ok {
 		return false
 	}
@@ -169,7 +169,7 @@ func (h *ContainerWriteHandler) txPropClamp(
 	prop proto.PropertyDetail,
 	reqValidSince time.Time,
 	reqValidUntil time.Time,
-	rteID string,
+	containerID string,
 ) (ok bool, done bool) {
 	var (
 		value                 string
@@ -183,7 +183,7 @@ func (h *ContainerWriteHandler) txPropClamp(
 		q.Container.Namespace,
 		prop.Attribute,
 		txTime.Format(msg.RFC3339Milli),
-		rteID,
+		containerID,
 	).Scan(
 		&value,
 		&validFrom,
@@ -229,7 +229,7 @@ func (h *ContainerWriteHandler) txPropClamp(
 		// of the new record
 		reqValidSince,
 		// ID of the container environment
-		rteID,
+		containerID,
 	); err != nil {
 		mr.ServerError(err)
 		return false, false
@@ -271,7 +271,7 @@ func (h *ContainerWriteHandler) txPropSetValue(
 	stmt *sql.Stmt,
 	prop proto.PropertyDetail,
 	reqValidSince, reqValidUntil time.Time,
-	rteID string,
+	containerID string,
 ) bool {
 	var res sql.Result
 	var err error
@@ -284,7 +284,7 @@ func (h *ContainerWriteHandler) txPropSetValue(
 		reqValidUntil,
 		q.UserIDLib,
 		q.AuthUser,
-		rteID,
+		containerID,
 	); err != nil {
 		mr.ServerError(err)
 		return false

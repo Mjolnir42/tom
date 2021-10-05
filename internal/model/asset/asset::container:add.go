@@ -96,7 +96,7 @@ func (h *ContainerWriteHandler) add(q *msg.Request, mr *msg.Result) {
 		txTime, validSince, validUntil time.Time
 		rows                           *sql.Rows
 		ok                             bool
-		rteID                          string
+		containerID                    string
 	)
 	// setup a consistent transaction time timestamp that is used for all
 	// records
@@ -204,9 +204,9 @@ func (h *ContainerWriteHandler) add(q *msg.Request, mr *msg.Result) {
 		validSince,
 		validUntil,
 	).Scan(
-		&rteID,
+		&containerID,
 	); err == sql.ErrNoRows {
-		// query did not return the generated rteID
+		// query did not return the generated containerID
 		mr.ServerError(err)
 		tx.Rollback()
 		return
@@ -223,7 +223,7 @@ func (h *ContainerWriteHandler) add(q *msg.Request, mr *msg.Result) {
 			continue
 		}
 		if ok = h.txPropUpdate(
-			q, mr, tx, &txTime, q.Container.Property[key], rteID,
+			q, mr, tx, &txTime, q.Container.Property[key], containerID,
 		); !ok {
 			tx.Rollback()
 			return
