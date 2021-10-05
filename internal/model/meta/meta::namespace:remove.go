@@ -164,7 +164,7 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 		switch attrType {
 		case proto.AttributeUnique:
 			for _, statement := range []string{
-				stmt.ContainerUniqAttrRemove,
+				stmt.ContainerDelNamespaceUniqValues,
 				stmt.OrchestrationUniqAttrRemove,
 				stmt.RuntimeDelNamespaceUniqValues,
 				stmt.ServerUniqAttrRemove,
@@ -193,7 +193,7 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 			}
 		case proto.AttributeStandard:
 			for _, statement := range []string{
-				stmt.ContainerStdAttrRemove,
+				stmt.ContainerDelNamespaceStdValues,
 				stmt.OrchestrationStdAttrRemove,
 				stmt.RuntimeDelNamespaceStdValues,
 				stmt.ServerStdAttrRemove,
@@ -260,9 +260,9 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 	// remove all containers in the namespace
 	for _, statement := range []string{
 		// TODO asset.Socket
-		stmt.ContainerNamespaceRemoveLinking,
-		stmt.ContainerNamespaceRemoveParent,
-		stmt.ContainerNamespaceRemove,
+		stmt.ContainerDelNamespaceLinking,
+		stmt.ContainerDelNamespaceParent,
+		stmt.ContainerDelNamespace,
 		// TODO asset.Orchestration
 		stmt.RuntimeDelNamespaceLinking,
 		stmt.RuntimeDelNamespaceParent,

@@ -12,16 +12,16 @@ import (
 	"github.com/mjolnir42/tom/internal/handler"
 )
 
-// routeRegisterRuntime registers the runtime routes with the request
+// routeRegisterContainer registers the container routes with the request
 // router for routes not added into the registry during init()
-func (m *Model) routeRegisterRuntime(rt *httprouter.Router) {
+func (m *Model) routeRegisterContainer(rt *httprouter.Router) {
 }
 
-// handleRegisterRuntime registers the runtime application core handlers
+// handleRegisterContainer registers the container application core handlers
 // in the provided handlermap
-func handleRegisterRuntime(hm *handler.Map, length int) {
-	hm.Add(NewRuntimeReadHandler(length))
-	hm.Add(NewRuntimeWriteHandler(length))
+func handleRegisterContainer(hm *handler.Map, length int) {
+	hm.Add(NewContainerReadHandler(length))
+	hm.Add(NewContainerWriteHandler(length))
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

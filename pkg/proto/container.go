@@ -7,6 +7,77 @@
 
 package proto //
 
+const (
+	CmdContainer           = ModelAsset + `::` + EntityContainer + `:`
+	CmdContainerAdd        = ModelAsset + `::` + EntityContainer + `:` + ActionAdd
+	CmdContainerList       = ModelAsset + `::` + EntityContainer + `:` + ActionList
+	CmdContainerLink       = ModelAsset + `::` + EntityContainer + `:` + ActionLink
+	CmdContainerPropRemove = ModelAsset + `::` + EntityContainer + `:` + ActionPropRemove
+	CmdContainerPropSet    = ModelAsset + `::` + EntityContainer + `:` + ActionPropSet
+	CmdContainerPropUpdate = ModelAsset + `::` + EntityContainer + `:` + ActionPropUpdate
+	CmdContainerRemove     = ModelAsset + `::` + EntityContainer + `:` + ActionRemove
+	CmdContainerShow       = ModelAsset + `::` + EntityContainer + `:` + ActionShow
+)
+
+func init() {
+	Commands[CmdContainerAdd] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/container/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{},
+	}
+	Commands[CmdContainerList] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/container/`,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{},
+	}
+	Commands[CmdContainerLink] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/container/` + PlHoldTomID + `/link/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdRuntimePropSet] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/container/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdRuntimePropUpdate] = CmdDef{
+		Method:      MethodPATCH,
+		Path:        `/container/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdRuntimePropRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/container/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdContainerRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/container/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdContainerShow] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/container/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateDetail,
+		Placeholder: []string{PlHoldTomID},
+	}
+}
+
 // Container ...
 type Container struct {
 	Namespace    string                    `json:"namespace"`

@@ -27,6 +27,7 @@ type Request struct {
 
 	Update UpdateData
 
+	Container     proto.Container
 	Library       proto.Library
 	Namespace     proto.Namespace
 	Orchestration proto.Orchestration

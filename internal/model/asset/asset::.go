@@ -11,6 +11,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/handler"
 	"github.com/mjolnir42/tom/internal/rest"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 var registry = make([]function, 0, 32)

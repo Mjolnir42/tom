@@ -129,7 +129,7 @@ func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) 
 		switch attrType {
 		case proto.AttributeUnique:
 			for _, statement := range []string{
-				stmt.ContainerUniqAttrRemove,
+				stmt.ContainerDelNamespaceUniqValues,
 				stmt.OrchestrationUniqAttrRemove,
 				stmt.RuntimeDelNamespaceUniqValues,
 				stmt.ServerUniqAttrRemove,
@@ -158,7 +158,7 @@ func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) 
 			}
 		case proto.AttributeStandard:
 			for _, statement := range []string{
-				stmt.ContainerStdAttrRemove,
+				stmt.ContainerDelNamespaceStdValues,
 				stmt.OrchestrationStdAttrRemove,
 				stmt.RuntimeDelNamespaceStdValues,
 				stmt.ServerStdAttrRemove,
