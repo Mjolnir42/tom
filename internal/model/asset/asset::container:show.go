@@ -79,10 +79,10 @@ func (m *Model) ContainerShow(w http.ResponseWriter, r *http.Request,
 // show returns full details for a specific container
 func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	var (
-		rteID, dictionaryID string
-		tx                  *sql.Tx
-		rows                *sql.Rows
-		err                 error
+		containerID, dictionaryID string
+		tx                        *sql.Tx
+		rows, links, lprops       *sql.Rows
+		err                       error
 	)
 
 	// start transaction
@@ -100,7 +100,7 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	txShow := tx.Stmt(h.stmtShow)
 	txProp := tx.Stmt(h.stmtProp)
 
-	rte := proto.Container{
+	ct := proto.Container{
 		Namespace: q.Container.Namespace,
 		Name:      q.Container.Name,
 	}
@@ -115,10 +115,10 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		q.Container.Name,
 		txTime,
 	).Scan(
-		&rteID,
+		&containerID,
 		&dictionaryID,
 		&createdAt,
-		&rte.CreatedBy,
+		&ct.CreatedBy,
 		&since,
 		&until,
 		&namedAt,
@@ -131,16 +131,18 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	rte.CreatedAt = createdAt.Format(msg.RFC3339Milli)
+	ct.CreatedAt = createdAt.Format(msg.RFC3339Milli)
 	name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
 	name.ValidSince = since.Format(msg.RFC3339Milli)
 	name.ValidUntil = until.Format(msg.RFC3339Milli)
-	rte.Property = make(map[string]proto.PropertyDetail)
-	rte.Property[`name`] = name
+	name.Namespace = q.Container.Namespace
+	ct.Property = make(map[string]proto.PropertyDetail)
+	ct.Property[q.Container.Namespace+`::name`] = name
 
+	// fetch container properties
 	if rows, err = txProp.Query(
 		dictionaryID,
-		rteID,
+		containerID,
 		txTime,
 	); err != nil {
 		mr.ServerError(err)
@@ -163,10 +165,6 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		if prop.Attribute == `name` {
-			// name has already been set
-			continue
-		}
 		prop.ValidSince = since.Format(msg.RFC3339Milli)
 		prop.ValidUntil = until.Format(msg.RFC3339Milli)
 		prop.CreatedAt = at.Format(msg.RFC3339Milli)
@@ -175,7 +173,7 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		// set specialty fields
 		switch prop.Attribute {
 		case `name`:
-			if rte.Name != prop.Value {
+			if ct.Name != prop.Value {
 				rows.Close()
 				mr.ExpectationFailed(
 					fmt.Errorf(`Encountered confused resultset`),
@@ -183,25 +181,103 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 				return
 			}
 		case `type`:
-			rte.Type = prop.Value
+			ct.Type = prop.Value
 		}
 		switch prop.Attribute {
 		case `name`:
 			// name attribute has already been added
 		default:
-			rte.Property[prop.Attribute] = prop
+			ct.Property[prop.Namespace+`::`+prop.Attribute] = prop
 		}
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err)
 		return
 	}
+
+	// fetch linked containers
+	linklist := [][]string{}
+	if links, err = tx.Stmt(h.stmtLinked).Query(
+		containerID,
+		dictionaryID,
+		txTime,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	for links.Next() {
+		var linkedContID, linkedDictID, linkedContName, linkedDictName string
+		if err = links.Scan(
+			&linkedContID,
+			&linkedDictID,
+			&linkedContName,
+			&linkedDictName,
+		); err != nil {
+			links.Close()
+			mr.ServerError(err)
+			return
+		}
+		ct.Link = append(ct.Link, linkedContName+`.`+linkedDictName+`.container.tom`)
+		linklist = append(linklist, []string{
+			linkedContID,
+			linkedDictID,
+			linkedContName,
+			linkedDictName,
+		})
+	}
+	if err = links.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	// fetch properties from linked containers
+	for i := range linklist {
+		if lprops, err = tx.Query(
+			stmt.ContainerTxShowProperties,
+			linklist[i][1],
+			linklist[i][0],
+			txTime,
+		); err != nil {
+			mr.ServerError(err)
+			return
+		}
+
+		for lprops.Next() {
+			prop := proto.PropertyDetail{}
+			var since, until, at time.Time
+
+			if err = lprops.Scan(
+				&prop.Attribute,
+				&prop.Value,
+				&since,
+				&until,
+				&at,
+				&prop.CreatedBy,
+			); err != nil {
+				lprops.Close()
+				mr.ServerError(err)
+				return
+			}
+			prop.ValidSince = since.Format(msg.RFC3339Milli)
+			prop.ValidUntil = until.Format(msg.RFC3339Milli)
+			prop.CreatedAt = at.Format(msg.RFC3339Milli)
+			prop.Namespace = linklist[i][3]
+
+			ct.Property[prop.Namespace+`::`+prop.Attribute] = prop
+		}
+		if err = lprops.Err(); err != nil {
+			mr.ServerError(err)
+			return
+		}
+	}
+
 	// close transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err)
 		return
 	}
-	mr.Container = append(mr.Container, rte)
+	mr.Container = append(mr.Container, ct)
 	mr.OK()
 }
 

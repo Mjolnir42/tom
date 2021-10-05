@@ -30,6 +30,47 @@ WHERE             (meta.dictionary.name = $1::text OR $1::text IS NULL)
   AND             meta.unique_attribute.attribute = 'name'::text
   AND             now()::timestamptz(3) <@ asset.container_unique_attribute_values.validity;`
 
+	ContainerListLinked = `
+WITH sel_cte AS ( SELECT linkedViaA.containerID_B AS linkedContainerID,
+                         linkedViaA.dictionaryID_B AS linkedDictID
+                  FROM   asset.container
+                  JOIN   asset.container_linking AS linkedViaA
+                    ON   asset.container.containerID = linkedViaA.containerID_A
+                  WHERE  asset.container.containerID = $1::uuid
+                    AND  asset.container.dictionaryID = $2::uuid
+                  UNION
+                  SELECT linkedViaB.containerID_A AS linkedContainerID,
+                         linkedViaB.dictionaryID_A AS linkedDictID
+                  FROM   asset.container
+                  JOIN   asset.container_linking AS linkedViaB
+                    ON   asset.container.containerID = linkedViaB.containerID_B
+                  WHERE  asset.container.containerID = $1::uuid
+                    AND  asset.container.dictionaryID = $2::uuid)
+SELECT            sel_cte.linkedContainerID AS containerID,
+                  sel_cte.linkedDictID AS dictionaryID,
+                  asset.container_unique_attribute_values.value AS name,
+                  meta.dictionary.name AS namespace
+FROM              sel_cte
+JOIN              asset.container
+  ON              sel_cte.linkedContainerID
+   =              asset.container.containerID
+ AND              sel_cte.linkedDictID
+   =              asset.container.dictionaryID
+JOIN              meta.unique_attribute
+  ON              asset.container.dictionaryID
+   =              meta.unique_attribute.dictionaryID
+JOIN              asset.container_unique_attribute_values
+  ON              sel_cte.linkedContainerID
+   =              asset.container_unique_attribute_values.containerID
+ AND              sel_cte.linkedDictID
+   =              asset.container_unique_attribute_values.dictionaryID
+ AND              meta.unique_attribute.attributeID
+   =              asset.container_unique_attribute_values.attributeID
+JOIN              meta.dictionary
+  ON              sel_cte.linkedDictID = meta.dictionary.dictionaryID
+WHERE             meta.unique_attribute.attribute = 'name'::text
+  AND             $3::timestamptz(3) <@ asset.container_unique_attribute_values.validity;`
+
 	ContainerTxShow = `
 SELECT            asset.container.containerID,
                   asset.container.dictionaryID,
@@ -97,6 +138,7 @@ WHERE       meta.dictionary.dictionaryID = $1::uuid
 
 func init() {
 	m[ContainerList] = `ContainerList`
+	m[ContainerListLinked] = `ContainerListLinked`
 	m[ContainerTxShow] = `ContainerTxShow`
 	m[ContainerTxShowProperties] = `ContainerTxShowProperties`
 }

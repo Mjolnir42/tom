@@ -19,14 +19,15 @@ import (
 
 // ContainerReadHandler ...
 type ContainerReadHandler struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	name     string
-	conn     *sql.DB
-	lm       *lhm.LogHandleMap
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	stmtProp *sql.Stmt
+	Input      chan msg.Request
+	Shutdown   chan struct{}
+	name       string
+	conn       *sql.DB
+	lm         *lhm.LogHandleMap
+	stmtList   *sql.Stmt
+	stmtShow   *sql.Stmt
+	stmtProp   *sql.Stmt
+	stmtLinked *sql.Stmt
 }
 
 // NewContainerReadHandler returns a new handler instance
@@ -86,6 +87,7 @@ func (h *ContainerReadHandler) Run() {
 
 	for statement, prepared := range map[string]**sql.Stmt{
 		stmt.ContainerList:             &h.stmtList,
+		stmt.ContainerListLinked:       &h.stmtLinked,
 		stmt.ContainerTxShow:           &h.stmtShow,
 		stmt.ContainerTxShowProperties: &h.stmtProp,
 	} {
