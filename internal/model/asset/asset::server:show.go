@@ -11,6 +11,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
@@ -217,28 +218,38 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	qrySrvName.Valid = false
 	qryDictName.String = ``
 	qryDictName.Valid = false
-	txLink = tx.Stmt(h.stmtLink)
+	txLink = tx.Stmt(h.stmtLinked)
 	if rows, err = txLink.Query(
 		server.ID,
+		dictID,
+		time.Now().UTC(),
 	); err != nil {
 		mr.ServerError(err)
 		return
 	}
 	for rows.Next() {
 		if err = rows.Scan(
-			&id,
-			&dictID,
+			&qrySrvID.String,
+			&qryDictID.String,
+			&qrySrvName.String,
+			&qryDictName.String,
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err)
 			return
 		}
 
-		if qrySrvID.String = id; qrySrvID.String != `` {
+		if qrySrvID.String != `` {
 			qrySrvID.Valid = true
 		}
-		if qryDictID.String = dictID; qryDictID.String != `` {
+		if qryDictID.String != `` {
 			qryDictID.Valid = true
+		}
+		if qrySrvName.String != `` {
+			qrySrvName.Valid = true
+		}
+		if qryDictName.String != `` {
+			qryDictName.Valid = true
 		}
 		if err = tx.Stmt(h.stmtFind).QueryRow(
 			qrySrvName,

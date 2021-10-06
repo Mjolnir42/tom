@@ -22,6 +22,13 @@ func init() {
 		ResultTmpl:  TemplateList,
 		Placeholder: []string{},
 	}
+	Commands[CmdServerLink] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/server/` + PlHoldTomID + `/link/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
 	Commands[CmdServerPropRemove] = CmdDef{
 		Method:      MethodDELETE,
 		Path:        `/server/` + PlHoldTomID + `/property/`,

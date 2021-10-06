@@ -68,17 +68,6 @@ WHERE       now()::timestamptz(3) <@ asset.server_unique_attribute_values.validi
      AND    (asset.server.dictionaryID = $3::uuid OR $3::uuid IS NULL)
      AND    (meta.dictionary.name = $4::varchar OR $4::varchar IS NULL);`
 
-	ServerLink = `
-SELECT      asset.server_linking.serverID_A as serverID,
-            asset.server_linking.dictionaryID_A as dictionaryID
-FROM        asset.server_linking
-WHERE       asset.server_linking.serverID_B = $1::uuid
-UNION
-SELECT      asset.server_linking.serverID_B as serverID,
-            asset.server_linking.dictionaryID_B as dictionaryID
-FROM        asset.server_linking
-WHERE       asset.server_linking.serverID_A = $1::uuid;`
-
 	ServerList = `
 SELECT      asset.server.serverID,
             meta.dictionary.name,
@@ -134,14 +123,83 @@ WHERE       asset.server.serverID = $1::uuid
      AND    now()::timestamptz(3) <@ asset.server_parent.validity
      AND    now()::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity
      AND    meta.unique_attribute.attribute IN ('name');`
+
+	ServerTxShow = `
+SELECT            asset.server.serverID,
+                  asset.server.dictionaryID,
+                  asset.server.createdAt,
+                  creator.uid AS createdBy,
+                  lower(asset.server_unique_attribute_values.validity) AS validSince,
+                  upper(asset.server_unique_attribute_values.validity) AS validUntil,
+                  asset.server_unique_attribute_values.createdAt AS namedAt,
+                  namegiver.uid AS namedBy
+FROM              meta.dictionary
+    JOIN          asset.server
+        ON        meta.dictionary.dictionaryID = asset.server.dictionaryID
+    JOIN          inventory.user AS creator
+        ON        asset.server.createdBy = creator.userID
+    JOIN          meta.unique_attribute
+        ON        meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN          asset.server_unique_attribute_values
+        ON        meta.dictionary.dictionaryID = asset.server_unique_attribute_values.dictionaryID
+        AND       asset.server.serverID = asset.server_unique_attribute_values.serverID
+        AND       meta.unique_attribute.attributeID = asset.server_unique_attribute_values.attributeID
+    JOIN          inventory.user AS namegiver
+        ON        asset.server_unique_attribute_values.createdBy = namegiver.userID
+WHERE             meta.dictionary.name = $1::text
+     AND          meta.unique_attribute.attribute = 'name'::text
+     AND          asset.server_unique_attribute_values.value = $2::text
+     AND          $3::timestamptz(3) <@ asset.server_unique_attribute_values.validity;`
+
+	ServerListLinked = `
+WITH sel_cte AS ( SELECT linkedViaA.serverID_B AS linkedServerID,
+                         linkedViaA.dictionaryID_B AS linkedDictID
+                  FROM   asset.server
+                  JOIN   asset.server_linking AS linkedViaA
+                    ON   asset.server.serverID = linkedViaA.serverID_A
+                  WHERE  asset.server.serverID = $1::uuid
+                    AND  asset.server.dictionaryID = $2::uuid
+                  UNION
+                  SELECT linkedViaB.serverID_A AS linkedServerID,
+                         linkedViaB.dictionaryID_A AS linkedDictID
+                  FROM   asset.server
+                  JOIN   asset.server_linking AS linkedViaB
+                    ON   asset.server.serverID = linkedViaB.serverID_B
+                  WHERE  asset.server.serverID = $1::uuid
+                    AND  asset.server.dictionaryID = $2::uuid)
+SELECT            sel_cte.linkedServerID AS serverID,
+                  sel_cte.linkedDictID AS dictionaryID,
+                  asset.server_unique_attribute_values.value AS name,
+                  meta.dictionary.name AS namespace
+FROM              sel_cte
+JOIN              asset.server
+  ON              sel_cte.linkedServerID
+   =              asset.server.serverID
+ AND              sel_cte.linkedDictID
+   =              asset.server.dictionaryID
+JOIN              meta.unique_attribute
+  ON              asset.server.dictionaryID
+   =              meta.unique_attribute.dictionaryID
+JOIN              asset.server_unique_attribute_values
+  ON              sel_cte.linkedServerID
+   =              asset.server_unique_attribute_values.serverID
+ AND              sel_cte.linkedDictID
+   =              asset.server_unique_attribute_values.dictionaryID
+ AND              meta.unique_attribute.attributeID
+   =              asset.server_unique_attribute_values.attributeID
+JOIN              meta.dictionary
+  ON              sel_cte.linkedDictID = meta.dictionary.dictionaryID
+WHERE             meta.unique_attribute.attribute = 'name'::text
+  AND             $3::timestamptz(3) <@ asset.server_unique_attribute_values.validity;`
 )
 
 func init() {
 	m[ServerAttribute] = `ServerAttribute`
 	m[ServerFind] = `ServerFind`
-	m[ServerLink] = `ServerLink`
+	m[ServerListLinked] = `ServerListLinked`
 	m[ServerList] = `ServerList`
 	m[ServerParent] = `ServerParent`
+	m[ServerTxShow] = `ServerTxShow`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

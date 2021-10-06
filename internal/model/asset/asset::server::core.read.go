@@ -28,7 +28,7 @@ type ServerReadHandler struct {
 	stmtFind      *sql.Stmt
 	stmtList      *sql.Stmt
 	stmtParent    *sql.Stmt
-	stmtLink      *sql.Stmt
+	stmtLinked    *sql.Stmt
 }
 
 // NewServerReadHandler returns a new handler instance
@@ -86,11 +86,11 @@ func (h *ServerReadHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.ServerAttribute: &h.stmtAttribute,
-		stmt.ServerFind:      &h.stmtFind,
-		stmt.ServerLink:      &h.stmtLink,
-		stmt.ServerList:      &h.stmtList,
-		stmt.ServerParent:    &h.stmtParent,
+		stmt.ServerAttribute:  &h.stmtAttribute,
+		stmt.ServerFind:       &h.stmtFind,
+		stmt.ServerListLinked: &h.stmtLinked,
+		stmt.ServerList:       &h.stmtList,
+		stmt.ServerParent:     &h.stmtParent,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

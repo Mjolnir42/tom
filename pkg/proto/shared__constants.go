@@ -72,6 +72,7 @@ const (
 	CmdServer           = ModelAsset + `::` + EntityServer + `:`
 	CmdServerAdd        = ModelAsset + `::` + EntityServer + `:` + ActionAdd
 	CmdServerList       = ModelAsset + `::` + EntityServer + `:` + ActionList
+	CmdServerLink       = ModelAsset + `::` + EntityServer + `:` + ActionLink
 	CmdServerPropRemove = ModelAsset + `::` + EntityServer + `:` + ActionPropRemove
 	CmdServerPropSet    = ModelAsset + `::` + EntityServer + `:` + ActionPropSet
 	CmdServerPropUpdate = ModelAsset + `::` + EntityServer + `:` + ActionPropUpdate

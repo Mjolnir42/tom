@@ -19,13 +19,21 @@ import (
 
 // ServerWriteHandler ...
 type ServerWriteHandler struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	name       string
-	conn       *sql.DB
-	lm         *lhm.LogHandleMap
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
+	Input                chan msg.Request
+	Shutdown             chan struct{}
+	name                 string
+	conn                 *sql.DB
+	lm                   *lhm.LogHandleMap
+	stmtAdd              *sql.Stmt
+	stmtAttQueryType     *sql.Stmt
+	stmtLink             *sql.Stmt
+	stmtRemove           *sql.Stmt
+	stmtTxStdPropAdd     *sql.Stmt
+	stmtTxStdPropClamp   *sql.Stmt
+	stmtTxStdPropSelect  *sql.Stmt
+	stmtTxUniqPropAdd    *sql.Stmt
+	stmtTxUniqPropClamp  *sql.Stmt
+	stmtTxUniqPropSelect *sql.Stmt
 }
 
 // NewServerWriteHandler returns a new handler instance
@@ -41,6 +49,10 @@ func NewServerWriteHandler(length int) (string, *ServerWriteHandler) {
 func (h *ServerWriteHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionAdd,
+		proto.ActionLink,
+		proto.ActionPropRemove,
+		proto.ActionPropSet,
+		proto.ActionPropUpdate,
 		proto.ActionRemove,
 	} {
 		hm.Request(msg.SectionServer, action, h.name)
@@ -55,6 +67,14 @@ func (h *ServerWriteHandler) process(q *msg.Request) {
 	switch q.Action {
 	case proto.ActionAdd:
 		h.add(q, &result)
+	case proto.ActionLink:
+		h.link(q, &result)
+	case proto.ActionPropRemove:
+		h.propertyRemove(q, &result)
+	case proto.ActionPropSet:
+		h.propertySet(q, &result)
+	case proto.ActionPropUpdate:
+		h.propertyUpdate(q, &result)
 	case proto.ActionRemove:
 		h.remove(q, &result)
 	default:
@@ -84,8 +104,16 @@ func (h *ServerWriteHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.ServerAdd:    &h.stmtAdd,
-		stmt.ServerRemove: &h.stmtRemove,
+		stmt.NamespaceAttributeQueryType: &h.stmtAttQueryType,
+		stmt.ServerAdd:                   &h.stmtAdd,
+		stmt.ServerLink:                  &h.stmtLink,
+		stmt.ServerRemove:                &h.stmtRemove,
+		stmt.ServerTxStdPropertyAdd:      &h.stmtTxStdPropAdd,
+		stmt.ServerTxStdPropertyClamp:    &h.stmtTxStdPropClamp,
+		stmt.ServerTxStdPropertySelect:   &h.stmtTxStdPropSelect,
+		stmt.ServerTxUniqPropertyAdd:     &h.stmtTxUniqPropAdd,
+		stmt.ServerTxUniqPropertyClamp:   &h.stmtTxUniqPropClamp,
+		stmt.ServerTxUniqPropertySelect:  &h.stmtTxUniqPropSelect,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
