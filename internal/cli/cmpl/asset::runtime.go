@@ -20,7 +20,8 @@ func RuntimeAdd(c *cli.Context) {
 }
 
 func RuntimeRemove(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdRuntimeRemove)
+	GenericMulti(c, uniq, multi)
 }
 
 func RuntimeList(c *cli.Context) {
