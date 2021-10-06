@@ -104,7 +104,7 @@ func (h *ContainerWriteHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.NamespaceAttributeQueryType: &h.stmtAttQueryType,
+		stmt.NamespaceAttributeQueryType:   &h.stmtAttQueryType,
 		stmt.ContainerAdd:                  &h.stmtAdd,
 		stmt.ContainerLink:                 &h.stmtLink,
 		stmt.ContainerRemove:               &h.stmtRemove,
