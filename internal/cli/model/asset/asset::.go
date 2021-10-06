@@ -16,6 +16,7 @@ type ActionFunc func(cli.ActionFunc) cli.ActionFunc
 func Register(app cli.App, run ActionFunc) *cli.App {
 	app = *registerAssetServer(app, run)
 	app = *registerAssetRuntime(app, run)
+	app = *registerAssetContainer(app, run)
 	return &app
 }
 

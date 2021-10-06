@@ -94,6 +94,12 @@ type Container struct {
 	UniqProperty []PropertyDetail          `json:"-"`
 }
 
+func NewContainerRequest() Request {
+	return Request{
+		Container: &Container{},
+	}
+}
+
 type ContainerHeader struct {
 	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
