@@ -15,10 +15,6 @@ import (
 // routeRegisterServer registers the server routes with the request
 // router
 func (m *Model) routeRegisterServer(rt *httprouter.Router) {
-	rt.GET(`/server/`, m.x.Authenticated(m.ServerList))
-	rt.GET(`/server/:tomID`, m.x.Authenticated(m.ServerShow))
-	rt.POST(`/server/`, m.x.Authenticated(m.ServerAdd))
-	rt.DELETE(`/server/:tomID`, m.x.Authenticated(m.ServerRemove))
 }
 
 // handleRegisterServer registers the server application core handlers

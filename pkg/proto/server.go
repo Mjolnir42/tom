@@ -7,6 +7,58 @@
 
 package proto //
 
+func init() {
+	Commands[CmdServerAdd] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/server/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{},
+	}
+	Commands[CmdServerList] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/server/`,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{},
+	}
+	Commands[CmdServerPropRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/server/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdServerPropSet] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/server/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdServerRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/server/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdServerPropUpdate] = CmdDef{
+		Method:      MethodPATCH,
+		Path:        `/server/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdServerShow] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/server/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateDetail,
+		Placeholder: []string{PlHoldTomID},
+	}
+}
+
 // Server defines a server within the asset model
 type Server struct {
 	Namespace    string                    `json:"namespace"`
@@ -23,6 +75,13 @@ type Server struct {
 	UniqProperty []PropertyDetail          `json:"-"`
 }
 
+func NewServerRequest() Request {
+	return Request{
+		Server: &Server{},
+	}
+}
+
+// ServerHeader defines ....
 type ServerHeader struct {
 	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
