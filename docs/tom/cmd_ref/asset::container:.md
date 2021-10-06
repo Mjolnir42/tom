@@ -15,6 +15,7 @@ tom container remove ${tomID}
 tom container property set ${name} namespace ${space} property ${attr} value ${val} [since ${since}] [until ${until}] [property ...]
 tom container property update ${name} namespace ${space} property ${attr} value ${val} [since ${since}] [until ${until}] [property ...]
 tom container property remove ${name} namespace ${space} property ${attr} [property ...]
+tom container link ${tomID} is-equal ${linkedID}
 ```
 
 # PROPERTIES

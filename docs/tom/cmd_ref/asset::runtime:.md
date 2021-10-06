@@ -15,6 +15,7 @@ tom runtime remove ${tomID}
 tom runtime property set ${name} namespace ${space} property ${attr} value ${val} [since ${since}] [until ${until}] [property ...]
 tom runtime property update ${name} namespace ${space} property ${attr} value ${val} [since ${since}] [until ${until}] [property ...]
 tom runtime property remove ${name} namespace ${space} property ${attr} [property ...]
+tom runtime link ${tomID} is-equal ${linkedID}
 ```
 
 # PROPERTIES
