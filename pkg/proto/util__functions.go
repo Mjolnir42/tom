@@ -99,4 +99,12 @@ func CheckPropertyConstraints(prop *PropertyDetail) error {
 	return nil
 }
 
+// AssertCommandIsDefined checks that the package variable Commands
+// has an entry for command c
+func AssertCommandIsDefined(c string) {
+	if _, ok := Commands[c]; !ok {
+		panic(c)
+	}
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
