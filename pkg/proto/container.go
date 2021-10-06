@@ -41,21 +41,21 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
-	Commands[CmdRuntimePropSet] = CmdDef{
+	Commands[CmdContainerPropSet] = CmdDef{
 		Method:      MethodPUT,
 		Path:        `/container/` + PlHoldTomID + `/property/`,
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
-	Commands[CmdRuntimePropUpdate] = CmdDef{
+	Commands[CmdContainerPropUpdate] = CmdDef{
 		Method:      MethodPATCH,
 		Path:        `/container/` + PlHoldTomID + `/property/`,
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
-	Commands[CmdRuntimePropRemove] = CmdDef{
+	Commands[CmdContainerPropRemove] = CmdDef{
 		Method:      MethodDELETE,
 		Path:        `/container/` + PlHoldTomID + `/property/`,
 		Body:        true,
