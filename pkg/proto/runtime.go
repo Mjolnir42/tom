@@ -8,11 +8,60 @@
 package proto //
 
 func init() {
+	Commands[CmdRuntimeAdd] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/runtime/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{},
+	}
+	Commands[CmdRuntimeList] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/runtime/`,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{},
+	}
 	Commands[CmdRuntimeLink] = CmdDef{
 		Method:      MethodPOST,
 		Path:        `/runtime/` + PlHoldTomID + `/link/`,
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdRuntimePropSet] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/runtime/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdRuntimePropUpdate] = CmdDef{
+		Method:      MethodPATCH,
+		Path:        `/runtime/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdRuntimePropRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/runtime/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdRuntimeRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/runtime/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdRuntimeShow] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/runtime/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateDetail,
 		Placeholder: []string{PlHoldTomID},
 	}
 }

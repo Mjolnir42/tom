@@ -79,55 +79,6 @@ var Commands = map[string]CmdDef{
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	},
-	CmdRuntimeList: {
-		Method:      MethodGET,
-		Path:        `/runtime/`,
-		Body:        false,
-		ResultTmpl:  TemplateList,
-		Placeholder: []string{},
-	},
-	CmdRuntimeShow: {
-		Method:      MethodGET,
-		Path:        `/runtime/` + PlHoldTomID,
-		Body:        false,
-		ResultTmpl:  TemplateDetail,
-		Placeholder: []string{PlHoldTomID},
-	},
-	CmdRuntimeAdd: {
-		Method:      MethodPOST,
-		Path:        `/runtime/`,
-		Body:        true,
-		ResultTmpl:  TemplateCommand,
-		Placeholder: []string{},
-	},
-	CmdRuntimeRemove: {
-		Method:      MethodDELETE,
-		Path:        `/runtime/` + PlHoldTomID,
-		Body:        false,
-		ResultTmpl:  TemplateCommand,
-		Placeholder: []string{PlHoldTomID},
-	},
-	CmdRuntimePropSet: {
-		Method:      MethodPUT,
-		Path:        `/runtime/` + PlHoldTomID + `/property/`,
-		Body:        true,
-		ResultTmpl:  TemplateCommand,
-		Placeholder: []string{PlHoldTomID},
-	},
-	CmdRuntimePropUpdate: {
-		Method:      MethodPATCH,
-		Path:        `/runtime/` + PlHoldTomID + `/property/`,
-		Body:        true,
-		ResultTmpl:  TemplateCommand,
-		Placeholder: []string{PlHoldTomID},
-	},
-	CmdRuntimePropRemove: {
-		Method:      MethodDELETE,
-		Path:        `/runtime/` + PlHoldTomID + `/property/`,
-		Body:        true,
-		ResultTmpl:  TemplateCommand,
-		Placeholder: []string{PlHoldTomID},
-	},
 }
 
 func AssertCommandIsDefined(c string) {
