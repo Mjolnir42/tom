@@ -137,7 +137,7 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	name.ValidUntil = until.Format(msg.RFC3339Milli)
 	name.Namespace = q.Container.Namespace
 	ct.Property = make(map[string]proto.PropertyDetail)
-	ct.Property[q.Container.Namespace+`::name`] = name
+	ct.Property[q.Container.Namespace+`::`+ct.Name+`::name`] = name
 
 	// fetch container properties
 	if rows, err = txProp.Query(
@@ -187,7 +187,7 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		case `name`:
 			// name attribute has already been added
 		default:
-			ct.Property[prop.Namespace+`::`+prop.Attribute] = prop
+			ct.Property[prop.Namespace+`::`+ct.Name+`::`+prop.Attribute] = prop
 		}
 	}
 	if err = rows.Err(); err != nil {
@@ -235,8 +235,8 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	for i := range linklist {
 		if lprops, err = tx.Query(
 			stmt.ContainerTxShowProperties,
-			linklist[i][1],
-			linklist[i][0],
+			linklist[i][1], // linkedDictID
+			linklist[i][0], // linkedContID
 			txTime,
 		); err != nil {
 			mr.ServerError(err)
@@ -262,9 +262,10 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 			prop.ValidSince = since.Format(msg.RFC3339Milli)
 			prop.ValidUntil = until.Format(msg.RFC3339Milli)
 			prop.CreatedAt = at.Format(msg.RFC3339Milli)
-			prop.Namespace = linklist[i][3]
+			prop.Namespace = linklist[i][3] // linkedDictName
 
-			ct.Property[prop.Namespace+`::`+prop.Attribute] = prop
+			// linklist[i][2] is linkedContName
+			ct.Property[prop.Namespace+`::`+linklist[i][2]+`::`+prop.Attribute] = prop
 		}
 		if err = lprops.Err(); err != nil {
 			mr.ServerError(err)

@@ -137,7 +137,7 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 	name.ValidUntil = until.Format(msg.RFC3339Milli)
 	name.Namespace = q.Runtime.Namespace
 	rte.Property = make(map[string]proto.PropertyDetail)
-	rte.Property[q.Runtime.Namespace+`::name`] = name
+	rte.Property[q.Runtime.Namespace+`::`+rte.Name+`::name`] = name
 
 	// fetch runtime properties
 	if rows, err = txProp.Query(
@@ -234,8 +234,8 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 		// fetch properties from linked runtime
 		if lprops, err = tx.Query(
 			stmt.RuntimeTxShowProperties,
-			linklist[i][1],
-			linklist[i][0],
+			linklist[i][1], // linkedDictID
+			linklist[i][0], // linkedRteID
 			txTime,
 		); err != nil {
 			mr.ServerError(err)
@@ -261,9 +261,10 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 			prop.ValidSince = since.Format(msg.RFC3339Milli)
 			prop.ValidUntil = until.Format(msg.RFC3339Milli)
 			prop.CreatedAt = at.Format(msg.RFC3339Milli)
-			prop.Namespace = linklist[i][3]
+			prop.Namespace = linklist[i][3] // linkedDictName
 
-			rte.Property[prop.Namespace+`::`+prop.Attribute] = prop
+			// linklist[i][2] is linkedRteName
+			rte.Property[prop.Namespace+`::`+linklist[i][2]+`::`+prop.Attribute] = prop
 		}
 		if err = lprops.Err(); err != nil {
 			mr.ServerError(err)
