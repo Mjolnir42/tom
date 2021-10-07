@@ -36,17 +36,17 @@ func ContainerShow(c *cli.Context) {
 
 func ContainerPropSet(c *cli.Context) {
 	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdContainerPropSet)
-	GenericMulti(c, uniq, multi)
+	GenericPropertyChain(c, uniq, multi)
 }
 
 func ContainerPropUpdate(c *cli.Context) {
 	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdContainerPropUpdate)
-	GenericMulti(c, uniq, multi)
+	GenericPropertyChain(c, uniq, multi)
 }
 
 func ContainerPropRemove(c *cli.Context) {
 	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdContainerPropRemove)
-	GenericMulti(c, uniq, multi)
+	GenericPropertyChain(c, uniq, multi)
 }
 
 func ContainerLink(c *cli.Context) {
