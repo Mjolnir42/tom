@@ -35,6 +35,7 @@ func New(x *rest.Rest) *Model {
 func (m *Model) RouteRegister(rt *httprouter.Router) {
 	m.routeRegisterServer(rt)
 	m.routeRegisterRuntime(rt)
+	m.routeRegisterContainer(rt)
 	m.routeRegisterOrchestration(rt)
 
 	m.routeRegisterFromRegistry(rt)
@@ -74,6 +75,7 @@ func (m *Model) routeRegisterFromRegistry(rt *httprouter.Router) {
 // HandleRegister registers the application core handlers in the
 // provided handlerMap
 func HandleRegister(hm *handler.Map, length int) {
+	handleRegisterContainer(hm, length)
 	handleRegisterRuntime(hm, length)
 	handleRegisterServer(hm, length)
 	handleRegisterOrchestration(hm, length)
