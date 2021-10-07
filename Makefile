@@ -19,7 +19,7 @@ install_linux: generate
 	@echo "Building Linux ...."
 	@env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install -tags osusergo,netgo -ldflags "-X main.tomVersion=$(TOMVER)-$(GITHASH)/$(BRANCH)" ./...
 
-generate: sanitize
+generate:
 	@echo "Generating ...."
 	@go generate ./cmd/...
 

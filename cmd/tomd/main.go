@@ -35,7 +35,7 @@ var (
 	TomCfg config.Configuration
 	// lookup table of logfile handles for logrotate reopen
 	lm *lhm.LogHandleMap
-	//
+	// populated via Makefile
 	tomVersion string
 )
 
