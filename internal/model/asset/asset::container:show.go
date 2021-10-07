@@ -103,6 +103,7 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	ct := proto.Container{
 		Namespace: q.Container.Namespace,
 		Name:      q.Container.Name,
+		Link:      []string{},
 	}
 	name := proto.PropertyDetail{
 		Attribute: `name`,

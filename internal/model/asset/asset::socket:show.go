@@ -105,6 +105,7 @@ func (h *SocketReadHandler) show(q *msg.Request, mr *msg.Result) {
 	ct := proto.Socket{
 		Namespace: q.Socket.Namespace,
 		Name:      q.Socket.Name,
+		Link:      []string{},
 	}
 	name := proto.PropertyDetail{
 		Attribute: `name`,

@@ -134,6 +134,7 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 			ID:        id,
 			Namespace: dictName,
 			Name:      value,
+			Link:      []string{},
 		}
 		ambiguous = true
 	}

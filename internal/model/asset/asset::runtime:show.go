@@ -104,6 +104,7 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 	rte := proto.Runtime{
 		Namespace: q.Runtime.Namespace,
 		Name:      q.Runtime.Name,
+		Link:      []string{},
 	}
 	name := proto.PropertyDetail{
 		Attribute: `name`,
