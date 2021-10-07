@@ -31,23 +31,24 @@ func (s *Socket) String() string {
 }
 
 func (s *Socket) FormatDNS() string {
-	return s.Name + `.` + s.Namespace + `.` + EntityContainer + `.tom`
+	return s.Name + `.` + s.Namespace + `.` + EntitySocket + `.tom`
 }
 
 func (s *Socket) FormatTomID() string {
-	return `tom://` + s.Namespace + `/` + EntityContainer + `/name=` + s.Name
+	return `tom://` + s.Namespace + `/` + EntitySocket + `/name=` + s.Name
 }
 
 func (s *Socket) ParseTomID() error {
+	var typeID string
 	switch {
 	case s.TomID == ``:
 		return ErrEmptyTomID
 	case isTomIDFormatDNS(s.TomID):
-		s.Name, s.Namespace, _ = parseTomIDFormatDNS(s.TomID)
-		return nil
+		s.Name, s.Namespace, typeID = parseTomIDFormatDNS(s.TomID)
+		return assessTomID(EntitySocket, typeID)
 	case isTomIDFormatURI(s.TomID):
-		s.Name, s.Namespace, _ = parseTomIDFormatURI(s.TomID)
-		return nil
+		s.Name, s.Namespace, typeID = parseTomIDFormatURI(s.TomID)
+		return assessTomID(EntitySocket, typeID)
 	default:
 		return ErrInvalidTomID
 	}

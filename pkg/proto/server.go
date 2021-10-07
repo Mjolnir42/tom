@@ -114,15 +114,16 @@ func (s *Server) FormatTomID() string {
 }
 
 func (s *Server) ParseTomID() error {
+	var typeID string
 	switch {
 	case s.TomID == ``:
 		return ErrEmptyTomID
 	case isTomIDFormatDNS(s.TomID):
-		s.Name, s.Namespace, _ = parseTomIDFormatDNS(s.TomID)
-		return nil
+		s.Name, s.Namespace, typeID = parseTomIDFormatDNS(s.TomID)
+		return assessTomID(EntityServer, typeID)
 	case isTomIDFormatURI(s.TomID):
-		s.Name, s.Namespace, _ = parseTomIDFormatURI(s.TomID)
-		return nil
+		s.Name, s.Namespace, typeID = parseTomIDFormatURI(s.TomID)
+		return assessTomID(EntityServer, typeID)
 	default:
 		return ErrInvalidTomID
 	}

@@ -33,9 +33,9 @@ type AttributeDefinition struct {
 }
 
 const (
-	tomIDFormatDNS = `^(:?[` + CharUnreserved + `]+)\.(:?[` + CharNamespace + `]+)\.(:?server|runtime|orchestration)\.tom\.?$`
+	tomIDFormatDNS = `^(:?[` + CharUnreserved + `]+)\.(:?[` + CharNamespace + `]+)\.(:?server|runtime|orchestration|container|socket)\.tom\.?$`
 	tomIDNamespDNS = `^(:?[` + CharNamespace + `]+)\.(:?namespace)\.tom\.?$`
-	tomIDFormatURI = `^tom://(:?[` + CharNamespace + `]+)/(:?server|runtime|orchestration)/name=(:?[` + CharUnreserved + `]+)$`
+	tomIDFormatURI = `^tom://(:?[` + CharNamespace + `]+)/(:?server|runtime|orchestration|container|socket)/name=(:?[` + CharUnreserved + `]+)$`
 	tomIDNamespURI = `^tom:///(:?namespace)/name=(:?[` + CharNamespace + `]+)$`
 )
 
@@ -83,6 +83,13 @@ func parseTomIDFormatURI(s string) (name, namespace, entity string) {
 	default:
 		return ``, ``, ``
 	}
+}
+
+func assessTomID(entity, value string) error {
+	if entity != value {
+		return ErrInvalidTomID
+	}
+	return nil
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

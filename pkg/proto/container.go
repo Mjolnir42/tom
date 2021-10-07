@@ -125,15 +125,16 @@ func (c *Container) FormatTomID() string {
 }
 
 func (c *Container) ParseTomID() error {
+	var typeID string
 	switch {
 	case c.TomID == ``:
 		return ErrEmptyTomID
 	case isTomIDFormatDNS(c.TomID):
-		c.Name, c.Namespace, _ = parseTomIDFormatDNS(c.TomID)
-		return nil
+		c.Name, c.Namespace, typeID = parseTomIDFormatDNS(c.TomID)
+		return assessTomID(EntityContainer, typeID)
 	case isTomIDFormatURI(c.TomID):
-		c.Name, c.Namespace, _ = parseTomIDFormatURI(c.TomID)
-		return nil
+		c.Name, c.Namespace, typeID = parseTomIDFormatURI(c.TomID)
+		return assessTomID(EntityContainer, typeID)
 	default:
 		return ErrInvalidTomID
 	}

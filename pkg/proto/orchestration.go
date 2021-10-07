@@ -80,15 +80,16 @@ func (o *Orchestration) FormatTomID() string {
 }
 
 func (o *Orchestration) ParseTomID() error {
+	var typeID string
 	switch {
 	case o.TomID == ``:
 		return ErrEmptyTomID
 	case isTomIDFormatDNS(o.TomID):
-		o.Name, o.Namespace, _ = parseTomIDFormatDNS(o.TomID)
-		return nil
+		o.Name, o.Namespace, typeID = parseTomIDFormatDNS(o.TomID)
+		return assessTomID(EntityOrchestration, typeID)
 	case isTomIDFormatURI(o.TomID):
-		o.Name, o.Namespace, _ = parseTomIDFormatURI(o.TomID)
-		return nil
+		o.Name, o.Namespace, typeID = parseTomIDFormatURI(o.TomID)
+		return assessTomID(EntityOrchestration, typeID)
 	default:
 		return ErrInvalidTomID
 	}
