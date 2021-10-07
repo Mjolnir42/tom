@@ -84,7 +84,10 @@ type Server struct {
 
 func NewServerRequest() Request {
 	return Request{
-		Server: &Server{},
+		Server: &Server{
+			Link:     []string{},
+			Property: map[string]PropertyDetail{},
+		},
 	}
 }
 

@@ -9,13 +9,14 @@
 package cmpl
 
 import (
-	//"github.com/mjolnir42/tom/internal/cli/adm"
-	//"github.com/mjolnir42/tom/pkg/proto"
+	"github.com/mjolnir42/tom/internal/cli/adm"
+	"github.com/mjolnir42/tom/pkg/proto"
 	"github.com/urfave/cli/v2"
 )
 
 func ServerAdd(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdServerAdd)
+	GenericMultiWithProperty(c, uniq, multi)
 }
 
 func ServerRemove(c *cli.Context) {

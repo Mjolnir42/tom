@@ -8,11 +8,14 @@
 package asset // import "github.com/mjolnir42/tom/internal/model/asset/"
 
 import (
+	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/rest"
+	"github.com/mjolnir42/tom/internal/stmt"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
@@ -62,7 +65,153 @@ func (m *Model) ServerAdd(w http.ResponseWriter, r *http.Request,
 
 // add creates a new server
 func (h *ServerWriteHandler) add(q *msg.Request, mr *msg.Result) {
-	mr.NotImplemented()
+	var (
+		res                            sql.Result
+		err                            error
+		tx                             *sql.Tx
+		txTime, validSince, validUntil time.Time
+		rows                           *sql.Rows
+		ok                             bool
+		rteID                          string
+	)
+	// setup a consistent transaction time timestamp that is used for all
+	// records
+	txTime = time.Now().UTC()
+
+	switch q.Server.Property[`name`].ValidSince {
+	case `always`:
+		validSince = msg.NegTimeInf
+	case `forever`:
+		mr.BadRequest()
+		return
+	case ``:
+		validSince = txTime
+	default:
+		if validSince, err = time.Parse(
+			msg.RFC3339Milli, q.Server.Property[`name`].ValidSince,
+		); err != nil {
+			mr.BadRequest(err)
+			return
+		}
+	}
+
+	switch q.Server.Property[`name`].ValidUntil {
+	case `always`:
+		mr.BadRequest()
+		return
+	case `forever`:
+		validUntil = msg.PosTimeInf
+	case ``:
+		validUntil = msg.PosTimeInf
+	default:
+		if validSince, err = time.Parse(
+			msg.RFC3339Milli, q.Server.Property[`name`].ValidUntil,
+		); err != nil {
+			mr.BadRequest(err)
+			return
+		}
+	}
+
+	// open transaction
+	if tx, err = h.conn.Begin(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	// discover all attributes and record them with their type
+	attrMap := map[string]string{}
+	if rows, err = tx.Query(
+		stmt.NamespaceAttributeDiscover,
+		q.Server.Namespace,
+	); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+	for rows.Next() {
+		var attribute, typ string
+		if err = rows.Scan(
+			&attribute,
+			&typ,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			tx.Rollback()
+			return
+		}
+		attrMap[attribute] = typ
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+
+	// for all properties specified in the request, check that the attribute
+	// exists and create missing attributes
+	for key := range q.Server.Property {
+		if _, ok = attrMap[key]; !ok {
+			if res, err = tx.Exec(
+				stmt.NamespaceAttributeAddStandard,
+				q.Server.Namespace,
+				key,
+				q.UserIDLib,
+				q.AuthUser,
+			); err != nil {
+				mr.ServerError(err)
+				tx.Rollback()
+				return
+			}
+			if !mr.CheckRowsAffected(res.RowsAffected()) {
+				tx.Rollback()
+				return
+			}
+		}
+	}
+
+	// create named runtime environment in specified namespace,
+	// this is an INSERT statement with a RETURNING clause, thus
+	// requires .QueryRow instead of .Exec
+	if err = tx.Stmt(h.stmtAdd).QueryRow(
+		q.Server.Namespace,
+		q.UserIDLib,
+		q.AuthUser,
+		q.Server.Property[`name`].Value,
+		validSince,
+		validUntil,
+	).Scan(
+		&rteID,
+	); err == sql.ErrNoRows {
+		// query did not return the generated rteID
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	} else if err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+
+	// for all properties specified in the request, update the value.
+	// this transparently creates missing entries.
+	for key := range q.Server.Property {
+		if key == `name` {
+			continue
+		}
+		if ok = h.txPropUpdate(
+			q, mr, tx, &txTime, q.Server.Property[key], rteID,
+		); !ok {
+			tx.Rollback()
+			return
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	mr.Server = append(mr.Server, q.Server)
+	mr.OK()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
