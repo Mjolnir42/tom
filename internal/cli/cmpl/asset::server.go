@@ -24,7 +24,8 @@ func ServerRemove(c *cli.Context) {
 }
 
 func ServerList(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdServerList)
+	DirectMulti(c, uniq, multi)
 }
 
 func ServerShow(c *cli.Context) {
