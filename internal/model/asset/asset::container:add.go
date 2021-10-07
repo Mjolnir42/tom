@@ -51,6 +51,12 @@ func (m *Model) ContainerAdd(w http.ResponseWriter, r *http.Request,
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
+	if req.Container.Link == nil {
+		req.Container.Link = []string{}
+	}
+	if req.Container.Property == nil {
+		req.Container.Property = map[string]proto.PropertyDetail{}
+	}
 	request.Container = *req.Container
 
 	if err := proto.ValidNamespace(
