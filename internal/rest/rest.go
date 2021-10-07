@@ -91,6 +91,40 @@ func DecodeJSONBody(r *http.Request, s interface{}) error {
 	case *proto.Request:
 		c := s.(*proto.Request)
 		err = decoder.Decode(c)
+		if err == nil {
+			if c.Container != nil {
+				if c.Container.Link == nil {
+					c.Container.Link = []string{}
+				}
+				if c.Container.Property == nil {
+					c.Container.Property = map[string]proto.PropertyDetail{}
+				}
+			}
+			if c.Orchestration != nil {
+				if c.Orchestration.Link == nil {
+					c.Orchestration.Link = []string{}
+				}
+				if c.Orchestration.Property == nil {
+					c.Orchestration.Property = map[string]proto.PropertyDetail{}
+				}
+			}
+			if c.Runtime != nil {
+				if c.Runtime.Link == nil {
+					c.Runtime.Link = []string{}
+				}
+				if c.Runtime.Property == nil {
+					c.Runtime.Property = map[string]proto.PropertyDetail{}
+				}
+			}
+			if c.Server != nil {
+				if c.Server.Link == nil {
+					c.Server.Link = []string{}
+				}
+				if c.Server.Property == nil {
+					c.Server.Property = map[string]proto.PropertyDetail{}
+				}
+			}
+		}
 	default:
 		rt := reflect.TypeOf(s)
 		err = fmt.Errorf("DecodeJSON: unhandled request of type: %s", rt)

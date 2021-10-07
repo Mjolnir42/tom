@@ -84,7 +84,10 @@ type Runtime struct {
 
 func NewRuntimeRequest() Request {
 	return Request{
-		Runtime: &Runtime{},
+		Runtime: &Runtime{
+			Link:     []string{},
+			Property: map[string]PropertyDetail{},
+		},
 	}
 }
 
