@@ -42,6 +42,7 @@ func (m *Model) RouteRegister(rt *httprouter.Router) {
 	m.routeRegisterOrchestration(rt)
 	m.routeRegisterRuntime(rt)
 	m.routeRegisterServer(rt)
+	//m.routeRegisterSocket(rt)
 
 	m.routeRegisterFromRegistry(rt)
 }
@@ -87,6 +88,7 @@ func HandleRegister(hm *handler.Map, length int) {
 	handleRegisterOrchestration(hm, length)
 	handleRegisterRuntime(hm, length)
 	handleRegisterServer(hm, length)
+	//handleRegisterSocket(hm, length)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
