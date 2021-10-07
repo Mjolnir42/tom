@@ -96,10 +96,7 @@ type Container struct {
 
 func NewContainerRequest() Request {
 	return Request{
-		Container: &Container{
-			Link:     []string{},
-			Property: map[string]PropertyDetail{},
-		},
+		Container: &Container{},
 	}
 }
 
