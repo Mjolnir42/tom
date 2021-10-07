@@ -61,10 +61,16 @@ func (r *Result) Clear(err ...error) {
 		r.NamespaceHeader = []proto.NamespaceHeader{}
 	case SectionOrchestration:
 		r.Orchestration = []proto.Orchestration{}
+		r.OrchestrationHeader = []proto.OrchestrationHeader{}
 	case SectionRuntime:
 		r.Runtime = []proto.Runtime{}
+		r.RuntimeHeader = []proto.RuntimeHeader{}
 	case SectionServer:
 		r.Server = []proto.Server{}
+		r.ServerHeader = []proto.ServerHeader{}
+	case SectionContainer:
+		r.Container = []proto.Container{}
+		r.ContainerHeader = []proto.ContainerHeader{}
 	}
 }
 
