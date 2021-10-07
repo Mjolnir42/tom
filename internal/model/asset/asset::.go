@@ -25,6 +25,7 @@ type Model struct {
 	x *rest.Rest
 }
 
+// New returns a new instance of asset.Model
 func New(x *rest.Rest) *Model {
 	m := &Model{
 		x: x,
@@ -32,15 +33,22 @@ func New(x *rest.Rest) *Model {
 	return m
 }
 
+// RouteRegister registers all request routes for the asset package with
+// the provided httprouter.Router instance
 func (m *Model) RouteRegister(rt *httprouter.Router) {
-	m.routeRegisterServer(rt)
-	m.routeRegisterRuntime(rt)
+	// these functions are currently no-op but left in place as
+	// on-demand registration hook
 	m.routeRegisterContainer(rt)
 	m.routeRegisterOrchestration(rt)
+	m.routeRegisterRuntime(rt)
+	m.routeRegisterServer(rt)
 
 	m.routeRegisterFromRegistry(rt)
 }
 
+// routeRegisterFromRegistry picks up the route registration requests
+// put into the registry package variable during init() phase of the
+// package
 func (m *Model) routeRegisterFromRegistry(rt *httprouter.Router) {
 	for _, f := range registry {
 		m.x.LM.GetLogger(`application`).Infof(
@@ -76,9 +84,9 @@ func (m *Model) routeRegisterFromRegistry(rt *httprouter.Router) {
 // provided handlerMap
 func HandleRegister(hm *handler.Map, length int) {
 	handleRegisterContainer(hm, length)
+	handleRegisterOrchestration(hm, length)
 	handleRegisterRuntime(hm, length)
 	handleRegisterServer(hm, length)
-	handleRegisterOrchestration(hm, length)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
