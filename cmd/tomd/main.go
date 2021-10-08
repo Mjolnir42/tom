@@ -138,6 +138,7 @@ func run() int {
 		page.New(api).RouteRegister(router)
 		bulk.New(api).RouteRegister(router)
 		supervisor.New(api).RouteRegister(router)
+		page.New(api).RouteRegister(router)
 
 		lm.GetLogger(`application`).Infof(
 			"Running API router interface %d for %s",
