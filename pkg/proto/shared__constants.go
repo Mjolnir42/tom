@@ -97,18 +97,27 @@ const (
 	CmdOrchestrationPropUpdate = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropUpdate
 	CmdOrchestrationRemove     = ModelAsset + `::` + EntityOrchestration + `:` + ActionRemove
 	CmdOrchestrationShow       = ModelAsset + `::` + EntityOrchestration + `:` + ActionShow
+
+	CmdPageStaticCSS   = `page::static::css`
+	CmdPageStaticFont  = `page::static::font`
+	CmdPageStaticImage = `page::static::img`
+	CmdPageStaticJS    = `page::static::js`
+	CmdPageApplication = `page::application`
 )
 
 const (
+	TemplateBindata = `bindata`
 	TemplateCommand = `command`
-	TemplateList    = `list`
 	TemplateDetail  = `detail`
+	TemplateList    = `list`
+	TemplateNone    = `none`
 )
 
 const (
 	PlHoldNone     = ``
 	PlHoldTomID    = `:tomID`
 	PlHoldTargetID = `:targetID`
+	PlHoldAsset    = `:asset`
 )
 
 const (

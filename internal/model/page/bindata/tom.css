@@ -1,0 +1,35 @@
+body {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+	background-color: #cdcdcd;
+}
+
+.container-fluid {
+  padding-left: 50px;
+  padding-right: 50px;
+}
+
+.card-text {
+	font-size: 36px;
+}
+
+.card {
+	background-color: #ffffff;
+}
+
+.blink {
+	animation: blink-animation 2s steps(5, start) infinite;
+	-webkit-animation: blink-animation 2s steps(5, start) infinite;
+}
+
+@keyframes blink-animation {
+	to {
+		visibility: hidden;
+	}
+}
+
+@-webkit-keyframes blink-animation {
+	to {
+		visibility: hidden;
+	}
+}

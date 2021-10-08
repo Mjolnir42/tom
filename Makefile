@@ -22,6 +22,7 @@ install_linux: generate
 generate:
 	@echo "Generating ...."
 	@go generate ./cmd/...
+	@go generate ./internal/...
 
 sanitize: build check
 
