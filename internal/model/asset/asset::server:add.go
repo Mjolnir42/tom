@@ -72,7 +72,7 @@ func (h *ServerWriteHandler) add(q *msg.Request, mr *msg.Result) {
 		txTime, validSince, validUntil time.Time
 		rows                           *sql.Rows
 		ok                             bool
-		rteID                          string
+		serverID                       string
 	)
 	// setup a consistent transaction time timestamp that is used for all
 	// records
@@ -169,7 +169,7 @@ func (h *ServerWriteHandler) add(q *msg.Request, mr *msg.Result) {
 		}
 	}
 
-	// create named runtime environment in specified namespace,
+	// create named server in specified namespace,
 	// this is an INSERT statement with a RETURNING clause, thus
 	// requires .QueryRow instead of .Exec
 	if err = tx.Stmt(h.stmtAdd).QueryRow(
@@ -180,9 +180,9 @@ func (h *ServerWriteHandler) add(q *msg.Request, mr *msg.Result) {
 		validSince,
 		validUntil,
 	).Scan(
-		&rteID,
+		&serverID,
 	); err == sql.ErrNoRows {
-		// query did not return the generated rteID
+		// query did not return the generated serverID
 		mr.ServerError(err)
 		tx.Rollback()
 		return
@@ -199,7 +199,7 @@ func (h *ServerWriteHandler) add(q *msg.Request, mr *msg.Result) {
 			continue
 		}
 		if ok = h.txPropUpdate(
-			q, mr, tx, &txTime, q.Server.Property[key], rteID,
+			q, mr, tx, &txTime, q.Server.Property[key], serverID,
 		); !ok {
 			tx.Rollback()
 			return

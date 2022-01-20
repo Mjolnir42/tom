@@ -66,7 +66,7 @@ func run() int {
 	goopt.Parse(nil)
 
 	// read configuration file
-	lm.EarlyPrintf("Starting runtime config initialization, TOM v%s", tomVersion)
+	lm.EarlyPrintf("Starting runtime config initialization, TOM %s", tomVersion)
 	if configFile, err = filepath.Abs(*cliConfigPath); err != nil {
 		lm.EarlyFatal(err)
 	}
