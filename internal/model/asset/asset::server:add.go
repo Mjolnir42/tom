@@ -9,10 +9,12 @@ package asset // import "github.com/mjolnir42/tom/internal/model/asset/"
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/tom/internal/cli/adm"
 	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/rest"
 	"github.com/mjolnir42/tom/internal/stmt"
@@ -73,6 +75,16 @@ func (m *Model) ServerAdd(w http.ResponseWriter, r *http.Request,
 		}
 		if err := proto.CheckPropertyConstraints(&obj); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+	}
+
+	_, _, mandatory := adm.ArgumentsForCommand(proto.CmdServerAdd)
+	for _, prop := range mandatory {
+		if _, ok := request.Server.Property[prop]; !ok {
+			m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
+				"Missing mandatory property: %s", prop,
+			))
 			return
 		}
 	}
