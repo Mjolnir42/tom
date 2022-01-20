@@ -65,11 +65,11 @@ func (h *ServerReadHandler) list(q *msg.Request, mr *msg.Result) {
 		id, namespace, key, value string
 		rows                      *sql.Rows
 		err                       error
-		server                    proto.Server
+		server                    proto.ServerHeader
 		ok                        bool
 	)
 
-	list := make(map[string]proto.Server)
+	list := make(map[string]proto.ServerHeader)
 	if rows, err = h.stmtList.Query(); err != nil {
 		mr.ServerError(err)
 		return
@@ -87,9 +87,8 @@ func (h *ServerReadHandler) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		if server, ok = list[id]; !ok {
-			server = proto.Server{}
+			server = proto.ServerHeader{}
 		}
-		server.ID = id
 		server.Namespace = namespace
 		switch {
 		case key == `type`:
@@ -104,7 +103,7 @@ func (h *ServerReadHandler) list(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	for _, server := range list {
-		mr.Server = append(mr.Server, server)
+		mr.ServerHeader = append(mr.ServerHeader, server)
 	}
 	mr.OK()
 }
