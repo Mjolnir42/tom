@@ -53,6 +53,30 @@ func (m *Model) ServerAdd(w http.ResponseWriter, r *http.Request,
 	}
 	request.Server = *req.Server
 
+	if err := proto.ValidNamespace(
+		request.Server.Namespace,
+	); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
+	}
+
+	// at least the name property must be filled in
+	if request.Server.Property == nil {
+		m.x.ReplyBadRequest(&w, &request, nil)
+		return
+	}
+
+	for prop, obj := range request.Server.Property {
+		if err := proto.OnlyUnreserved(prop); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+		if err := proto.CheckPropertyConstraints(&obj); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+	}
+
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
 		return
