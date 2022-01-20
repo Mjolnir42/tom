@@ -10,6 +10,7 @@ package asset // import "github.com/mjolnir42/tom/internal/model/asset/"
 import (
 	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
@@ -62,11 +63,12 @@ func (m *Model) ServerList(w http.ResponseWriter, r *http.Request,
 // list returns all servers
 func (h *ServerReadHandler) list(q *msg.Request, mr *msg.Result) {
 	var (
-		id, namespace, key, value string
-		rows                      *sql.Rows
-		err                       error
-		server                    proto.ServerHeader
-		ok                        bool
+		id, namespace, key, value, author string
+		creationTime                      time.Time
+		rows                              *sql.Rows
+		err                               error
+		server                            proto.ServerHeader
+		ok                                bool
 	)
 
 	list := make(map[string]proto.ServerHeader)
@@ -81,6 +83,8 @@ func (h *ServerReadHandler) list(q *msg.Request, mr *msg.Result) {
 			&namespace,
 			&key,
 			&value,
+			&author,
+			&creationTime,
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err)
@@ -95,6 +99,8 @@ func (h *ServerReadHandler) list(q *msg.Request, mr *msg.Result) {
 			server.Type = value
 		case key == `name`:
 			server.Name = value
+			server.CreatedBy = author
+			server.CreatedAt = creationTime.Format(msg.RFC3339Milli)
 		}
 		list[id] = server
 	}
