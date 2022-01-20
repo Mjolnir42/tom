@@ -72,7 +72,9 @@ WHERE       now()::timestamptz(3) <@ asset.server_unique_attribute_values.validi
 SELECT      asset.server.serverID,
             meta.dictionary.name,
             meta.standard_attribute.attribute,
-            asset.server_standard_attribute_values.value
+            asset.server_standard_attribute_values.value,
+            inventory.user.uid AS createdBy,
+            asset.server_standard_attribute_values.createdAt
 FROM        asset.server
     JOIN    meta.dictionary
       ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
@@ -82,13 +84,17 @@ FROM        asset.server
       ON    asset.server_standard_attribute_values.serverID = asset.server.serverID
      AND    asset.server_standard_attribute_values.dictionaryID = asset.server.dictionaryID
      AND    asset.server_standard_attribute_values.attributeID = meta.standard_attribute.attributeID
+    JOIN    inventory.user
+      ON    asset.server_standard_attribute_values.createdBy = inventory.user.userID
    WHERE    now()::timestamptz(3) <@ asset.server_standard_attribute_values.validity
      AND    meta.standard_attribute.attribute IN ('type')
 UNION
 SELECT      asset.server.serverID,
             meta.dictionary.name,
             meta.unique_attribute.attribute,
-            asset.server_unique_attribute_values.value
+            asset.server_unique_attribute_values.value,
+            inventory.user.uid AS createdBy,
+            asset.server_unique_attribute_values.createdAt
 FROM        asset.server
     JOIN    meta.dictionary
       ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
@@ -98,6 +104,8 @@ FROM        asset.server
       ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
      AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
      AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+    JOIN    inventory.user
+      ON    asset.server_unique_attribute_values.createdBy = inventory.user.userID
 WHERE       now()::timestamptz(3) <@ asset.server_unique_attribute_values.validity
      AND    meta.unique_attribute.attribute IN ('name');`
 
