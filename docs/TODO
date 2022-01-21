@@ -29,6 +29,7 @@
         ├── asset::container:property.update  [DONE]
         ├── asset::container:remove
         ├── asset::container:show             [DONE]
+        ├── asset::container:stack
     └── tom/asset
         ├── asset::container:add              [DONE]
         ├── asset::container:link             [DONE]
@@ -38,6 +39,7 @@
         ├── asset::container:property.update  [DONE]
         ├── asset::container:remove
         ├── asset::container:show             [DONE]
+        ├── asset::container:stack
 ====================================================
     └── tomd/asset
         ├── asset::runtime:add                [DONE]
@@ -48,6 +50,7 @@
         ├── asset::runtime:property.update    [DONE]
         ├── asset::runtime:remove             [DONE]
         ├── asset::runtime:show               [DONE]
+        ├── asset::runtime:stack
     └── tom/asset
         ├── asset::runtime:add                [DONE]
         ├── asset::runtime:link               [DONE]
@@ -57,6 +60,7 @@
         ├── asset::runtime:property.update    [DONE]
         ├── asset::runtime:remove             [DONE]
         ├── asset::runtime:show               [DONE]
+        ├── asset::runtime:stack
 ====================================================
     └── tomd/asset
         ├── asset::server:add
@@ -67,6 +71,7 @@
         ├── asset::server:property.update
         ├── asset::server:remove
         ├── asset::server:show
+        ├── asset::server:stack
     └── tom/asset
         ├── asset::server:add
         ├── asset::server:link
@@ -76,6 +81,7 @@
         ├── asset::server:property.update
         ├── asset::server:remove
         ├── asset::server:show
+        ├── asset::server:stack
 ====================================================
     └── tomd/asset
         ├── asset::socket:add
