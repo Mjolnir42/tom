@@ -196,7 +196,7 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 		case `name`:
 			// name attribute has already been added
 		default:
-			rte.Property[prop.Namespace+`::`+prop.Attribute] = prop
+			rte.Property[prop.Namespace+`::`+rte.Name+`::`+prop.Attribute] = prop
 		}
 	}
 	if err = rows.Err(); err != nil {
