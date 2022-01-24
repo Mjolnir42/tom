@@ -20,7 +20,8 @@ func ServerAdd(c *cli.Context) {
 }
 
 func ServerRemove(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdServerRemove)
+	GenericMulti(c, uniq, multi)
 }
 
 func ServerList(c *cli.Context) {
@@ -34,15 +35,19 @@ func ServerShow(c *cli.Context) {
 }
 
 func ServerPropSet(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdServerPropSet)
+	GenericPropertyChain(c, uniq, multi)
 }
 
 func ServerPropUpdate(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdServerPropUpdate)
+	GenericPropertyChain(c, uniq, multi)
 }
 
 func ServerPropRemove(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdServerPropRemove)
+	GenericMulti(c, uniq, multi)
+}
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
