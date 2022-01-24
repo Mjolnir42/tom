@@ -81,11 +81,15 @@ func (m *Model) ServerAdd(w http.ResponseWriter, r *http.Request,
 
 	_, _, mandatory := adm.ArgumentsForCommand(proto.CmdServerAdd)
 	for _, prop := range mandatory {
-		if _, ok := request.Server.Property[prop]; !ok {
-			m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
-				"Missing mandatory property: %s", prop,
-			))
-			return
+		switch prop {
+		case `namespace`:
+		default:
+			if _, ok := request.Server.Property[prop]; !ok {
+				m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
+					"Missing mandatory property: %s", prop,
+				))
+				return
+			}
 		}
 	}
 
