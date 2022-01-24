@@ -29,7 +29,8 @@ func ServerList(c *cli.Context) {
 }
 
 func ServerShow(c *cli.Context) {
-	None(c)
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdServerShow)
+	GenericMulti(c, uniq, multi)
 }
 
 func ServerPropSet(c *cli.Context) {

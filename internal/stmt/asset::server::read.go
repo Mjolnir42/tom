@@ -199,6 +199,43 @@ JOIN              meta.dictionary
   ON              sel_cte.linkedDictID = meta.dictionary.dictionaryID
 WHERE             meta.unique_attribute.attribute = 'name'::text
   AND             $3::timestamptz(3) <@ asset.server_unique_attribute_values.validity;`
+
+	ServerTxShowProperties = `
+SELECT      meta.unique_attribute.attribute AS attribute,
+            asset.server_unique_attribute_values.value AS value,
+            lower(asset.server_unique_attribute_values.validity) AS validSince,
+            upper(asset.server_unique_attribute_values.validity) AS validUntil,
+            asset.server_unique_attribute_values.createdAt AS createdAt,
+            inventory.user.uid AS uid
+FROM        meta.dictionary
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.server_unique_attribute_values
+      ON    meta.unique_attribute.dictionaryID = asset.server_unique_attribute_values.dictionaryID
+     AND    meta.unique_attribute.attributeID  = asset.server_unique_attribute_values.attributeID
+    JOIN    inventory.user
+      ON    asset.server_unique_attribute_values.createdBy =  inventory.user.userID
+WHERE       meta.dictionary.dictionaryID = $1::uuid
+     AND    asset.server_unique_attribute_values.serverID = $2::uuid
+     AND    $3::timestamptz(3) <@ asset.server_unique_attribute_values.validity
+UNION
+SELECT      meta.standard_attribute.attribute AS attribute,
+            asset.server_standard_attribute_values.value AS value,
+            lower(asset.server_standard_attribute_values.validity) AS validSince,
+            upper(asset.server_standard_attribute_values.validity) AS validUntil,
+            asset.server_standard_attribute_values.createdAt AS createdAt,
+            inventory.user.uid AS uid
+FROM        meta.dictionary
+    JOIN    meta.standard_attribute
+      ON    meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+    JOIN    asset.server_standard_attribute_values
+      ON    meta.standard_attribute.dictionaryID = asset.server_standard_attribute_values.dictionaryID
+     AND    meta.standard_attribute.attributeID  = asset.server_standard_attribute_values.attributeID
+    JOIN    inventory.user
+      ON    asset.server_standard_attribute_values.createdBy =  inventory.user.userID
+WHERE       meta.dictionary.dictionaryID = $1::uuid
+     AND    asset.server_standard_attribute_values.serverID = $2::uuid
+     AND    $3::timestamptz(3) <@ asset.server_standard_attribute_values.validity;`
 )
 
 func init() {
@@ -207,6 +244,7 @@ func init() {
 	m[ServerListLinked] = `ServerListLinked`
 	m[ServerList] = `ServerList`
 	m[ServerParent] = `ServerParent`
+	m[ServerTxShowProperties] = `ServerTxShowProperties`
 	m[ServerTxShow] = `ServerTxShow`
 }
 
