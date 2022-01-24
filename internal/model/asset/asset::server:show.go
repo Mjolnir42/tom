@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -11,6 +11,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -70,15 +71,11 @@ func (m *Model) ServerShow(w http.ResponseWriter, r *http.Request,
 // show returns full details for a specific server
 func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	var (
-		tx                                           *sql.Tx
-		err                                          error
-		txFind, txAttr, txParent, txLink             *sql.Stmt
-		qrySrvID, qrySrvName, qryDictID, qryDictName *sql.NullString
-		rows                                         *sql.Rows
-		server                                       proto.Server
-		ambiguous                                    bool
-		id, dictID, dictName, attrID, attrTyp, value string
-		rteID, rteDictID, rteDictName, rteName, key  string
+		serverID, dictionaryID                 string
+		tx                                     *sql.Tx
+		rows, links, lprops                    *sql.Rows
+		err                                    error
+		rteID, rteDictID, rteDictName, rteName string
 	)
 
 	// start transaction
@@ -92,111 +89,119 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	}
 	defer tx.Rollback()
 
-	// find the server
-	if qrySrvID.String = q.Server.ID; qrySrvID.String != `` {
-		qrySrvID.Valid = true
+	txTime := time.Now().UTC()
+	txShow := tx.Stmt(h.stmtTxShow)
+	txProp := tx.Stmt(h.stmtTxProp)
+
+	server := proto.Server{
+		Namespace: q.Server.Namespace,
+		Name:      q.Server.Name,
+		Link:      []string{},
 	}
-	if qrySrvName.String = q.Server.Name; qrySrvName.String != `` {
-		qrySrvName.Valid = true
+	name := proto.PropertyDetail{
+		Attribute: `name`,
+		Value:     q.Server.Name,
 	}
-	if qryDictName.String = q.Server.Namespace; qryDictName.String != `` {
-		qryDictName.Valid = true
+
+	var since, until, createdAt, namedAt time.Time
+	if err = txShow.QueryRow(
+		q.Server.Namespace,
+		q.Server.Name,
+		txTime,
+	).Scan(
+		&serverID,
+		&dictionaryID,
+		&createdAt,
+		&server.CreatedBy,
+		&since,
+		&until,
+		&namedAt,
+		&name.CreatedBy,
+	); err == sql.ErrNoRows {
+		mr.NotFound(err)
+		return
+	} else if err != nil {
+		mr.ServerError(err)
+		return
 	}
-	txFind = tx.Stmt(h.stmtFind)
-	if rows, err = txFind.Query(
-		qrySrvName,
-		qrySrvID,
-		qryDictID,
-		qryDictName,
+
+	server.CreatedAt = createdAt.Format(msg.RFC3339Milli)
+	name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
+	name.ValidSince = since.Format(msg.RFC3339Milli)
+	name.ValidUntil = until.Format(msg.RFC3339Milli)
+	name.Namespace = q.Server.Namespace
+	server.Property = make(map[string]proto.PropertyDetail)
+	server.Property[q.Server.Namespace+`::`+server.Name+`::name`] = name
+
+	// fetch server properties
+	if rows, err = txProp.Query(
+		dictionaryID,
+		serverID,
+		txTime,
 	); err != nil {
 		mr.ServerError(err)
 		return
 	}
+
 	for rows.Next() {
-		if ambiguous {
-			rows.Close()
-			mr.ExpectationFailed(fmt.Errorf(`Request is ambiguous`))
-			return
-		}
+		prop := proto.PropertyDetail{}
+		var since, until, at time.Time
+
 		if err = rows.Scan(
-			&id,
-			&dictID,
-			&dictName,
-			&attrID,
-			&key,
-			&value,
+			&prop.Attribute,
+			&prop.Value,
+			&since,
+			&until,
+			&at,
+			&prop.CreatedBy,
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err)
 			return
 		}
-		server = proto.Server{
-			ID:        id,
-			Namespace: dictName,
-			Name:      value,
-			Link:      []string{},
+		prop.ValidSince = since.Format(msg.RFC3339Milli)
+		prop.ValidUntil = until.Format(msg.RFC3339Milli)
+		prop.CreatedAt = at.Format(msg.RFC3339Milli)
+		prop.Namespace = q.Server.Namespace
+
+		switch {
+		case strings.HasSuffix(prop.Attribute, `_json`):
+			fallthrough
+		case strings.HasSuffix(prop.Attribute, `_list`):
+			prop.Raw = []byte(prop.Value)
 		}
-		ambiguous = true
+
+		// set specialty fields
+		switch prop.Attribute {
+		case `name`:
+			if server.Name != prop.Value {
+				rows.Close()
+				mr.ExpectationFailed(
+					fmt.Errorf(`Encountered confused resultset`),
+				)
+				return
+			}
+		case `type`:
+			server.Type = prop.Value
+		}
+		switch prop.Attribute {
+		case `name`:
+			// name attribute has already been added
+		default:
+			server.Property[prop.Namespace+`::`+server.Name+`::`+prop.Attribute] = prop
+		}
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err)
 		return
 	}
 
-	// query all server attributes
-	txAttr = tx.Stmt(h.stmtAttribute)
-	if rows, err = txAttr.Query(
-		server.ID,
-	); err != nil {
-		mr.ServerError(err)
-		return
-	}
-	for rows.Next() {
-		if err = rows.Scan(
-			&id,
-			&dictName,
-			&key,
-			&value,
-			&attrTyp,
-		); err != nil {
-			rows.Close()
-			mr.ServerError(err)
-			return
-		}
-		switch {
-		case id != server.ID || dictName != server.Namespace:
-			rows.Close()
-			mr.ExpectationFailed(fmt.Errorf(`Request is ambiguous`))
-			return
-		case key == `type`:
-			server.Type = value
-		case key == `name`:
-			server.Name = value
-		default:
-			server.Property[key] = proto.PropertyDetail{
-				Attribute: key,
-				Value:     value,
-			}
-			switch attrTyp {
-			case proto.AttributeUnique:
-				server.UniqProperty = append(server.UniqProperty, server.Property[key])
-			case proto.AttributeStandard:
-				server.StdProperty = append(server.StdProperty, server.Property[key])
-			default:
-				rows.Close()
-				mr.ExpectationFailed(fmt.Errorf(`Received impossible attribute type`))
-				return
-			}
-		}
-	}
-	if err = rows.Err(); err != nil {
-		mr.ServerError(err)
-		return
-	}
 	// query parent
-	txParent = tx.Stmt(h.stmtParent)
-	if err = txParent.QueryRow(
-		server.ID,
+	noParent := false
+	if err = tx.Stmt(
+		h.stmtParent,
+	).QueryRow(
+		serverID,
 	).Scan(
 		&rteID,
 		&rteDictID,
@@ -204,89 +209,116 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		&rteName,
 	); err == sql.ErrNoRows {
 		// not an error
+		noParent = true
 	} else if err != nil {
 		mr.ServerError(err)
 		return
 	}
-	server.Parent = (&proto.Runtime{
-		ID:        rteID,
-		Namespace: rteDictName,
-		Name:      rteName,
-	}).FormatTomID()
+	if !noParent {
+		server.Parent = (&proto.Runtime{
+			ID:        rteID,
+			Namespace: rteDictName,
+			Name:      rteName,
+		}).FormatTomID()
+	}
 
-	// query links
-	qrySrvName.String = ``
-	qrySrvName.Valid = false
-	qryDictName.String = ``
-	qryDictName.Valid = false
-	txLink = tx.Stmt(h.stmtLinked)
-	if rows, err = txLink.Query(
-		server.ID,
-		dictID,
-		time.Now().UTC(),
+	// fetch linked servers
+	linklist := [][]string{}
+	if links, err = tx.Stmt(h.stmtLinked).Query(
+		serverID,
+		dictionaryID,
+		txTime,
 	); err != nil {
 		mr.ServerError(err)
 		return
 	}
-	for rows.Next() {
-		if err = rows.Scan(
-			&qrySrvID.String,
-			&qryDictID.String,
-			&qrySrvName.String,
-			&qryDictName.String,
+	for links.Next() {
+		var linkedSrvID, linkedDictID, linkedSrvName, linkedDictName string
+		if err = links.Scan(
+			&linkedSrvID,
+			&linkedDictID,
+			&linkedSrvName,
+			&linkedDictName,
 		); err != nil {
-			rows.Close()
+			links.Close()
 			mr.ServerError(err)
 			return
 		}
 
-		if qrySrvID.String != `` {
-			qrySrvID.Valid = true
-		}
-		if qryDictID.String != `` {
-			qryDictID.Valid = true
-		}
-		if qrySrvName.String != `` {
-			qrySrvName.Valid = true
-		}
-		if qryDictName.String != `` {
-			qryDictName.Valid = true
-		}
-		if err = tx.Stmt(h.stmtFind).QueryRow(
-			qrySrvName,
-			qrySrvID,
-			qryDictID,
-			qryDictName,
-		).Scan(
-			id,
-			dictID,
-			dictName,
-			attrID,
-			key,
-			value,
-		); err == sql.ErrNoRows {
-			rows.Close()
-			mr.ServerError(fmt.Errorf(`Inconsistent dataset`))
-			return
-		} else if err != nil {
-			rows.Close()
-			mr.ServerError(err)
-			return
-		}
 		server.Link = append(server.Link, (&proto.Server{
-			Namespace: dictName,
-			Name:      value,
+			ID:        linkedSrvID,
+			Namespace: linkedDictName,
+			Name:      linkedSrvName,
 		}).FormatTomID())
+
+		linklist = append(linklist, []string{
+			linkedSrvID,
+			linkedDictID,
+			linkedSrvName,
+			linkedDictName,
+		})
 	}
-	if err = rows.Err(); err != nil {
+	if err = links.Err(); err != nil {
 		mr.ServerError(err)
 		return
 	}
 
+	for i := range linklist {
+		// fetch properties from linked runtime
+		if lprops, err = tx.Stmt(
+			h.stmtTxProp,
+		).Query(
+			linklist[i][1], // linkedDictID
+			linklist[i][0], // linkedSrvID
+			txTime,
+		); err != nil {
+			mr.ServerError(err)
+			return
+		}
+
+		for lprops.Next() {
+			prop := proto.PropertyDetail{}
+			var since, until, at time.Time
+
+			if err = lprops.Scan(
+				&prop.Attribute,
+				&prop.Value,
+				&since,
+				&until,
+				&at,
+				&prop.CreatedBy,
+			); err != nil {
+				lprops.Close()
+				mr.ServerError(err)
+				return
+			}
+			prop.ValidSince = since.Format(msg.RFC3339Milli)
+			prop.ValidUntil = until.Format(msg.RFC3339Milli)
+			prop.CreatedAt = at.Format(msg.RFC3339Milli)
+			prop.Namespace = linklist[i][3] // linkedDictName
+
+			switch {
+			case strings.HasSuffix(prop.Attribute, `_json`):
+				fallthrough
+			case strings.HasSuffix(prop.Attribute, `_list`):
+				prop.Raw = []byte(prop.Value)
+			}
+
+			// linklist[i][2] is linkedSrvName
+			server.Property[prop.Namespace+`::`+linklist[i][2]+`::`+prop.Attribute] = prop
+		}
+		if err = lprops.Err(); err != nil {
+			mr.ServerError(err)
+			return
+		}
+	}
+
+	// close transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err)
 		return
 	}
+	mr.Server = append(mr.Server, server)
 	mr.OK()
 }
 

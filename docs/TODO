@@ -70,7 +70,7 @@
         ├── asset::server:property.set
         ├── asset::server:property.update
         ├── asset::server:remove
-        ├── asset::server:show
+        ├── asset::server:show                [DONE]
         ├── asset::server:stack
     └── tom/asset
         ├── asset::server:add
@@ -80,7 +80,7 @@
         ├── asset::server:property.set
         ├── asset::server:property.update
         ├── asset::server:remove
-        ├── asset::server:show
+        ├── asset::server:show                [DONE]
         ├── asset::server:stack
 ====================================================
     └── tomd/asset
