@@ -11,6 +11,8 @@ software.
 
 ```
 tom server link ${tomID} is-equal ${linkedID}
+tom server show ${name} namespace ${space}
+tom server show ${tomID}
 ```
 
 # PROPERTIES
