@@ -78,6 +78,13 @@ func registerAssetServer(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetServerRemove),
 						BashComplete: cmpl.ServerRemove,
 					},
+					{
+						Name:         `link`,
+						Usage:        `Link two servers as referring to the same entity`,
+						Description:  help.Text(proto.CmdServerLink),
+						Action:       run(cmdAssetServerLink),
+						BashComplete: cmpl.ServerLink,
+					},
 				},
 			},
 		}...,

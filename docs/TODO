@@ -64,7 +64,7 @@
 ====================================================
     └── tomd/asset
         ├── asset::server:add
-        ├── asset::server:link
+        ├── asset::server:link                [DONE]
         ├── asset::server:list
         ├── asset::server:property.remove
         ├── asset::server:property.set
@@ -74,7 +74,7 @@
         ├── asset::server:stack
     └── tom/asset
         ├── asset::server:add
-        ├── asset::server:link
+        ├── asset::server:link                [DONE]
         ├── asset::server:list
         ├── asset::server:property.remove
         ├── asset::server:property.set
