@@ -594,15 +594,19 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		return []string{`property`}, []string{`namespace`, `type`, `since`, `until`}, []string{`namespace`, `type`}
 	case proto.CmdContainerList, proto.CmdContainerShow, proto.CmdContainerRemove:
 		fallthrough
-	case proto.CmdServerShow:
+	case proto.CmdServerList, proto.CmdServerShow, proto.CmdServerRemove:
 		fallthrough
 	case proto.CmdRuntimeList, proto.CmdRuntimeShow, proto.CmdRuntimeRemove:
 		return []string{}, []string{`namespace`}, []string{}
 	case proto.CmdContainerPropSet, proto.CmdContainerPropUpdate, proto.CmdContainerPropRemove:
 		fallthrough
+	case proto.CmdServerPropSet, proto.CmdServerPropUpdate, proto.CmdServerPropRemove:
+		fallthrough
 	case proto.CmdRuntimePropSet, proto.CmdRuntimePropUpdate, proto.CmdRuntimePropRemove:
 		return []string{`property`}, []string{`namespace`}, []string{`property`, `namespace`}
 	case proto.CmdContainerLink:
+		fallthrough
+	case proto.CmdServerLink:
 		fallthrough
 	case proto.CmdRuntimeLink:
 		return []string{`is-equal`}, []string{}, []string{`is-equal`}
