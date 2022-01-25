@@ -106,6 +106,7 @@ const (
 	CmdPageStaticJS    = `page::static::js`
 	CmdPageApplication = `page::application`
 
+	MetaPropertyCmdLink  = ModelAsset + `::` + `meta-cmd` + `::` + ActionLink
 	MetaPropertyCmdStack = ModelAsset + `::` + `meta-cmd` + `::` + ActionStack
 )
 

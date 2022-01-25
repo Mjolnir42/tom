@@ -77,14 +77,17 @@ func (m *Model) RuntimeLink(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	for prop, obj := range request.Runtime.Property {
-		if request.Runtime.Property[prop].Attribute != proto.ActionLink {
+		if request.Runtime.Property[prop].Attribute != proto.MetaPropertyCmdLink {
 			m.x.ReplyBadRequest(&w, &request, nil)
 			return
 		}
-		if err := proto.OnlyUnreserved(
-			request.Runtime.Property[prop].Attribute,
+		if err, entityType, _ := proto.ParseTomID(
+			request.Runtime.Property[prop].Value,
 		); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		} else if entityType != proto.EntityRuntime {
+			m.x.ReplyBadRequest(&w, &request, nil)
 			return
 		}
 		if err := proto.CheckPropertyConstraints(&obj); err != nil {
