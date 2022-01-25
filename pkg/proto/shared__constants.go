@@ -34,8 +34,8 @@ const (
 	ActionAttrRemove = `attribute.remove`
 	ActionHdSet      = `headof.set`
 	ActionHdUnset    = `headof.unset`
-	ActionList       = `list`
 	ActionLink       = `link`
+	ActionList       = `list`
 	ActionMbrAdd     = `member.add`
 	ActionMbrList    = `member.list`
 	ActionMbrRemove  = `member.remove`
@@ -72,8 +72,8 @@ const (
 
 	CmdServer           = ModelAsset + `::` + EntityServer + `:`
 	CmdServerAdd        = ModelAsset + `::` + EntityServer + `:` + ActionAdd
-	CmdServerList       = ModelAsset + `::` + EntityServer + `:` + ActionList
 	CmdServerLink       = ModelAsset + `::` + EntityServer + `:` + ActionLink
+	CmdServerList       = ModelAsset + `::` + EntityServer + `:` + ActionList
 	CmdServerPropRemove = ModelAsset + `::` + EntityServer + `:` + ActionPropRemove
 	CmdServerPropSet    = ModelAsset + `::` + EntityServer + `:` + ActionPropSet
 	CmdServerPropUpdate = ModelAsset + `::` + EntityServer + `:` + ActionPropUpdate
@@ -83,8 +83,8 @@ const (
 
 	CmdRuntime           = ModelAsset + `::` + EntityRuntime + `:`
 	CmdRuntimeAdd        = ModelAsset + `::` + EntityRuntime + `:` + ActionAdd
-	CmdRuntimeList       = ModelAsset + `::` + EntityRuntime + `:` + ActionList
 	CmdRuntimeLink       = ModelAsset + `::` + EntityRuntime + `:` + ActionLink
+	CmdRuntimeList       = ModelAsset + `::` + EntityRuntime + `:` + ActionList
 	CmdRuntimePropRemove = ModelAsset + `::` + EntityRuntime + `:` + ActionPropRemove
 	CmdRuntimePropSet    = ModelAsset + `::` + EntityRuntime + `:` + ActionPropSet
 	CmdRuntimePropUpdate = ModelAsset + `::` + EntityRuntime + `:` + ActionPropUpdate
