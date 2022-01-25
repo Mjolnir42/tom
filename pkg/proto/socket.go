@@ -65,4 +65,12 @@ func (s *Socket) PropertyIterator() <-chan PropertyDetail {
 	return ret
 }
 
+func (s *Socket) ExportName() string {
+	return s.Name
+}
+
+func (s *Socket) ExportNamespace() string {
+	return s.Namespace
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

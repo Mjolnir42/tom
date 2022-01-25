@@ -143,4 +143,12 @@ func (r *Runtime) PropertyIterator() <-chan PropertyDetail {
 	return ret
 }
 
+func (r *Runtime) ExportName() string {
+	return r.Name
+}
+
+func (r *Runtime) ExportNamespace() string {
+	return r.Namespace
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

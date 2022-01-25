@@ -106,4 +106,12 @@ func (o *Orchestration) PropertyIterator() <-chan PropertyDetail {
 	return ret
 }
 
+func (o *Orchestration) ExportName() string {
+	return o.Name
+}
+
+func (o *Orchestration) ExportNamespace() string {
+	return o.Namespace
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
