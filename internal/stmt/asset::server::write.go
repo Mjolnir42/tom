@@ -221,6 +221,34 @@ SELECT            $1::uuid,
                   sel_uid.userID,
                   $7::timestamptz(3)
 FROM              sel_uid;`
+
+	ServerTxStackAdd = `
+WITH sel_uid AS ( SELECT inventory.user.userID
+                  FROM   inventory.user
+                  JOIN   inventory.identity_library
+                    ON   inventory.identity_library.identityLibraryID
+                    =    inventory.user.identityLibraryID
+                  WHERE  inventory.user.uid = $6::text
+                    AND  inventory.identity_library.name = $7::text)
+INSERT INTO       asset.server_parent (
+                         serverID,
+                         parentRuntimeID,
+                         validity,
+                         createdBy,
+                         createdAt
+                  )
+SELECT            $1::uuid,
+                  $2::uuid,
+                  tstzrange($3::timestamptz(3), $4::timestamptz(3), '[]'),
+                  sel_uid.userID,
+                  $5::timestamptz(3)
+FROM              sel_uid;`
+
+	ServerTxStackClamp = `
+UPDATE            asset.server_parent
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.server_parent.serverID = $2::uuid
+  AND             $1::timestamptz(3) <@ asset.server_parent.validity;`
 )
 
 func init() {
@@ -228,6 +256,8 @@ func init() {
 	m[ServerLink] = `ServerLink`
 	m[ServerRemove] = `ServerRemove`
 	m[ServerStdAttrRemove] = `ServerStdAttrRemove`
+	m[ServerTxStackAdd] = `ServerTxStackAdd`
+	m[ServerTxStackClamp] = `ServerTxStackClamp`
 	m[ServerTxStdPropertyAdd] = `ServerTxStdPropertyAdd`
 	m[ServerTxStdPropertyClamp] = `ServerTxStdPropertyClamp`
 	m[ServerTxStdPropertySelect] = `ServerTxStdPropertySelect`

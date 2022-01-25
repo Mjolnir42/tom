@@ -34,6 +34,9 @@ type ServerWriteHandler struct {
 	stmtTxUniqPropAdd    *sql.Stmt
 	stmtTxUniqPropClamp  *sql.Stmt
 	stmtTxUniqPropSelect *sql.Stmt
+	stmtTxStackAdd       *sql.Stmt
+	stmtTxStackClamp     *sql.Stmt
+	stmtTxRuntimeShow    *sql.Stmt
 }
 
 // NewServerWriteHandler returns a new handler instance
@@ -54,6 +57,7 @@ func (h *ServerWriteHandler) Register(hm *handler.Map) {
 		proto.ActionPropSet,
 		proto.ActionPropUpdate,
 		proto.ActionRemove,
+		proto.ActionStack,
 	} {
 		hm.Request(msg.SectionServer, action, h.name)
 	}
@@ -77,6 +81,8 @@ func (h *ServerWriteHandler) process(q *msg.Request) {
 		h.propertyUpdate(q, &result)
 	case proto.ActionRemove:
 		h.remove(q, &result)
+	case proto.ActionStack:
+		h.stack(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -114,6 +120,9 @@ func (h *ServerWriteHandler) Run() {
 		stmt.ServerTxUniqPropertyAdd:     &h.stmtTxUniqPropAdd,
 		stmt.ServerTxUniqPropertyClamp:   &h.stmtTxUniqPropClamp,
 		stmt.ServerTxUniqPropertySelect:  &h.stmtTxUniqPropSelect,
+		stmt.ServerTxStackAdd:            &h.stmtTxStackAdd,
+		stmt.ServerTxStackClamp:          &h.stmtTxStackClamp,
+		stmt.RuntimeTxShow:               &h.stmtTxRuntimeShow,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

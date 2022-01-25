@@ -610,6 +610,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		fallthrough
 	case proto.CmdRuntimeLink:
 		return []string{`is-equal`}, []string{}, []string{`is-equal`}
+	case proto.CmdServerStack:
+		return []string{}, []string{`namespace`, `since`, `until`, `provided-by`}, []string{`provided-by`}
 	default:
 		return []string{}, []string{}, []string{}
 	}

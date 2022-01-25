@@ -45,6 +45,7 @@ const (
 	ActionPropUpdate = `property.update`
 	ActionRemove     = `remove`
 	ActionShow       = `show`
+	ActionStack      = `stack`
 	ActionUpdate     = `update`
 )
 
@@ -78,6 +79,7 @@ const (
 	CmdServerPropUpdate = ModelAsset + `::` + EntityServer + `:` + ActionPropUpdate
 	CmdServerRemove     = ModelAsset + `::` + EntityServer + `:` + ActionRemove
 	CmdServerShow       = ModelAsset + `::` + EntityServer + `:` + ActionShow
+	CmdServerStack      = ModelAsset + `::` + EntityServer + `:` + ActionStack
 
 	CmdRuntime           = ModelAsset + `::` + EntityRuntime + `:`
 	CmdRuntimeAdd        = ModelAsset + `::` + EntityRuntime + `:` + ActionAdd
@@ -103,6 +105,8 @@ const (
 	CmdPageStaticImage = `page::static::img`
 	CmdPageStaticJS    = `page::static::js`
 	CmdPageApplication = `page::application`
+
+	MetaPropertyCmdStack = ModelAsset + `::` + `meta-cmd` + `::` + ActionStack
 )
 
 const (

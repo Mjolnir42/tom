@@ -13,6 +13,8 @@ software.
 tom server link ${tomID} is-equal ${linkedID}
 tom server show ${name} namespace ${space}
 tom server show ${tomID}
+tom server stack ${name} namespace ${space} provided-by ${providerID}
+tom server stack ${tomID} provided-by ${providerID}
 ```
 
 # PROPERTIES
