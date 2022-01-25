@@ -85,6 +85,13 @@ func registerAssetServer(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetServerLink),
 						BashComplete: cmpl.ServerLink,
 					},
+					{
+						Name:         `stack`,
+						Usage:        `Specify the runtime environment providing a server`,
+						Description:  help.Text(proto.CmdServerStack),
+						Action:       run(cmdAssetServerStack),
+						BashComplete: cmpl.ServerStack,
+					},
 				},
 			},
 		}...,

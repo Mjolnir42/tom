@@ -64,6 +64,13 @@ func init() {
 		ResultTmpl:  TemplateDetail,
 		Placeholder: []string{PlHoldTomID},
 	}
+	Commands[CmdServerStack] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/server/` + PlHoldTomID + `/parent`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
 }
 
 // Server defines a server within the asset model

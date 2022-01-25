@@ -45,6 +45,7 @@ const (
 	ActionPropUpdate = `property.update`
 	ActionRemove     = `remove`
 	ActionShow       = `show`
+	ActionStack      = `stack`
 	ActionUpdate     = `update`
 )
 
@@ -78,6 +79,7 @@ const (
 	CmdServerPropUpdate = ModelAsset + `::` + EntityServer + `:` + ActionPropUpdate
 	CmdServerRemove     = ModelAsset + `::` + EntityServer + `:` + ActionRemove
 	CmdServerShow       = ModelAsset + `::` + EntityServer + `:` + ActionShow
+	CmdServerStack      = ModelAsset + `::` + EntityServer + `:` + ActionStack
 
 	CmdRuntime           = ModelAsset + `::` + EntityRuntime + `:`
 	CmdRuntimeAdd        = ModelAsset + `::` + EntityRuntime + `:` + ActionAdd
@@ -97,6 +99,8 @@ const (
 	CmdOrchestrationPropUpdate = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropUpdate
 	CmdOrchestrationRemove     = ModelAsset + `::` + EntityOrchestration + `:` + ActionRemove
 	CmdOrchestrationShow       = ModelAsset + `::` + EntityOrchestration + `:` + ActionShow
+
+	MetaPropertyCmdStack = ModelAsset + `::` + `meta-cmd` + `::` + ActionStack
 )
 
 const (
