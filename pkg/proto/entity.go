@@ -14,6 +14,8 @@ type Entity interface {
 	ParseTomID() error
 	PropertyIterator() <-chan PropertyDetail
 	SetTomID() Entity
+	ExportName() string
+	ExportNamespace() string
 }
 
 func ParseTomID(s string) (error, string, Entity) {
