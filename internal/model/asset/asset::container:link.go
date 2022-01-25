@@ -77,14 +77,17 @@ func (m *Model) ContainerLink(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	for prop, obj := range request.Container.Property {
-		if request.Container.Property[prop].Attribute != proto.ActionLink {
+		if request.Container.Property[prop].Attribute != proto.MetaPropertyCmdLink {
 			m.x.ReplyBadRequest(&w, &request, nil)
 			return
 		}
-		if err := proto.OnlyUnreserved(
-			request.Container.Property[prop].Attribute,
+		if err, entityType, _ := proto.ParseTomID(
+			request.Container.Property[prop].Value,
 		); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		} else if entityType != proto.EntityContainer {
+			m.x.ReplyBadRequest(&w, &request, nil)
 			return
 		}
 		if err := proto.CheckPropertyConstraints(&obj); err != nil {

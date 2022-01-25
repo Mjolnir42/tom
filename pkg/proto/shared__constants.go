@@ -100,6 +100,7 @@ const (
 	CmdOrchestrationRemove     = ModelAsset + `::` + EntityOrchestration + `:` + ActionRemove
 	CmdOrchestrationShow       = ModelAsset + `::` + EntityOrchestration + `:` + ActionShow
 
+	MetaPropertyCmdLink  = ModelAsset + `::` + `meta-cmd` + `::` + ActionLink
 	MetaPropertyCmdStack = ModelAsset + `::` + `meta-cmd` + `::` + ActionStack
 )
 

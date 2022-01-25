@@ -53,8 +53,8 @@ func cmdAssetRuntimeLink(c *cli.Context) error {
 		if err := proto.OnlyUnreserved(target.Name); err != nil {
 			return err
 		}
-		req.Runtime.Property[target.FormatDNS()] = proto.PropertyDetail{
-			Attribute:  proto.ActionLink,
+		req.Runtime.Property[proto.MetaPropertyCmdLink+`::`+target.FormatDNS()] = proto.PropertyDetail{
+			Attribute:  proto.MetaPropertyCmdLink,
 			Value:      target.FormatDNS(),
 			ValidSince: `perpetual`,
 			ValidUntil: `perpetual`,
