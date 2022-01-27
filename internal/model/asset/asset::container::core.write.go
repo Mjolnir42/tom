@@ -104,7 +104,6 @@ func (h *ContainerWriteHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.NamespaceAttributeQueryType:   &h.stmtAttQueryType,
 		stmt.ContainerAdd:                  &h.stmtAdd,
 		stmt.ContainerLink:                 &h.stmtLink,
 		stmt.ContainerRemove:               &h.stmtRemove,
@@ -114,6 +113,7 @@ func (h *ContainerWriteHandler) Run() {
 		stmt.ContainerTxUniqPropertyAdd:    &h.stmtTxUniqPropAdd,
 		stmt.ContainerTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
 		stmt.ContainerTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
+		stmt.NamespaceAttributeQueryType:   &h.stmtAttQueryType,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

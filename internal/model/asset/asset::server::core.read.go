@@ -19,19 +19,19 @@ import (
 
 // ServerReadHandler ...
 type ServerReadHandler struct {
-	Input         chan msg.Request
-	Shutdown      chan struct{}
-	name          string
-	conn          *sql.DB
-	lm            *lhm.LogHandleMap
-	stmtAttribute *sql.Stmt
-	stmtFind      *sql.Stmt
-	stmtList      *sql.Stmt
-	stmtParent    *sql.Stmt
-	stmtLinked    *sql.Stmt
-	stmtTxShow    *sql.Stmt
-	stmtTxProp    *sql.Stmt
+	Input          chan msg.Request
+	Shutdown       chan struct{}
+	name           string
+	conn           *sql.DB
+	lm             *lhm.LogHandleMap
+	stmtAttribute  *sql.Stmt
+	stmtFind       *sql.Stmt
+	stmtLinked     *sql.Stmt
+	stmtList       *sql.Stmt
+	stmtParent     *sql.Stmt
 	stmtTxChildren *sql.Stmt
+	stmtTxProp     *sql.Stmt
+	stmtTxShow     *sql.Stmt
 }
 
 // NewServerReadHandler returns a new handler instance
@@ -91,12 +91,12 @@ func (h *ServerReadHandler) Run() {
 	for statement, prepared := range map[string]**sql.Stmt{
 		stmt.ServerAttribute:        &h.stmtAttribute,
 		stmt.ServerFind:             &h.stmtFind,
-		stmt.ServerListLinked:       &h.stmtLinked,
 		stmt.ServerList:             &h.stmtList,
+		stmt.ServerListLinked:       &h.stmtLinked,
 		stmt.ServerParent:           &h.stmtParent,
 		stmt.ServerTxShow:           &h.stmtTxShow,
-		stmt.ServerTxShowProperties: &h.stmtTxProp,
 		stmt.ServerTxShowChildren:   &h.stmtTxChildren,
+		stmt.ServerTxShowProperties: &h.stmtTxProp,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
