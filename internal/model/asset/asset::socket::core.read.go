@@ -26,10 +26,10 @@ type SocketReadHandler struct {
 	name       string
 	conn       *sql.DB
 	lm         *lhm.LogHandleMap
-	stmtList   *sql.Stmt
-	stmtShow   *sql.Stmt
-	stmtProp   *sql.Stmt
 	stmtLinked *sql.Stmt
+	stmtList   *sql.Stmt
+	stmtProp   *sql.Stmt
+	stmtShow   *sql.Stmt
 }
 
 // NewSocketReadHandler returns a new handler instance

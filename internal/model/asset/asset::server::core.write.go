@@ -28,15 +28,15 @@ type ServerWriteHandler struct {
 	stmtAttQueryType     *sql.Stmt
 	stmtLink             *sql.Stmt
 	stmtRemove           *sql.Stmt
+	stmtTxRuntimeShow    *sql.Stmt
+	stmtTxStackAdd       *sql.Stmt
+	stmtTxStackClamp     *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
 	stmtTxStdPropSelect  *sql.Stmt
 	stmtTxUniqPropAdd    *sql.Stmt
 	stmtTxUniqPropClamp  *sql.Stmt
 	stmtTxUniqPropSelect *sql.Stmt
-	stmtTxStackAdd       *sql.Stmt
-	stmtTxStackClamp     *sql.Stmt
-	stmtTxRuntimeShow    *sql.Stmt
 }
 
 // NewServerWriteHandler returns a new handler instance
@@ -111,18 +111,18 @@ func (h *ServerWriteHandler) Run() {
 
 	for statement, prepared := range map[string]**sql.Stmt{
 		stmt.NamespaceAttributeQueryType: &h.stmtAttQueryType,
+		stmt.RuntimeTxShow:               &h.stmtTxRuntimeShow,
 		stmt.ServerAdd:                   &h.stmtAdd,
 		stmt.ServerLink:                  &h.stmtLink,
 		stmt.ServerRemove:                &h.stmtRemove,
+		stmt.ServerTxStackAdd:            &h.stmtTxStackAdd,
+		stmt.ServerTxStackClamp:          &h.stmtTxStackClamp,
 		stmt.ServerTxStdPropertyAdd:      &h.stmtTxStdPropAdd,
 		stmt.ServerTxStdPropertyClamp:    &h.stmtTxStdPropClamp,
 		stmt.ServerTxStdPropertySelect:   &h.stmtTxStdPropSelect,
 		stmt.ServerTxUniqPropertyAdd:     &h.stmtTxUniqPropAdd,
 		stmt.ServerTxUniqPropertyClamp:   &h.stmtTxUniqPropClamp,
 		stmt.ServerTxUniqPropertySelect:  &h.stmtTxUniqPropSelect,
-		stmt.ServerTxStackAdd:            &h.stmtTxStackAdd,
-		stmt.ServerTxStackClamp:          &h.stmtTxStackClamp,
-		stmt.RuntimeTxShow:               &h.stmtTxRuntimeShow,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

@@ -19,16 +19,16 @@ import (
 
 // RuntimeReadHandler ...
 type RuntimeReadHandler struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	name       string
-	conn       *sql.DB
-	lm         *lhm.LogHandleMap
-	stmtLinked *sql.Stmt
-	stmtList   *sql.Stmt
-	stmtParent *sql.Stmt
-	stmtProp   *sql.Stmt
-	stmtShow   *sql.Stmt
+	Input          chan msg.Request
+	Shutdown       chan struct{}
+	name           string
+	conn           *sql.DB
+	lm             *lhm.LogHandleMap
+	stmtLinked     *sql.Stmt
+	stmtList       *sql.Stmt
+	stmtParent     *sql.Stmt
+	stmtProp       *sql.Stmt
+	stmtShow       *sql.Stmt
 	stmtTxChildren *sql.Stmt
 }
 
