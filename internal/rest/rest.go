@@ -101,8 +101,14 @@ func DecodeJSONBody(r *http.Request, s interface{}) error {
 				}
 			}
 			if c.Orchestration != nil {
+				if c.Orchestration.Parent == nil {
+					c.Orchestration.Parent = []string{}
+				}
 				if c.Orchestration.Link == nil {
 					c.Orchestration.Link = []string{}
+				}
+				if c.Orchestration.Children == nil {
+					c.Orchestration.Children = []string{}
 				}
 				if c.Orchestration.Property == nil {
 					c.Orchestration.Property = map[string]proto.PropertyDetail{}
@@ -112,6 +118,9 @@ func DecodeJSONBody(r *http.Request, s interface{}) error {
 				if c.Runtime.Link == nil {
 					c.Runtime.Link = []string{}
 				}
+				if c.Runtime.Children == nil {
+					c.Runtime.Children = []string{}
+				}
 				if c.Runtime.Property == nil {
 					c.Runtime.Property = map[string]proto.PropertyDetail{}
 				}
@@ -119,6 +128,9 @@ func DecodeJSONBody(r *http.Request, s interface{}) error {
 			if c.Server != nil {
 				if c.Server.Link == nil {
 					c.Server.Link = []string{}
+				}
+				if c.Server.Children == nil {
+					c.Server.Children = []string{}
 				}
 				if c.Server.Property == nil {
 					c.Server.Property = map[string]proto.PropertyDetail{}

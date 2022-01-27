@@ -31,6 +31,7 @@ type ServerReadHandler struct {
 	stmtLinked    *sql.Stmt
 	stmtTxShow    *sql.Stmt
 	stmtTxProp    *sql.Stmt
+	stmtTxChildren *sql.Stmt
 }
 
 // NewServerReadHandler returns a new handler instance
@@ -95,6 +96,7 @@ func (h *ServerReadHandler) Run() {
 		stmt.ServerParent:           &h.stmtParent,
 		stmt.ServerTxShow:           &h.stmtTxShow,
 		stmt.ServerTxShowProperties: &h.stmtTxProp,
+		stmt.ServerTxShowChildren:   &h.stmtTxChildren,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

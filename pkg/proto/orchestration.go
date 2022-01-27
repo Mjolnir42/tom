@@ -45,6 +45,7 @@ type Orchestration struct {
 	Type         string                    `json:"type"`
 	Parent       []string                  `json:"parent"`
 	Link         []string                  `json:"link"`
+	Children     []string                  `json:"children"`
 	Property     map[string]PropertyDetail `json:"property"`
 	CreatedAt    string                    `json:"createdAt"`
 	CreatedBy    string                    `json:"createdBy"`
@@ -52,6 +53,17 @@ type Orchestration struct {
 	TomID        string                    `json:"-"`
 	StdProperty  []PropertyDetail          `json:"-"`
 	UniqProperty []PropertyDetail          `json:"-"`
+}
+
+func NewOrchestrationRequest() Request {
+	return Request{
+		Orchestration: &Orchestration{
+			Parent:   []string{},
+			Link:     []string{},
+			Children: []string{},
+			Property: map[string]PropertyDetail{},
+		},
+	}
 }
 
 // OrchestrationHeader defines ....

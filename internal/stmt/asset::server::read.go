@@ -236,6 +236,25 @@ FROM        meta.dictionary
 WHERE       meta.dictionary.dictionaryID = $1::uuid
      AND    asset.server_standard_attribute_values.serverID = $2::uuid
      AND    $3::timestamptz(3) <@ asset.server_standard_attribute_values.validity;`
+
+	ServerTxShowChildren = `
+SELECT      asset.runtime_environment_unique_attribute_values.value,
+            meta.dictionary.name
+FROM        asset.runtime_environment_parent
+    JOIN    asset.runtime_environment
+      ON    asset.runtime_environment_parent.rteID = asset.runtime_environment.rteID
+    JOIN    meta.dictionary
+      ON    asset.runtime_environment.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.runtime_environment_unique_attribute_values
+      ON    asset.runtime_environment.rteID = asset.runtime_environment_unique_attribute_values.rteID
+		 AND    meta.unique_attribute.dictionaryID = asset.runtime_environment_unique_attribute_values.dictionaryID
+     AND    meta.unique_attribute.attributeID  = asset.runtime_environment_unique_attribute_values.attributeID
+WHERE       asset.runtime_environment_parent.parentServerID = $1::uuid
+     AND    meta.unique_attribute.attribute = 'name'::text
+     AND    $2::timestamptz(3) <@ asset.runtime_environment_parent.validity
+     AND    $2::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
 )
 
 func init() {
@@ -244,6 +263,7 @@ func init() {
 	m[ServerListLinked] = `ServerListLinked`
 	m[ServerList] = `ServerList`
 	m[ServerParent] = `ServerParent`
+	m[ServerTxShowChildren] = `ServerTxShowChildren`
 	m[ServerTxShowProperties] = `ServerTxShowProperties`
 	m[ServerTxShow] = `ServerTxShow`
 }

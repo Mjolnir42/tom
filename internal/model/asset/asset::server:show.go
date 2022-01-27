@@ -92,11 +92,13 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	txTime := time.Now().UTC()
 	txShow := tx.Stmt(h.stmtTxShow)
 	txProp := tx.Stmt(h.stmtTxProp)
+	txChildren := tx.Stmt(h.stmtTxChildren)
 
 	server := proto.Server{
 		Namespace: q.Server.Namespace,
 		Name:      q.Server.Name,
 		Link:      []string{},
+		Children:  []string{},
 	}
 	name := proto.PropertyDetail{
 		Attribute: `name`,
@@ -220,6 +222,36 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 			Namespace: rteDictName,
 			Name:      rteName,
 		}).FormatTomID()
+	}
+
+	// query children
+	if rows, err = txChildren.Query(
+		serverID,
+		txTime,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	for rows.Next() {
+		var chldName, chldDictName string
+		if err = rows.Scan(
+			&chldName,
+			&chldDictName,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			return
+		}
+		// servers can only have runtimes as children
+		server.Children = append(server.Children, (&proto.Runtime{
+			Namespace: chldDictName,
+			Name:      chldName,
+		}).FormatTomID())
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
 	}
 
 	// fetch linked servers

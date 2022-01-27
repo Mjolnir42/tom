@@ -213,12 +213,71 @@ WHERE       asset.runtime_environment.rteID = $1::uuid
             -- registered parent is still valid, based on the validity of the parent's name
      AND    $2::timestamptz(3) <@ asset.orchestration_environment_unique_attribute_values.validity
      AND    meta.unique_attribute.attribute IN ('name');`
+
+	RuntimeTxShowChildren = `
+SELECT      'server'::text AS childEntity,
+            asset.server_unique_attribute_values.value AS childName,
+            meta.dictionary.name AS childDictName
+FROM        asset.server_parent
+    JOIN    asset.server
+      ON    asset.server_parent.serverID = asset.server.serverID
+    JOIN    meta.dictionary
+      ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.server_unique_attribute_values
+      ON    asset.server.serverID = asset.server_unique_attribute_values.serverID
+     AND    meta.unique_attribute.dictionaryID = asset.server_unique_attribute_values.dictionaryID
+     AND    meta.unique_attribute.attributeID  = asset.server_unique_attribute_values.attributeID
+WHERE       asset.server_parent.parentRuntimeID = $1::uuid
+     AND    meta.unique_attribute.attribute = 'name'::text
+     AND    $2::timestamptz(3) <@ asset.server_parent.validity
+     AND    $2::timestamptz(3) <@ asset.server_unique_attribute_values.validity
+UNION
+SELECT      'orchestration'::text AS childEntity,
+            asset.orchestration_environment_unique_attribute_values.value AS childName,
+            meta.dictionary.name AS childDictName
+FROM        asset.orchestration_environment_mapping
+    JOIN    asset.orchestration_environment
+      ON    asset.orchestration_environment_mapping.orchID = asset.orchestration_environment.orchID
+    JOIN    meta.dictionary
+      ON    asset.orchestration_environment.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.orchestration_environment_unique_attribute_values
+      ON    asset.orchestration_environment.orchID = asset.orchestration_environment_unique_attribute_values.orchID
+     AND    meta.unique_attribute.dictionaryID = asset.orchestration_environment_unique_attribute_values.dictionaryID
+     AND    meta.unique_attribute.attributeID  = asset.orchestration_environment_unique_attribute_values.attributeID
+WHERE       asset.orchestration_environment_mapping.parentRuntimeID = $1::uuid
+     AND    meta.unique_attribute.attribute = 'name'::text
+     AND    $2::timestamptz(3) <@ asset.orchestration_environment_mapping.validity
+     AND    $2::timestamptz(3) <@ asset.orchestration_environment_unique_attribute_values.validity
+UNION
+SELECT      'runtime'::text AS childEntity,
+            asset.runtime_environment_unique_attribute_values.value AS childName,
+            meta.dictionary.name AS childDictName
+FROM        asset.runtime_environment_parent
+    JOIN    asset.runtime_environment
+      ON    asset.runtime_environment_parent.rteID = asset.runtime_environment.rteID
+    JOIN    meta.dictionary
+      ON    asset.runtime_environment.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.runtime_environment_unique_attribute_values
+      ON    asset.runtime_environment.rteID = asset.runtime_environment_unique_attribute_values.rteID
+     AND    meta.unique_attribute.dictionaryID = asset.runtime_environment_unique_attribute_values.dictionaryID
+     AND    meta.unique_attribute.attributeID  = asset.runtime_environment_unique_attribute_values.attributeID
+WHERE       asset.runtime_environment_parent.parentRuntimeID = $1::uuid
+     AND    meta.unique_attribute.attribute = 'name'::text
+     AND    $2::timestamptz(3) <@ asset.runtime_environment_parent.validity
+     AND    $2::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
 )
 
 func init() {
 	m[RuntimeListLinked] = `RuntimeListLinked`
 	m[RuntimeList] = `RuntimeList`
 	m[RuntimeParent] = `RuntimeParent`
+	m[RuntimeTxShowChildren] = `RuntimeTxShowChildren`
 	m[RuntimeTxShowProperties] = `RuntimeTxShowProperties`
 	m[RuntimeTxShow] = `RuntimeTxShow`
 }
