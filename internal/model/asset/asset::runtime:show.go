@@ -101,11 +101,13 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 	txShow := tx.Stmt(h.stmtShow)
 	txProp := tx.Stmt(h.stmtProp)
 	txParent := tx.Stmt(h.stmtParent)
+	txChildren := tx.Stmt(h.stmtTxChildren)
 
 	rte := proto.Runtime{
 		Namespace: q.Runtime.Namespace,
 		Name:      q.Runtime.Name,
 		Link:      []string{},
+		Children:  []string{},
 	}
 	name := proto.PropertyDetail{
 		Attribute: `name`,
@@ -245,6 +247,53 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError()
 			return
 		}
+	}
+
+	// query children
+	if rows, err = txChildren.Query(
+		rteID,
+		txTime,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	for rows.Next() {
+		var chldEntity, chldName, chldDictName string
+		if err = rows.Scan(
+			&chldEntity,
+			&chldName,
+			&chldDictName,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			return
+		}
+		switch chldEntity {
+		case proto.EntityRuntime:
+			rte.Children = append(rte.Children, (&proto.Runtime{
+				Namespace: chldDictName,
+				Name:      chldName,
+			}).FormatTomID())
+		case proto.EntityServer:
+			rte.Children = append(rte.Children, (&proto.Server{
+				Namespace: chldDictName,
+				Name:      chldName,
+			}).FormatTomID())
+		case proto.EntityOrchestration:
+			rte.Children = append(rte.Children, (&proto.Orchestration{
+				Namespace: chldDictName,
+				Name:      chldName,
+			}).FormatTomID())
+		default:
+			rows.Close()
+			mr.ServerError()
+			return
+		}
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
 	}
 
 	// fetch linked runtimes
