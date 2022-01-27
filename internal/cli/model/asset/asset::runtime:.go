@@ -85,6 +85,13 @@ func registerAssetRuntime(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetRuntimeLink),
 						BashComplete: cmpl.RuntimeLink,
 					},
+					{
+						Name:         `stack`,
+						Usage:        `Specify the base this runtime runs on`,
+						Description:  help.Text(proto.CmdRuntimeStack),
+						Action:       run(cmdAssetRuntimeStack),
+						BashComplete: cmpl.RuntimeStack,
+					},
 				},
 			},
 		}...,

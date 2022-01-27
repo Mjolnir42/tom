@@ -64,6 +64,13 @@ func init() {
 		ResultTmpl:  TemplateDetail,
 		Placeholder: []string{PlHoldTomID},
 	}
+	Commands[CmdRuntimeStack] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/runtime/` + PlHoldTomID + `/parent`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
 }
 
 // Runtime defines a runtime within the asset model
