@@ -24,11 +24,11 @@ type RuntimeReadHandler struct {
 	name       string
 	conn       *sql.DB
 	lm         *lhm.LogHandleMap
+	stmtLinked *sql.Stmt
 	stmtList   *sql.Stmt
-	stmtShow   *sql.Stmt
 	stmtParent *sql.Stmt
 	stmtProp   *sql.Stmt
-	stmtLinked *sql.Stmt
+	stmtShow   *sql.Stmt
 }
 
 // NewRuntimeReadHandler returns a new handler instance
