@@ -26,6 +26,7 @@ type RuntimeReadHandler struct {
 	lm         *lhm.LogHandleMap
 	stmtList   *sql.Stmt
 	stmtShow   *sql.Stmt
+	stmtParent *sql.Stmt
 	stmtProp   *sql.Stmt
 	stmtLinked *sql.Stmt
 }
@@ -88,6 +89,7 @@ func (h *RuntimeReadHandler) Run() {
 	for statement, prepared := range map[string]**sql.Stmt{
 		stmt.RuntimeList:             &h.stmtList,
 		stmt.RuntimeListLinked:       &h.stmtLinked,
+		stmt.RuntimeParent:           &h.stmtParent,
 		stmt.RuntimeTxShow:           &h.stmtShow,
 		stmt.RuntimeTxShowProperties: &h.stmtProp,
 	} {

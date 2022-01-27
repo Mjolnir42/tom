@@ -100,6 +100,7 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 	txTime := time.Now().UTC()
 	txShow := tx.Stmt(h.stmtShow)
 	txProp := tx.Stmt(h.stmtProp)
+	txParent := tx.Stmt(h.stmtParent)
 
 	rte := proto.Runtime{
 		Namespace: q.Runtime.Namespace,
@@ -202,6 +203,48 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err)
 		return
+	}
+
+	// fetch parent information for stacked runtimes
+	var hasParent bool = true
+	var ptEntity, ptObjID, ptDictID, ptDictName, ptObjName string
+	if err = txParent.QueryRow(
+		rteID,
+		txTime,
+	).Scan(
+		&ptEntity,
+		&ptObjID,
+		&ptDictID,
+		&ptDictName,
+		&ptObjName,
+	); err == sql.ErrNoRows {
+		// not an error
+		hasParent = false
+	} else if err != nil {
+		mr.ServerError(err)
+		return
+	}
+	if hasParent {
+		switch ptEntity {
+		case proto.EntityRuntime:
+			rte.Parent = (&proto.Runtime{
+				Namespace: ptDictName,
+				Name:      ptObjName,
+			}).FormatTomID()
+		case proto.EntityServer:
+			rte.Parent = (&proto.Server{
+				Namespace: ptDictName,
+				Name:      ptObjName,
+			}).FormatTomID()
+		case proto.EntityOrchestration:
+			rte.Parent = (&proto.Orchestration{
+				Namespace: ptDictName,
+				Name:      ptObjName,
+			}).FormatTomID()
+		default:
+			mr.ServerError()
+			return
+		}
 	}
 
 	// fetch linked runtimes

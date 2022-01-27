@@ -134,12 +134,92 @@ FROM        meta.dictionary
 WHERE       meta.dictionary.dictionaryID = $1::uuid
      AND    asset.runtime_environment_standard_attribute_values.rteID = $2::uuid
      AND    $3::timestamptz(3) <@ asset.runtime_environment_standard_attribute_values.validity;`
+
+	RuntimeParent = `
+SELECT      'runtime'::text                                         AS entity,
+            asset.runtime_environment.rteID                         AS objID,
+            asset.runtime_environment.dictionaryID                  AS dictID,
+            meta.dictionary.name                                    AS dictName,
+            asset.runtime_environment_unique_attribute_values.value AS objName
+FROM        asset.runtime_environment
+    JOIN    asset.runtime_environment_parent
+      ON    asset.runtime_environment.rteID = asset.runtime_environment_parent.rteID
+    JOIN    asset.runtime_environment AS parent
+      ON    asset.runtime_environment_parent.parentRuntimeID = parent.rteID
+    JOIN    meta.dictionary
+      ON    parent.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.runtime_environment_unique_attribute_values
+      ON    asset.runtime_environment_unique_attribute_values.rteID = parent.rteID
+     AND    asset.runtime_environment_unique_attribute_values.dictionaryID = parent.dictionaryID
+     AND    asset.runtime_environment_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+            -- runtime environment for which the parent is searched
+WHERE       asset.runtime_environment.rteID = $1::uuid
+            -- parent relationship is currently valid
+     AND    $2::timestamptz(3) <@ asset.runtime_environment_parent.validity
+            -- registered parent is still valid, based on the validity of the parent's name
+     AND    $2::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity
+     AND    meta.unique_attribute.attribute IN ('name')
+UNION
+SELECT      'server'::text                             AS entity,
+            asset.server.serverID                      AS objID,
+            asset.server.dictionaryID                  AS dictID,
+            meta.dictionary.name                       AS dictName,
+            asset.server_unique_attribute_values.value AS objName
+FROM        asset.runtime_environment
+    JOIN    asset.runtime_environment_parent
+      ON    asset.runtime_environment.rteID = asset.runtime_environment_parent.rteID
+    JOIN    asset.server
+      ON    asset.runtime_environment_parent.parentServerID = asset.server.serverID
+    JOIN    meta.dictionary
+      ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.server_unique_attribute_values
+      ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
+     AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
+     AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+            -- runtime environment for which the parent is searched
+WHERE       asset.runtime_environment.rteID = $1::uuid
+            -- parent relationship is currently valid
+     AND    $2::timestamptz(3) <@ asset.runtime_environment_parent.validity
+            -- registered parent is still valid, based on the validity of the parent's name
+     AND    $2::timestamptz(3) <@ asset.server_unique_attribute_values.validity
+     AND    meta.unique_attribute.attribute IN ('name')
+UNION
+SELECT      'orchestration'::text                                         AS entity,
+            asset.orchestration_environment.orchID                        AS objID,
+            asset.orchestration_environment.dictionaryID                  AS dictID,
+            meta.dictionary.name                                          AS dictName,
+            asset.orchestration_environment_unique_attribute_values.value AS objName
+FROM        asset.runtime_environment
+    JOIN    asset.runtime_environment_parent
+      ON    asset.runtime_environment.rteID = asset.runtime_environment_parent.rteID
+    JOIN    asset.orchestration_environment
+      ON    asset.runtime_environment_parent.parentOrchestrationID = asset.orchestration_environment.orchID
+    JOIN    meta.dictionary
+      ON    asset.orchestration_environment.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.orchestration_environment_unique_attribute_values
+      ON    asset.orchestration_environment_unique_attribute_values.orchID = asset.orchestration_environment.orchID
+     AND    asset.orchestration_environment_unique_attribute_values.dictionaryID = asset.orchestration_environment.dictionaryID
+     AND    asset.orchestration_environment_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+            -- runtime environment for which the parent is searched
+WHERE       asset.runtime_environment.rteID = $1::uuid
+            -- parent relationship is currently valid
+     AND    $2::timestamptz(3) <@ asset.runtime_environment_parent.validity
+            -- registered parent is still valid, based on the validity of the parent's name
+     AND    $2::timestamptz(3) <@ asset.orchestration_environment_unique_attribute_values.validity
+     AND    meta.unique_attribute.attribute IN ('name');`
 )
 
 func init() {
 	m[RuntimeList] = `RuntimeList`
 	m[RuntimeListLinked] = `RuntimeListLinked`
 	m[RuntimeTxShow] = `RuntimeTxShow`
+	m[RuntimeParent] = `RuntimeParent`
 	m[RuntimeTxShowProperties] = `RuntimeTxShowProperties`
 }
 
