@@ -216,11 +216,11 @@ WHERE       asset.runtime_environment.rteID = $1::uuid
 )
 
 func init() {
-	m[RuntimeList] = `RuntimeList`
 	m[RuntimeListLinked] = `RuntimeListLinked`
-	m[RuntimeTxShow] = `RuntimeTxShow`
+	m[RuntimeList] = `RuntimeList`
 	m[RuntimeParent] = `RuntimeParent`
 	m[RuntimeTxShowProperties] = `RuntimeTxShowProperties`
+	m[RuntimeTxShow] = `RuntimeTxShow`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
