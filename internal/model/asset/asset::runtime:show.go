@@ -226,7 +226,12 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		rte.Link = append(rte.Link, linkedRteName+`.`+linkedDictName+`.runtime.tom`)
+
+		rte.Link = append(rte.Link, (&proto.Runtime{
+			Namespace: linkedDictName,
+			Name:      linkedRteName,
+		}).FormatTomID())
+
 		linklist = append(linklist, []string{
 			linkedRteID,
 			linkedDictID,
