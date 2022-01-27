@@ -236,6 +236,38 @@ SELECT            $1::uuid,
                   sel_uid.userID,
                   $7::timestamptz(3)
 FROM              sel_uid;`
+
+	RuntimeTxStackAdd = `
+WITH sel_uid AS ( SELECT inventory.user.userID
+                  FROM   inventory.user
+                  JOIN   inventory.identity_library
+                    ON   inventory.identity_library.identityLibraryID
+                    =    inventory.user.identityLibraryID
+                  WHERE  inventory.user.uid = $8::text
+                    AND  inventory.identity_library.name = $9::text)
+INSERT INTO       asset.runtime_environment_parent (
+                         rteID,
+                         parentServerID,
+                         parentRuntimeID,
+                         parentOrchestrationID,
+                         validity,
+                         createdBy,
+                         createdAt
+                  )
+SELECT            $1::uuid,
+                  $2::uuid,
+                  $3::uuid,
+                  $4::uuid,
+                  tstzrange($5::timestamptz(3), $6::timestamptz(3), '[]'),
+                  sel_uid.userID,
+                  $7::timestamptz(3)
+FROM              sel_uid;`
+
+	RuntimeTxStackClamp = `
+UPDATE            asset.runtime_environment_parent
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.runtime_environment_parent.rteID = $2::uuid
+  AND             $1::timestamptz(3) <@ asset.runtime_environment_parent.validity;`
 )
 
 func init() {
@@ -247,6 +279,8 @@ func init() {
 	m[RuntimeDelNamespace] = `RuntimeDelNamespace`
 	m[RuntimeLink] = `RuntimeLink`
 	m[RuntimeRemove] = `RuntimeRemove`
+	m[RuntimeTxStackAdd] = `RuntimeTxStackAdd`
+	m[RuntimeTxStackClamp] = `RuntimeTxStackClamp`
 	m[RuntimeTxStdPropertyAdd] = `RuntimeTxStdPropertyAdd`
 	m[RuntimeTxStdPropertyClamp] = `RuntimeTxStdPropertyClamp`
 	m[RuntimeTxStdPropertySelect] = `RuntimeTxStdPropertySelect`

@@ -90,6 +90,7 @@ const (
 	CmdRuntimePropUpdate = ModelAsset + `::` + EntityRuntime + `:` + ActionPropUpdate
 	CmdRuntimeRemove     = ModelAsset + `::` + EntityRuntime + `:` + ActionRemove
 	CmdRuntimeShow       = ModelAsset + `::` + EntityRuntime + `:` + ActionShow
+	CmdRuntimeStack      = ModelAsset + `::` + EntityRuntime + `:` + ActionStack
 
 	CmdOrchestration           = ModelAsset + `::` + EntityOrchestration + `:`
 	CmdOrchestrationAdd        = ModelAsset + `::` + EntityOrchestration + `:` + ActionAdd

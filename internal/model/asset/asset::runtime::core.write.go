@@ -28,6 +28,11 @@ type RuntimeWriteHandler struct {
 	stmtAttQueryType     *sql.Stmt
 	stmtLink             *sql.Stmt
 	stmtRemove           *sql.Stmt
+	stmtTxOrchShow       *sql.Stmt
+	stmtTxServerShow     *sql.Stmt
+	stmtTxShow           *sql.Stmt
+	stmtTxStackAdd       *sql.Stmt
+	stmtTxStackClamp     *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
 	stmtTxStdPropSelect  *sql.Stmt
@@ -54,6 +59,7 @@ func (h *RuntimeWriteHandler) Register(hm *handler.Map) {
 		proto.ActionPropSet,
 		proto.ActionPropUpdate,
 		proto.ActionRemove,
+		proto.ActionStack,
 	} {
 		hm.Request(msg.SectionRuntime, action, h.name)
 	}
@@ -77,6 +83,8 @@ func (h *RuntimeWriteHandler) process(q *msg.Request) {
 		h.propertyUpdate(q, &result)
 	case proto.ActionRemove:
 		h.remove(q, &result)
+	case proto.ActionStack:
+		h.stack(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -105,15 +113,20 @@ func (h *RuntimeWriteHandler) Run() {
 
 	for statement, prepared := range map[string]**sql.Stmt{
 		stmt.NamespaceAttributeQueryType: &h.stmtAttQueryType,
+		stmt.OrchestrationTxShow:         &h.stmtTxOrchShow,
 		stmt.RuntimeAdd:                  &h.stmtAdd,
 		stmt.RuntimeLink:                 &h.stmtLink,
 		stmt.RuntimeRemove:               &h.stmtRemove,
+		stmt.RuntimeTxShow:               &h.stmtTxShow,
+		stmt.RuntimeTxStackAdd:           &h.stmtTxStackAdd,
+		stmt.RuntimeTxStackClamp:         &h.stmtTxStackClamp,
 		stmt.RuntimeTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
 		stmt.RuntimeTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
 		stmt.RuntimeTxStdPropertySelect:  &h.stmtTxStdPropSelect,
 		stmt.RuntimeTxUniqPropertyAdd:    &h.stmtTxUniqPropAdd,
 		stmt.RuntimeTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
 		stmt.RuntimeTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
+		stmt.ServerTxShow:                &h.stmtTxServerShow,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
