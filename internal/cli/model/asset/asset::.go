@@ -17,6 +17,7 @@ func Register(app cli.App, run ActionFunc) *cli.App {
 	app = *registerAssetServer(app, run)
 	app = *registerAssetRuntime(app, run)
 	app = *registerAssetContainer(app, run)
+	app = *registerAssetOrchestration(app, run)
 	return &app
 }
 

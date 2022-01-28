@@ -590,6 +590,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		fallthrough
 	case proto.CmdServerAdd:
 		fallthrough
+	case proto.CmdOrchestrationAdd:
+		fallthrough
 	case proto.CmdRuntimeAdd:
 		return []string{`property`}, []string{`namespace`, `type`, `since`, `until`}, []string{`namespace`, `type`}
 	case proto.CmdContainerList, proto.CmdContainerShow, proto.CmdContainerRemove:

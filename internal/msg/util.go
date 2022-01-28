@@ -8,8 +8,81 @@
 package msg // import "github.com/mjolnir42/tom/internal/msg"
 
 import (
+	"fmt"
 	"time"
 )
+
+//
+func ResolveValidSince(s string, t, tx *time.Time) (err error) {
+	switch s {
+	case `always`:
+		*t = NegTimeInf
+	case `forever`, `perpetual`:
+		err = fmt.Errorf("Invalid keyword for ValidSince: %s", s)
+	case ``:
+		*t = *tx
+	default:
+		*t, err = time.Parse(
+			RFC3339Milli,
+			s,
+		)
+	}
+	return
+}
+
+//
+func ResolvePValidSince(s string, t, tx *time.Time) (err error) {
+	switch s {
+	case `always`, `perpetual`:
+		*t = NegTimeInf
+	case `forever`:
+		err = fmt.Errorf("Invalid keyword for ValidSince: %s", s)
+	case ``:
+		*t = *tx
+	default:
+		*t, err = time.Parse(
+			RFC3339Milli,
+			s,
+		)
+	}
+	return
+}
+
+//
+func ResolveValidUntil(s string, t, tx *time.Time) (err error) {
+	switch s {
+	case `always`, `perpetual`:
+		err = fmt.Errorf("Invalid keyword for ValidSince: %s", s)
+	case `forever`:
+		*t = PosTimeInf
+	case ``:
+		*t = PosTimeInf
+	default:
+		*t, err = time.Parse(
+			RFC3339Milli,
+			s,
+		)
+	}
+	return
+}
+
+//
+func ResolvePValidUntil(s string, t, tx *time.Time) (err error) {
+	switch s {
+	case `always`:
+		err = fmt.Errorf("Invalid keyword for ValidSince: %s", s)
+	case `forever`, `perpetual`:
+		*t = PosTimeInf
+	case ``:
+		*t = PosTimeInf
+	default:
+		*t, err = time.Parse(
+			RFC3339Milli,
+			s,
+		)
+	}
+	return
+}
 
 //
 func ParseValidSince(s string, txNow *time.Time) (since *time.Time, err error) {

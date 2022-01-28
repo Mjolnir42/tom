@@ -20,6 +20,7 @@ func (m *Model) routeRegisterOrchestration(rt *httprouter.Router) {
 // handleRegisterOrchestration registers the orchestration application core handlers
 // in the provided handlermap
 func handleRegisterOrchestration(hm *handler.Map, length int) {
+	hm.Add(NewOrchestrationWriteHandler(length))
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
