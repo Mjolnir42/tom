@@ -8,7 +8,9 @@
 package asset // import "github.com/mjolnir42/tom/internal/model/asset/"
 
 import (
+	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
@@ -47,6 +49,9 @@ func (m *Model) OrchestrationList(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionOrchestration
 	request.Action = proto.ActionList
+	request.Orchestration = proto.Orchestration{
+		Namespace: r.URL.Query().Get(`namespace`),
+	}
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -56,6 +61,68 @@ func (m *Model) OrchestrationList(w http.ResponseWriter, r *http.Request,
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	m.x.Send(&w, &result, exportOrchestrationList)
+}
+
+// list returns all orchestration environments
+func (h *OrchestrationReadHandler) list(q *msg.Request, mr *msg.Result) {
+	var (
+		id, dictName, key, value, author string
+		creationTime                     time.Time
+		rows                             *sql.Rows
+		err                              error
+		namespace                        sql.NullString
+		orch                             proto.OrchestrationHeader
+		ok                               bool
+	)
+
+	if q.Orchestration.Namespace != `` {
+		namespace.String = q.Orchestration.Namespace
+		namespace.Valid = true
+	}
+
+	list := make(map[string]proto.OrchestrationHeader)
+	if rows, err = h.stmtList.Query(
+		namespace,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&id,
+			&dictName,
+			&key,
+			&value,
+			&author,
+			&creationTime,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			return
+		}
+		if orch, ok = list[id]; !ok {
+			orch = proto.OrchestrationHeader{}
+		}
+		orch.Namespace = dictName
+		switch key {
+		case `type`:
+			orch.Type = value
+		case `name`:
+			orch.Name = value
+			orch.CreatedBy = author
+			orch.CreatedAt = creationTime.Format(msg.RFC3339Milli)
+		}
+		list[id] = orch
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	for _, oenv := range list {
+		mr.OrchestrationHeader = append(mr.OrchestrationHeader, oenv)
+	}
+	mr.OK()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
