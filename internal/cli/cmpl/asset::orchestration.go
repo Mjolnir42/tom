@@ -19,4 +19,9 @@ func OrchestrationAdd(c *cli.Context) {
 	GenericMultiWithProperty(c, uniq, multi)
 }
 
+func OrchestrationList(c *cli.Context) {
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdOrchestrationList)
+	DirectMulti(c, uniq, multi)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -20,6 +20,7 @@ func (m *Model) routeRegisterOrchestration(rt *httprouter.Router) {
 // handleRegisterOrchestration registers the orchestration application core handlers
 // in the provided handlermap
 func handleRegisterOrchestration(hm *handler.Map, length int) {
+	hm.Add(NewOrchestrationReadHandler(length))
 	hm.Add(NewOrchestrationWriteHandler(length))
 }
 

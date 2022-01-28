@@ -29,6 +29,13 @@ func registerAssetOrchestration(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetOrchestrationAdd),
 						BashComplete: cmpl.OrchestrationAdd,
 					},
+					{
+						Name:         `list`,
+						Usage:        `List all existing orchestration environments`,
+						Description:  help.Text(proto.CmdOrchestrationList),
+						Action:       run(cmdAssetOrchestrationList),
+						BashComplete: cmpl.OrchestrationList,
+					},
 				},
 			},
 		}...,
