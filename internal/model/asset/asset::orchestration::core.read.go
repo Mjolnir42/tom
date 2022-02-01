@@ -25,6 +25,11 @@ type OrchestrationReadHandler struct {
 	conn           *sql.DB
 	lm             *lhm.LogHandleMap
 	stmtList       *sql.Stmt
+	stmtTxChildren *sql.Stmt
+	stmtTxLinks    *sql.Stmt
+	stmtTxParent   *sql.Stmt
+	stmtTxProp     *sql.Stmt
+	stmtTxShow     *sql.Stmt
 }
 
 // NewOrchestrationReadHandler returns a new handler instance
@@ -53,6 +58,8 @@ func (h *OrchestrationReadHandler) process(q *msg.Request) {
 	switch q.Action {
 	case proto.ActionList:
 		h.list(q, &result)
+	case proto.ActionShow:
+		h.show(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -80,7 +87,12 @@ func (h *OrchestrationReadHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.OrchestrationList:       &h.stmtList,
+		stmt.OrchestrationList:             &h.stmtList,
+		stmt.OrchestrationListLinked:       &h.stmtTxLinks,
+		stmt.OrchestrationTxParent:         &h.stmtTxParent,
+		stmt.OrchestrationTxShow:           &h.stmtTxShow,
+		stmt.OrchestrationTxShowChildren:   &h.stmtTxChildren,
+		stmt.OrchestrationTxShowProperties: &h.stmtTxProp,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
