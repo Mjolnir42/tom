@@ -25,7 +25,10 @@ type OrchestrationWriteHandler struct {
 	conn                 *sql.DB
 	lm                   *lhm.LogHandleMap
 	stmtAdd              *sql.Stmt
+	stmtAttAddStandard   *sql.Stmt
+	stmtAttDiscover      *sql.Stmt
 	stmtAttQueryType     *sql.Stmt
+	stmtTxShow           *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
 	stmtTxStdPropClean   *sql.Stmt
@@ -49,6 +52,7 @@ func NewOrchestrationWriteHandler(length int) (string, *OrchestrationWriteHandle
 func (h *OrchestrationWriteHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionAdd,
+		proto.ActionPropUpdate,
 	} {
 		hm.Request(msg.SectionOrchestration, action, h.name)
 	}
@@ -62,6 +66,8 @@ func (h *OrchestrationWriteHandler) process(q *msg.Request) {
 	switch q.Action {
 	case proto.ActionAdd:
 		h.add(q, &result)
+	case proto.ActionPropUpdate:
+		h.propertyUpdate(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -89,8 +95,11 @@ func (h *OrchestrationWriteHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.NamespaceAttributeQueryType: &h.stmtAttQueryType,
-		stmt.OrchestrationAdd:            &h.stmtAdd,
+		stmt.NamespaceAttributeAddStandard:     &h.stmtAttAddStandard,
+		stmt.NamespaceAttributeDiscover:        &h.stmtAttDiscover,
+		stmt.NamespaceAttributeQueryType:       &h.stmtAttQueryType,
+		stmt.OrchestrationAdd:                  &h.stmtAdd,
+		stmt.OrchestrationTxShow:               &h.stmtTxShow,
 		stmt.OrchestrationTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
 		stmt.OrchestrationTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
 		stmt.OrchestrationTxStdPropertyClean:   &h.stmtTxStdPropClean,

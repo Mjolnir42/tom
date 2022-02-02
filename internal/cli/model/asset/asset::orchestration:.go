@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2021, Jörg Pernfuß
+ * Copyright (c) 2021-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -42,6 +42,20 @@ func registerAssetOrchestration(app cli.App, run ActionFunc) *cli.App {
 						Description:  help.Text(proto.CmdOrchestrationShow),
 						Action:       run(cmdAssetOrchestrationShow),
 						BashComplete: cmpl.OrchestrationShow,
+					},
+					{
+						Name:        `property`,
+						Usage:       `Commands for orchestration environment properties`,
+						Description: help.Text(proto.CmdOrchestration),
+						Subcommands: []*cli.Command{
+							{
+								Name:         `update`,
+								Usage:        `Update properties of an orchestration environment`,
+								Description:  help.Text(proto.CmdOrchestrationPropUpdate),
+								Action:       run(cmdAssetOrchestrationPropUpdate),
+								BashComplete: cmpl.OrchestrationPropUpdate,
+							},
+						},
 					},
 				},
 			},
