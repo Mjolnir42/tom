@@ -57,6 +57,13 @@ func registerAssetOrchestration(app cli.App, run ActionFunc) *cli.App {
 							},
 						},
 					},
+					{
+						Name:         `link`,
+						Usage:        `Link two orchestration environments as referring to the same entity`,
+						Description:  help.Text(proto.CmdOrchestrationLink),
+						Action:       run(cmdAssetOrchestrationLink),
+						BashComplete: cmpl.OrchestrationLink,
+					},
 				},
 			},
 		}...,
