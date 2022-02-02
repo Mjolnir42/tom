@@ -614,6 +614,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		fallthrough
 	case proto.CmdServerLink:
 		fallthrough
+	case proto.CmdOrchestrationLink:
+		fallthrough
 	case proto.CmdRuntimeLink:
 		return []string{`is-equal`}, []string{}, []string{`is-equal`}
 	case proto.CmdServerStack:

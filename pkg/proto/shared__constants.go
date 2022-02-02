@@ -94,6 +94,7 @@ const (
 
 	CmdOrchestration           = ModelAsset + `::` + EntityOrchestration + `:`
 	CmdOrchestrationAdd        = ModelAsset + `::` + EntityOrchestration + `:` + ActionAdd
+	CmdOrchestrationLink       = ModelAsset + `::` + EntityOrchestration + `:` + ActionLink
 	CmdOrchestrationList       = ModelAsset + `::` + EntityOrchestration + `:` + ActionList
 	CmdOrchestrationPropRemove = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropRemove
 	CmdOrchestrationPropSet    = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropSet

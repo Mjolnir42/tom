@@ -28,6 +28,7 @@ type OrchestrationWriteHandler struct {
 	stmtAttAddStandard   *sql.Stmt
 	stmtAttDiscover      *sql.Stmt
 	stmtAttQueryType     *sql.Stmt
+	stmtTxLink           *sql.Stmt
 	stmtTxShow           *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
@@ -52,6 +53,7 @@ func NewOrchestrationWriteHandler(length int) (string, *OrchestrationWriteHandle
 func (h *OrchestrationWriteHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionAdd,
+		proto.ActionLink,
 		proto.ActionPropUpdate,
 	} {
 		hm.Request(msg.SectionOrchestration, action, h.name)
@@ -66,6 +68,8 @@ func (h *OrchestrationWriteHandler) process(q *msg.Request) {
 	switch q.Action {
 	case proto.ActionAdd:
 		h.add(q, &result)
+	case proto.ActionLink:
+		h.link(q, &result)
 	case proto.ActionPropUpdate:
 		h.propertyUpdate(q, &result)
 	default:
@@ -99,6 +103,7 @@ func (h *OrchestrationWriteHandler) Run() {
 		stmt.NamespaceAttributeDiscover:        &h.stmtAttDiscover,
 		stmt.NamespaceAttributeQueryType:       &h.stmtAttQueryType,
 		stmt.OrchestrationAdd:                  &h.stmtAdd,
+		stmt.OrchestrationTxLink:               &h.stmtTxLink,
 		stmt.OrchestrationTxShow:               &h.stmtTxShow,
 		stmt.OrchestrationTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
 		stmt.OrchestrationTxStdPropertyClamp:   &h.stmtTxStdPropClamp,

@@ -232,11 +232,36 @@ WHERE             asset.orchestration_environment_unique_attribute_values.dictio
   AND             asset.orchestration_environment_unique_attribute_values.attributeID     = cte_att.attributeID
   AND             asset.orchestration_environment_unique_attribute_values.orchID          = $3::uuid
   AND             lower(asset.orchestration_environment_unique_attribute_values.validity) > $4::timestamptz(3);`
+
+	OrchestrationTxLink = `
+WITH sel_uid AS ( SELECT inventory.user.userID
+                  FROM   inventory.user
+                  JOIN   inventory.identity_library
+                    ON   inventory.identity_library.identityLibraryID
+                    =    inventory.user.identityLibraryID
+                  WHERE  inventory.user.uid = $5::text
+                    AND  inventory.identity_library.name = $6::text)
+INSERT INTO       asset.orchestration_environment_linking (
+                         orchID_A,
+                         dictionaryID_A,
+                         orchID_B,
+                         dictionaryID_B,
+                         createdBy,
+                         createdAt
+                  )
+SELECT            $1::uuid,
+                  $2::uuid,
+                  $3::uuid,
+                  $4::uuid,
+                  sel_uid.userID,
+                  $7::timestamptz(3)
+FROM              sel_uid;`
 )
 
 func init() {
 	m[OrchestrationAdd] = `OrchestrationAdd`
 	m[OrchestrationStdAttrRemove] = `OrchestrationStdAttrRemove`
+	m[OrchestrationTxLink] = `OrchestrationTxLink`
 	m[OrchestrationTxStdPropertyAdd] = `OrchestrationTxStdPropertyAdd`
 	m[OrchestrationTxStdPropertyClamp] = `OrchestrationTxStdPropertyClamp`
 	m[OrchestrationTxStdPropertyClean] = `OrchestrationTxStdPropertyClean`
