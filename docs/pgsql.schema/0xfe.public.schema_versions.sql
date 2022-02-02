@@ -224,5 +224,9 @@ VALUES
     'inventory',
     20210824001,
     'add user system~nobody'
+),
+(   'view',
+    20220202001,
+    'update resolveRuntimeTo.. functions'
 )
 ;
