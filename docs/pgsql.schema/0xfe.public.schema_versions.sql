@@ -220,8 +220,7 @@ VALUES
     20210727002,
     'make inventory names unique per library'
 ),
-(
-    'inventory',
+(   'inventory',
     20210824001,
     'add user system~nobody'
 ),
