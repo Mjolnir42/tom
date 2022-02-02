@@ -5,7 +5,7 @@
 -- -- nested/linked runtime and orchestration environments to the
 -- -- next (!) server(s), which are either virtual or physical.
 -- -- It does not drill further into found server(s).
-CREATE FUNCTION view.resolveRuntimeToServer(rt uuid)
+CREATE OR REPLACE FUNCTION view.resolveRuntimeToServer(rt uuid)
   RETURNS TABLE ( serverID   uuid,
                   serverType text,
                   depth      smallint)
@@ -94,7 +94,9 @@ CREATE FUNCTION view.resolveRuntimeToServer(rt uuid)
   FROM    asset.server_standard_attribute_values AS ssa
   JOIN    t
     ON    t.parentServerID = ssa.serverID
-  NATURAL JOIN meta.standard_attribute AS ma
+  JOIN    meta.standard_attribute AS ma
+    ON    ssa.dictionaryID = ma.dictionaryID
+   AND    ssa.attributeID = ma.attributeID
   WHERE   t.parentServerID IS NOT NULL
     AND   ma.attribute = 'type';
   $BODY$
@@ -103,7 +105,7 @@ CREATE FUNCTION view.resolveRuntimeToServer(rt uuid)
 -- -- resolveRuntimeToPhysical tracks a specified runtime down to the
 -- -- physical server(s), across any nested virtual servers and
 -- -- orchestration environments in between.
-CREATE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
+CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
   RETURNS TABLE ( serverID   uuid,
                   serverType text,
                   depth      smallint)
@@ -209,7 +211,9 @@ CREATE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
   FROM    asset.server_standard_attribute_values AS ssa
   JOIN    t
     ON    t.parentServerID = ssa.serverID
-  NATURAL JOIN meta.standard_attribute AS ma
+  JOIN    meta.standard_attribute AS ma
+    ON    ssa.dictionaryID = ma.dictionaryID
+   AND    ssa.attributeID = ma.attributeID
   WHERE   t.parentServerID IS NOT NULL
     AND   ma.attribute = 'type'
     AND   ssa.value = 'physical';
