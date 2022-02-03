@@ -47,6 +47,7 @@ func Perform(cmd Specification, c *cli.Context) error {
 		goto missingBody
 	}
 
+	path = proto.Commands[cmd.Name].Path
 	switch {
 	case len(proto.Commands[cmd.Name].Placeholder) != 0:
 		if cmd.Placeholder == nil {
@@ -59,14 +60,12 @@ func Perform(cmd Specification, c *cli.Context) error {
 			}
 
 			path = strings.Replace(
-				proto.Commands[cmd.Name].Path,
+				path,
 				ph,
 				cmd.Placeholder[ph],
 				1,
 			)
 		}
-	default:
-		path = proto.Commands[cmd.Name].Path
 	}
 
 	switch proto.Commands[cmd.Name].Method {
