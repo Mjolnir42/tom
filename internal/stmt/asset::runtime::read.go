@@ -271,6 +271,40 @@ WHERE       asset.runtime_environment_parent.parentRuntimeID = $1::uuid
      AND    meta.unique_attribute.attribute = 'name'::text
      AND    $2::timestamptz(3) <@ asset.runtime_environment_parent.validity
      AND    $2::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
+
+	RuntimeResolveServer = `
+SELECT      asset.server_unique_attribute_values.value,
+            meta.dictionary.name,
+            resolution.serverType
+FROM        view.resolveRuntimeToServer($1::uuid) AS resolution
+    JOIN    asset.server
+      ON    resolution.serverID = asset.server.serverID
+    JOIN    meta.dictionary
+      ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.server_unique_attribute_values
+      ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
+     AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
+     AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+WHERE       meta.unique_attribute.attribute IN ('name');`
+
+	RuntimeResolvePhysical = `
+SELECT      asset.server_unique_attribute_values.value,
+            meta.dictionary.name,
+            resolution.serverType
+FROM        view.resolveRuntimeToPhysical($1::uuid) AS resolution
+    JOIN    asset.server
+      ON    resolution.serverID = asset.server.serverID
+    JOIN    meta.dictionary
+      ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.server_unique_attribute_values
+      ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
+     AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
+     AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+WHERE       meta.unique_attribute.attribute IN ('name');`
 )
 
 func init() {
@@ -280,6 +314,8 @@ func init() {
 	m[RuntimeTxShowChildren] = `RuntimeTxShowChildren`
 	m[RuntimeTxShowProperties] = `RuntimeTxShowProperties`
 	m[RuntimeTxShow] = `RuntimeTxShow`
+	m[RuntimeResolveServer] = `RuntimeResolveServer`
+	m[RuntimeResolvePhysical] = `RuntimeResolvePhysical`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

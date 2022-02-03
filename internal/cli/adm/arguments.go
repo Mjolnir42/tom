@@ -602,6 +602,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		fallthrough
 	case proto.CmdRuntimeList, proto.CmdRuntimeShow, proto.CmdRuntimeRemove:
 		return []string{}, []string{`namespace`}, []string{}
+	case proto.CmdRuntimeResolve:
+		return []string{}, []string{`namespace`, `level`}, []string{`level`}
 	case proto.CmdContainerPropSet, proto.CmdContainerPropUpdate, proto.CmdContainerPropRemove:
 		fallthrough
 	case proto.CmdServerPropSet, proto.CmdServerPropUpdate, proto.CmdServerPropRemove:

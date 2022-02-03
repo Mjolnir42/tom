@@ -30,6 +30,8 @@ type RuntimeReadHandler struct {
 	stmtProp       *sql.Stmt
 	stmtShow       *sql.Stmt
 	stmtTxChildren *sql.Stmt
+	stmtResolvNext *sql.Stmt
+	stmtResolvPhys *sql.Stmt
 }
 
 // NewRuntimeReadHandler returns a new handler instance
@@ -46,6 +48,7 @@ func (h *RuntimeReadHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionList,
 		proto.ActionShow,
+		proto.ActionResolve,
 	} {
 		hm.Request(msg.SectionRuntime, action, h.name)
 	}
@@ -61,6 +64,8 @@ func (h *RuntimeReadHandler) process(q *msg.Request) {
 		h.list(q, &result)
 	case proto.ActionShow:
 		h.show(q, &result)
+	case proto.ActionResolve:
+		h.resolve(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -91,6 +96,8 @@ func (h *RuntimeReadHandler) Run() {
 		stmt.RuntimeList:             &h.stmtList,
 		stmt.RuntimeListLinked:       &h.stmtLinked,
 		stmt.RuntimeParent:           &h.stmtParent,
+		stmt.RuntimeResolvePhysical:  &h.stmtResolvPhys,
+		stmt.RuntimeResolveServer:    &h.stmtResolvNext,
 		stmt.RuntimeTxShow:           &h.stmtShow,
 		stmt.RuntimeTxShowChildren:   &h.stmtTxChildren,
 		stmt.RuntimeTxShowProperties: &h.stmtProp,

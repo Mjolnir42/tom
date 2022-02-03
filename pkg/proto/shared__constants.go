@@ -44,6 +44,7 @@ const (
 	ActionPropSet    = `property.set`
 	ActionPropUpdate = `property.update`
 	ActionRemove     = `remove`
+	ActionResolve    = `resolve`
 	ActionShow       = `show`
 	ActionStack      = `stack`
 	ActionUnstack    = `unstack`
@@ -90,6 +91,7 @@ const (
 	CmdRuntimePropSet    = ModelAsset + `::` + EntityRuntime + `:` + ActionPropSet
 	CmdRuntimePropUpdate = ModelAsset + `::` + EntityRuntime + `:` + ActionPropUpdate
 	CmdRuntimeRemove     = ModelAsset + `::` + EntityRuntime + `:` + ActionRemove
+	CmdRuntimeResolve    = ModelAsset + `::` + EntityRuntime + `:` + ActionResolve
 	CmdRuntimeShow       = ModelAsset + `::` + EntityRuntime + `:` + ActionShow
 	CmdRuntimeStack      = ModelAsset + `::` + EntityRuntime + `:` + ActionStack
 
@@ -129,6 +131,7 @@ const (
 	PlHoldTomID    = `:tomID`
 	PlHoldTargetID = `:targetID`
 	PlHoldAsset    = `:asset`
+	PlHoldResolv   = `:level`
 )
 
 const (
