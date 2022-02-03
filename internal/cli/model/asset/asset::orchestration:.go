@@ -49,6 +49,13 @@ func registerAssetOrchestration(app cli.App, run ActionFunc) *cli.App {
 						Description: help.Text(proto.CmdOrchestration),
 						Subcommands: []*cli.Command{
 							{
+								Name:         `set`,
+								Usage:        `Set all properties of an orchestration environment`,
+								Description:  help.Text(proto.CmdOrchestrationPropSet),
+								Action:       run(cmdAssetOrchestrationPropSet),
+								BashComplete: cmpl.OrchestrationPropSet,
+							},
+							{
 								Name:         `update`,
 								Usage:        `Update properties of an orchestration environment`,
 								Description:  help.Text(proto.CmdOrchestrationPropUpdate),

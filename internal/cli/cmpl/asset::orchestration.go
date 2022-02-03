@@ -29,6 +29,11 @@ func OrchestrationShow(c *cli.Context) {
 	GenericMulti(c, uniq, multi)
 }
 
+func OrchestrationPropSet(c *cli.Context) {
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdOrchestrationPropSet)
+	GenericPropertyChain(c, uniq, multi)
+}
+
 func OrchestrationPropUpdate(c *cli.Context) {
 	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdOrchestrationPropUpdate)
 	GenericPropertyChain(c, uniq, multi)

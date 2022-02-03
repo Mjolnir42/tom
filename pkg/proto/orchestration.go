@@ -29,6 +29,13 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
+	Commands[CmdOrchestrationPropSet] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/orchestration/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
 	Commands[CmdOrchestrationPropUpdate] = CmdDef{
 		Method:      MethodPATCH,
 		Path:        `/orchestration/` + PlHoldTomID + `/property/`,

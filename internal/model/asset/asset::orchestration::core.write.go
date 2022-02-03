@@ -57,6 +57,7 @@ func (h *OrchestrationWriteHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionAdd,
 		proto.ActionLink,
+		proto.ActionPropSet,
 		proto.ActionPropUpdate,
 		proto.ActionStack,
 		proto.ActionUnstack,
@@ -74,6 +75,8 @@ func (h *OrchestrationWriteHandler) process(q *msg.Request) {
 		h.add(q, &result)
 	case proto.ActionLink:
 		h.link(q, &result)
+	case proto.ActionPropSet:
+		h.propertySet(q, &result)
 	case proto.ActionPropUpdate:
 		h.propertyUpdate(q, &result)
 	case proto.ActionStack:
