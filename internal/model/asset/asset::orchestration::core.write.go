@@ -68,7 +68,6 @@ func (h *OrchestrationWriteHandler) Register(hm *handler.Map) {
 // process is the request dispatcher
 func (h *OrchestrationWriteHandler) process(q *msg.Request) {
 	result := msg.FromRequest(q)
-	//	logRequest(h.reqLog, q)
 
 	switch q.Action {
 	case proto.ActionAdd:

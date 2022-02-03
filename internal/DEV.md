@@ -1,6 +1,8 @@
 # Add new REST command
 
-1. register command in `.../pkr/proto/shared__def.go Commands
+1. register command
+    1. command keywords in `.../pkr/proto/shared__constants.go
+    2. command method definitions in `.../pkr/proto/${entity}.go`
 2. ensure model file `.../internal/model/${model}/${model}::.go`
 3. ensure entity file `.../internal/model/${model}/${model}::${entity}:.go`
 4. ensure command file `.../internal/model/${model}/${model}::${entity}:${command}.go
