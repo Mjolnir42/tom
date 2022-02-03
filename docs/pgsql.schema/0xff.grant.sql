@@ -85,12 +85,12 @@ BEGIN;
     '[-infinity,infinity]'::tstzrange,
     '00000000-0000-0000-0000-000000000000'::uuid
   ),
+  (
     '00000000-0000-0000-0000-000000000000'::uuid,
     'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid,
     '00000000-0000-0000-0000-000000000000'::uuid,
     '[-infinity,infinity]'::tstzrange,
     '00000000-0000-0000-0000-000000000000'::uuid
-  (
   );
   INSERT INTO inventory.team_lead (
     identityLibraryID,
