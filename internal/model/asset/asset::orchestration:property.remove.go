@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2022, Jörg Pernfuß
+ * Copyright (c) 2020-2021, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -16,34 +16,33 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/rest"
-	"github.com/mjolnir42/tom/internal/stmt"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 func init() {
-	proto.AssertCommandIsDefined(proto.CmdRuntimePropRemove)
+	proto.AssertCommandIsDefined(proto.CmdOrchestrationPropRemove)
 
 	registry = append(registry, function{
-		cmd:    proto.CmdRuntimePropRemove,
-		handle: runtimePropRemove,
+		cmd:    proto.CmdOrchestrationPropRemove,
+		handle: orchestrationPropRemove,
 	})
 }
 
-func runtimePropRemove(m *Model) httprouter.Handle {
-	return m.x.Authenticated(m.RuntimePropRemove)
+func orchestrationPropRemove(m *Model) httprouter.Handle {
+	return m.x.Authenticated(m.OrchestrationPropRemove)
 }
 
-func exportRuntimePropRemove(result *proto.Result, r *msg.Result) {
-	result.Runtime = &[]proto.Runtime{}
-	*result.Runtime = append(*result.Runtime, r.Runtime...)
+func exportOrchestrationPropRemove(result *proto.Result, r *msg.Result) {
+	result.Orchestration = &[]proto.Orchestration{}
+	*result.Orchestration = append(*result.Orchestration, r.Orchestration...)
 }
 
-// RuntimePropRemove function
-func (m *Model) RuntimePropRemove(w http.ResponseWriter, r *http.Request,
+// OrchestrationPropRemove function
+func (m *Model) OrchestrationPropRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
 	request := msg.New(r, params)
-	request.Section = msg.SectionRuntime
+	request.Section = msg.SectionOrchestration
 	request.Action = proto.ActionPropRemove
 
 	req := proto.Request{}
@@ -51,10 +50,10 @@ func (m *Model) RuntimePropRemove(w http.ResponseWriter, r *http.Request,
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Runtime = *req.Runtime
+	request.Orchestration = *req.Orchestration
 
-	request.Runtime.TomID = params.ByName(`tomID`)
-	if err := request.Runtime.ParseTomID(); err != nil {
+	request.Orchestration.TomID = params.ByName(`tomID`)
+	if err := request.Orchestration.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
@@ -62,19 +61,19 @@ func (m *Model) RuntimePropRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	// input validation
-	if err := proto.ValidNamespace(request.Runtime.Namespace); err != nil {
+	if err := proto.ValidNamespace(request.Orchestration.Namespace); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	if err := proto.OnlyUnreserved(request.Runtime.Name); err != nil {
+	if err := proto.OnlyUnreserved(request.Orchestration.Name); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	if request.Runtime.Property == nil {
+	if request.Orchestration.Property == nil {
 		m.x.ReplyBadRequest(&w, &request, nil)
 		return
 	}
-	for prop, obj := range request.Runtime.Property {
+	for prop, obj := range request.Orchestration.Property {
 		if err := proto.OnlyUnreserved(prop); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
@@ -92,40 +91,43 @@ func (m *Model) RuntimePropRemove(w http.ResponseWriter, r *http.Request,
 
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	m.x.Send(&w, &result, exportRuntimePropRemove)
+	m.x.Send(&w, &result, exportOrchestrationPropRemove)
 }
 
 // propertyRemove ...
-func (h *RuntimeWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
+func (h *OrchestrationWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
 	var (
-		txTime                                           time.Time
-		rteID, dictionaryID, createdAt, createdBy        string
+		oreID, nsID, createdAt, createdBy                string
 		nameValidSince, nameValidUntil, namedAt, namedBy string
 		err                                              error
-		rows                                             *sql.Rows
 		tx                                               *sql.Tx
+		rows                                             *sql.Rows
 		ok, done                                         bool
 	)
-	// setup a consistent transaction time timestamp that is used for all
-	// records
-	txTime = time.Now().UTC()
+
+	// setup a consistent transaction time timestamp that is used for
+	// all records
+	txTime := time.Now().UTC()
 
 	// open transaction
 	if tx, err = h.conn.Begin(); err != nil {
 		mr.ServerError(err)
 		return
 	}
+	defer tx.Rollback()
 
-	// discover rteID at the start of the transaction, as the property
+	txDiscover := tx.Stmt(h.stmtAttDiscover)
+	txShow := tx.Stmt(h.stmtTxShow)
+
+	// discover oreID at the start of the transaction, as the property
 	// updates might include a name change
-	if err = tx.QueryRow(
-		stmt.RuntimeTxShow,
-		q.Runtime.Namespace,
-		q.Runtime.Name,
+	if err = txShow.QueryRow(
+		q.Orchestration.Namespace,
+		q.Orchestration.Name,
 		txTime,
 	).Scan(
-		&rteID,
-		&dictionaryID,
+		&oreID,
+		&nsID,
 		&createdAt,
 		&createdBy,
 		&nameValidSince,
@@ -134,25 +136,23 @@ func (h *RuntimeWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
 		&namedBy,
 	); err == sql.ErrNoRows {
 		mr.NotFound(err)
-		tx.Rollback()
 		return
 	} else if err != nil {
 		mr.ServerError(err)
-		tx.Rollback()
 		return
 	}
 
-	// discover all attributes and record them with their type
+	// discover all attributes available within the namespace
+	// and record them with their type
 	attrMap := map[string]string{}
 	reqMap := map[string]string{}
-	if rows, err = tx.Query(
-		stmt.NamespaceAttributeDiscover,
-		q.Runtime.Namespace,
+	if rows, err = txDiscover.Query(
+		q.Orchestration.Namespace,
 	); err != nil {
 		mr.ServerError(err)
-		tx.Rollback()
 		return
 	}
+
 	for rows.Next() {
 		var attribute, typ string
 		if err = rows.Scan(
@@ -161,22 +161,21 @@ func (h *RuntimeWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err)
-			tx.Rollback()
 			return
 		}
 		attrMap[attribute] = typ
 	}
+
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err)
-		tx.Rollback()
 		return
 	}
 
 	// for all properties specified in the request, check that the attribute
 	// exists and record its type
-	for key := range q.Runtime.Property {
-		if _, ok = attrMap[q.Runtime.Property[key].Attribute]; ok {
-			reqMap[q.Runtime.Property[key].Attribute] = attrMap[q.Runtime.Property[key].Attribute]
+	for key := range q.Orchestration.Property {
+		if _, ok = attrMap[q.Orchestration.Property[key].Attribute]; !ok {
+			reqMap[q.Orchestration.Property[key].Attribute] = attrMap[q.Orchestration.Property[key].Attribute]
 		} else {
 			mr.BadRequest(fmt.Errorf(
 				"Specified property attribute <%s> does not exist.",
@@ -190,22 +189,24 @@ func (h *RuntimeWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
 	// remove specialty attributes that are not to be reset from the
 	// ToDo list
 	for _, attr := range []string{`name`, `type`, `parent`} {
-		delete(reqMap, attr)
+		delete(attrMap, attr)
 	}
 
 	// for all properties in the request, any currently valid value must
 	// be invalided by setting its validUntil value to the time of the
 	// transaction
 	for key := range reqMap {
-		var stmtSelect, stmtClamp *sql.Stmt
+		var stmtSelect, stmtClamp, stmtClean *sql.Stmt
 
 		switch attrMap[key] {
 		case proto.AttributeStandard:
 			stmtSelect = tx.Stmt(h.stmtTxStdPropSelect)
 			stmtClamp = tx.Stmt(h.stmtTxStdPropClamp)
+			stmtClean = tx.Stmt(h.stmtTxStdPropClean)
 		case proto.AttributeUnique:
 			stmtSelect = tx.Stmt(h.stmtTxUniqPropSelect)
 			stmtClamp = tx.Stmt(h.stmtTxUniqPropClamp)
+			stmtClean = tx.Stmt(h.stmtTxUniqPropClean)
 		default:
 			mr.ServerError()
 			tx.Rollback()
@@ -234,7 +235,7 @@ func (h *RuntimeWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
 			// to determine if the record needs clamping
 			txTime,
 			// the ID of the runtime being edited
-			rteID,
+			oreID,
 		); !ok {
 			// appropriate error function is already called by h.txPropClamp
 			tx.Rollback()
@@ -250,7 +251,7 @@ func (h *RuntimeWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
 				},
 				txTime,
 				txTime,
-				rteID,
+				oreID,
 			); !ok {
 				tx.Rollback()
 				return
@@ -264,13 +265,24 @@ func (h *RuntimeWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
 				return
 			}
 		}
+
+		if ok = h.txPropClean(
+			q, mr,
+			stmtClean,
+			proto.PropertyDetail{Attribute: key},
+			&txTime,
+			oreID,
+		); !ok {
+			tx.Rollback()
+			return
+		}
 	}
 
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err)
 		return
 	}
-	mr.Runtime = append(mr.Runtime, q.Runtime)
+	mr.Orchestration = append(mr.Orchestration, q.Orchestration)
 	mr.OK()
 }
 

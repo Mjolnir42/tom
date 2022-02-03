@@ -62,6 +62,13 @@ func registerAssetOrchestration(app cli.App, run ActionFunc) *cli.App {
 								Action:       run(cmdAssetOrchestrationPropUpdate),
 								BashComplete: cmpl.OrchestrationPropUpdate,
 							},
+							{
+								Name:         `remove`,
+								Usage:        `Remove properties of an orchestration environment`,
+								Description:  help.Text(proto.CmdOrchestrationPropRemove),
+								Action:       run(cmdAssetOrchestrationPropRemove),
+								BashComplete: cmpl.OrchestrationPropRemove,
+							},
 						},
 					},
 					{

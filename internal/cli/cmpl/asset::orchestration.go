@@ -39,6 +39,11 @@ func OrchestrationPropUpdate(c *cli.Context) {
 	GenericPropertyChain(c, uniq, multi)
 }
 
+func OrchestrationPropRemove(c *cli.Context) {
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdOrchestrationPropRemove)
+	GenericMulti(c, uniq, multi)
+}
+
 func OrchestrationLink(c *cli.Context) {
 	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdOrchestrationLink)
 	GenericMulti(c, uniq, multi)

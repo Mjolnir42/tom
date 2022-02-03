@@ -43,6 +43,13 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
+	Commands[CmdOrchestrationPropRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/orchestration/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
 	Commands[CmdOrchestrationShow] = CmdDef{
 		Method:      MethodGET,
 		Path:        `/orchestration/` + PlHoldTomID,
