@@ -19,6 +19,11 @@ func OrchestrationAdd(c *cli.Context) {
 	GenericMultiWithProperty(c, uniq, multi)
 }
 
+func OrchestrationRemove(c *cli.Context) {
+	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdOrchestrationRemove)
+	GenericMulti(c, uniq, multi)
+}
+
 func OrchestrationList(c *cli.Context) {
 	multi, uniq, _ := adm.ArgumentsForCommand(proto.CmdOrchestrationList)
 	DirectMulti(c, uniq, multi)

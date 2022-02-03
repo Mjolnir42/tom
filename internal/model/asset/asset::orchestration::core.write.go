@@ -28,6 +28,7 @@ type OrchestrationWriteHandler struct {
 	stmtAttAddStandard   *sql.Stmt
 	stmtAttDiscover      *sql.Stmt
 	stmtAttQueryType     *sql.Stmt
+	stmtRemove           *sql.Stmt
 	stmtTxLink           *sql.Stmt
 	stmtTxRteShow        *sql.Stmt
 	stmtTxShow           *sql.Stmt
@@ -60,6 +61,7 @@ func (h *OrchestrationWriteHandler) Register(hm *handler.Map) {
 		proto.ActionPropRemove,
 		proto.ActionPropSet,
 		proto.ActionPropUpdate,
+		proto.ActionRemove,
 		proto.ActionStack,
 		proto.ActionUnstack,
 	} {
@@ -82,6 +84,8 @@ func (h *OrchestrationWriteHandler) process(q *msg.Request) {
 		h.propertySet(q, &result)
 	case proto.ActionPropUpdate:
 		h.propertyUpdate(q, &result)
+	case proto.ActionRemove:
+		h.remove(q, &result)
 	case proto.ActionStack:
 		h.stack(q, &result)
 	case proto.ActionUnstack:
@@ -117,6 +121,7 @@ func (h *OrchestrationWriteHandler) Run() {
 		stmt.NamespaceAttributeDiscover:        &h.stmtAttDiscover,
 		stmt.NamespaceAttributeQueryType:       &h.stmtAttQueryType,
 		stmt.OrchestrationAdd:                  &h.stmtAdd,
+		stmt.OrchestrationRemove:               &h.stmtRemove,
 		stmt.OrchestrationTxLink:               &h.stmtTxLink,
 		stmt.OrchestrationTxShow:               &h.stmtTxShow,
 		stmt.OrchestrationTxStackAdd:           &h.stmtTxStackAdd,
