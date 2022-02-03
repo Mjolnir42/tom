@@ -233,6 +233,36 @@ WHERE             asset.orchestration_environment_unique_attribute_values.dictio
   AND             asset.orchestration_environment_unique_attribute_values.orchID          = $3::uuid
   AND             lower(asset.orchestration_environment_unique_attribute_values.validity) > $4::timestamptz(3);`
 
+	OrchestrationTxStackAdd = `
+WITH sel_uid AS ( SELECT inventory.user.userID
+                  FROM   inventory.user
+                  JOIN   inventory.identity_library
+                    ON   inventory.identity_library.identityLibraryID
+                    =    inventory.user.identityLibraryID
+                  WHERE  inventory.user.uid = $6::text
+                    AND  inventory.identity_library.name = $7::text)
+INSERT INTO       asset.orchestration_environment_mapping (
+                         orchID,
+                         parentRuntimeID,
+                         validity,
+                         createdBy,
+                         createdAt
+                  )
+SELECT            $1::uuid,
+                  $2::uuid,
+                  tstzrange($3::timestamptz(3), $4::timestamptz(3), '[]'),
+                  sel_uid.userID,
+                  $5::timestamptz(3)
+FROM              sel_uid;`
+
+	OrchestrationTxStackClamp = `
+UPDATE            asset.orchestration_environment_mapping
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.orchestration_environment_mapping.orchID = $2::uuid
+  AND             asset.orchestration_environment_mapping.parentRuntimeID = $3::uuid
+  AND             $1::timestamptz(3) <@ asset.orchestration_environment_mapping.validity
+	AND             $4::timestamptz(3) <@ asset.orchestration_environment_mapping.validity;`
+
 	OrchestrationTxLink = `
 WITH sel_uid AS ( SELECT inventory.user.userID
                   FROM   inventory.user
@@ -262,6 +292,8 @@ func init() {
 	m[OrchestrationAdd] = `OrchestrationAdd`
 	m[OrchestrationStdAttrRemove] = `OrchestrationStdAttrRemove`
 	m[OrchestrationTxLink] = `OrchestrationTxLink`
+	m[OrchestrationTxStackAdd] = `OrchestrationTxStackAdd`
+	m[OrchestrationTxStackClamp] = `OrchestrationTxStackClamp`
 	m[OrchestrationTxStdPropertyAdd] = `OrchestrationTxStdPropertyAdd`
 	m[OrchestrationTxStdPropertyClamp] = `OrchestrationTxStdPropertyClamp`
 	m[OrchestrationTxStdPropertyClean] = `OrchestrationTxStdPropertyClean`
