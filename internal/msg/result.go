@@ -51,7 +51,8 @@ func FromRequest(rq *Request) Result {
 func (r *Result) Clear(err ...error) {
 	if len(err) > 0 {
 		r.Err = err[len(err)-1]
-	} else {
+	}
+	if r.Err == nil {
 		r.Err = fmt.Errorf(`Unspecified error condition`)
 	}
 

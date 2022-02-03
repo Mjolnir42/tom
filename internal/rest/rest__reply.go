@@ -8,6 +8,7 @@
 package rest // import "github.com/mjolnir42/tom/internal/rest/"
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/mjolnir42/tom/internal/msg"
@@ -18,6 +19,9 @@ func nopExport(res *proto.Result, r *msg.Result) {
 }
 
 func (x *Rest) replyBadRequestDispatch(w *http.ResponseWriter, q *msg.Request, err error) {
+	if err == nil {
+		err = fmt.Errorf(http.StatusText(http.StatusBadRequest))
+	}
 	result := msg.FromRequest(q)
 	result.BadRequest(err)
 	x.send(w, &result, nopExport)
@@ -30,6 +34,9 @@ func (x *Rest) replyForbiddenDispatch(w *http.ResponseWriter, q *msg.Request) {
 }
 
 func (x *Rest) replyServerError(w *http.ResponseWriter, q *msg.Request, err error) {
+	if err == nil {
+		err = fmt.Errorf(http.StatusText(http.StatusInternalServerError))
+	}
 	result := msg.FromRequest(q)
 	result.ServerError()
 	x.send(w, &result, nopExport)
