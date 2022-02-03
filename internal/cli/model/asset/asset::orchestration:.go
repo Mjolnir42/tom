@@ -72,6 +72,13 @@ func registerAssetOrchestration(app cli.App, run ActionFunc) *cli.App {
 						},
 					},
 					{
+						Name:         `remove`,
+						Usage:        `Remove an orchestration environment`,
+						Description:  help.Text(proto.CmdOrchestrationRemove),
+						Action:       run(cmdAssetOrchestrationRemove),
+						BashComplete: cmpl.OrchestrationRemove,
+					},
+					{
 						Name:         `link`,
 						Usage:        `Link two orchestration environments as referring to the same entity`,
 						Description:  help.Text(proto.CmdOrchestrationLink),

@@ -61,4 +61,10 @@ func (m *Model) OrchestrationRemove(w http.ResponseWriter, r *http.Request,
 	m.x.Send(&w, &result, exportOrchestrationRemove)
 }
 
+// remove ...
+func (h *OrchestrationWriteHandler) remove(q *msg.Request, mr *msg.Result) {
+	// TODO
+	mr.NotImplemented()
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

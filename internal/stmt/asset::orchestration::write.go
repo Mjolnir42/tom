@@ -49,6 +49,9 @@ FROM              ins_orc
   CROSS JOIN      sel_dct
 RETURNING         orchID;`
 
+	OrchestrationRemove = `
+SELECT      'Orchestration.REMOVE';`
+
 	OrchestrationStdAttrRemove = `
 DELETE FROM       asset.orchestration_environment_standard_attribute_values
 WHERE             attributeID = $1::uuid
@@ -290,6 +293,7 @@ FROM              sel_uid;`
 
 func init() {
 	m[OrchestrationAdd] = `OrchestrationAdd`
+	m[OrchestrationRemove] = `OrchestrationRemove`
 	m[OrchestrationStdAttrRemove] = `OrchestrationStdAttrRemove`
 	m[OrchestrationTxLink] = `OrchestrationTxLink`
 	m[OrchestrationTxStackAdd] = `OrchestrationTxStackAdd`
