@@ -29,7 +29,10 @@ type OrchestrationWriteHandler struct {
 	stmtAttDiscover      *sql.Stmt
 	stmtAttQueryType     *sql.Stmt
 	stmtTxLink           *sql.Stmt
+	stmtTxRteShow        *sql.Stmt
 	stmtTxShow           *sql.Stmt
+	stmtTxStackAdd       *sql.Stmt
+	stmtTxStackClamp     *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
 	stmtTxStdPropClean   *sql.Stmt
@@ -55,6 +58,8 @@ func (h *OrchestrationWriteHandler) Register(hm *handler.Map) {
 		proto.ActionAdd,
 		proto.ActionLink,
 		proto.ActionPropUpdate,
+		proto.ActionStack,
+		proto.ActionUnstack,
 	} {
 		hm.Request(msg.SectionOrchestration, action, h.name)
 	}
@@ -72,6 +77,10 @@ func (h *OrchestrationWriteHandler) process(q *msg.Request) {
 		h.link(q, &result)
 	case proto.ActionPropUpdate:
 		h.propertyUpdate(q, &result)
+	case proto.ActionStack:
+		h.stack(q, &result)
+	case proto.ActionUnstack:
+		h.unstack(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -105,6 +114,8 @@ func (h *OrchestrationWriteHandler) Run() {
 		stmt.OrchestrationAdd:                  &h.stmtAdd,
 		stmt.OrchestrationTxLink:               &h.stmtTxLink,
 		stmt.OrchestrationTxShow:               &h.stmtTxShow,
+		stmt.OrchestrationTxStackAdd:           &h.stmtTxStackAdd,
+		stmt.OrchestrationTxStackClamp:         &h.stmtTxStackClamp,
 		stmt.OrchestrationTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
 		stmt.OrchestrationTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
 		stmt.OrchestrationTxStdPropertyClean:   &h.stmtTxStdPropClean,
@@ -113,6 +124,7 @@ func (h *OrchestrationWriteHandler) Run() {
 		stmt.OrchestrationTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
 		stmt.OrchestrationTxUniqPropertyClean:  &h.stmtTxUniqPropClean,
 		stmt.OrchestrationTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
+		stmt.RuntimeTxShow:                     &h.stmtTxRteShow,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

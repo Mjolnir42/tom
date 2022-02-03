@@ -31,6 +31,9 @@ tom server add ${name} namespace ${space} type ${typ}
            link ${tomID} is-equal ${tomID}
            stack ${name} namespace ${space} provided-by ${tomID}
 
+tom orchestration stack ${name} namespace ${space} provided-by ${tomID} [provided-by ....] replacing ${tomID} [replacing ...]
+                  unstack ${name} namespace ${space} unprovide ${tomID} [unprovide ...]
+
 tom socket list ${name} namespace ${space}
 tom socket list ${tomID}
 

@@ -50,6 +50,20 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
+	Commands[CmdOrchestrationStack] = CmdDef{
+		Method:      MethodPATCH,
+		Path:        `/orchestration/` + PlHoldTomID + `/parent`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdOrchestrationUnstack] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/orchestration/` + PlHoldTomID + `/parent`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
 }
 
 // Orchestration defines a orchestration environment within the asset model

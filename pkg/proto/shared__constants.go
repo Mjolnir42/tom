@@ -46,6 +46,7 @@ const (
 	ActionRemove     = `remove`
 	ActionShow       = `show`
 	ActionStack      = `stack`
+	ActionUnstack    = `unstack`
 	ActionUpdate     = `update`
 )
 
@@ -101,6 +102,8 @@ const (
 	CmdOrchestrationPropUpdate = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropUpdate
 	CmdOrchestrationRemove     = ModelAsset + `::` + EntityOrchestration + `:` + ActionRemove
 	CmdOrchestrationShow       = ModelAsset + `::` + EntityOrchestration + `:` + ActionShow
+	CmdOrchestrationStack      = ModelAsset + `::` + EntityOrchestration + `:` + ActionStack
+	CmdOrchestrationUnstack    = ModelAsset + `::` + EntityOrchestration + `:` + ActionUnstack
 
 	CmdPageStaticCSS   = `page::static::css`
 	CmdPageStaticFont  = `page::static::font`
@@ -108,8 +111,9 @@ const (
 	CmdPageStaticJS    = `page::static::js`
 	CmdPageApplication = `page::application`
 
-	MetaPropertyCmdLink  = ModelAsset + `::` + `meta-cmd` + `::` + ActionLink
-	MetaPropertyCmdStack = ModelAsset + `::` + `meta-cmd` + `::` + ActionStack
+	MetaPropertyCmdLink    = ModelAsset + `::` + `meta-cmd` + `::` + ActionLink
+	MetaPropertyCmdStack   = ModelAsset + `::` + `meta-cmd` + `::` + ActionStack
+	MetaPropertyCmdUnstack = ModelAsset + `::` + `meta-cmd` + `::` + ActionUnstack
 )
 
 const (
