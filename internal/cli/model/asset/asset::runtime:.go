@@ -92,6 +92,13 @@ func registerAssetRuntime(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetRuntimeStack),
 						BashComplete: cmpl.RuntimeStack,
 					},
+					{
+						Name:         `resolve`,
+						Usage:        `Resolve this runtime down to the server(s) it runs on`,
+						Description:  help.Text(proto.CmdRuntimeResolve),
+						Action:       run(cmdAssetRuntimeResolve),
+						BashComplete: cmpl.RuntimeResolve,
+					},
 				},
 			},
 		}...,
