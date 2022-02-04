@@ -1,6 +1,6 @@
 database {
   host: 127.0.0.1
-  user: tom
+  user: tomsvc
   database: tom
   port: 5432
   password: **********
