@@ -1,19 +1,20 @@
 # DESCRIPTION
 
-This command retrieves a list of configured server. The optional
-namespace parameter restricts the resultset to the specified namespace.
+This command retrieves a list of configured orchestration environments.
+The optional namespace parameter restricts the resultset to the
+specified namespace.
 
 # SYNOPSIS
 
 ```
-tom server list [namespace ${space}]
+tom orchestration list [namespace ${space}]
 ```
 
 # ARGUMENT TYPES
 
 Argument | Type | Description | Default Value | Optional
  ------- | ---- | ----------- | ------------- | --------
-namespace | string | namespace to list | | yes
+space | string | name of the namespace | | yes
 
 # PERMISSIONS
 
@@ -27,6 +28,6 @@ omnipotence | | | no | yes
 # EXAMPLES
 
 ```
-tom server list
-tom server list namespace inventory
+tom orchestration list
+tom orchestration list namespace inventory
 ```

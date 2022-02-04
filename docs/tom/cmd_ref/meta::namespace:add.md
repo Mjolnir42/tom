@@ -52,4 +52,5 @@ omnipotence | | | no | yes
 # EXAMPLES
 
 ```
+tom namespace add inventory type authoritative uniq-attr name uniq-attr serial std-attr lifecycle-state
 ```
