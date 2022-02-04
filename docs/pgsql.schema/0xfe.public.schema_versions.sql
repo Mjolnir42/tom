@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS  public.schema_versions (
     serial                        bigserial       PRIMARY KEY,
     schema                        varchar(16)     NOT NULL,
     version                       numeric(16,0)   NOT NULL,
-    created_at                    timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
+    createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
     description                   text            NOT NULL
 );
 
@@ -227,5 +227,37 @@ VALUES
 (   'view',
     20220202001,
     'update resolveRuntimeTo.. functions'
+),
+(   'asset',
+    20220204001,
+    'update default value for timestamp columns with timezone'
+),
+(   'bulk',
+    20220204001,
+    'update default value for timestamp columns with timezone'
+),
+(   'filter',
+    20220204001,
+    'update default value for timestamp columns with timezone'
+),
+(   'inventory',
+    20220204001,
+    'update default value for timestamp columns with timezone'
+),
+(   'ix',
+    20220204001,
+    'update default value for timestamp columns with timezone'
+),
+(   'meta',
+    20220204001,
+    'update default value for timestamp columns with timezone'
+),
+(   'public',
+    20220204001,
+    'update default value for timestamp columns with timezone'
+),
+(   'yp',
+    20220204001,
+    'update default value for timestamp columns with timezone'
 )
 ;
