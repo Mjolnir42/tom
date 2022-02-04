@@ -16,6 +16,10 @@ tom runtime property set ${name} namespace ${space} property ${attr} value ${val
 tom runtime property update ${name} namespace ${space} property ${attr} value ${val} [since ${since}] [until ${until}] [property ...]
 tom runtime property remove ${name} namespace ${space} property ${attr} [property ...]
 tom runtime link ${tomID} is-equal ${linkedID}
+tom runtime stack ${name} namespace ${space} provided-by ${providerID}
+tom runtime stack ${tomID} provided-by ${providerID}
+tom runtime resolve ${name} namespace ${space} level ${detail}
+tom runtime resolve ${tomID} level ${detail}
 ```
 
 # PROPERTIES
@@ -45,4 +49,4 @@ with the item.
 
 # SEE ALSO
 
-See `tom namespace help ${command}` for detailed help.
+See `tom runtime help ${command}` for detailed help.

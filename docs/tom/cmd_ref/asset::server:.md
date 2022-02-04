@@ -10,9 +10,14 @@ software.
 # SYNOPSIS OVERVIEW
 
 ```
-tom server link ${tomID} is-equal ${linkedID}
+tom server add ${name} namespace ${space} type ${typ} [since ${since}] [until ${until}] [property ...]
+tom server list [namespace ${space}]
 tom server show ${name} namespace ${space}
 tom server show ${tomID}
+tom server property set ${name} namespace ${space} property ${attr} value ${val} [since ${since}] [until ${until}] [property ...]
+tom server property update ${name} namespace ${space} property ${attr} value ${val} [since ${since}] [until ${until}] [property ...]
+tom server property remove ${name} namespace ${space} property ${attr} [property ...]
+tom server link ${tomID} is-equal ${linkedID}
 tom server stack ${name} namespace ${space} provided-by ${providerID}
 tom server stack ${tomID} provided-by ${providerID}
 ```
@@ -21,7 +26,7 @@ tom server stack ${tomID} provided-by ${providerID}
 
 The following are the properties a server should have.
 Perpetual properties can not be changed, while properties with validity
-can be updated over the lifetime of the runtime environment.
+can be updated over the lifetime of the server.
 
 Attribute | Unique? | Perpetual
  -------- | ------- | ---------
