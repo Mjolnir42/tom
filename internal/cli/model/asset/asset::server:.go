@@ -99,6 +99,13 @@ func registerAssetServer(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetServerUnstack),
 						BashComplete: cmpl.ServerUnstack,
 					},
+					{
+						Name:         `resolve`,
+						Usage:        `Resolve this server down to the server(s) it runs on`,
+						Description:  help.Text(proto.CmdServerResolve),
+						Action:       run(cmdAssetServerResolve),
+						BashComplete: cmpl.ServerResolve,
+					},
 				},
 			},
 		}...,

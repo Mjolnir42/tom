@@ -22,6 +22,8 @@ tom server stack ${name} namespace ${space} provided-by ${providerID}
 tom server stack ${tomID} provided-by ${providerID}
 tom server unstack ${name} namespace ${space}
 tom server unstack ${tomID}
+tom server resolve ${name} namespace ${space} level ${detail}
+tom server resolve ${tomID} level ${detail}
 ```
 
 # PROPERTIES
