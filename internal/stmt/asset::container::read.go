@@ -134,6 +134,29 @@ FROM        meta.dictionary
 WHERE       meta.dictionary.dictionaryID = $1::uuid
      AND    asset.container_standard_attribute_values.containerID = $2::uuid
      AND    $3::timestamptz(3) <@ asset.container_standard_attribute_values.validity;`
+
+	ContainerTxParent = `
+SELECT      asset.runtime_environment.rteID,
+            asset.runtime_environment.dictionaryID,
+            meta.dictionary.name,
+            asset.runtime_environment_unique_attribute_values.value
+FROM        asset.container
+    JOIN    asset.container_parent
+      ON    asset.container.containerID = asset.container_parent.containerID
+    JOIN    asset.runtime_environment
+      ON    asset.container_parent.parentRuntimeID = asset.runtime_environment.rteID
+    JOIN    meta.dictionary
+      ON    asset.runtime_environment.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.runtime_environment_unique_attribute_values
+      ON    asset.runtime_environment_unique_attribute_values.rteID = asset.runtime_environment.rteID
+     AND    asset.runtime_environment_unique_attribute_values.dictionaryID = asset.runtime_environment.dictionaryID
+     AND    asset.runtime_environment_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+WHERE       asset.container.containerID = $1::uuid
+     AND    $2::timestamptz(3) <@ asset.container_parent.validity
+     AND    $2::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity
+     AND    meta.unique_attribute.attribute IN ('name');`
 )
 
 func init() {
@@ -141,6 +164,7 @@ func init() {
 	m[ContainerListLinked] = `ContainerListLinked`
 	m[ContainerTxShow] = `ContainerTxShow`
 	m[ContainerTxShowProperties] = `ContainerTxShowProperties`
+	m[ContainerTxParent] = `ContainerTxParent`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

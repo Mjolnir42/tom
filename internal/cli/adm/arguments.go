@@ -620,7 +620,7 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		fallthrough
 	case proto.CmdRuntimeLink:
 		return []string{`is-equal`}, []string{}, []string{`is-equal`}
-	case proto.CmdServerStack:
+	case proto.CmdServerStack, proto.CmdContainerStack:
 		return []string{}, []string{`namespace`, `since`, `until`, `provided-by`}, []string{`provided-by`}
 	case proto.CmdOrchestrationStack:
 		return []string{`provided-by`, `replacing`}, []string{`namespace`, `since`, `until`}, []string{`provided-by`}
@@ -628,7 +628,7 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		return []string{`unprovide`}, []string{`namespace`, `since`}, []string{`unprovide`}
 	case proto.CmdRuntimeStack:
 		return []string{}, []string{`namespace`, `runs-on`}, []string{`runs-on`}
-	case proto.CmdServerUnstack, proto.CmdRuntimeUnstack:
+	case proto.CmdContainerUnstack, proto.CmdServerUnstack, proto.CmdRuntimeUnstack:
 		return []string{}, []string{`namespace`}, []string{}
 	default:
 		return []string{}, []string{}, []string{}

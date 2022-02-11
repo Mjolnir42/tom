@@ -70,7 +70,6 @@
         ├── meta::namespace:show                 [DONE]
 =======================================================
     └── tomd/asset
-        ├── asset::container:resolve             [    ]
         ├── asset::container:add                 [DONE]
         ├── asset::container:link                [DONE]
         ├── asset::container:list                [DONE]
@@ -78,11 +77,11 @@
         ├── asset::container:property.set        [DONE]
         ├── asset::container:property.update     [DONE]
         ├── asset::container:remove              [    ]
+        ├── asset::container:resolve             [    ]
         ├── asset::container:show                [DONE]
-        ├── asset::container:stack               [    ]
-        ├── asset::container:unstack             [    ]
+        ├── asset::container:stack               [DONE]
+        ├── asset::container:unstack             [DONE]
     └── tom/asset
-        ├── asset::container:resolve             [    ]
         ├── asset::container:add                 [DONE]
         ├── asset::container:link                [DONE]
         ├── asset::container:list                [DONE]
@@ -90,9 +89,10 @@
         ├── asset::container:property.set        [DONE]
         ├── asset::container:property.update     [DONE]
         ├── asset::container:remove              [    ]
+        ├── asset::container:resolve             [    ]
         ├── asset::container:show                [DONE]
-        ├── asset::container:stack               [    ]
-        ├── asset::container:unstack             [    ]
+        ├── asset::container:stack               [DONE]
+        ├── asset::container:unstack             [DONE]
 =======================================================
     └── tomd/asset
         ├── asset::runtime:add                   [DONE]

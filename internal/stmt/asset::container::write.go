@@ -236,6 +236,34 @@ SELECT            $1::uuid,
                   sel_uid.userID,
                   $7::timestamptz(3)
 FROM              sel_uid;`
+
+	ContainerTxStackAdd = `
+WITH sel_uid AS ( SELECT inventory.user.userID
+                  FROM   inventory.user
+                  JOIN   inventory.identity_library
+                    ON   inventory.identity_library.identityLibraryID
+                    =    inventory.user.identityLibraryID
+                  WHERE  inventory.user.uid = $6::text
+                    AND  inventory.identity_library.name = $7::text)
+INSERT INTO       asset.container_parent (
+                         containerID,
+                         parentRuntimeID,
+                         validity,
+                         createdBy,
+                         createdAt
+                  )
+SELECT            $1::uuid,
+                  $2::uuid,
+                  tstzrange($3::timestamptz(3), $4::timestamptz(3), '[]'),
+                  sel_uid.userID,
+                  $5::timestamptz(3)
+FROM              sel_uid;`
+
+	ContainerTxStackClamp = `
+UPDATE            asset.container_parent
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.container_parent.containerID = $2::uuid
+  AND             $1::timestamptz(3) <@ asset.container_parent.validity;`
 )
 
 func init() {
@@ -247,6 +275,8 @@ func init() {
 	m[ContainerDelNamespace] = `ContainerDelNamespace`
 	m[ContainerLink] = `ContainerLink`
 	m[ContainerRemove] = `ContainerRemove`
+	m[ContainerTxStackAdd] = `ContainerTxStackAdd`
+	m[ContainerTxStackClamp] = `ContainerTxStackClamp`
 	m[ContainerTxStdPropertyAdd] = `ContainerTxStdPropertyAdd`
 	m[ContainerTxStdPropertyClamp] = `ContainerTxStdPropertyClamp`
 	m[ContainerTxStdPropertySelect] = `ContainerTxStdPropertySelect`

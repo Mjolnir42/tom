@@ -28,6 +28,7 @@ type ContainerReadHandler struct {
 	stmtList   *sql.Stmt
 	stmtProp   *sql.Stmt
 	stmtShow   *sql.Stmt
+	stmtTxParent   *sql.Stmt
 }
 
 // NewContainerReadHandler returns a new handler instance
@@ -90,6 +91,7 @@ func (h *ContainerReadHandler) Run() {
 		stmt.ContainerListLinked:       &h.stmtLinked,
 		stmt.ContainerTxShow:           &h.stmtShow,
 		stmt.ContainerTxShowProperties: &h.stmtProp,
+		stmt.ContainerTxParent:         &h.stmtTxParent,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
