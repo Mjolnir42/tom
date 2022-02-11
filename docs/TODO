@@ -101,11 +101,11 @@
         ├── asset::runtime:property.remove       [DONE]
         ├── asset::runtime:property.set          [DONE]
         ├── asset::runtime:property.update       [DONE]
-        ├── asset::runtime:remove                [DONE]
+        ├── asset::runtime:remove                [    ]
         ├── asset::runtime:resolve               [DONE]
         ├── asset::runtime:show                  [DONE]
         ├── asset::runtime:stack                 [DONE]
-        ├── asset::runtime:unstack               [    ]
+        ├── asset::runtime:unstack               [DONE]
     └── tom/asset
         ├── asset::runtime:add                   [DONE]
         ├── asset::runtime:link                  [DONE]
@@ -113,11 +113,11 @@
         ├── asset::runtime:property.remove       [DONE]
         ├── asset::runtime:property.set          [DONE]
         ├── asset::runtime:property.update       [DONE]
-        ├── asset::runtime:remove                [DONE]
+        ├── asset::runtime:remove                [    ]
         ├── asset::runtime:resolve               [DONE]
         ├── asset::runtime:show                  [DONE]
         ├── asset::runtime:stack                 [DONE]
-        ├── asset::runtime:unstack               [    ]
+        ├── asset::runtime:unstack               [DONE]
 =======================================================
     └── tomd/asset
         ├── asset::server:add                    [DONE]
