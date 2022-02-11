@@ -259,5 +259,9 @@ VALUES
 (   'yp',
     20220204001,
     'update default value for timestamp columns with timezone'
+),
+(   'view',
+    20220211001,
+    'update view.resolve..To.. functions'
 )
 ;

@@ -33,17 +33,18 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToServer(rt uuid)
        OR rteID IN (
           SELECT  rteID_A
           FROM    asset.runtime_environment_linking
-          WHERE   rteID_A = rt::uuid
-             OR   rteID_B = rt::uuid
+          WHERE   rteID_B = rt::uuid
           UNION
           SELECT  rteID_B
           FROM    asset.runtime_environment_linking
           WHERE   rteID_A = rt::uuid
-             OR   rteID_B = rt::uuid
        )
     UNION
     -- recursive iteration query
-    SELECT  null::uuid,
+    SELECT  CASE WHEN t.parentServerID IS NOT NULL
+                 THEN t.parentServerID
+                 ELSE null::uuid
+            END,
             CASE WHEN arep.rteID  IS NOT NULL THEN arep.rteID
                  ELSE null::uuid
             END,
@@ -64,13 +65,11 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToServer(rt uuid)
               OR arep.rteID IN (
                 SELECT  rteID_A
                 FROM    asset.runtime_environment_linking
-                WHERE   rteID_A = t.parentruntimeid
-                   OR   rteID_B = t.parentruntimeid
+                WHERE   rteID_B = t.parentruntimeid
                 UNION
                 SELECT  rteID_B
                 FROM    asset.runtime_environment_linking
                 WHERE   rteID_A = t.parentruntimeid
-                   OR   rteID_B = t.parentruntimeID
               )
      LEFT   JOIN
             asset.orchestration_environment_mapping AS aoem
@@ -78,26 +77,30 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToServer(rt uuid)
               OR aoem.orchID IN (
                 SELECT  orchID_A
                 FROM    asset.orchestration_environment_linking
-                WHERE   orchID_A = t.parentOrchestrationID
-                  OR    orchID_B = t.parentOrchestrationID
+                WHERE   orchID_B = t.parentOrchestrationID
                 UNION
                 SELECT  orchID_B
                 FROM    asset.orchestration_environment_linking
                 WHERE   orchID_A = t.parentOrchestrationID
-                   OR   orchID_B = t.parentOrchestrationID
               )
      WHERE  t.depth < 32
+       AND  (   t.parentRuntimeID       IS NOT NULL
+             OR t.parentServerID        IS NOT NULL
+             OR t.parentOrchestrationID IS NOT NULL)
      )
   SELECT  ssa.serverID AS serverID,
           ssa.value    AS serverType,
           t.depth      AS depth
   FROM    asset.server_standard_attribute_values AS ssa
   JOIN    t
-    ON    t.parentServerID = ssa.serverID
+    ON    t.serverID = ssa.serverID
   JOIN    meta.standard_attribute AS ma
     ON    ssa.dictionaryID = ma.dictionaryID
    AND    ssa.attributeID = ma.attributeID
-  WHERE   t.parentServerID IS NOT NULL
+  WHERE   t.serverID IS NOT NULL
+    AND   t.parentServerID IS NULL
+    AND   t.parentRuntimeID IS NULL
+    AND   t.parentOrchestrationID IS NULL
     AND   ma.attribute = 'type';
   $BODY$
   LANGUAGE sql IMMUTABLE;
@@ -133,17 +136,16 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
        OR rteID IN (
           SELECT  rteID_A
           FROM    asset.runtime_environment_linking
-          WHERE   rteID_A = rt::uuid
-             OR   rteID_B = rt::uuid
+          WHERE   rteID_B = rt::uuid
           UNION
           SELECT  rteID_B
           FROM    asset.runtime_environment_linking
           WHERE   rteID_A = rt::uuid
-             OR   rteID_B = rt::uuid
        )
     UNION
     -- recursive iteration query
     SELECT  CASE WHEN asp.serverID IS NOT NULL THEN asp.serverID
+                 WHEN t.parentServerID IS NOT NULL AND asp.serverID IS NULL THEN t.parentServerID
                  ELSE null::uuid
             END,
             CASE WHEN arep.rteID   IS NOT NULL THEN arep.rteID
@@ -167,13 +169,11 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
               OR arep.rteID IN (
                 SELECT  rteID_A
                 FROM    asset.runtime_environment_linking
-                WHERE   rteID_A = t.parentruntimeid
-                   OR   rteID_B = t.parentruntimeid
+                WHERE   rteID_B = t.parentRuntimeID
                 UNION
                 SELECT  rteID_B
                 FROM    asset.runtime_environment_linking
-                WHERE   rteID_A = t.parentruntimeid
-                   OR   rteID_B = t.parentruntimeID
+                WHERE   rteID_A = t.parentRuntimeID
               )
      LEFT   JOIN
             asset.server_parent AS asp
@@ -181,13 +181,11 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
               OR asp.serverID IN (
                 SELECT  serverID_A
                 FROM    asset.server_linking
-                WHERE   serverID_A = t.parentServerID
-                   OR   serverID_B = t.parentServerID
+                WHERE   serverID_B = t.parentServerID
                 UNION
                 SELECT  serverID_B
                 FROM    asset.server_linking
                 WHERE   serverID_A = t.parentServerID
-                   OR   serverID_B = t.parentServerID
               )
      LEFT   JOIN
             asset.orchestration_environment_mapping AS aoem
@@ -195,26 +193,30 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
               OR aoem.orchID IN (
                 SELECT  orchID_A
                 FROM    asset.orchestration_environment_linking
-                WHERE   orchID_A = t.parentOrchestrationID
-                  OR    orchID_B = t.parentOrchestrationID
+                WHERE   orchID_B = t.parentOrchestrationID
                 UNION
                 SELECT  orchID_B
                 FROM    asset.orchestration_environment_linking
                 WHERE   orchID_A = t.parentOrchestrationID
-                   OR   orchID_B = t.parentOrchestrationID
               )
      WHERE  t.depth < 32
+       AND  (   t.parentRuntimeID       IS NOT NULL
+             OR t.parentServerID        IS NOT NULL
+             OR t.parentOrchestrationID IS NOT NULL)
      )
   SELECT  ssa.serverID AS serverID,
           ssa.value    AS serverType,
           t.depth      AS depth
   FROM    asset.server_standard_attribute_values AS ssa
   JOIN    t
-    ON    t.parentServerID = ssa.serverID
+    ON    t.serverID = ssa.serverID
   JOIN    meta.standard_attribute AS ma
     ON    ssa.dictionaryID = ma.dictionaryID
    AND    ssa.attributeID = ma.attributeID
-  WHERE   t.parentServerID IS NOT NULL
+  WHERE   t.serverID IS NOT NULL
+    AND   t.parentServerID IS NULL
+    AND   t.parentRuntimeID IS NULL
+    AND   t.parentOrchestrationID IS NULL
     AND   ma.attribute = 'type'
     AND   ssa.value = 'physical';
   $BODY$
