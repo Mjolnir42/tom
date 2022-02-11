@@ -79,19 +79,26 @@ func (m *Model) ServerStack(w http.ResponseWriter, r *http.Request,
 
 	for prop, obj := range request.Server.Property {
 		// property attribute must be stacking request
-		if request.Server.Property[prop].Attribute != proto.MetaPropertyCmdStack {
+		switch request.Server.Property[prop].Attribute {
+		case proto.MetaPropertyCmdStack:
+		default:
 			m.x.ReplyBadRequest(&w, &request, nil)
 			return
 		}
+
 		// servers must be provided-by runtimes
 		if err, entityType, _ := proto.ParseTomID(
 			request.Server.Property[prop].Value,
 		); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
-		} else if entityType != proto.EntityRuntime {
-			m.x.ReplyBadRequest(&w, &request, nil)
-			return
+		} else {
+			switch entityType {
+			case proto.EntityRuntime:
+			default:
+				m.x.ReplyBadRequest(&w, &request, nil)
+				return
+			}
 		}
 		if err := proto.CheckPropertyConstraints(&obj); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
