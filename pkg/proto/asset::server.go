@@ -86,6 +86,20 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
+	Commands[CmdServerUnstack] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/server/` + PlHoldTomID + `/parent`,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdServerResolve] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/server/` + PlHoldTomID + `/resolve/` + PlHoldResolv,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{PlHoldTomID, PlHoldResolv},
+	}
 }
 
 // Server defines a server within the asset model
