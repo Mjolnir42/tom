@@ -63,26 +63,30 @@
         ├── asset::runtime:stack
 ====================================================
     └── tomd/asset
-        ├── asset::server:add
-        ├── asset::server:link                [DONE]
-        ├── asset::server:list
-        ├── asset::server:property.remove
-        ├── asset::server:property.set
-        ├── asset::server:property.update
-        ├── asset::server:remove
-        ├── asset::server:show                [DONE]
-        ├── asset::server:stack
+        ├── asset::server:add                    [DONE]
+        ├── asset::server:link                   [DONE]
+        ├── asset::server:list                   [DONE]
+        ├── asset::server:property.remove        [DONE]
+        ├── asset::server:property.set           [DONE]
+        ├── asset::server:property.update        [DONE]
+        ├── asset::server:remove                 [    ]
+        ├── asset::server:show                   [DONE]
+        ├── asset::server:stack                  [DONE]
+        ├── asset::server:unstack                [DONE]
+        ├── asset::server:resolve                [    ]
     └── tom/asset
-        ├── asset::server:add
-        ├── asset::server:link                [DONE]
-        ├── asset::server:list
-        ├── asset::server:property.remove
-        ├── asset::server:property.set
-        ├── asset::server:property.update
-        ├── asset::server:remove
-        ├── asset::server:show                [DONE]
-        ├── asset::server:stack
-====================================================
+        ├── asset::server:add                    [DONE]
+        ├── asset::server:link                   [DONE]
+        ├── asset::server:list                   [DONE]
+        ├── asset::server:property.remove        [DONE]
+        ├── asset::server:property.set           [DONE]
+        ├── asset::server:property.update        [DONE]
+        ├── asset::server:remove                 [    ]
+        ├── asset::server:show                   [DONE]
+        ├── asset::server:stack                  [DONE]
+        ├── asset::server:unstack                [DONE]
+        ├── asset::server:resolve                [    ]
+=======================================================
     └── tomd/asset
         ├── asset::socket:add
         ├── asset::socket:link

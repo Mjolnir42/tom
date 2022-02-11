@@ -29,6 +29,7 @@ type ServerWriteHandler struct {
 	stmtLink             *sql.Stmt
 	stmtRemove           *sql.Stmt
 	stmtTxRuntimeShow    *sql.Stmt
+	stmtTxShow           *sql.Stmt
 	stmtTxStackAdd       *sql.Stmt
 	stmtTxStackClamp     *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
@@ -58,6 +59,7 @@ func (h *ServerWriteHandler) Register(hm *handler.Map) {
 		proto.ActionPropUpdate,
 		proto.ActionRemove,
 		proto.ActionStack,
+		proto.ActionUnstack,
 	} {
 		hm.Request(msg.SectionServer, action, h.name)
 	}
@@ -83,6 +85,8 @@ func (h *ServerWriteHandler) process(q *msg.Request) {
 		h.remove(q, &result)
 	case proto.ActionStack:
 		h.stack(q, &result)
+	case proto.ActionUnstack:
+		h.unstack(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -115,6 +119,7 @@ func (h *ServerWriteHandler) Run() {
 		stmt.ServerAdd:                   &h.stmtAdd,
 		stmt.ServerLink:                  &h.stmtLink,
 		stmt.ServerRemove:                &h.stmtRemove,
+		stmt.ServerTxShow:                &h.stmtTxShow,
 		stmt.ServerTxStackAdd:            &h.stmtTxStackAdd,
 		stmt.ServerTxStackClamp:          &h.stmtTxStackClamp,
 		stmt.ServerTxStdPropertyAdd:      &h.stmtTxStdPropAdd,

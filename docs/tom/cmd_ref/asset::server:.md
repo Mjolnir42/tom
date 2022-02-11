@@ -20,6 +20,8 @@ tom server property remove ${name} namespace ${space} property ${attr} [property
 tom server link ${tomID} is-equal ${linkedID}
 tom server stack ${name} namespace ${space} provided-by ${providerID}
 tom server stack ${tomID} provided-by ${providerID}
+tom server unstack ${name} namespace ${space}
+tom server unstack ${tomID}
 ```
 
 # PROPERTIES
