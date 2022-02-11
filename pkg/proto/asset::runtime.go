@@ -121,11 +121,15 @@ type Runtime struct {
 
 func NewRuntimeRequest() Request {
 	return Request{
-		Runtime: &Runtime{
-			Link:     []string{},
-			Children: []string{},
-			Property: map[string]PropertyDetail{},
-		},
+		Runtime: NewRuntime(),
+	}
+}
+
+func NewRuntime() *Runtime {
+	return &Runtime{
+		Link:     []string{},
+		Children: []string{},
+		Property: map[string]PropertyDetail{},
 	}
 }
 

@@ -60,6 +60,7 @@ func (h *RuntimeWriteHandler) Register(hm *handler.Map) {
 		proto.ActionPropUpdate,
 		proto.ActionRemove,
 		proto.ActionStack,
+		proto.ActionUnstack,
 	} {
 		hm.Request(msg.SectionRuntime, action, h.name)
 	}
@@ -85,6 +86,8 @@ func (h *RuntimeWriteHandler) process(q *msg.Request) {
 		h.remove(q, &result)
 	case proto.ActionStack:
 		h.stack(q, &result)
+	case proto.ActionUnstack:
+		h.unstack(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
