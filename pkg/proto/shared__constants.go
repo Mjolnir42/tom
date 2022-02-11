@@ -61,17 +61,6 @@ const (
 )
 
 const (
-	CmdNamespace           = ModelMeta + `::` + EntityNamespace + `:`
-	CmdNamespaceAdd        = ModelMeta + `::` + EntityNamespace + `:` + ActionAdd
-	CmdNamespaceAttrAdd    = ModelMeta + `::` + EntityNamespace + `:` + ActionAttrAdd
-	CmdNamespaceAttrRemove = ModelMeta + `::` + EntityNamespace + `:` + ActionAttrRemove
-	CmdNamespaceList       = ModelMeta + `::` + EntityNamespace + `:` + ActionList
-	CmdNamespacePropRemove = ModelMeta + `::` + EntityNamespace + `:` + ActionPropRemove
-	CmdNamespacePropSet    = ModelMeta + `::` + EntityNamespace + `:` + ActionPropSet
-	CmdNamespacePropUpdate = ModelMeta + `::` + EntityNamespace + `:` + ActionPropUpdate
-	CmdNamespaceRemove     = ModelMeta + `::` + EntityNamespace + `:` + ActionRemove
-	CmdNamespaceShow       = ModelMeta + `::` + EntityNamespace + `:` + ActionShow
-
 	CmdServer           = ModelAsset + `::` + EntityServer + `:`
 	CmdServerAdd        = ModelAsset + `::` + EntityServer + `:` + ActionAdd
 	CmdServerLink       = ModelAsset + `::` + EntityServer + `:` + ActionLink
