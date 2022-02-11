@@ -202,11 +202,47 @@ WHERE             meta.dictionary.name = $1::text
      AND          meta.unique_attribute.attribute = 'name'::text
      AND          asset.orchestration_environment_unique_attribute_values.value = $2::text
      AND          $3::timestamptz(3) <@ asset.orchestration_environment_unique_attribute_values.validity;`
+
+	OrchestrationResolveServer = `
+SELECT      asset.server_unique_attribute_values.value,
+            meta.dictionary.name,
+            resolution.serverType
+FROM        view.resolveOrchestrationToServer($1::uuid) AS resolution
+    JOIN    asset.server
+      ON    resolution.serverID = asset.server.serverID
+    JOIN    meta.dictionary
+      ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.server_unique_attribute_values
+      ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
+     AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
+     AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+WHERE       meta.unique_attribute.attribute IN ('name');`
+
+	OrchestrationResolvePhysical = `
+SELECT      asset.server_unique_attribute_values.value,
+            meta.dictionary.name,
+            resolution.serverType
+FROM        view.resolveOrchestrationToPhysical($1::uuid) AS resolution
+    JOIN    asset.server
+      ON    resolution.serverID = asset.server.serverID
+    JOIN    meta.dictionary
+      ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.server_unique_attribute_values
+      ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
+     AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
+     AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+WHERE       meta.unique_attribute.attribute IN ('name');`
 )
 
 func init() {
 	m[OrchestrationListLinked] = `OrchestrationListLinked`
 	m[OrchestrationList] = `OrchestrationList`
+	m[OrchestrationResolvePhysical] = `OrchestrationResolvePhysical`
+	m[OrchestrationResolveServer] = `OrchestrationResolveServer`
 	m[OrchestrationTxParent] = `OrchestrationTxParent`
 	m[OrchestrationTxShowChildren] = `OrchestrationTxShowChildren`
 	m[OrchestrationTxShowProperties] = `OrchestrationTxShowProperties`

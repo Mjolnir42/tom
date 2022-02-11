@@ -25,6 +25,8 @@ type OrchestrationReadHandler struct {
 	conn           *sql.DB
 	lm             *lhm.LogHandleMap
 	stmtList       *sql.Stmt
+	stmtResolvNext *sql.Stmt
+	stmtResolvPhys *sql.Stmt
 	stmtTxChildren *sql.Stmt
 	stmtTxLinks    *sql.Stmt
 	stmtTxParent   *sql.Stmt
@@ -45,6 +47,7 @@ func NewOrchestrationReadHandler(length int) (string, *OrchestrationReadHandler)
 func (h *OrchestrationReadHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionList,
+		proto.ActionResolve,
 		proto.ActionShow,
 	} {
 		hm.Request(msg.SectionOrchestration, action, h.name)
@@ -58,6 +61,8 @@ func (h *OrchestrationReadHandler) process(q *msg.Request) {
 	switch q.Action {
 	case proto.ActionList:
 		h.list(q, &result)
+	case proto.ActionResolve:
+		h.resolve(q, &result)
 	case proto.ActionShow:
 		h.show(q, &result)
 	default:
@@ -89,6 +94,8 @@ func (h *OrchestrationReadHandler) Run() {
 	for statement, prepared := range map[string]**sql.Stmt{
 		stmt.OrchestrationList:             &h.stmtList,
 		stmt.OrchestrationListLinked:       &h.stmtTxLinks,
+		stmt.OrchestrationResolvePhysical:  &h.stmtResolvPhys,
+		stmt.OrchestrationResolveServer:    &h.stmtResolvNext,
 		stmt.OrchestrationTxParent:         &h.stmtTxParent,
 		stmt.OrchestrationTxShow:           &h.stmtTxShow,
 		stmt.OrchestrationTxShowChildren:   &h.stmtTxChildren,

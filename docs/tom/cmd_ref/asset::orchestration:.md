@@ -24,6 +24,8 @@ tom orchestration stack ${name} namespace ${space} provided-by ${providerID} [pr
 tom orchestration stack ${tomID} provided-by ${providerID} [provided-by ...] [replacing ${oldID}] [replacing ...]
 tom orchestration unstack ${name} namespace ${space} unprovide ${providerID} [unprovide ...]
 tom orchestration unstack ${tomID} unprovide ${providerID} [unprovide ...]
+tom orchestration resolve ${name} namespace ${space} level ${detail}
+tom orchestration resolve ${tomID} level ${detail}
 ```
 
 # PROPERTIES
