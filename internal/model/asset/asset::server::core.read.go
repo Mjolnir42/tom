@@ -29,6 +29,8 @@ type ServerReadHandler struct {
 	stmtLinked     *sql.Stmt
 	stmtList       *sql.Stmt
 	stmtParent     *sql.Stmt
+	stmtResolvNext *sql.Stmt
+	stmtResolvPhys *sql.Stmt
 	stmtTxChildren *sql.Stmt
 	stmtTxProp     *sql.Stmt
 	stmtTxShow     *sql.Stmt
@@ -47,6 +49,7 @@ func NewServerReadHandler(length int) (string, *ServerReadHandler) {
 func (h *ServerReadHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionList,
+		proto.ActionResolve,
 		proto.ActionShow,
 	} {
 		hm.Request(msg.SectionServer, action, h.name)
@@ -60,6 +63,8 @@ func (h *ServerReadHandler) process(q *msg.Request) {
 	switch q.Action {
 	case proto.ActionList:
 		h.list(q, &result)
+	case proto.ActionResolve:
+		h.resolve(q, &result)
 	case proto.ActionShow:
 		h.show(q, &result)
 	default:
@@ -94,6 +99,8 @@ func (h *ServerReadHandler) Run() {
 		stmt.ServerList:             &h.stmtList,
 		stmt.ServerListLinked:       &h.stmtLinked,
 		stmt.ServerParent:           &h.stmtParent,
+		stmt.ServerResolvePhysical:  &h.stmtResolvPhys,
+		stmt.ServerResolveServer:    &h.stmtResolvNext,
 		stmt.ServerTxShow:           &h.stmtTxShow,
 		stmt.ServerTxShowChildren:   &h.stmtTxChildren,
 		stmt.ServerTxShowProperties: &h.stmtTxProp,

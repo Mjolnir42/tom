@@ -255,6 +255,40 @@ WHERE       asset.runtime_environment_parent.parentServerID = $1::uuid
      AND    meta.unique_attribute.attribute = 'name'::text
      AND    $2::timestamptz(3) <@ asset.runtime_environment_parent.validity
      AND    $2::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
+
+	ServerResolveServer = `
+SELECT      asset.server_unique_attribute_values.value,
+            meta.dictionary.name,
+            resolution.serverType
+FROM        view.resolveServerToServer($1::uuid) AS resolution
+    JOIN    asset.server
+      ON    resolution.serverID = asset.server.serverID
+    JOIN    meta.dictionary
+      ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.server_unique_attribute_values
+      ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
+     AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
+     AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+WHERE       meta.unique_attribute.attribute IN ('name');`
+
+	ServerResolvePhysical = `
+SELECT      asset.server_unique_attribute_values.value,
+            meta.dictionary.name,
+            resolution.serverType
+FROM        view.resolveServerToPhysical($1::uuid) AS resolution
+    JOIN    asset.server
+      ON    resolution.serverID = asset.server.serverID
+    JOIN    meta.dictionary
+      ON    asset.server.dictionaryID = meta.dictionary.dictionaryID
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    asset.server_unique_attribute_values
+      ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
+     AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
+     AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
+WHERE       meta.unique_attribute.attribute IN ('name');`
 )
 
 func init() {
@@ -263,6 +297,8 @@ func init() {
 	m[ServerListLinked] = `ServerListLinked`
 	m[ServerList] = `ServerList`
 	m[ServerParent] = `ServerParent`
+	m[ServerResolvePhysical] = `ServerResolvePhysical`
+	m[ServerResolveServer] = `ServerResolveServer`
 	m[ServerTxShowChildren] = `ServerTxShowChildren`
 	m[ServerTxShowProperties] = `ServerTxShowProperties`
 	m[ServerTxShow] = `ServerTxShow`
