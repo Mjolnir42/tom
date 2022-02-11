@@ -61,18 +61,6 @@ const (
 )
 
 const (
-	CmdOrchestration           = ModelAsset + `::` + EntityOrchestration + `:`
-	CmdOrchestrationAdd        = ModelAsset + `::` + EntityOrchestration + `:` + ActionAdd
-	CmdOrchestrationLink       = ModelAsset + `::` + EntityOrchestration + `:` + ActionLink
-	CmdOrchestrationList       = ModelAsset + `::` + EntityOrchestration + `:` + ActionList
-	CmdOrchestrationPropRemove = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropRemove
-	CmdOrchestrationPropSet    = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropSet
-	CmdOrchestrationPropUpdate = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropUpdate
-	CmdOrchestrationRemove     = ModelAsset + `::` + EntityOrchestration + `:` + ActionRemove
-	CmdOrchestrationShow       = ModelAsset + `::` + EntityOrchestration + `:` + ActionShow
-	CmdOrchestrationStack      = ModelAsset + `::` + EntityOrchestration + `:` + ActionStack
-	CmdOrchestrationUnstack    = ModelAsset + `::` + EntityOrchestration + `:` + ActionUnstack
-
 	MetaPropertyCmdLink    = ModelAsset + `::` + `meta-cmd` + `::` + ActionLink
 	MetaPropertyCmdStack   = ModelAsset + `::` + `meta-cmd` + `::` + ActionStack
 	MetaPropertyCmdUnstack = ModelAsset + `::` + `meta-cmd` + `::` + ActionUnstack

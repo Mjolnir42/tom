@@ -7,6 +7,21 @@
 
 package proto //
 
+const (
+	CmdOrchestration           = ModelAsset + `::` + EntityOrchestration + `:`
+	CmdOrchestrationAdd        = ModelAsset + `::` + EntityOrchestration + `:` + ActionAdd
+	CmdOrchestrationLink       = ModelAsset + `::` + EntityOrchestration + `:` + ActionLink
+	CmdOrchestrationList       = ModelAsset + `::` + EntityOrchestration + `:` + ActionList
+	CmdOrchestrationPropRemove = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropRemove
+	CmdOrchestrationPropSet    = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropSet
+	CmdOrchestrationPropUpdate = ModelAsset + `::` + EntityOrchestration + `:` + ActionPropUpdate
+	CmdOrchestrationRemove     = ModelAsset + `::` + EntityOrchestration + `:` + ActionRemove
+	CmdOrchestrationResolve    = ModelAsset + `::` + EntityOrchestration + `:` + ActionResolve
+	CmdOrchestrationShow       = ModelAsset + `::` + EntityOrchestration + `:` + ActionShow
+	CmdOrchestrationStack      = ModelAsset + `::` + EntityOrchestration + `:` + ActionStack
+	CmdOrchestrationUnstack    = ModelAsset + `::` + EntityOrchestration + `:` + ActionUnstack
+)
+
 func init() {
 	Commands[CmdOrchestrationAdd] = CmdDef{
 		Method:      MethodPOST,
