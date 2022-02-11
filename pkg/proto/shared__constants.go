@@ -61,18 +61,6 @@ const (
 )
 
 const (
-	CmdRuntime           = ModelAsset + `::` + EntityRuntime + `:`
-	CmdRuntimeAdd        = ModelAsset + `::` + EntityRuntime + `:` + ActionAdd
-	CmdRuntimeLink       = ModelAsset + `::` + EntityRuntime + `:` + ActionLink
-	CmdRuntimeList       = ModelAsset + `::` + EntityRuntime + `:` + ActionList
-	CmdRuntimePropRemove = ModelAsset + `::` + EntityRuntime + `:` + ActionPropRemove
-	CmdRuntimePropSet    = ModelAsset + `::` + EntityRuntime + `:` + ActionPropSet
-	CmdRuntimePropUpdate = ModelAsset + `::` + EntityRuntime + `:` + ActionPropUpdate
-	CmdRuntimeRemove     = ModelAsset + `::` + EntityRuntime + `:` + ActionRemove
-	CmdRuntimeResolve    = ModelAsset + `::` + EntityRuntime + `:` + ActionResolve
-	CmdRuntimeShow       = ModelAsset + `::` + EntityRuntime + `:` + ActionShow
-	CmdRuntimeStack      = ModelAsset + `::` + EntityRuntime + `:` + ActionStack
-
 	CmdOrchestration           = ModelAsset + `::` + EntityOrchestration + `:`
 	CmdOrchestrationAdd        = ModelAsset + `::` + EntityOrchestration + `:` + ActionAdd
 	CmdOrchestrationLink       = ModelAsset + `::` + EntityOrchestration + `:` + ActionLink
