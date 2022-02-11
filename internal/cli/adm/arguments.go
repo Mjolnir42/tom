@@ -628,6 +628,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		return []string{`unprovide`}, []string{`namespace`, `since`}, []string{`unprovide`}
 	case proto.CmdRuntimeStack:
 		return []string{}, []string{`namespace`, `runs-on`}, []string{`runs-on`}
+	case proto.CmdRuntimeUnstack:
+		return []string{}, []string{`namespace`}, []string{}
 	default:
 		return []string{}, []string{}, []string{}
 	}

@@ -93,6 +93,13 @@ func registerAssetRuntime(app cli.App, run ActionFunc) *cli.App {
 						BashComplete: cmpl.RuntimeStack,
 					},
 					{
+						Name:         `unstack`,
+						Usage:        `Remove the base this runtime runs on`,
+						Description:  help.Text(proto.CmdRuntimeUnstack),
+						Action:       run(cmdAssetRuntimeUnstack),
+						BashComplete: cmpl.RuntimeUnstack,
+					},
+					{
 						Name:         `resolve`,
 						Usage:        `Resolve this runtime down to the server(s) it runs on`,
 						Description:  help.Text(proto.CmdRuntimeResolve),

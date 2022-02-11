@@ -20,6 +20,8 @@ tom runtime stack ${name} namespace ${space} provided-by ${providerID}
 tom runtime stack ${tomID} provided-by ${providerID}
 tom runtime resolve ${name} namespace ${space} level ${detail}
 tom runtime resolve ${tomID} level ${detail}
+tom runtime unstack ${name} namespace ${space}
+tom runtime unstack ${tomID}
 ```
 
 # PROPERTIES
