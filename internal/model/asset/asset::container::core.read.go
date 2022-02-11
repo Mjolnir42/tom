@@ -19,15 +19,17 @@ import (
 
 // ContainerReadHandler ...
 type ContainerReadHandler struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	name       string
-	conn       *sql.DB
-	lm         *lhm.LogHandleMap
-	stmtLinked *sql.Stmt
-	stmtList   *sql.Stmt
-	stmtProp   *sql.Stmt
-	stmtShow   *sql.Stmt
+	Input          chan msg.Request
+	Shutdown       chan struct{}
+	name           string
+	conn           *sql.DB
+	lm             *lhm.LogHandleMap
+	stmtLinked     *sql.Stmt
+	stmtList       *sql.Stmt
+	stmtProp       *sql.Stmt
+	stmtResolvNext *sql.Stmt
+	stmtResolvPhys *sql.Stmt
+	stmtShow       *sql.Stmt
 	stmtTxParent   *sql.Stmt
 }
 
@@ -44,6 +46,7 @@ func NewContainerReadHandler(length int) (string, *ContainerReadHandler) {
 func (h *ContainerReadHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionList,
+		proto.ActionResolve,
 		proto.ActionShow,
 	} {
 		hm.Request(msg.SectionContainer, action, h.name)
@@ -60,6 +63,8 @@ func (h *ContainerReadHandler) process(q *msg.Request) {
 		h.list(q, &result)
 	case proto.ActionShow:
 		h.show(q, &result)
+	case proto.ActionResolve:
+		h.resolve(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -89,9 +94,11 @@ func (h *ContainerReadHandler) Run() {
 	for statement, prepared := range map[string]**sql.Stmt{
 		stmt.ContainerList:             &h.stmtList,
 		stmt.ContainerListLinked:       &h.stmtLinked,
+		stmt.ContainerResolvePhysical:  &h.stmtResolvPhys,
+		stmt.ContainerResolveServer:    &h.stmtResolvNext,
+		stmt.ContainerTxParent:         &h.stmtTxParent,
 		stmt.ContainerTxShow:           &h.stmtShow,
 		stmt.ContainerTxShowProperties: &h.stmtProp,
-		stmt.ContainerTxParent:         &h.stmtTxParent,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
