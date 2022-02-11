@@ -99,6 +99,13 @@ func registerAssetOrchestration(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetOrchestrationUnstack),
 						BashComplete: cmpl.OrchestrationUnstack,
 					},
+					{
+						Name:         `resolve`,
+						Usage:        `Resolve this orchestration down to the server(s) it runs on`,
+						Description:  help.Text(proto.CmdOrchestrationResolve),
+						Action:       run(cmdAssetOrchestrationResolve),
+						BashComplete: cmpl.OrchestrationResolve,
+					},
 				},
 			},
 		}...,
