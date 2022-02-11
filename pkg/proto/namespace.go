@@ -7,6 +7,85 @@
 
 package proto //
 
+const (
+	CmdNamespace           = ModelMeta + `::` + EntityNamespace + `:`
+	CmdNamespaceAdd        = ModelMeta + `::` + EntityNamespace + `:` + ActionAdd
+	CmdNamespaceAttrAdd    = ModelMeta + `::` + EntityNamespace + `:` + ActionAttrAdd
+	CmdNamespaceAttrRemove = ModelMeta + `::` + EntityNamespace + `:` + ActionAttrRemove
+	CmdNamespaceList       = ModelMeta + `::` + EntityNamespace + `:` + ActionList
+	CmdNamespacePropRemove = ModelMeta + `::` + EntityNamespace + `:` + ActionPropRemove
+	CmdNamespacePropSet    = ModelMeta + `::` + EntityNamespace + `:` + ActionPropSet
+	CmdNamespacePropUpdate = ModelMeta + `::` + EntityNamespace + `:` + ActionPropUpdate
+	CmdNamespaceRemove     = ModelMeta + `::` + EntityNamespace + `:` + ActionRemove
+	CmdNamespaceShow       = ModelMeta + `::` + EntityNamespace + `:` + ActionShow
+)
+
+func init() {
+	Commands[CmdNamespaceAdd] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/namespace/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{},
+	}
+	Commands[CmdNamespaceList] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/namespace/`,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{},
+	}
+	Commands[CmdNamespaceShow] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/namespace/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateDetail,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdNamespaceAttrAdd] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/namespace/` + PlHoldTomID + `/attribute/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdNamespaceAttrRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/namespace/` + PlHoldTomID + `/attribute/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdNamespacePropSet] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/namespace/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdNamespacePropUpdate] = CmdDef{
+		Method:      MethodPATCH,
+		Path:        `/namespace/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdNamespacePropRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/namespace/` + PlHoldTomID + `/property/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdNamespaceRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/namespace/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+}
+
 // Namespace defines ...
 type Namespace struct {
 	Name         string                    `json:"name"`
