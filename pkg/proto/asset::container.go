@@ -10,13 +10,16 @@ package proto //
 const (
 	CmdContainer           = ModelAsset + `::` + EntityContainer + `:`
 	CmdContainerAdd        = ModelAsset + `::` + EntityContainer + `:` + ActionAdd
-	CmdContainerList       = ModelAsset + `::` + EntityContainer + `:` + ActionList
 	CmdContainerLink       = ModelAsset + `::` + EntityContainer + `:` + ActionLink
+	CmdContainerList       = ModelAsset + `::` + EntityContainer + `:` + ActionList
 	CmdContainerPropRemove = ModelAsset + `::` + EntityContainer + `:` + ActionPropRemove
 	CmdContainerPropSet    = ModelAsset + `::` + EntityContainer + `:` + ActionPropSet
 	CmdContainerPropUpdate = ModelAsset + `::` + EntityContainer + `:` + ActionPropUpdate
 	CmdContainerRemove     = ModelAsset + `::` + EntityContainer + `:` + ActionRemove
+	CmdContainerResolve    = ModelAsset + `::` + EntityContainer + `:` + ActionResolve
 	CmdContainerShow       = ModelAsset + `::` + EntityContainer + `:` + ActionShow
+	CmdContainerStack      = ModelAsset + `::` + EntityContainer + `:` + ActionStack
+	CmdContainerUnstack    = ModelAsset + `::` + EntityContainer + `:` + ActionUnstack
 )
 
 func init() {
@@ -74,6 +77,27 @@ func init() {
 		Path:        `/container/` + PlHoldTomID,
 		Body:        false,
 		ResultTmpl:  TemplateDetail,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdContainerResolve] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/container/` + PlHoldTomID + `/resolve/` + PlHoldResolv,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{PlHoldTomID, PlHoldResolv},
+	}
+	Commands[CmdContainerStack] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/container/` + PlHoldTomID + `/parent`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdContainerUnstack] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/container/` + PlHoldTomID + `/parent`,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
 }

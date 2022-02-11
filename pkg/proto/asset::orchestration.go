@@ -93,6 +93,13 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
+	Commands[CmdOrchestrationResolve] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/orchestration/` + PlHoldTomID + `/resolve/` + PlHoldResolv,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{PlHoldTomID, PlHoldResolv},
+	}
 }
 
 // Orchestration defines a orchestration environment within the asset model

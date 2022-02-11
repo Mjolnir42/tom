@@ -93,6 +93,13 @@ func init() {
 		ResultTmpl:  TemplateList,
 		Placeholder: []string{PlHoldTomID, PlHoldResolv},
 	}
+	Commands[CmdRuntimeUnstack] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/runtime/` + PlHoldTomID + `/parent`,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
 }
 
 // Runtime defines a runtime within the asset model
