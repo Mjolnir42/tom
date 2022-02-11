@@ -7,6 +7,21 @@
 
 package proto //
 
+const (
+	CmdServer           = ModelAsset + `::` + EntityServer + `:`
+	CmdServerAdd        = ModelAsset + `::` + EntityServer + `:` + ActionAdd
+	CmdServerLink       = ModelAsset + `::` + EntityServer + `:` + ActionLink
+	CmdServerList       = ModelAsset + `::` + EntityServer + `:` + ActionList
+	CmdServerPropRemove = ModelAsset + `::` + EntityServer + `:` + ActionPropRemove
+	CmdServerPropSet    = ModelAsset + `::` + EntityServer + `:` + ActionPropSet
+	CmdServerPropUpdate = ModelAsset + `::` + EntityServer + `:` + ActionPropUpdate
+	CmdServerRemove     = ModelAsset + `::` + EntityServer + `:` + ActionRemove
+	CmdServerResolve    = ModelAsset + `::` + EntityServer + `:` + ActionResolve
+	CmdServerShow       = ModelAsset + `::` + EntityServer + `:` + ActionShow
+	CmdServerStack      = ModelAsset + `::` + EntityServer + `:` + ActionStack
+	CmdServerUnstack    = ModelAsset + `::` + EntityServer + `:` + ActionUnstack
+)
+
 func init() {
 	Commands[CmdServerAdd] = CmdDef{
 		Method:      MethodPOST,
