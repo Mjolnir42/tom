@@ -99,6 +99,13 @@ func registerAssetContainer(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetContainerUnstack),
 						BashComplete: cmpl.ContainerUnstack,
 					},
+					{
+						Name:         `resolve`,
+						Usage:        `Resolve this container down to the server(s) it runs on`,
+						Description:  help.Text(proto.CmdContainerResolve),
+						Action:       run(cmdAssetContainerResolve),
+						BashComplete: cmpl.ContainerResolve,
+					},
 				},
 			},
 		}...,

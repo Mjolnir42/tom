@@ -20,6 +20,8 @@ tom container stack ${name} namespace ${space} provided-by ${providerID}
 tom container stack ${tomID} provided-by ${providerID}
 tom container unstack ${name} namespace ${space}
 tom container unstack ${tomID}
+tom container resolve ${name} namespace ${space} level ${detail}
+tom container resolve ${tomID} level ${detail}
 ```
 
 # PROPERTIES
