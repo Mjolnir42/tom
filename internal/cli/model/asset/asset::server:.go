@@ -92,6 +92,13 @@ func registerAssetServer(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetServerStack),
 						BashComplete: cmpl.ServerStack,
 					},
+					{
+						Name:         `unstack`,
+						Usage:        `Remove the provider runtime environment of a server`,
+						Description:  help.Text(proto.CmdServerUnstack),
+						Action:       run(cmdAssetServerUnstack),
+						BashComplete: cmpl.ServerUnstack,
+					},
 				},
 			},
 		}...,

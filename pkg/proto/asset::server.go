@@ -121,11 +121,15 @@ type Server struct {
 
 func NewServerRequest() Request {
 	return Request{
-		Server: &Server{
-			Link:     []string{},
-			Children: []string{},
-			Property: map[string]PropertyDetail{},
-		},
+		Server: NewServer(),
+	}
+}
+
+func NewServer() *Server {
+	return &Server{
+		Link:     []string{},
+		Children: []string{},
+		Property: map[string]PropertyDetail{},
 	}
 }
 
