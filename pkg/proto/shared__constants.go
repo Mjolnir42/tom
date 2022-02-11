@@ -61,17 +61,6 @@ const (
 )
 
 const (
-	CmdServer           = ModelAsset + `::` + EntityServer + `:`
-	CmdServerAdd        = ModelAsset + `::` + EntityServer + `:` + ActionAdd
-	CmdServerLink       = ModelAsset + `::` + EntityServer + `:` + ActionLink
-	CmdServerList       = ModelAsset + `::` + EntityServer + `:` + ActionList
-	CmdServerPropRemove = ModelAsset + `::` + EntityServer + `:` + ActionPropRemove
-	CmdServerPropSet    = ModelAsset + `::` + EntityServer + `:` + ActionPropSet
-	CmdServerPropUpdate = ModelAsset + `::` + EntityServer + `:` + ActionPropUpdate
-	CmdServerRemove     = ModelAsset + `::` + EntityServer + `:` + ActionRemove
-	CmdServerShow       = ModelAsset + `::` + EntityServer + `:` + ActionShow
-	CmdServerStack      = ModelAsset + `::` + EntityServer + `:` + ActionStack
-
 	CmdRuntime           = ModelAsset + `::` + EntityRuntime + `:`
 	CmdRuntimeAdd        = ModelAsset + `::` + EntityRuntime + `:` + ActionAdd
 	CmdRuntimeLink       = ModelAsset + `::` + EntityRuntime + `:` + ActionLink
