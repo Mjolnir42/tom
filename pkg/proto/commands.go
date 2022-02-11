@@ -7,6 +7,8 @@
 
 package proto //
 
+// CmdDef holds required information for a specific command, allowing to
+// make a request for this command
 type CmdDef struct {
 	Method      string
 	Path        string
@@ -15,6 +17,7 @@ type CmdDef struct {
 	Placeholder []string
 }
 
+// Commands is the exported map of all protocol commands defined in proto
 var Commands = map[string]CmdDef{}
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
