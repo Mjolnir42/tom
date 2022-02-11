@@ -28,6 +28,10 @@ type ContainerWriteHandler struct {
 	stmtAttQueryType     *sql.Stmt
 	stmtLink             *sql.Stmt
 	stmtRemove           *sql.Stmt
+	stmtTxRteShow        *sql.Stmt
+	stmtTxShow           *sql.Stmt
+	stmtTxStackAdd       *sql.Stmt
+	stmtTxStackClamp     *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
 	stmtTxStdPropSelect  *sql.Stmt
@@ -54,6 +58,8 @@ func (h *ContainerWriteHandler) Register(hm *handler.Map) {
 		proto.ActionPropSet,
 		proto.ActionPropUpdate,
 		proto.ActionRemove,
+		proto.ActionStack,
+		proto.ActionUnstack,
 	} {
 		hm.Request(msg.SectionContainer, action, h.name)
 	}
@@ -77,6 +83,10 @@ func (h *ContainerWriteHandler) process(q *msg.Request) {
 		h.propertyUpdate(q, &result)
 	case proto.ActionRemove:
 		h.remove(q, &result)
+	case proto.ActionStack:
+		h.stack(q, &result)
+	case proto.ActionUnstack:
+		h.unstack(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -114,6 +124,10 @@ func (h *ContainerWriteHandler) Run() {
 		stmt.ContainerTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
 		stmt.ContainerTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
 		stmt.NamespaceAttributeQueryType:   &h.stmtAttQueryType,
+		stmt.ContainerTxStackAdd:           &h.stmtTxStackAdd,
+		stmt.ContainerTxStackClamp:         &h.stmtTxStackClamp,
+		stmt.ContainerTxShow:               &h.stmtTxShow,
+		stmt.RuntimeTxShow:                 &h.stmtTxRteShow,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

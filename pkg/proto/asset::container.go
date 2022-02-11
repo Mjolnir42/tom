@@ -120,10 +120,14 @@ type Container struct {
 
 func NewContainerRequest() Request {
 	return Request{
-		Container: &Container{
-			Link:     []string{},
-			Property: map[string]PropertyDetail{},
-		},
+		Container: NewContainer(),
+	}
+}
+
+func NewContainer() *Container {
+	return &Container{
+		Link:     []string{},
+		Property: map[string]PropertyDetail{},
 	}
 }
 

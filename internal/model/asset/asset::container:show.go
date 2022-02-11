@@ -196,6 +196,34 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
+	// query parent information
+	var rteID, rteDictID, rteDictName, rteName string
+	noParent := false
+	if err = tx.Stmt(
+		h.stmtTxParent,
+	).QueryRow(
+		containerID,
+		txTime,
+	).Scan(
+		&rteID,
+		&rteDictID,
+		&rteDictName,
+		&rteName,
+	); err == sql.ErrNoRows {
+		// not an error
+		noParent = true
+	} else if err != nil {
+		mr.ServerError(err)
+		return
+	}
+	if !noParent {
+		ct.Parent = (&proto.Runtime{
+			ID:        rteID,
+			Namespace: rteDictName,
+			Name:      rteName,
+		}).FormatTomID()
+	}
+
 	// fetch linked containers
 	linklist := [][]string{}
 	if links, err = tx.Stmt(h.stmtLinked).Query(
