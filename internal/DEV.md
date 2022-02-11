@@ -1,8 +1,9 @@
 # Add new REST command
 
 1. register command
-    1. command keywords in `.../pkr/proto/shared__constants.go
-    2. command method definitions in `.../pkr/proto/${entity}.go`
+    1. action keywords in `.../pkg/proto/constants.go`
+    2. command keywords in `.../pkg/proto/${model}::${entity}.go
+    3. command method definitions in `.../pkg/proto/${model}::${${entity}.go`
 2. ensure model file `.../internal/model/${model}/${model}::.go`
 3. ensure entity file `.../internal/model/${model}/${model}::${entity}:.go`
 4. ensure command file `.../internal/model/${model}/${model}::${entity}:${command}.go
@@ -15,7 +16,8 @@
 
 # Add new cli command
 
-1. register command in `.../internal/cli/model/meta/meta::namespace:.go`
-2. create entry for command in adm.ArgumentsForCommand()
+1. register command in `.../internal/cli/model/${model}/${model}::${entity}:.go`
+2. create entry for command in `.../internal/cli/adm/arguments.go ArgumentsForCommand()`
 3. create bashcompletion in `.../internal/cli/cmpl/`
 4. create documentation in `.../docs/tom/cmd_ref/${model}::${entity}:${command}`
+5. create implementation in `.../internal/cli/model/${model}/${model}::${entity}:${command}.go`
