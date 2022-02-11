@@ -1,67 +1,124 @@
-====================================================
+=======================================================
+    └── tomd/iam
+        ├── iam::library:add
+        ├── iam::library:list
+        ├── iam::library:remove
+        ├── iam::library:show
+    └── tom/iam
+        ├── iam::library:add
+        ├── iam::library:list
+        ├── iam::library:remove
+        ├── iam::library:show
+=======================================================
+    └── tomd/iam
+        ├── iam::user:add
+        ├── iam::user:list
+        ├── iam::user:remove
+        ├── iam::user:show
+        ├── iam::user:update
+    └── tom/iam
+        ├── iam::user:add
+        ├── iam::user:list
+        ├── iam::user:remove
+        ├── iam::user:show
+        ├── iam::user:update
+=======================================================
+    └── tomd/iam
+        ├── iam::team:add
+        ├── iam::team:head.of.set
+        ├── iam::team:head.of.unset
+        ├── iam::team:list
+        ├── iam::team:member.add
+        ├── iam::team:member.list
+        ├── iam::team:member.remove
+        ├── iam::team:member.set
+        ├── iam::team:remove
+        ├── iam::team:show
+        ├── iam::team:update
+    └── tom/iam
+        ├── iam::team:add
+        ├── iam::team:head.of.set
+        ├── iam::team:head.of.unset
+        ├── iam::team:list
+        ├── iam::team:member.add
+        ├── iam::team:member.list
+        ├── iam::team:member.remove
+        ├── iam::team:member.set
+        ├── iam::team:remove
+        ├── iam::team:show
+        ├── iam::team:update
+=======================================================
     └── tomd/meta
-        ├── meta::namespace:add               [DONE]
-        ├── meta::namespace:list              [DONE]
-        ├── meta::namespace:attribute.add     [DONE]
-        ├── meta::namespace:attribute.remove  [DONE]
-        ├── meta::namespace:property.set      [DONE]
-        ├── meta::namespace:property.update   [DONE]
-        ├── meta::namespace:property.remove   [DONE]
-        ├── meta::namespace:remove            [DONE]
-        └── meta::namespace:show              [DONE]
+        ├── meta::namespace:add                  [DONE]
+        ├── meta::namespace:attribute.add        [DONE]
+        ├── meta::namespace:attribute.remove     [DONE]
+        ├── meta::namespace:list                 [DONE]
+        ├── meta::namespace:property.remove      [DONE]
+        ├── meta::namespace:property.set         [DONE]
+        ├── meta::namespace:property.update      [DONE]
+        ├── meta::namespace:remove               [DONE]
+        ├── meta::namespace:show                 [DONE]
     └── tom/meta
-        ├── meta::namespace:add               [DONE]
-        ├── meta::namespace:list              [DONE]
-        ├── meta::namespace:attribute.add     [DONE]
-        ├── meta::namespace:attribute.remove  [DONE]
-        ├── meta::namespace:property.set      [DONE]
-        ├── meta::namespace:property.update   [DONE]
-        ├── meta::namespace:property.remove   [DONE]
-        ├── meta::namespace:remove            [DONE]
-        └── meta::namespace:show              [DONE]
-====================================================
+        ├── meta::namespace:add                  [DONE]
+        ├── meta::namespace:attribute.add        [DONE]
+        ├── meta::namespace:attribute.remove     [DONE]
+        ├── meta::namespace:list                 [DONE]
+        ├── meta::namespace:property.remove      [DONE]
+        ├── meta::namespace:property.set         [DONE]
+        ├── meta::namespace:property.update      [DONE]
+        ├── meta::namespace:remove               [DONE]
+        ├── meta::namespace:show                 [DONE]
+=======================================================
     └── tomd/asset
-        ├── asset::container:add              [DONE]
-        ├── asset::container:link             [DONE]
-        ├── asset::container:list             [DONE]
-        ├── asset::container:property.remove  [DONE]
-        ├── asset::container:property.set
-        ├── asset::container:property.update  [DONE]
-        ├── asset::container:remove
-        ├── asset::container:show             [DONE]
-        ├── asset::container:stack
+        ├── asset::container:resolve             [    ]
+        ├── asset::container:add                 [DONE]
+        ├── asset::container:link                [DONE]
+        ├── asset::container:list                [DONE]
+        ├── asset::container:property.remove     [DONE]
+        ├── asset::container:property.set        [DONE]
+        ├── asset::container:property.update     [DONE]
+        ├── asset::container:remove              [    ]
+        ├── asset::container:show                [DONE]
+        ├── asset::container:stack               [    ]
+        ├── asset::container:unstack             [    ]
     └── tom/asset
-        ├── asset::container:add              [DONE]
-        ├── asset::container:link             [DONE]
-        ├── asset::container:list             [DONE]
-        ├── asset::container:property.remove  [DONE]
-        ├── asset::container:property.set
-        ├── asset::container:property.update  [DONE]
-        ├── asset::container:remove
-        ├── asset::container:show             [DONE]
-        ├── asset::container:stack
-====================================================
+        ├── asset::container:resolve             [    ]
+        ├── asset::container:add                 [DONE]
+        ├── asset::container:link                [DONE]
+        ├── asset::container:list                [DONE]
+        ├── asset::container:property.remove     [DONE]
+        ├── asset::container:property.set        [DONE]
+        ├── asset::container:property.update     [DONE]
+        ├── asset::container:remove              [    ]
+        ├── asset::container:show                [DONE]
+        ├── asset::container:stack               [    ]
+        ├── asset::container:unstack             [    ]
+=======================================================
     └── tomd/asset
-        ├── asset::runtime:add                [DONE]
-        ├── asset::runtime:link               [DONE]
-        ├── asset::runtime:list               [DONE]
-        ├── asset::runtime:property.remove    [DONE]
-        ├── asset::runtime:property.set       [DONE]
-        ├── asset::runtime:property.update    [DONE]
-        ├── asset::runtime:remove             [DONE]
-        ├── asset::runtime:show               [DONE]
-        ├── asset::runtime:stack
+        ├── asset::runtime:add                   [DONE]
+        ├── asset::runtime:link                  [DONE]
+        ├── asset::runtime:list                  [DONE]
+        ├── asset::runtime:property.remove       [DONE]
+        ├── asset::runtime:property.set          [DONE]
+        ├── asset::runtime:property.update       [DONE]
+        ├── asset::runtime:remove                [DONE]
+        ├── asset::runtime:resolve               [DONE]
+        ├── asset::runtime:show                  [DONE]
+        ├── asset::runtime:stack                 [DONE]
+        ├── asset::runtime:unstack               [    ]
     └── tom/asset
-        ├── asset::runtime:add                [DONE]
-        ├── asset::runtime:link               [DONE]
-        ├── asset::runtime:list               [DONE]
-        ├── asset::runtime:property.remove    [DONE]
-        ├── asset::runtime:property.set       [DONE]
-        ├── asset::runtime:property.update    [DONE]
-        ├── asset::runtime:remove             [DONE]
-        ├── asset::runtime:show               [DONE]
-        ├── asset::runtime:stack
-====================================================
+        ├── asset::runtime:add                   [DONE]
+        ├── asset::runtime:link                  [DONE]
+        ├── asset::runtime:list                  [DONE]
+        ├── asset::runtime:property.remove       [DONE]
+        ├── asset::runtime:property.set          [DONE]
+        ├── asset::runtime:property.update       [DONE]
+        ├── asset::runtime:remove                [DONE]
+        ├── asset::runtime:resolve               [DONE]
+        ├── asset::runtime:show                  [DONE]
+        ├── asset::runtime:stack                 [DONE]
+        ├── asset::runtime:unstack               [    ]
+=======================================================
     └── tomd/asset
         ├── asset::server:add                    [DONE]
         ├── asset::server:link                   [DONE]
@@ -70,10 +127,10 @@
         ├── asset::server:property.set           [DONE]
         ├── asset::server:property.update        [DONE]
         ├── asset::server:remove                 [    ]
+        ├── asset::server:resolve                [    ]
         ├── asset::server:show                   [DONE]
         ├── asset::server:stack                  [DONE]
         ├── asset::server:unstack                [DONE]
-        ├── asset::server:resolve                [    ]
     └── tom/asset
         ├── asset::server:add                    [DONE]
         ├── asset::server:link                   [DONE]
@@ -82,10 +139,10 @@
         ├── asset::server:property.set           [DONE]
         ├── asset::server:property.update        [DONE]
         ├── asset::server:remove                 [    ]
+        ├── asset::server:resolve                [    ]
         ├── asset::server:show                   [DONE]
         ├── asset::server:stack                  [DONE]
         ├── asset::server:unstack                [DONE]
-        ├── asset::server:resolve                [    ]
 =======================================================
     └── tomd/asset
         ├── asset::socket:add
@@ -105,23 +162,29 @@
         ├── asset::socket:property.update
         ├── asset::socket:remove
         ├── asset::socket:show
-====================================================
+=======================================================
     └── tomd/asset
-        ├── asset::orchestration:add
-        ├── asset::orchestration:link
-        ├── asset::orchestration:list
-        ├── asset::orchestration:property.remove
-        ├── asset::orchestration:property.set
-        ├── asset::orchestration:property.update
-        ├── asset::orchestration:remove
-        ├── asset::orchestration:show
+        ├── asset::orchestration:add             [DONE]
+        ├── asset::orchestration:link            [DONE]
+        ├── asset::orchestration:list            [DONE]
+        ├── asset::orchestration:property.remove [DONE]
+        ├── asset::orchestration:property.set    [DONE]
+        ├── asset::orchestration:property.update [DONE]
+        ├── asset::orchestration:remove          [    ]
+        ├── asset::orchestration:resolve         [    ]
+        ├── asset::orchestration:show            [DONE]
+        ├── asset::orchestration:stack           [DONE]
+        ├── asset::orchestration:unstack         [DONE]
     └── tom/asset
-        ├── asset::orchestration:add
-        ├── asset::orchestration:link
-        ├── asset::orchestration:list
-        ├── asset::orchestration:property.remove
-        ├── asset::orchestration:property.set
-        ├── asset::orchestration:property.update
-        ├── asset::orchestration:remove
-        ├── asset::orchestration:show
-====================================================
+        ├── asset::orchestration:add             [DONE]
+        ├── asset::orchestration:link            [DONE]
+        ├── asset::orchestration:list            [DONE]
+        ├── asset::orchestration:property.remove [DONE]
+        ├── asset::orchestration:property.set    [DONE]
+        ├── asset::orchestration:property.update [DONE]
+        ├── asset::orchestration:remove          [    ]
+        ├── asset::orchestration:resolve         [    ]
+        ├── asset::orchestration:show            [DONE]
+        ├── asset::orchestration:stack           [DONE]
+        ├── asset::orchestration:unstack         [DONE]
+=======================================================
