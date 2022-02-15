@@ -120,6 +120,25 @@ FROM              asset.server_standard_attribute_values
      AND          asset.server_standard_attribute_values.serverID = $4::uuid
    FOR UPDATE;`
 
+	ServerTxStdPropertyClean = `
+-- this statement is used to delete all records, for which the starting validity is after the timestamp specified
+-- in $4. this can be used to clean all records that only become valid in the future
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.standard_attribute.attributeID
+                   FROM       meta.standard_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
+                  WHERE       meta.standard_attribute.attribute = $2::text )
+DELETE FROM       asset.server_standard_attribute_values
+USING             cte_dct
+    CROSS JOIN    cte_att
+WHERE             asset.server_standard_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND             asset.server_standard_attribute_values.attributeID     = cte_att.attributeID
+  AND             asset.server_standard_attribute_values.serverID        = $3::uuid
+  AND             lower(asset.server_standard_attribute_values.validity) > $4::timestamptz(3);`
+
 	ServerTxUniqPropertyAdd = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                               inventory.user.userID AS userID
@@ -187,6 +206,25 @@ FROM              asset.server_unique_attribute_values
    WHERE          $3::timestamptz(3) <@ asset.server_unique_attribute_values.validity
      AND          asset.server_unique_attribute_values.serverID = $4::uuid
    FOR UPDATE;`
+
+	ServerTxUniqPropertyClean = `
+-- this statement is used to delete all records, for which the starting validity is after the timestamp specified
+-- in $4. this can be used to clean all records that only become valid in the future
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.unique_attribute.attributeID
+                   FROM       meta.unique_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
+                  WHERE       meta.unique_attribute.attribute = $2::text )
+DELETE FROM       asset.server_unique_attribute_values
+USING             cte_dct
+    CROSS JOIN    cte_att
+WHERE             asset.server_unique_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND             asset.server_unique_attribute_values.attributeID     = cte_att.attributeID
+  AND             asset.server_unique_attribute_values.serverID        = $3::uuid
+  AND             lower(asset.server_unique_attribute_values.validity) > $4::timestamptz(3);`
 
 	ServerStdAttrRemove = `
 DELETE FROM       asset.server_standard_attribute_values
@@ -260,9 +298,11 @@ func init() {
 	m[ServerTxStackClamp] = `ServerTxStackClamp`
 	m[ServerTxStdPropertyAdd] = `ServerTxStdPropertyAdd`
 	m[ServerTxStdPropertyClamp] = `ServerTxStdPropertyClamp`
+	m[ServerTxStdPropertyClean] = `ServerTxStdPropertyClean`
 	m[ServerTxStdPropertySelect] = `ServerTxStdPropertySelect`
 	m[ServerTxUniqPropertyAdd] = `ServerTxUniqPropertyAdd`
 	m[ServerTxUniqPropertyClamp] = `ServerTxUniqPropertyClamp`
+	m[ServerTxUniqPropertyClean] = `ServerTxUniqPropertyClean`
 	m[ServerTxUniqPropertySelect] = `ServerTxUniqPropertySelect`
 	m[ServerUniqAttrRemove] = `ServerUniqAttrRemove`
 }

@@ -35,9 +35,11 @@ type RuntimeWriteHandler struct {
 	stmtTxStackClamp     *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
+	stmtTxStdPropClean   *sql.Stmt
 	stmtTxStdPropSelect  *sql.Stmt
 	stmtTxUniqPropAdd    *sql.Stmt
 	stmtTxUniqPropClamp  *sql.Stmt
+	stmtTxUniqPropClean  *sql.Stmt
 	stmtTxUniqPropSelect *sql.Stmt
 }
 
@@ -125,9 +127,11 @@ func (h *RuntimeWriteHandler) Run() {
 		stmt.RuntimeTxStackClamp:         &h.stmtTxStackClamp,
 		stmt.RuntimeTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
 		stmt.RuntimeTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
+		stmt.RuntimeTxStdPropertyClean:   &h.stmtTxStdPropSelect,
 		stmt.RuntimeTxStdPropertySelect:  &h.stmtTxStdPropSelect,
 		stmt.RuntimeTxUniqPropertyAdd:    &h.stmtTxUniqPropAdd,
 		stmt.RuntimeTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
+		stmt.RuntimeTxUniqPropertyClean:  &h.stmtTxUniqPropSelect,
 		stmt.RuntimeTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
 		stmt.ServerTxShow:                &h.stmtTxServerShow,
 	} {

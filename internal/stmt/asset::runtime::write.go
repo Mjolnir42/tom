@@ -268,6 +268,44 @@ UPDATE            asset.runtime_environment_parent
    SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
 WHERE             asset.runtime_environment_parent.rteID = $2::uuid
   AND             $1::timestamptz(3) <@ asset.runtime_environment_parent.validity;`
+
+	RuntimeTxStdPropertyClean = `
+-- this statement is used to delete all records, for which the starting validity is after the timestamp specified
+-- in $4. this can be used to clean all records that only become valid in the future
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.standard_attribute.attributeID
+                   FROM       meta.standard_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
+                  WHERE       meta.standard_attribute.attribute = $2::text )
+DELETE FROM       asset.runtime_environment_standard_attribute_values
+USING             cte_dct
+    CROSS JOIN    cte_att
+WHERE             asset.runtime_environment_standard_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND             asset.runtime_environment_standard_attribute_values.attributeID     = cte_att.attributeID
+  AND             asset.runtime_environment_standard_attribute_values.rteID           = $3::uuid
+  AND             lower(asset.runtime_environment_standard_attribute_values.validity) > $4::timestamptz(3);`
+
+	RuntimeTxUniqPropertyClean = `
+-- this statement is used to delete all records, for which the starting validity is after the timestamp specified
+-- in $4. this can be used to clean all records that only become valid in the future
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.unique_attribute.attributeID
+                   FROM       meta.unique_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
+                  WHERE       meta.unique_attribute.attribute = $2::text )
+DELETE FROM       asset.runtime_environment_unique_attribute_values
+USING             cte_dct
+    CROSS JOIN    cte_att
+WHERE             asset.runtime_environment_unique_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND             asset.runtime_environment_unique_attribute_values.attributeID     = cte_att.attributeID
+  AND             asset.runtime_environment_unique_attribute_values.rteID           = $3::uuid
+  AND             lower(asset.runtime_environment_unique_attribute_values.validity) > $4::timestamptz(3);`
 )
 
 func init() {
@@ -283,9 +321,11 @@ func init() {
 	m[RuntimeTxStackClamp] = `RuntimeTxStackClamp`
 	m[RuntimeTxStdPropertyAdd] = `RuntimeTxStdPropertyAdd`
 	m[RuntimeTxStdPropertyClamp] = `RuntimeTxStdPropertyClamp`
+	m[RuntimeTxStdPropertyClean] = `RuntimeTxStdPropertyClean`
 	m[RuntimeTxStdPropertySelect] = `RuntimeTxStdPropertySelect`
 	m[RuntimeTxUniqPropertyAdd] = `RuntimeTxUniqPropertyAdd`
 	m[RuntimeTxUniqPropertyClamp] = `RuntimeTxUniqPropertyClamp`
+	m[RuntimeTxUniqPropertyClean] = `RuntimeTxUniqPropertyClean`
 	m[RuntimeTxUniqPropertySelect] = `RuntimeTxUniqPropertySelect`
 }
 

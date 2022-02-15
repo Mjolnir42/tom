@@ -96,16 +96,18 @@ func (h *ServerWriteHandler) txPropUpdate(
 	}
 
 	// select standard|unique
-	var stmtSelect, stmtClamp, stmtAdd *sql.Stmt
+	var stmtSelect, stmtClamp, stmtAdd, stmtClean *sql.Stmt
 	switch attributeType {
 	case proto.AttributeStandard:
 		stmtSelect = tx.Stmt(h.stmtTxStdPropSelect)
 		stmtClamp = tx.Stmt(h.stmtTxStdPropClamp)
 		stmtAdd = tx.Stmt(h.stmtTxStdPropAdd)
+		stmtClean = tx.Stmt(h.stmtTxStdPropClean)
 	case proto.AttributeUnique:
 		stmtSelect = tx.Stmt(h.stmtTxUniqPropSelect)
 		stmtClamp = tx.Stmt(h.stmtTxUniqPropClamp)
 		stmtAdd = tx.Stmt(h.stmtTxUniqPropAdd)
+		stmtClean = tx.Stmt(h.stmtTxUniqPropClean)
 	default:
 		mr.ServerError()
 		return false
@@ -135,7 +137,20 @@ func (h *ServerWriteHandler) txPropUpdate(
 	}
 
 	// txPropClamp either found no pre-existing value, or the existing value
-	// was successfully invalidated. Set the new value as requested.
+	// was successfully invalidated. Clean future records that have never
+	// been valid yet, ie. their validSince is after now()
+	if ok = h.txPropClean(
+		q,
+		mr,
+		stmtClean,
+		prop,
+		txTime,
+		serverID,
+	); !ok {
+		return false
+	}
+
+	// set the new value as requested.
 	if ok = h.txPropSetValue(
 		q,
 		mr,
@@ -290,6 +305,31 @@ func (h *ServerWriteHandler) txPropSetValue(
 		return false
 	}
 	if !mr.AssertOneRowAffected(res.RowsAffected()) {
+		return false
+	}
+	return true
+}
+
+// txPropClean deletes all records with a starting validity in the
+// future. This is restricted to current time, to ensure that no records
+// that were valid in the past can be deleted.
+func (h *ServerWriteHandler) txPropClean(
+	q *msg.Request,
+	mr *msg.Result,
+	stmt *sql.Stmt,
+	prop proto.PropertyDetail,
+	txTime *time.Time,
+	serverID string,
+) bool {
+	var err error
+
+	if _, err = stmt.Exec(
+		q.Server.Namespace,
+		prop.Attribute,
+		serverID,
+		*txTime,
+	); err != nil {
+		mr.ServerError(err)
 		return false
 	}
 	return true

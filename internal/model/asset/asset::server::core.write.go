@@ -34,9 +34,11 @@ type ServerWriteHandler struct {
 	stmtTxStackClamp     *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
+	stmtTxStdPropClean   *sql.Stmt
 	stmtTxStdPropSelect  *sql.Stmt
 	stmtTxUniqPropAdd    *sql.Stmt
 	stmtTxUniqPropClamp  *sql.Stmt
+	stmtTxUniqPropClean  *sql.Stmt
 	stmtTxUniqPropSelect *sql.Stmt
 }
 
@@ -124,9 +126,11 @@ func (h *ServerWriteHandler) Run() {
 		stmt.ServerTxStackClamp:          &h.stmtTxStackClamp,
 		stmt.ServerTxStdPropertyAdd:      &h.stmtTxStdPropAdd,
 		stmt.ServerTxStdPropertyClamp:    &h.stmtTxStdPropClamp,
+		stmt.ServerTxStdPropertyClean:    &h.stmtTxStdPropClean,
 		stmt.ServerTxStdPropertySelect:   &h.stmtTxStdPropSelect,
 		stmt.ServerTxUniqPropertyAdd:     &h.stmtTxUniqPropAdd,
 		stmt.ServerTxUniqPropertyClamp:   &h.stmtTxUniqPropClamp,
+		stmt.ServerTxUniqPropertyClean:   &h.stmtTxUniqPropClean,
 		stmt.ServerTxUniqPropertySelect:  &h.stmtTxUniqPropSelect,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {

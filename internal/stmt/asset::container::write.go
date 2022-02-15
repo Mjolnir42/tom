@@ -264,6 +264,44 @@ UPDATE            asset.container_parent
    SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
 WHERE             asset.container_parent.containerID = $2::uuid
   AND             $1::timestamptz(3) <@ asset.container_parent.validity;`
+
+	ContainerTxStdPropertyClean = `
+-- this statement is used to delete all records, for which the starting validity is after the timestamp specified
+-- in $4. this can be used to clean all records that only become valid in the future
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.standard_attribute.attributeID
+                   FROM       meta.standard_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.standard_attribute.dictionaryID
+                  WHERE       meta.standard_attribute.attribute = $2::text )
+DELETE FROM       asset.container_standard_attribute_values
+USING             cte_dct
+    CROSS JOIN    cte_att
+WHERE             asset.container_standard_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND             asset.container_standard_attribute_values.attributeID     = cte_att.attributeID
+  AND             asset.container_standard_attribute_values.containerID     = $3::uuid
+  AND             lower(asset.container_standard_attribute_values.validity) > $4::timestamptz(3);`
+
+	ContainerTxUniqPropertyClean = `
+-- this statement is used to delete all records, for which the starting validity is after the timestamp specified
+-- in $4. this can be used to clean all records that only become valid in the future
+WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID
+                  FROM        meta.dictionary
+                  WHERE       meta.dictionary.name = $1::text ),
+     cte_att AS ( SELECT      meta.unique_attribute.attributeID
+                   FROM       meta.unique_attribute
+                    JOIN      cte_dct
+                      ON      cte_dct.dictionaryID = meta.unique_attribute.dictionaryID
+                  WHERE       meta.unique_attribute.attribute = $2::text )
+DELETE FROM       asset.container_unique_attribute_values
+USING             cte_dct
+    CROSS JOIN    cte_att
+WHERE             asset.container_unique_attribute_values.dictionaryID    = cte_dct.dictionaryID
+  AND             asset.container_unique_attribute_values.attributeID     = cte_att.attributeID
+  AND             asset.container_unique_attribute_values.containerID     = $3::uuid
+  AND             lower(asset.container_unique_attribute_values.validity) > $4::timestamptz(3);`
 )
 
 func init() {
@@ -279,9 +317,11 @@ func init() {
 	m[ContainerTxStackClamp] = `ContainerTxStackClamp`
 	m[ContainerTxStdPropertyAdd] = `ContainerTxStdPropertyAdd`
 	m[ContainerTxStdPropertyClamp] = `ContainerTxStdPropertyClamp`
+	m[ContainerTxStdPropertyClean] = `ContainerTxStdPropertyClean`
 	m[ContainerTxStdPropertySelect] = `ContainerTxStdPropertySelect`
 	m[ContainerTxUniqPropertyAdd] = `ContainerTxUniqPropertyAdd`
 	m[ContainerTxUniqPropertyClamp] = `ContainerTxUniqPropertyClamp`
+	m[ContainerTxUniqPropertyClean] = `ContainerTxUniqPropertyClean`
 	m[ContainerTxUniqPropertySelect] = `ContainerTxUniqPropertySelect`
 }
 
