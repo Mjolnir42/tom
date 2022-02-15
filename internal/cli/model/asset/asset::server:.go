@@ -106,6 +106,13 @@ func registerAssetServer(app cli.App, run ActionFunc) *cli.App {
 						Action:       run(cmdAssetServerResolve),
 						BashComplete: cmpl.ServerResolve,
 					},
+					{
+						Name:         `remove`,
+						Usage:        `Remove a server`,
+						Description:  help.Text(proto.CmdServerRemove),
+						Action:       run(cmdAssetServerRemove),
+						BashComplete: cmpl.ServerRemove,
+					},
 				},
 			},
 		}...,

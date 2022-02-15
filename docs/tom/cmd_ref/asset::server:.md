@@ -24,6 +24,8 @@ tom server unstack ${name} namespace ${space}
 tom server unstack ${tomID}
 tom server resolve ${name} namespace ${space} level ${detail}
 tom server resolve ${tomID} level ${detail}
+tom server remove ${name} namespace ${space}
+tom server remove ${tomID}
 ```
 
 # PROPERTIES

@@ -49,9 +49,6 @@ FROM              ins_srv
 	CROSS JOIN      sel_dct
 RETURNING         serverID;`
 
-	ServerRemove = `
-SELECT      'Server.REMOVE';`
-
 	ServerTxStdPropertyAdd = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                               inventory.user.userID AS userID
@@ -287,12 +284,22 @@ UPDATE            asset.server_parent
    SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
 WHERE             asset.server_parent.serverID = $2::uuid
   AND             $1::timestamptz(3) <@ asset.server_parent.validity;`
+
+	ServerTxUnstackChildren = `
+UPDATE            asset.runtime_environment_parent
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.runtime_environment_parent.parentServerID = $2::uuid
+  AND             $1::timestamptz(3) <@ asset.runtime_environment_parent.validity;`
+
+	ServerTxUnstackCldClean = `
+DELETE FROM       asset.runtime_environment_parent
+WHERE             asset.runtime_environment_parent.parentServerID = $2::uuid
+  AND             lower(asset.runtime_environment_parent.validity) > $1::timestamptz(3);`
 )
 
 func init() {
 	m[ServerAdd] = `ServerAdd`
 	m[ServerLink] = `ServerLink`
-	m[ServerRemove] = `ServerRemove`
 	m[ServerStdAttrRemove] = `ServerStdAttrRemove`
 	m[ServerTxStackAdd] = `ServerTxStackAdd`
 	m[ServerTxStackClamp] = `ServerTxStackClamp`
@@ -304,6 +311,8 @@ func init() {
 	m[ServerTxUniqPropertyClamp] = `ServerTxUniqPropertyClamp`
 	m[ServerTxUniqPropertyClean] = `ServerTxUniqPropertyClean`
 	m[ServerTxUniqPropertySelect] = `ServerTxUniqPropertySelect`
+	m[ServerTxUnstackChildren] = `ServerTxUnstackChildren`
+	m[ServerTxUnstackCldClean] = `ServerTxUnstackCldClean`
 	m[ServerUniqAttrRemove] = `ServerUniqAttrRemove`
 }
 
