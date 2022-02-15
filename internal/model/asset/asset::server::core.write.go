@@ -40,6 +40,8 @@ type ServerWriteHandler struct {
 	stmtTxUniqPropClamp  *sql.Stmt
 	stmtTxUniqPropClean  *sql.Stmt
 	stmtTxUniqPropSelect *sql.Stmt
+	stmtTxUnstackChild   *sql.Stmt
+	stmtTxUnstackCldCln  *sql.Stmt
 }
 
 // NewServerWriteHandler returns a new handler instance
@@ -120,7 +122,6 @@ func (h *ServerWriteHandler) Run() {
 		stmt.RuntimeTxShow:               &h.stmtTxRuntimeShow,
 		stmt.ServerAdd:                   &h.stmtAdd,
 		stmt.ServerLink:                  &h.stmtLink,
-		stmt.ServerRemove:                &h.stmtRemove,
 		stmt.ServerTxShow:                &h.stmtTxShow,
 		stmt.ServerTxStackAdd:            &h.stmtTxStackAdd,
 		stmt.ServerTxStackClamp:          &h.stmtTxStackClamp,
@@ -132,6 +133,8 @@ func (h *ServerWriteHandler) Run() {
 		stmt.ServerTxUniqPropertyClamp:   &h.stmtTxUniqPropClamp,
 		stmt.ServerTxUniqPropertyClean:   &h.stmtTxUniqPropClean,
 		stmt.ServerTxUniqPropertySelect:  &h.stmtTxUniqPropSelect,
+		stmt.ServerTxUnstackChildren:     &h.stmtTxUnstackChild,
+		stmt.ServerTxUnstackCldClean:     &h.stmtTxUnstackCldCln,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
