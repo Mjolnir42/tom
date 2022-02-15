@@ -104,8 +104,9 @@ const (
 	CharAlpha       = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
 	CharDigit       = `0123456789`
 	CharPunctuation = `_-`
-	CharUnreserved  = CharAlpha + CharDigit + CharPunctuation
+	CharDot         = `.`
 	CharTilde       = `~`
+	CharUnreserved  = CharAlpha + CharDigit + CharTilde + CharDot + CharPunctuation
 	CharNamespace   = CharAlpha + CharDigit + CharTilde + CharPunctuation
 )
 
