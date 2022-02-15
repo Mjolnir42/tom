@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -105,6 +106,113 @@ func AssertCommandIsDefined(c string) {
 	if _, ok := Commands[c]; !ok {
 		panic(c)
 	}
+}
+
+// IsTomID returns true if s is a syntactically valid TomID
+func IsTomID(s string) bool {
+	return isTomIDFormatDNS(s) || isTomIDFormatURI(s)
+}
+
+// ParseTomID parses the TomID s and returns the entity type as a string as
+// well as and Entity object
+func ParseTomID(s string) (error, string, Entity) {
+	var name, namespace, entity string
+	switch {
+	case s == ``:
+		return ErrEmptyTomID, ``, nil
+	case isTomIDFormatDNS(s):
+		name, namespace, entity = parseTomIDFormatDNS(s)
+	case isTomIDFormatURI(s):
+		name, namespace, entity = parseTomIDFormatURI(s)
+	default:
+		return ErrInvalidTomID, ``, nil
+	}
+
+	switch entity {
+	case EntityContainer:
+		return nil, entity, (&Container{
+			Namespace: namespace,
+			Name:      name,
+		}).SetTomID()
+	case EntityNamespace:
+		return nil, entity, (&Namespace{
+			Name: name,
+		}).SetTomID()
+	case EntityOrchestration:
+		return nil, entity, (&Orchestration{
+			Namespace: namespace,
+			Name:      name,
+		}).SetTomID()
+	case EntityRuntime:
+		return nil, entity, (&Runtime{
+			Namespace: namespace,
+			Name:      name,
+		}).SetTomID()
+	case EntityServer:
+		return nil, entity, (&Server{
+			Namespace: namespace,
+			Name:      name,
+		}).SetTomID()
+	case EntitySocket:
+		return nil, entity, (&Socket{
+			Namespace: namespace,
+			Name:      name,
+		}).SetTomID()
+	default:
+		return ErrInvalidTomID, ``, nil
+	}
+}
+
+func isTomIDFormatDNS(s string) bool {
+	re := regexp.MustCompile(fmt.Sprintf("%s|%s", tomIDFormatDNS, tomIDNamespDNS))
+	return re.MatchString(s)
+}
+
+func isTomIDFormatURI(s string) bool {
+	re := regexp.MustCompile(fmt.Sprintf("%s|%s", tomIDFormatURI, tomIDNamespURI))
+	return re.MatchString(s)
+}
+
+func parseTomIDFormatDNS(s string) (name, namespace, entity string) {
+	reCommon := regexp.MustCompile(tomIDFormatDNS)
+	reNamespace := regexp.MustCompile(tomIDNamespDNS)
+	s = strings.TrimSuffix(s, `.`)
+
+	switch {
+	case reCommon.MatchString(s):
+		sn := reCommon.FindStringSubmatch(s)
+		return sn[1], sn[2], sn[3]
+	case reNamespace.MatchString(s):
+		sn := reNamespace.FindStringSubmatch(s)
+		return sn[1], ``, sn[2]
+	default:
+		return ``, ``, ``
+	}
+
+}
+
+func parseTomIDFormatURI(s string) (name, namespace, entity string) {
+	reCommon := regexp.MustCompile(tomIDFormatURI)
+	reNamespace := regexp.MustCompile(tomIDNamespURI)
+
+	parts := strings.Split(s, `/`)
+	switch {
+	case reCommon.MatchString(s):
+		sn := reShort.FindStringSubmatch(s)
+		return sn[3], sn[1], sn[2]
+	case reNamespace.MatchString(s):
+		sn := reShort.FindStringSubmatch(s)
+		return sn[2], ``, sn[1]
+	default:
+		return ``, ``, ``
+	}
+}
+
+func assessTomID(entity, value string) error {
+	if entity != value {
+		return ErrInvalidTomID
+	}
+	return nil
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
