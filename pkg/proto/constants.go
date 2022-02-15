@@ -94,9 +94,17 @@ const (
 )
 
 const (
+	nttContainerShort     = `cnr`
+	nttOrchestrationShort = `ore`
+	nttRuntimeShort       = `rte`
+	nttServerShort        = `srv`
+	nttSocketShort        = `sok`
+
 	tomIDEntities = EntityServer + `|` + EntityRuntime + `|` + EntityOrchestration + `|` + EntityContainer + `|` + EntitySocket
+	tomIDShortNTT = nttServerShort + `|` + nttRuntimeShort + `|` + nttOrchestrationShort + `|` + nttContainerShort + `|` + nttSocketShort
 
 	tomIDFormatDNS = `^(?P<id>[` + CharUnreserved + `]+)\.(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + tomIDEntities + `)\.tom\.?$`
+	tomIDShortDNS  = `^(?P<id>[` + CharUnreserved + `]+)\.(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + tomIDShortNTT + `)\.tom\.?$`
 	tomIDNamespDNS = `^(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + EntityNamespace + `)\.tom\.?$`
 	tomIDFormatURI = `^tom://(?P<ns>[` + CharNamespace + `]+)/(?P<ntt>` + tomIDEntities + `)/name=(?P<id>[` + CharUnreserved + `]+)$`
 	tomIDNamespURI = `^tom:///(?P<ntt>` + EntityNamespace + `)/name=(?P<id>[` + CharNamespace + `]+)$`

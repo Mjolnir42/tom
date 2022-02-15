@@ -164,7 +164,7 @@ func ParseTomID(s string) (error, string, Entity) {
 }
 
 func isTomIDFormatDNS(s string) bool {
-	re := regexp.MustCompile(fmt.Sprintf("%s|%s", tomIDFormatDNS, tomIDNamespDNS))
+	re := regexp.MustCompile(fmt.Sprintf("%s|%s|%s", tomIDFormatDNS, tomIDShortDNS, tomIDNamespDNS))
 	return re.MatchString(s)
 }
 
@@ -176,12 +176,16 @@ func isTomIDFormatURI(s string) bool {
 func parseTomIDFormatDNS(s string) (name, namespace, entity string) {
 	reCommon := regexp.MustCompile(tomIDFormatDNS)
 	reNamespace := regexp.MustCompile(tomIDNamespDNS)
+	reShort := regexp.MustCompile(tomIDShortDNS)
 	s = strings.TrimSuffix(s, `.`)
 
 	switch {
 	case reCommon.MatchString(s):
 		sn := reCommon.FindStringSubmatch(s)
 		return sn[1], sn[2], sn[3]
+	case reShort.MatchString(s):
+		sn := reShort.FindStringSubmatch(s)
+		return sn[1], sn[2], nttShort2Long(sn[3])
 	case reNamespace.MatchString(s):
 		sn := reNamespace.FindStringSubmatch(s)
 		return sn[1], ``, sn[2]
@@ -213,6 +217,23 @@ func assessTomID(entity, value string) error {
 		return ErrInvalidTomID
 	}
 	return nil
+}
+
+func nttShort2Long(s string) string {
+	switch s {
+	case nttContainerShort:
+		return EntityContainer
+	case nttOrchestrationShort:
+		return EntityOrchestration
+	case nttRuntimeShort:
+		return EntityRuntime
+	case nttServerShort:
+		return EntityServer
+	case nttSocketShort:
+		return EntitySocket
+	default:
+		return ``
+	}
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
