@@ -105,12 +105,22 @@ const (
 	CharDigit       = `0123456789`
 	CharPunctuation = `_-`
 	CharUnreserved  = CharAlpha + CharDigit + CharPunctuation
-	CharNamespace   = CharAlpha + CharDigit + `~` + CharPunctuation
+	CharTilde       = `~`
+	CharNamespace   = CharAlpha + CharDigit + CharTilde + CharPunctuation
 )
 
 const (
 	AttributeStandard = `standard`
 	AttributeUnique   = `unique`
+)
+
+const (
+	tomIDEntities = EntityServer + `|` + EntityRuntime + `|` + EntityOrchestration + `|` + EntityContainer + `|` + EntitySocket
+
+	tomIDFormatDNS = `^(?P<id>[` + CharUnreserved + `]+)\.(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + tomIDEntities + `)\.tom\.?$`
+	tomIDNamespDNS = `^(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + EntityNamespace + `)\.tom\.?$`
+	tomIDFormatURI = `^tom://(?P<ns>[` + CharNamespace + `]+)/(?P<ntt>` + tomIDEntities + `)/name=(?P<id>[` + CharUnreserved + `]+)$`
+	tomIDNamespURI = `^tom:///(?P<ntt>` + EntityNamespace + `)/name=(?P<id>[` + CharNamespace + `]+)$`
 )
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
