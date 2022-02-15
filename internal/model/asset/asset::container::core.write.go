@@ -34,9 +34,11 @@ type ContainerWriteHandler struct {
 	stmtTxStackClamp     *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
+	stmtTxStdPropClean   *sql.Stmt
 	stmtTxStdPropSelect  *sql.Stmt
 	stmtTxUniqPropAdd    *sql.Stmt
 	stmtTxUniqPropClamp  *sql.Stmt
+	stmtTxUniqPropClean  *sql.Stmt
 	stmtTxUniqPropSelect *sql.Stmt
 }
 
@@ -117,16 +119,18 @@ func (h *ContainerWriteHandler) Run() {
 		stmt.ContainerAdd:                  &h.stmtAdd,
 		stmt.ContainerLink:                 &h.stmtLink,
 		stmt.ContainerRemove:               &h.stmtRemove,
+		stmt.ContainerTxShow:               &h.stmtTxShow,
+		stmt.ContainerTxStackAdd:           &h.stmtTxStackAdd,
+		stmt.ContainerTxStackClamp:         &h.stmtTxStackClamp,
 		stmt.ContainerTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
 		stmt.ContainerTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
+		stmt.ContainerTxStdPropertyClean:   &h.stmtTxStdPropClean,
 		stmt.ContainerTxStdPropertySelect:  &h.stmtTxStdPropSelect,
 		stmt.ContainerTxUniqPropertyAdd:    &h.stmtTxUniqPropAdd,
 		stmt.ContainerTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
+		stmt.ContainerTxUniqPropertyClean:  &h.stmtTxUniqPropClean,
 		stmt.ContainerTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
 		stmt.NamespaceAttributeQueryType:   &h.stmtAttQueryType,
-		stmt.ContainerTxStackAdd:           &h.stmtTxStackAdd,
-		stmt.ContainerTxStackClamp:         &h.stmtTxStackClamp,
-		stmt.ContainerTxShow:               &h.stmtTxShow,
 		stmt.RuntimeTxShow:                 &h.stmtTxRteShow,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {

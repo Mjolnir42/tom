@@ -12,6 +12,10 @@ The validity of the value can be specified using the optional since and
 until keywords. Updating property values can not move the validity
 further into the past.
 
+Updates commands remove properties that have been set, but have not been
+valid yet (ie. their valid since is still in the future) and would become
+valid after the current command.
+
 Specified, but not previously created attributes specified in the call
 are transparently created as standard attributes.
 
