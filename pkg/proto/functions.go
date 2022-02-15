@@ -199,13 +199,12 @@ func parseTomIDFormatURI(s string) (name, namespace, entity string) {
 	reCommon := regexp.MustCompile(tomIDFormatURI)
 	reNamespace := regexp.MustCompile(tomIDNamespURI)
 
-	parts := strings.Split(s, `/`)
 	switch {
 	case reCommon.MatchString(s):
-		sn := reShort.FindStringSubmatch(s)
+		sn := reCommon.FindStringSubmatch(s)
 		return sn[3], sn[1], sn[2]
 	case reNamespace.MatchString(s):
-		sn := reShort.FindStringSubmatch(s)
+		sn := reNamespace.FindStringSubmatch(s)
 		return sn[2], ``, sn[1]
 	default:
 		return ``, ``, ``
