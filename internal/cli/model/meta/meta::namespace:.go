@@ -15,6 +15,9 @@ import (
 )
 
 func registerMetaNamespace(app cli.App, run ActionFunc) *cli.App {
+	handlerMap[proto.EntityNamespace+`:`+proto.ActionList] = run(cmdMetaNamespaceList)
+	handlerMap[proto.EntityNamespace+`:`+proto.ActionShow] = run(cmdMetaNamespaceShow)
+
 	app.Commands = append(app.Commands,
 		[]*cli.Command{
 			{

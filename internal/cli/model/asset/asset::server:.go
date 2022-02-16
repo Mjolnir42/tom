@@ -15,6 +15,9 @@ import (
 )
 
 func registerAssetServer(app cli.App, run ActionFunc) *cli.App {
+	handlerMap[proto.EntityServer+`:`+proto.ActionList] = run(cmdAssetServerList)
+	handlerMap[proto.EntityServer+`:`+proto.ActionShow] = run(cmdAssetServerShow)
+
 	app.Commands = append(app.Commands,
 		[]*cli.Command{
 			{
