@@ -25,6 +25,7 @@ type ContainerWriteHandler struct {
 	conn                 *sql.DB
 	lm                   *lhm.LogHandleMap
 	stmtAdd              *sql.Stmt
+	stmtAttQueryDiscover *sql.Stmt
 	stmtAttQueryType     *sql.Stmt
 	stmtLink             *sql.Stmt
 	stmtRemove           *sql.Stmt
@@ -130,6 +131,7 @@ func (h *ContainerWriteHandler) Run() {
 		stmt.ContainerTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
 		stmt.ContainerTxUniqPropertyClean:  &h.stmtTxUniqPropClean,
 		stmt.ContainerTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
+		stmt.NamespaceAttributeDiscover:    &h.stmtAttQueryDiscover,
 		stmt.NamespaceAttributeQueryType:   &h.stmtAttQueryType,
 		stmt.RuntimeTxShow:                 &h.stmtTxRteShow,
 	} {
