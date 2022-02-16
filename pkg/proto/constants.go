@@ -85,6 +85,7 @@ const (
 	CharPunctuation = `_-`
 	CharDot         = `.`
 	CharTilde       = `~`
+	CharAsterisk    = `*`
 	CharUnreserved  = CharAlpha + CharDigit + CharTilde + CharDot + CharPunctuation
 	CharNamespace   = CharAlpha + CharDigit + CharTilde + CharPunctuation
 )
@@ -109,6 +110,11 @@ const (
 	tomIDNamespDNS = `^(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + EntityNamespace + `)\.tom\.?$`
 	tomIDFormatURI = `^tom://(?P<ns>[` + CharNamespace + `]+)/(?P<ntt>` + tomIDEntities + `)/name=(?P<id>[` + CharUnreserved + `]+)$`
 	tomIDNamespURI = `^tom:///(?P<ntt>` + EntityNamespace + `)/name=(?P<id>[` + CharNamespace + `]+)$`
+
+	tomIDQueryNTT    = `^\` + CharAsterisk + `\.(?P<ntt>` + tomIDEntities + `)\.tom\.?$`
+	tomIDSQueryNTT   = `^\` + CharAsterisk + `\.(?P<ntt>` + tomIDShortNTT + `)\.tom\.?$`
+	tomIDQueryNsNTT  = `^\` + CharAsterisk + `\.(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + tomIDEntities + `)\.tom\.?$`
+	tomIDSQueryNsNTT = `^\` + CharAsterisk + `\.(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + tomIDShortNTT + `)\.tom\.?$`
 )
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
