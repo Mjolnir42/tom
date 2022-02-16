@@ -41,10 +41,12 @@ func exportServerRemove(result *proto.Result, r *msg.Result) {
 func (m *Model) ServerRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionServer
-	request.Action = proto.ActionRemove
-	request.Server = *(proto.NewServer())
+	request := msg.New(
+		r, params,
+		proto.CmdServerRemove,
+		msg.SectionServer,
+		proto.ActionRemove,
+	)
 	request.Server.TomID = params.ByName(`tomID`)
 
 	if err := request.Server.ParseTomID(); err != nil {

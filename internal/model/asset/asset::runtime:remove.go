@@ -41,10 +41,12 @@ func exportRuntimeRemove(result *proto.Result, r *msg.Result) {
 func (m *Model) RuntimeRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionRuntime
-	request.Action = proto.ActionRemove
-	request.Runtime = *(proto.NewRuntime())
+	request := msg.New(
+		r, params,
+		proto.CmdRuntimeRemove,
+		msg.SectionRuntime,
+		proto.ActionRemove,
+	)
 	request.Runtime.TomID = params.ByName(`tomID`)
 
 	if err := request.Runtime.ParseTomID(); err != nil {

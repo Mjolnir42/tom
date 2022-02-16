@@ -42,9 +42,12 @@ func exportContainerPropRemove(result *proto.Result, r *msg.Result) {
 func (m *Model) ContainerPropRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionContainer
-	request.Action = proto.ActionPropRemove
+	request := msg.New(
+		r, params,
+		proto.CmdContainerPropRemove,
+		msg.SectionContainer,
+		proto.ActionPropRemove,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

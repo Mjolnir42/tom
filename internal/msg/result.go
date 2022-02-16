@@ -18,6 +18,7 @@ import (
 type Result struct {
 	ID         uuid.UUID
 	RequestURI string
+	Command    string
 	Section    string
 	Action     string
 	Code       uint16
@@ -41,6 +42,7 @@ type Result struct {
 func FromRequest(rq *Request) Result {
 	return Result{
 		ID:         rq.ID,
+		Command:    rq.Command,
 		RequestURI: rq.RequestURI,
 		Section:    rq.Section,
 		Action:     rq.Action,

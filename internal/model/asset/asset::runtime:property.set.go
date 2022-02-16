@@ -42,9 +42,12 @@ func exportRuntimePropSet(result *proto.Result, r *msg.Result) {
 func (m *Model) RuntimePropSet(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionRuntime
-	request.Action = proto.ActionPropSet
+	request := msg.New(
+		r, params,
+		proto.CmdRuntimePropSet,
+		msg.SectionRuntime,
+		proto.ActionPropSet,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

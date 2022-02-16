@@ -42,9 +42,12 @@ func exportServerPropSet(result *proto.Result, r *msg.Result) {
 func (m *Model) ServerPropSet(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionServer
-	request.Action = proto.ActionPropSet
+	request := msg.New(
+		r, params,
+		proto.CmdServerPropSet,
+		msg.SectionServer,
+		proto.ActionPropSet,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

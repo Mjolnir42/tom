@@ -32,9 +32,12 @@ func (m *Model) LibraryList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionLibrary
-	request.Action = proto.ActionList
+	request := msg.New(
+		r, params,
+		proto.CmdLibraryList,
+		msg.SectionLibrary,
+		proto.ActionList,
+	)
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -50,10 +53,12 @@ func (m *Model) LibraryList(w http.ResponseWriter, r *http.Request,
 func (m *Model) LibraryShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionLibrary
-	request.Action = proto.ActionShow
-	request.Library = proto.Library{}
+	request := msg.New(
+		r, params,
+		proto.CmdLibraryShow,
+		msg.SectionLibrary,
+		proto.ActionShow,
+	)
 
 	switch {
 	case r.URL.Query().Get(`name`) != ``:
@@ -77,9 +82,12 @@ func (m *Model) LibraryAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer rest.PanicCatcher(w, m.x.LM)
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionLibrary
-	request.Action = proto.ActionAdd
+	request := msg.New(
+		r, params,
+		proto.CmdLibraryAdd,
+		msg.SectionLibrary,
+		proto.ActionAdd,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -102,12 +110,13 @@ func (m *Model) LibraryAdd(w http.ResponseWriter, r *http.Request,
 func (m *Model) LibraryRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionLibrary
-	request.Action = proto.ActionRemove
-	request.Library = proto.Library{
-		Name: params.ByName(`lib`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdLibraryRemove,
+		msg.SectionLibrary,
+		proto.ActionRemove,
+	)
+	request.Library.Name = params.ByName(`lib`)
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)

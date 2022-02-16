@@ -42,9 +42,12 @@ func (m *Model) RuntimeAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer rest.PanicCatcher(w, m.x.LM)
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionRuntime
-	request.Action = proto.ActionAdd
+	request := msg.New(
+		r, params,
+		proto.CmdRuntimeAdd,
+		msg.SectionRuntime,
+		proto.ActionAdd,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

@@ -41,9 +41,12 @@ func exportServerStack(result *proto.Result, r *msg.Result) {
 func (m *Model) ServerStack(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionServer
-	request.Action = proto.ActionStack
+	request := msg.New(
+		r, params,
+		proto.CmdServerStack,
+		msg.SectionServer,
+		proto.ActionStack,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

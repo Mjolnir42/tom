@@ -42,14 +42,15 @@ func exportOrchestrationShow(result *proto.Result, r *msg.Result) {
 func (m *Model) OrchestrationShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionOrchestration
-	request.Action = proto.ActionShow
-	request.Orchestration = proto.Orchestration{
-		TomID:     params.ByName(`tomID`),
-		Namespace: r.URL.Query().Get(`namespace`),
-		Name:      r.URL.Query().Get(`name`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdOrchestrationShow,
+		msg.SectionOrchestration,
+		proto.ActionShow,
+	)
+	request.Orchestration.TomID = params.ByName(`tomID`)
+	request.Orchestration.Namespace = r.URL.Query().Get(`namespace`)
+	request.Orchestration.Name = r.URL.Query().Get(`name`)
 
 	if err := request.Orchestration.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {

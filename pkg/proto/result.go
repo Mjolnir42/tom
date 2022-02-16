@@ -10,6 +10,7 @@ package proto //
 // Result is the response wrapper of Tom's public API
 type Result struct {
 	RequestID  string `json:"requestID"`
+	Command    string `json:"command"`
 	StatusCode uint16 `json:"status"`
 	ErrorText  string `json:"error"`
 	// Job information is set for StatusCode 202 (async processing)

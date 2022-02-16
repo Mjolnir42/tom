@@ -40,13 +40,14 @@ func exportServerResolve(result *proto.Result, r *msg.Result) {
 func (m *Model) ServerResolve(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionServer
-	request.Action = proto.ActionResolve
-	request.Server = proto.Server{
-		TomID: params.ByName(`tomID`),
-		Type:  params.ByName(`level`), // resolution detail type
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdServerResolve,
+		msg.SectionServer,
+		proto.ActionResolve,
+	)
+	request.Server.TomID = params.ByName(`tomID`)
+	request.Server.Type = params.ByName(`level`) // resolution detail type
 
 	if err := request.Server.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)

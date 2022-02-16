@@ -42,9 +42,12 @@ func (m *Model) NamespaceAttrAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer rest.PanicCatcher(w, m.x.LM)
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionNamespace
-	request.Action = proto.ActionAttrAdd
+	request := msg.New(
+		r, params,
+		proto.CmdNamespaceAttrAdd,
+		msg.SectionNamespace,
+		proto.ActionAttrAdd,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

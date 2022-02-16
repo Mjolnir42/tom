@@ -40,12 +40,13 @@ func exportNamespaceRemove(result *proto.Result, r *msg.Result) {
 func (m *Model) NamespaceRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionNamespace
-	request.Action = proto.ActionRemove
-	request.Namespace = proto.Namespace{
-		TomID: params.ByName(`tomID`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdNamespaceRemove,
+		msg.SectionNamespace,
+		proto.ActionRemove,
+	)
+	request.Namespace.TomID = params.ByName(`tomID`)
 
 	if err := request.Namespace.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)

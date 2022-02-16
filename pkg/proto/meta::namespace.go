@@ -105,7 +105,15 @@ type Namespace struct {
 
 func NewNamespaceRequest() Request {
 	return Request{
-		Namespace: &Namespace{},
+		Namespace: NewNamespace(),
+	}
+}
+
+func NewNamespace() *Namespace {
+	return &Namespace{
+		Constraint: []string{},
+		Attributes: []AttributeDefinition{},
+		Property:   map[string]PropertyDetail{},
 	}
 }
 

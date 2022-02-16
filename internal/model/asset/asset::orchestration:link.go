@@ -43,9 +43,12 @@ func exportOrchestrationLink(result *proto.Result, r *msg.Result) {
 func (m *Model) OrchestrationLink(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionOrchestration
-	request.Action = proto.ActionLink
+	request := msg.New(
+		r, params,
+		proto.CmdOrchestrationLink,
+		msg.SectionOrchestration,
+		proto.ActionLink,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

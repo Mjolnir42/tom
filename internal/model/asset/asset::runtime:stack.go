@@ -41,9 +41,12 @@ func exportRuntimeStack(result *proto.Result, r *msg.Result) {
 func (m *Model) RuntimeStack(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionRuntime
-	request.Action = proto.ActionStack
+	request := msg.New(
+		r, params,
+		proto.CmdRuntimeStack,
+		msg.SectionRuntime,
+		proto.ActionStack,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

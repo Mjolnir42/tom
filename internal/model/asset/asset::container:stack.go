@@ -40,9 +40,12 @@ func exportContainerStack(result *proto.Result, r *msg.Result) {
 func (m *Model) ContainerStack(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionContainer
-	request.Action = proto.ActionStack
+	request := msg.New(
+		r, params,
+		proto.CmdContainerStack,
+		msg.SectionContainer,
+		proto.ActionStack,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

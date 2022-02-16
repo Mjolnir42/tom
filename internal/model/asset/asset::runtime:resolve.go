@@ -40,13 +40,14 @@ func exportRuntimeResolve(result *proto.Result, r *msg.Result) {
 func (m *Model) RuntimeResolve(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionRuntime
-	request.Action = proto.ActionResolve
-	request.Runtime = proto.Runtime{
-		TomID: params.ByName(`tomID`),
-		Type:  params.ByName(`level`), // resolution detail type
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdRuntimeResolve,
+		msg.SectionRuntime,
+		proto.ActionResolve,
+	)
+	request.Runtime.TomID = params.ByName(`tomID`)
+	request.Runtime.Type = params.ByName(`level`) // resolution detail type
 
 	if err := request.Runtime.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)

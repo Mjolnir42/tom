@@ -40,13 +40,14 @@ func exportContainerResolve(result *proto.Result, r *msg.Result) {
 func (m *Model) ContainerResolve(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionContainer
-	request.Action = proto.ActionResolve
-	request.Container = proto.Container{
-		TomID: params.ByName(`tomID`),
-		Type:  params.ByName(`level`), // resolution detail type
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdContainerResolve,
+		msg.SectionContainer,
+		proto.ActionResolve,
+	)
+	request.Container.TomID = params.ByName(`tomID`)
+	request.Container.Type = params.ByName(`level`) // resolution detail type
 
 	if err := request.Container.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)

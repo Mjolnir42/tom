@@ -7,6 +7,21 @@
 
 package proto //
 
+const (
+	CmdTeam          = ModelIAM + `::` + EntityTeam + `:`
+	CmdTeamAdd       = ModelIAM + `::` + EntityTeam + `:` + ActionAdd
+	CmdTeamHdSet     = ModelIAM + `::` + EntityTeam + `:` + ActionHdSet
+	CmdTeamHdUnset   = ModelIAM + `::` + EntityTeam + `:` + ActionHdUnset
+	CmdTeamList      = ModelIAM + `::` + EntityTeam + `:` + ActionList
+	CmdTeamMbrAdd    = ModelIAM + `::` + EntityTeam + `:` + ActionMbrAdd
+	CmdTeamMbrList   = ModelIAM + `::` + EntityTeam + `:` + ActionMbrList
+	CmdTeamMbrRemove = ModelIAM + `::` + EntityTeam + `:` + ActionMbrRemove
+	CmdTeamMbrSet    = ModelIAM + `::` + EntityTeam + `:` + ActionMbrSet
+	CmdTeamRemove    = ModelIAM + `::` + EntityTeam + `:` + ActionRemove
+	CmdTeamShow      = ModelIAM + `::` + EntityTeam + `:` + ActionShow
+	CmdTeamUpdate    = ModelIAM + `::` + EntityTeam + `:` + ActionUpdate
+)
+
 // User ...
 type Team struct {
 	LibraryName string  `json:"library-name"`

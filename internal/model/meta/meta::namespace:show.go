@@ -42,13 +42,14 @@ func exportNamespaceShow(result *proto.Result, r *msg.Result) {
 func (m *Model) NamespaceShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionNamespace
-	request.Action = proto.ActionShow
-	request.Namespace = proto.Namespace{
-		TomID: params.ByName(`tomID`),
-		Name:  r.URL.Query().Get(`name`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdNamespaceShow,
+		msg.SectionNamespace,
+		proto.ActionShow,
+	)
+	request.Namespace.TomID = params.ByName(`tomID`)
+	request.Namespace.Name = r.URL.Query().Get(`name`)
 
 	if err := request.Namespace.ParseTomID(); err != nil {
 		if !(err == proto.ErrEmptyTomID && request.Namespace.Name != ``) {

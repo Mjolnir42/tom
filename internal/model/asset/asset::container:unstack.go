@@ -39,10 +39,12 @@ func exportContainerUnstack(result *proto.Result, r *msg.Result) {
 func (m *Model) ContainerUnstack(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionContainer
-	request.Action = proto.ActionUnstack
-	request.Container = *(proto.NewContainer())
+	request := msg.New(
+		r, params,
+		proto.CmdContainerUnstack,
+		msg.SectionContainer,
+		proto.ActionUnstack,
+	)
 
 	request.Container.TomID = params.ByName(`tomID`)
 	if err := request.Container.ParseTomID(); err != nil {

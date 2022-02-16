@@ -40,10 +40,12 @@ func exportOrchestrationRemove(result *proto.Result, r *msg.Result) {
 func (m *Model) OrchestrationRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionOrchestration
-	request.Action = proto.ActionRemove
-	request.Orchestration = *(proto.NewOrchestration())
+	request := msg.New(
+		r, params,
+		proto.CmdOrchestrationRemove,
+		msg.SectionOrchestration,
+		proto.ActionRemove,
+	)
 	request.Orchestration.TomID = params.ByName(`tomID`)
 
 	if err := request.Orchestration.ParseTomID(); err != nil {

@@ -42,14 +42,15 @@ func exportServerShow(result *proto.Result, r *msg.Result) {
 func (m *Model) ServerShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionServer
-	request.Action = proto.ActionShow
-	request.Server = proto.Server{
-		TomID:     params.ByName(`tomID`),
-		Namespace: r.URL.Query().Get(`namespace`),
-		Name:      r.URL.Query().Get(`name`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdServerShow,
+		msg.SectionServer,
+		proto.ActionShow,
+	)
+	request.Server.TomID = params.ByName(`tomID`)
+	request.Server.Namespace = r.URL.Query().Get(`namespace`)
+	request.Server.Name = r.URL.Query().Get(`name`)
 
 	if err := request.Server.ParseTomID(); err != nil {
 		if !(err == proto.ErrEmptyTomID && request.Server.Name != ``) {

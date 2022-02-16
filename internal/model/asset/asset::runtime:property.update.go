@@ -41,9 +41,12 @@ func exportRuntimePropUpdate(result *proto.Result, r *msg.Result) {
 func (m *Model) RuntimePropUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionRuntime
-	request.Action = proto.ActionPropUpdate
+	request := msg.New(
+		r, params,
+		proto.CmdRuntimePropUpdate,
+		msg.SectionRuntime,
+		proto.ActionPropUpdate,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

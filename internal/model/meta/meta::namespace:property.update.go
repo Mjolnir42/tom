@@ -43,9 +43,12 @@ func (m *Model) NamespacePropertyUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer rest.PanicCatcher(w, m.x.LM)
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionNamespace
-	request.Action = proto.ActionPropUpdate
+	request := msg.New(
+		r, params,
+		proto.CmdNamespacePropUpdate,
+		msg.SectionNamespace,
+		proto.ActionPropUpdate,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
