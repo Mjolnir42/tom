@@ -112,6 +112,7 @@ type Container struct {
 	Property  map[string]PropertyDetail `json:"property"`
 	CreatedAt string                    `json:"createdAt"`
 	CreatedBy string                    `json:"createdBy"`
+	Resources []string                  `json:"resources"`
 	ID        string                    `json:"-"`
 	TomID     string                    `json:"-"`
 }
@@ -124,8 +125,9 @@ func NewContainerRequest() Request {
 
 func NewContainer() *Container {
 	return &Container{
-		Link:     []string{},
-		Property: map[string]PropertyDetail{},
+		Link:      []string{},
+		Property:  map[string]PropertyDetail{},
+		Resources: []string{},
 	}
 }
 

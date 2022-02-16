@@ -113,6 +113,7 @@ type Runtime struct {
 	Property  map[string]PropertyDetail `json:"property"`
 	CreatedAt string                    `json:"createdAt"`
 	CreatedBy string                    `json:"createdBy"`
+	Resources []string                  `json:"resources"`
 	ID        string                    `json:"-"`
 	TomID     string                    `json:"-"`
 }
@@ -125,9 +126,10 @@ func NewRuntimeRequest() Request {
 
 func NewRuntime() *Runtime {
 	return &Runtime{
-		Link:     []string{},
-		Children: []string{},
-		Property: map[string]PropertyDetail{},
+		Link:      []string{},
+		Children:  []string{},
+		Property:  map[string]PropertyDetail{},
+		Resources: []string{},
 	}
 }
 
