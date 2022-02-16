@@ -19,12 +19,21 @@ func init() {
 
 func cmdAssetRuntimeList(c *cli.Context) error {
 	opts := map[string][]string{}
-	if err := adm.VariadicDirect(
-		proto.CmdRuntimeList,
-		c,
-		&opts,
-	); err != nil {
-		return err
+	switch {
+	case proto.IsWildcardTomID(c.Args().First()):
+		if err := adm.VerifySingleArgument(c); err != nil {
+			return err
+		}
+		_, ns, _ := proto.ParseTomIDWildcard(c.Args().First())
+		opts[`namespace`] = []string{ns}
+	default:
+		if err := adm.VariadicDirect(
+			proto.CmdRuntimeList,
+			c,
+			&opts,
+		); err != nil {
+			return err
+		}
 	}
 
 	spec := adm.Specification{
