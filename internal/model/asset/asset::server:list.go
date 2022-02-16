@@ -73,6 +73,7 @@ func (m *Model) ServerList(w http.ResponseWriter, r *http.Request,
 func (h *ServerReadHandler) list(q *msg.Request, mr *msg.Result) {
 	var (
 		id, namespace, key, value, author string
+		queryNS                           sql.NullString
 		creationTime                      time.Time
 		rows                              *sql.Rows
 		err                               error
@@ -80,8 +81,15 @@ func (h *ServerReadHandler) list(q *msg.Request, mr *msg.Result) {
 		ok                                bool
 	)
 
+	if q.Server.Namespace != `` {
+		queryNS.String = q.Server.Namespace
+		queryNS.Valid = true
+	}
+
 	list := make(map[string]proto.ServerHeader)
-	if rows, err = h.stmtList.Query(); err != nil {
+	if rows, err = h.stmtList.Query(
+		queryNS,
+	); err != nil {
 		mr.ServerError(err)
 		return
 	}

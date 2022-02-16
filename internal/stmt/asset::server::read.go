@@ -87,6 +87,7 @@ FROM        asset.server
     JOIN    inventory.user
       ON    asset.server_standard_attribute_values.createdBy = inventory.user.userID
    WHERE    now()::timestamptz(3) <@ asset.server_standard_attribute_values.validity
+     AND    (meta.dictionary.name = $1::text OR $1::text IS NULL)
      AND    meta.standard_attribute.attribute IN ('type')
 UNION
 SELECT      asset.server.serverID,
@@ -107,6 +108,7 @@ FROM        asset.server
     JOIN    inventory.user
       ON    asset.server_unique_attribute_values.createdBy = inventory.user.userID
 WHERE       now()::timestamptz(3) <@ asset.server_unique_attribute_values.validity
+     AND    (meta.dictionary.name = $1::text OR $1::text IS NULL)
      AND    meta.unique_attribute.attribute IN ('name');`
 
 	ServerParent = `
