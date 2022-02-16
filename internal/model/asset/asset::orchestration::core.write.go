@@ -29,11 +29,14 @@ type OrchestrationWriteHandler struct {
 	stmtAttDiscover      *sql.Stmt
 	stmtAttQueryType     *sql.Stmt
 	stmtRemove           *sql.Stmt
+	stmtTxChild          *sql.Stmt
+	stmtTxChildClean     *sql.Stmt
 	stmtTxLink           *sql.Stmt
 	stmtTxRteShow        *sql.Stmt
 	stmtTxShow           *sql.Stmt
 	stmtTxStackAdd       *sql.Stmt
 	stmtTxStackClamp     *sql.Stmt
+	stmtTxStackClampAll  *sql.Stmt
 	stmtTxStdPropAdd     *sql.Stmt
 	stmtTxStdPropClamp   *sql.Stmt
 	stmtTxStdPropClean   *sql.Stmt
@@ -121,11 +124,11 @@ func (h *OrchestrationWriteHandler) Run() {
 		stmt.NamespaceAttributeDiscover:        &h.stmtAttDiscover,
 		stmt.NamespaceAttributeQueryType:       &h.stmtAttQueryType,
 		stmt.OrchestrationAdd:                  &h.stmtAdd,
-		stmt.OrchestrationRemove:               &h.stmtRemove,
 		stmt.OrchestrationTxLink:               &h.stmtTxLink,
 		stmt.OrchestrationTxShow:               &h.stmtTxShow,
 		stmt.OrchestrationTxStackAdd:           &h.stmtTxStackAdd,
 		stmt.OrchestrationTxStackClamp:         &h.stmtTxStackClamp,
+		stmt.OrchestrationTxStackClampAll:      &h.stmtTxStackClampAll,
 		stmt.OrchestrationTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
 		stmt.OrchestrationTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
 		stmt.OrchestrationTxStdPropertyClean:   &h.stmtTxStdPropClean,
@@ -134,6 +137,8 @@ func (h *OrchestrationWriteHandler) Run() {
 		stmt.OrchestrationTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
 		stmt.OrchestrationTxUniqPropertyClean:  &h.stmtTxUniqPropClean,
 		stmt.OrchestrationTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
+		stmt.OrchestrationTxUnstackChild:       &h.stmtTxChild,
+		stmt.OrchestrationTxUnstackChildClean:  &h.stmtTxChildClean,
 		stmt.RuntimeTxShow:                     &h.stmtTxRteShow,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {

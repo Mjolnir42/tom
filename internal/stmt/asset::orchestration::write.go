@@ -49,9 +49,6 @@ FROM              ins_orc
   CROSS JOIN      sel_dct
 RETURNING         orchID;`
 
-	OrchestrationRemove = `
-SELECT      'Orchestration.REMOVE';`
-
 	OrchestrationStdAttrRemove = `
 DELETE FROM       asset.orchestration_environment_standard_attribute_values
 WHERE             attributeID = $1::uuid
@@ -266,6 +263,12 @@ WHERE             asset.orchestration_environment_mapping.orchID = $2::uuid
   AND             $1::timestamptz(3) <@ asset.orchestration_environment_mapping.validity
 	AND             $4::timestamptz(3) <@ asset.orchestration_environment_mapping.validity;`
 
+	OrchestrationTxStackClampAll = `
+UPDATE            asset.orchestration_environment_mapping
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.orchestration_environment_mapping.orchID = $2::uuid
+	AND             $1::timestamptz(3) <@ asset.orchestration_environment_mapping.validity;`
+
 	OrchestrationTxLink = `
 WITH sel_uid AS ( SELECT inventory.user.userID
                   FROM   inventory.user
@@ -289,15 +292,26 @@ SELECT            $1::uuid,
                   sel_uid.userID,
                   $7::timestamptz(3)
 FROM              sel_uid;`
+
+	OrchestrationTxUnstackChild = `
+UPDATE            asset.runtime_environment_parent
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.runtime_environment_parent.parentOrchestrationID = $2::uuid
+  AND             $1::timestamptz(3) <@ asset.runtime_environment_parent.validity;`
+
+	OrchestrationTxUnstackChildClean = `
+DELETE FROM       asset.runtime_environment_parent
+WHERE             asset.runtime_environment_parent.parentOrchestrationID = $2::uuid
+  AND             lower(asset.runtime_environment_parent.validity) > $1::timestamptz(3);`
 )
 
 func init() {
 	m[OrchestrationAdd] = `OrchestrationAdd`
-	m[OrchestrationRemove] = `OrchestrationRemove`
 	m[OrchestrationStdAttrRemove] = `OrchestrationStdAttrRemove`
 	m[OrchestrationTxLink] = `OrchestrationTxLink`
 	m[OrchestrationTxStackAdd] = `OrchestrationTxStackAdd`
 	m[OrchestrationTxStackClamp] = `OrchestrationTxStackClamp`
+	m[OrchestrationTxStackClampAll] = `OrchestrationTxStackClampAll`
 	m[OrchestrationTxStdPropertyAdd] = `OrchestrationTxStdPropertyAdd`
 	m[OrchestrationTxStdPropertyClamp] = `OrchestrationTxStdPropertyClamp`
 	m[OrchestrationTxStdPropertyClean] = `OrchestrationTxStdPropertyClean`
@@ -306,6 +320,8 @@ func init() {
 	m[OrchestrationTxUniqPropertyClamp] = `OrchestrationTxUniqPropertyClamp`
 	m[OrchestrationTxUniqPropertyClean] = `OrchestrationTxUniqPropertyClean`
 	m[OrchestrationTxUniqPropertySelect] = `OrchestrationTxUniqPropertySelect`
+	m[OrchestrationTxUnstackChildClean] = `OrchestrationTxUnstackChildClean`
+	m[OrchestrationTxUnstackChild] = `OrchestrationTxUnstackChild`
 	m[OrchestrationUniqAttrRemove] = `OrchestrationUniqAttrRemove`
 }
 
