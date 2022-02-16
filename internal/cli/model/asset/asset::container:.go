@@ -15,6 +15,9 @@ import (
 )
 
 func registerAssetContainer(app cli.App, run ActionFunc) *cli.App {
+	handlerMap[proto.EntityContainer+`:`+proto.ActionList] = run(cmdAssetContainerList)
+	handlerMap[proto.EntityContainer+`:`+proto.ActionShow] = run(cmdAssetContainerShow)
+
 	app.Commands = append(app.Commands,
 		[]*cli.Command{
 			{

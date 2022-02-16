@@ -15,6 +15,9 @@ import (
 )
 
 func registerAssetRuntime(app cli.App, run ActionFunc) *cli.App {
+	handlerMap[proto.EntityRuntime+`:`+proto.ActionList] = run(cmdAssetRuntimeList)
+	handlerMap[proto.EntityRuntime+`:`+proto.ActionShow] = run(cmdAssetRuntimeShow)
+
 	app.Commands = append(app.Commands,
 		[]*cli.Command{
 			{

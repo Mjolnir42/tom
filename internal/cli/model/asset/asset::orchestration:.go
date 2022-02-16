@@ -15,6 +15,9 @@ import (
 )
 
 func registerAssetOrchestration(app cli.App, run ActionFunc) *cli.App {
+	handlerMap[proto.EntityOrchestration+`:`+proto.ActionList] = run(cmdAssetOrchestrationList)
+	handlerMap[proto.EntityOrchestration+`:`+proto.ActionShow] = run(cmdAssetOrchestrationShow)
+
 	app.Commands = append(app.Commands,
 		[]*cli.Command{
 			{

@@ -12,8 +12,13 @@ import (
 )
 
 type ActionFunc func(cli.ActionFunc) cli.ActionFunc
+type Registry map[string]func(*cli.Context) error
 
-func Register(app cli.App, run ActionFunc) *cli.App {
+var handlerMap Registry
+
+func Register(app cli.App, run ActionFunc, r Registry) *cli.App {
+	handlerMap = r
+
 	app = *registerAssetServer(app, run)
 	app = *registerAssetRuntime(app, run)
 	app = *registerAssetContainer(app, run)
