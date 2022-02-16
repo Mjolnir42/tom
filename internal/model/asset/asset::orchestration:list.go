@@ -49,8 +49,14 @@ func (m *Model) OrchestrationList(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionOrchestration
 	request.Action = proto.ActionList
-	request.Orchestration = proto.Orchestration{
-		Namespace: r.URL.Query().Get(`namespace`),
+	request.Orchestration = *(proto.NewOrchestration())
+
+	if r.URL.Query().Get(`namespace`) != `` {
+		request.Orchestration.Namespace = r.URL.Query().Get(`namespace`)
+		if err := proto.ValidNamespace(request.Orchestration.Namespace); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
 	}
 
 	if !m.x.IsAuthorized(&request) {

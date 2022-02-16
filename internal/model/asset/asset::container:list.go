@@ -49,11 +49,8 @@ func (m *Model) ContainerList(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionContainer
 	request.Action = proto.ActionList
+	request.Container = *(proto.NewContainer())
 
-	if !m.x.IsAuthorized(&request) {
-		m.x.ReplyForbidden(&w, &request)
-		return
-	}
 	if r.URL.Query().Get(`namespace`) != `` {
 		request.Container.Namespace = r.URL.Query().Get(`namespace`)
 		if err := proto.ValidNamespace(request.Container.Namespace); err != nil {
@@ -62,12 +59,17 @@ func (m *Model) ContainerList(w http.ResponseWriter, r *http.Request,
 		}
 	}
 
+	if !m.x.IsAuthorized(&request) {
+		m.x.ReplyForbidden(&w, &request)
+		return
+	}
+
 	m.x.HM.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	m.x.Send(&w, &result, exportContainerList)
 }
 
-// list returns all servers
+// list returns all containers
 func (h *ContainerReadHandler) list(q *msg.Request, mr *msg.Result) {
 	var (
 		dictionaryName, containerName, author string
