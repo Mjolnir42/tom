@@ -27,7 +27,16 @@ type RuntimeWriteHandler struct {
 	stmtAdd              *sql.Stmt
 	stmtAttQueryType     *sql.Stmt
 	stmtLink             *sql.Stmt
-	stmtRemove           *sql.Stmt
+	stmtTxCldCnr         *sql.Stmt
+	stmtTxCldCnrClean    *sql.Stmt
+	stmtTxCldOre         *sql.Stmt
+	stmtTxCldOreClean    *sql.Stmt
+	stmtTxCldRte         *sql.Stmt
+	stmtTxCldRteClean    *sql.Stmt
+	stmtTxCldSok         *sql.Stmt
+	stmtTxCldSokClean    *sql.Stmt
+	stmtTxCldSrv         *sql.Stmt
+	stmtTxCldSrvClean    *sql.Stmt
 	stmtTxOrchShow       *sql.Stmt
 	stmtTxServerShow     *sql.Stmt
 	stmtTxShow           *sql.Stmt
@@ -117,23 +126,32 @@ func (h *RuntimeWriteHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.NamespaceAttributeQueryType: &h.stmtAttQueryType,
-		stmt.OrchestrationTxShow:         &h.stmtTxOrchShow,
-		stmt.RuntimeAdd:                  &h.stmtAdd,
-		stmt.RuntimeLink:                 &h.stmtLink,
-		stmt.RuntimeRemove:               &h.stmtRemove,
-		stmt.RuntimeTxShow:               &h.stmtTxShow,
-		stmt.RuntimeTxStackAdd:           &h.stmtTxStackAdd,
-		stmt.RuntimeTxStackClamp:         &h.stmtTxStackClamp,
-		stmt.RuntimeTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
-		stmt.RuntimeTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
-		stmt.RuntimeTxStdPropertyClean:   &h.stmtTxStdPropSelect,
-		stmt.RuntimeTxStdPropertySelect:  &h.stmtTxStdPropSelect,
-		stmt.RuntimeTxUniqPropertyAdd:    &h.stmtTxUniqPropAdd,
-		stmt.RuntimeTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
-		stmt.RuntimeTxUniqPropertyClean:  &h.stmtTxUniqPropSelect,
-		stmt.RuntimeTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
-		stmt.ServerTxShow:                &h.stmtTxServerShow,
+		stmt.NamespaceAttributeQueryType:   &h.stmtAttQueryType,
+		stmt.OrchestrationTxShow:           &h.stmtTxOrchShow,
+		stmt.RuntimeAdd:                    &h.stmtAdd,
+		stmt.RuntimeLink:                   &h.stmtLink,
+		stmt.RuntimeTxShow:                 &h.stmtTxShow,
+		stmt.RuntimeTxStackAdd:             &h.stmtTxStackAdd,
+		stmt.RuntimeTxStackClamp:           &h.stmtTxStackClamp,
+		stmt.RuntimeTxStdPropertyAdd:       &h.stmtTxStdPropAdd,
+		stmt.RuntimeTxStdPropertyClamp:     &h.stmtTxStdPropClamp,
+		stmt.RuntimeTxStdPropertyClean:     &h.stmtTxStdPropSelect,
+		stmt.RuntimeTxStdPropertySelect:    &h.stmtTxStdPropSelect,
+		stmt.RuntimeTxUniqPropertyAdd:      &h.stmtTxUniqPropAdd,
+		stmt.RuntimeTxUniqPropertyClamp:    &h.stmtTxUniqPropClamp,
+		stmt.RuntimeTxUniqPropertyClean:    &h.stmtTxUniqPropSelect,
+		stmt.RuntimeTxUniqPropertySelect:   &h.stmtTxUniqPropSelect,
+		stmt.RuntimeTxUnstackChildCnr:      &h.stmtTxCldCnr,
+		stmt.RuntimeTxUnstackChildCnrClean: &h.stmtTxCldCnrClean,
+		stmt.RuntimeTxUnstackChildOre:      &h.stmtTxCldOre,
+		stmt.RuntimeTxUnstackChildOreClean: &h.stmtTxCldOreClean,
+		stmt.RuntimeTxUnstackChildRte:      &h.stmtTxCldRte,
+		stmt.RuntimeTxUnstackChildRteClean: &h.stmtTxCldRteClean,
+		stmt.RuntimeTxUnstackChildSok:      &h.stmtTxCldSok,
+		stmt.RuntimeTxUnstackChildSokClean: &h.stmtTxCldSokClean,
+		stmt.RuntimeTxUnstackChildSrv:      &h.stmtTxCldSrv,
+		stmt.RuntimeTxUnstackChildSrvClean: &h.stmtTxCldSrvClean,
+		stmt.ServerTxShow:                  &h.stmtTxServerShow,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

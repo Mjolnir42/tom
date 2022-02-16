@@ -49,9 +49,6 @@ FROM              ins_rte
   CROSS JOIN      sel_dct
 RETURNING         rteID;`
 
-	RuntimeRemove = `
-SELECT      'Runtime.REMOVE';`
-
 	RuntimeTxStdPropertyAdd = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                               inventory.user.userID AS userID
@@ -306,6 +303,61 @@ WHERE             asset.runtime_environment_unique_attribute_values.dictionaryID
   AND             asset.runtime_environment_unique_attribute_values.attributeID     = cte_att.attributeID
   AND             asset.runtime_environment_unique_attribute_values.rteID           = $3::uuid
   AND             lower(asset.runtime_environment_unique_attribute_values.validity) > $4::timestamptz(3);`
+
+	RuntimeTxUnstackChildRte = `
+UPDATE            asset.runtime_environment_parent
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.runtime_environment_parent.parentRuntimeID = $2::uuid
+  AND             $1::timestamptz(3) <@ asset.runtime_environment_parent.validity;`
+
+	RuntimeTxUnstackChildRteClean = `
+DELETE FROM       asset.runtime_environment_parent
+WHERE             asset.runtime_environment_parent.parentRuntimeID = $2::uuid
+  AND             lower(asset.runtime_environment_parent.validity) > $1::timestamptz(3);`
+
+	RuntimeTxUnstackChildSrv = `
+UPDATE            asset.server_parent
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.server_parent.parentRuntimeID = $2::uuid
+  AND             $1::timestamptz(3) <@ asset.server_parent.validity;`
+
+	RuntimeTxUnstackChildSrvClean = `
+DELETE FROM       asset.server_parent
+WHERE             asset.server_parent.parentRuntimeID = $2::uuid
+  AND             lower(asset.server_parent.validity) > $1::timestamptz(3);`
+
+	RuntimeTxUnstackChildCnr = `
+UPDATE            asset.container_parent
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.container_parent.parentRuntimeID = $2::uuid
+  AND             $1::timestamptz(3) <@ asset.container_parent.validity;`
+
+	RuntimeTxUnstackChildCnrClean = `
+DELETE FROM       asset.container_parent
+WHERE             asset.container_parent.parentRuntimeID = $2::uuid
+  AND             lower(asset.container_parent.validity) > $1::timestamptz(3);`
+
+	RuntimeTxUnstackChildSok = `
+UPDATE            asset.socket_parent
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.socket_parent.parentRuntimeID = $2::uuid
+  AND             $1::timestamptz(3) <@ asset.socket_parent.validity;`
+
+	RuntimeTxUnstackChildSokClean = `
+DELETE FROM       asset.socket_parent
+WHERE             asset.socket_parent.parentRuntimeID = $2::uuid
+  AND             lower(asset.socket_parent.validity) > $1::timestamptz(3);`
+
+	RuntimeTxUnstackChildOre = `
+UPDATE            asset.orchestration_environment_mapping
+   SET            validity = tstzrange(lower(validity), $1::timestamptz(3), '[)')
+WHERE             asset.orchestration_environment_mapping.parentRuntimeID = $2::uuid
+  AND             $1::timestamptz(3) <@ asset.orchestration_environment_mapping.validity;`
+
+	RuntimeTxUnstackChildOreClean = `
+DELETE FROM       asset.orchestration_environment_mapping
+WHERE             asset.orchestration_environment_mapping.parentRuntimeID = $2::uuid
+  AND             lower(asset.orchestration_environment_mapping.validity) > $1::timestamptz(3);`
 )
 
 func init() {
@@ -316,7 +368,6 @@ func init() {
 	m[RuntimeDelNamespaceUniqValues] = `RuntimeDelNamespaceUniqValues`
 	m[RuntimeDelNamespace] = `RuntimeDelNamespace`
 	m[RuntimeLink] = `RuntimeLink`
-	m[RuntimeRemove] = `RuntimeRemove`
 	m[RuntimeTxStackAdd] = `RuntimeTxStackAdd`
 	m[RuntimeTxStackClamp] = `RuntimeTxStackClamp`
 	m[RuntimeTxStdPropertyAdd] = `RuntimeTxStdPropertyAdd`
@@ -327,6 +378,16 @@ func init() {
 	m[RuntimeTxUniqPropertyClamp] = `RuntimeTxUniqPropertyClamp`
 	m[RuntimeTxUniqPropertyClean] = `RuntimeTxUniqPropertyClean`
 	m[RuntimeTxUniqPropertySelect] = `RuntimeTxUniqPropertySelect`
+	m[RuntimeTxUnstackChildCnrClean] = `RuntimeTxUnstackChildCnrClean`
+	m[RuntimeTxUnstackChildCnr] = `RuntimeTxUnstackChildCnr`
+	m[RuntimeTxUnstackChildOreClean] = `RuntimeTxUnstackChildOreClean`
+	m[RuntimeTxUnstackChildOre] = `RuntimeTxUnstackChildOre`
+	m[RuntimeTxUnstackChildRteClean] = `RuntimeTxUnstackChildRteClean`
+	m[RuntimeTxUnstackChildRte] = `RuntimeTxUnstackChildRte`
+	m[RuntimeTxUnstackChildSokClean] = `RuntimeTxUnstackChildSokClean`
+	m[RuntimeTxUnstackChildSok] = `RuntimeTxUnstackChildSok`
+	m[RuntimeTxUnstackChildSrvClean] = `RuntimeTxUnstackChildSrvClean`
+	m[RuntimeTxUnstackChildSrv] = `RuntimeTxUnstackChildSrv`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
