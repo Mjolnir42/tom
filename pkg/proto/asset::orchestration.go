@@ -113,6 +113,7 @@ type Orchestration struct {
 	Property  map[string]PropertyDetail `json:"property"`
 	CreatedAt string                    `json:"createdAt"`
 	CreatedBy string                    `json:"createdBy"`
+	Resources []string                  `json:"resources"`
 	ID        string                    `json:"-"`
 	TomID     string                    `json:"-"`
 }
@@ -125,10 +126,11 @@ func NewOrchestrationRequest() Request {
 
 func NewOrchestration() *Orchestration {
 	return &Orchestration{
-		Parent:   []string{},
-		Link:     []string{},
-		Children: []string{},
-		Property: map[string]PropertyDetail{},
+		Parent:    []string{},
+		Link:      []string{},
+		Children:  []string{},
+		Property:  map[string]PropertyDetail{},
+		Resources: []string{},
 	}
 }
 
