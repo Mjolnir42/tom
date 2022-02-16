@@ -88,19 +88,17 @@ func init() {
 
 // Namespace defines ...
 type Namespace struct {
-	Name         string                    `json:"name"`
-	Type         string                    `json:"type"`
-	LookupKey    string                    `json:"lookup-attribute-key"`
-	LookupURI    string                    `json:"lookup-uri"`
-	Constraint   []string                  `json:"entity-contraint-list"`
-	Attributes   []AttributeDefinition     `json:"attributes"`
-	Property     map[string]PropertyDetail `json:"property,omitempty"`
-	CreatedAt    string                    `json:"createdAt"`
-	CreatedBy    string                    `json:"createdBy"`
-	ID           string                    `json:"-"`
-	TomID        string                    `json:"-"`
-	StdProperty  []PropertyDetail          `json:"-"`
-	UniqProperty []PropertyDetail          `json:"-"`
+	Name       string                    `json:"name"`
+	Type       string                    `json:"type"`
+	LookupKey  string                    `json:"lookup-attribute-key"`
+	LookupURI  string                    `json:"lookup-uri"`
+	Constraint []string                  `json:"entity-contraint-list"`
+	Attributes []AttributeDefinition     `json:"attributes"`
+	Property   map[string]PropertyDetail `json:"property,omitempty"`
+	CreatedAt  string                    `json:"createdAt"`
+	CreatedBy  string                    `json:"createdBy"`
+	ID         string                    `json:"-"`
+	TomID      string                    `json:"-"`
 }
 
 func NewNamespaceRequest() Request {
