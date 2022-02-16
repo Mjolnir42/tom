@@ -9,16 +9,14 @@ package proto //
 
 // Socket ...
 type Socket struct {
-	Namespace    string                    `json:"namespace"`
-	Name         string                    `json:"name"`
-	Parent       string                    `json:"parent"`
-	Property     map[string]PropertyDetail `json:"property"`
-	CreatedAt    string                    `json:"createdAt"`
-	CreatedBy    string                    `json:"createdBy"`
-	ID           string                    `json:"-"`
-	TomID        string                    `json:"-"`
-	StdProperty  []PropertyDetail          `json:"-"`
-	UniqProperty []PropertyDetail          `json:"-"`
+	Namespace string                    `json:"namespace"`
+	Name      string                    `json:"name"`
+	Parent    string                    `json:"parent"`
+	Property  map[string]PropertyDetail `json:"property"`
+	CreatedAt string                    `json:"createdAt"`
+	CreatedBy string                    `json:"createdBy"`
+	ID        string                    `json:"-"`
+	TomID     string                    `json:"-"`
 }
 
 func (s *Socket) SetTomID() Entity {

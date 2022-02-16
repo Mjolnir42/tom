@@ -104,18 +104,16 @@ func init() {
 
 // Container ...
 type Container struct {
-	Namespace    string                    `json:"namespace"`
-	Name         string                    `json:"name"`
-	Type         string                    `json:"type"`
-	Parent       string                    `json:"parent"`
-	Link         []string                  `json:"link"`
-	Property     map[string]PropertyDetail `json:"property"`
-	CreatedAt    string                    `json:"createdAt"`
-	CreatedBy    string                    `json:"createdBy"`
-	ID           string                    `json:"-"`
-	TomID        string                    `json:"-"`
-	StdProperty  []PropertyDetail          `json:"-"`
-	UniqProperty []PropertyDetail          `json:"-"`
+	Namespace string                    `json:"namespace"`
+	Name      string                    `json:"name"`
+	Type      string                    `json:"type"`
+	Parent    string                    `json:"parent"`
+	Link      []string                  `json:"link"`
+	Property  map[string]PropertyDetail `json:"property"`
+	CreatedAt string                    `json:"createdAt"`
+	CreatedBy string                    `json:"createdBy"`
+	ID        string                    `json:"-"`
+	TomID     string                    `json:"-"`
 }
 
 func NewContainerRequest() Request {
