@@ -49,6 +49,15 @@ func (m *Model) ServerList(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = proto.ActionList
+	request.Server = *(proto.NewServer())
+
+	if r.URL.Query().Get(`namespace`) != `` {
+		request.Server.Namespace = r.URL.Query().Get(`namespace`)
+		if err := proto.ValidNamespace(request.Server.Namespace); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+	}
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)

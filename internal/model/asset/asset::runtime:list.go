@@ -49,6 +49,7 @@ func (m *Model) RuntimeList(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionRuntime
 	request.Action = proto.ActionList
+	request.Runtime = *(proto.NewRuntime())
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
