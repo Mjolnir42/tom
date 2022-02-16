@@ -121,12 +121,16 @@ type Orchestration struct {
 
 func NewOrchestrationRequest() Request {
 	return Request{
-		Orchestration: &Orchestration{
-			Parent:   []string{},
-			Link:     []string{},
-			Children: []string{},
-			Property: map[string]PropertyDetail{},
-		},
+		Orchestration: NewOrchestration(),
+	}
+}
+
+func NewOrchestration() *Orchestration {
+	return &Orchestration{
+		Parent:   []string{},
+		Link:     []string{},
+		Children: []string{},
+		Property: map[string]PropertyDetail{},
 	}
 }
 
