@@ -113,6 +113,10 @@ func IsTomID(s string) bool {
 	return isTomIDFormatDNS(s) || isTomIDFormatURI(s)
 }
 
+func IsWildcardTomID(s string) bool {
+	return isTomIDWildcardFormat(s)
+}
+
 // ParseTomID parses the TomID s and returns the entity type as a string as
 // well as and Entity object
 func ParseTomID(s string) (error, string, Entity) {
@@ -173,6 +177,16 @@ func isTomIDFormatURI(s string) bool {
 	return re.MatchString(s)
 }
 
+func isTomIDWildcardFormat(s string) bool {
+	re := regexp.MustCompile(fmt.Sprintf("%s|%s|%s|%s",
+		tomIDQueryNTT,
+		tomIDSQueryNTT,
+		tomIDQueryNsNTT,
+		tomIDSQueryNsNTT,
+	))
+	return re.MatchString(s)
+}
+
 func parseTomIDFormatDNS(s string) (name, namespace, entity string) {
 	reCommon := regexp.MustCompile(tomIDFormatDNS)
 	reNamespace := regexp.MustCompile(tomIDNamespDNS)
@@ -206,6 +220,30 @@ func parseTomIDFormatURI(s string) (name, namespace, entity string) {
 	case reNamespace.MatchString(s):
 		sn := reNamespace.FindStringSubmatch(s)
 		return sn[2], ``, sn[1]
+	default:
+		return ``, ``, ``
+	}
+}
+
+func ParseTomIDWildcard(s string) (name, namespace, entity string) {
+	reQueryNTT := regexp.MustCompile(tomIDQueryNTT)
+	reSQueryNTT := regexp.MustCompile(tomIDSQueryNTT)
+	reQueryNsNTT := regexp.MustCompile(tomIDQueryNsNTT)
+	reSQueryNsNTT := regexp.MustCompile(tomIDSQueryNsNTT)
+
+	switch {
+	case reQueryNTT.MatchString(s):
+		sn := reQueryNTT.FindStringSubmatch(s)
+		return ``, ``, sn[1]
+	case reSQueryNTT.MatchString(s):
+		sn := reSQueryNTT.FindStringSubmatch(s)
+		return ``, ``, nttShort2Long(sn[1])
+	case reQueryNsNTT.MatchString(s):
+		sn := reQueryNsNTT.FindStringSubmatch(s)
+		return ``, sn[1], sn[2]
+	case reSQueryNsNTT.MatchString(s):
+		sn := reSQueryNsNTT.FindStringSubmatch(s)
+		return ``, sn[1], nttShort2Long(sn[2])
 	default:
 		return ``, ``, ``
 	}
