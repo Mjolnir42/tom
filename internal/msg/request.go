@@ -17,6 +17,7 @@ import (
 
 type Request struct {
 	ID         uuid.UUID
+	Command    string
 	Section    string
 	Action     string
 	RemoteAddr string
@@ -38,17 +39,39 @@ type Request struct {
 }
 
 // New returns a Request
-func New(r *http.Request, params httprouter.Params) Request {
+func New(r *http.Request, params httprouter.Params, cmd, sec, ac string) Request {
 	returnChannel := make(chan Result, 1)
 	identity := authUser(params)
-	return Request{
+	rq := Request{
 		ID:         requestID(params),
+		Command:    cmd,
+		Section:    sec,
+		Action:     ac,
 		RequestURI: requestURI(params),
 		RemoteAddr: remoteAddr(r),
 		UserIDLib:  identity[0],
 		AuthUser:   identity[1],
 		Reply:      returnChannel,
 	}
+	switch sec {
+	case SectionContainer:
+		rq.Container = *(proto.NewContainer())
+	case SectionLibrary:
+		rq.Library = proto.Library{} // TODO when implenting model
+	case SectionNamespace:
+		rq.Namespace = *(proto.NewNamespace())
+	case SectionOrchestration:
+		rq.Orchestration = *(proto.NewOrchestration())
+	case SectionRuntime:
+		rq.Runtime = *(proto.NewRuntime())
+	case SectionServer:
+		rq.Server = *(proto.NewServer())
+	case SectionTeam:
+		rq.Team = proto.Team{} // TODO when implementing model
+	case SectionUser:
+		rq.User = proto.User{} // TODO when implementing model
+	}
+	return rq
 }
 
 type UpdateData struct {

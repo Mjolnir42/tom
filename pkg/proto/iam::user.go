@@ -7,6 +7,15 @@
 
 package proto //
 
+const (
+	CmdUser       = ModelIAM + `::` + EntityUser + `:`
+	CmdUserAdd    = ModelIAM + `::` + EntityUser + `:` + ActionAdd
+	CmdUserList   = ModelIAM + `::` + EntityUser + `:` + ActionList
+	CmdUserRemove = ModelIAM + `::` + EntityUser + `:` + ActionRemove
+	CmdUserShow   = ModelIAM + `::` + EntityUser + `:` + ActionShow
+	CmdUserUpdate = ModelIAM + `::` + EntityUser + `:` + ActionUpdate
+)
+
 // User ...
 type User struct {
 	LibraryName    string `json:"library-name"`

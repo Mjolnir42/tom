@@ -42,9 +42,12 @@ func (m *Model) NamespacePropertyRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer rest.PanicCatcher(w, m.x.LM)
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionNamespace
-	request.Action = proto.ActionPropRemove
+	request := msg.New(
+		r, params,
+		proto.CmdNamespacePropRemove,
+		msg.SectionNamespace,
+		proto.ActionPropRemove,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

@@ -41,9 +41,12 @@ func exportServerPropUpdate(result *proto.Result, r *msg.Result) {
 func (m *Model) ServerPropUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionServer
-	request.Action = proto.ActionPropUpdate
+	request := msg.New(
+		r, params,
+		proto.CmdServerPropUpdate,
+		msg.SectionServer,
+		proto.ActionPropUpdate,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

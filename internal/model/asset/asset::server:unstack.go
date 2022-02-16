@@ -39,10 +39,12 @@ func exportServerUnstack(result *proto.Result, r *msg.Result) {
 func (m *Model) ServerUnstack(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionServer
-	request.Action = proto.ActionUnstack
-	request.Server = *(proto.NewServer())
+	request := msg.New(
+		r, params,
+		proto.CmdServerUnstack,
+		msg.SectionServer,
+		proto.ActionUnstack,
+	)
 
 	request.Server.TomID = params.ByName(`tomID`)
 	if err := request.Server.ParseTomID(); err != nil {

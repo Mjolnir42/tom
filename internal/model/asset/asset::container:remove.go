@@ -40,10 +40,12 @@ func exportContainerRemove(result *proto.Result, r *msg.Result) {
 func (m *Model) ContainerRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionContainer
-	request.Action = proto.ActionRemove
-	request.Container = *(proto.NewContainer())
+	request := msg.New(
+		r, params,
+		proto.CmdContainerRemove,
+		msg.SectionContainer,
+		proto.ActionRemove,
+	)
 	request.Container.TomID = params.ByName(`tomID`)
 
 	if err := request.Container.ParseTomID(); err != nil {

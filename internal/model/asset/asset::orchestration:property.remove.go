@@ -41,9 +41,12 @@ func exportOrchestrationPropRemove(result *proto.Result, r *msg.Result) {
 func (m *Model) OrchestrationPropRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionOrchestration
-	request.Action = proto.ActionPropRemove
+	request := msg.New(
+		r, params,
+		proto.CmdOrchestrationPropRemove,
+		msg.SectionOrchestration,
+		proto.ActionPropRemove,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

@@ -40,9 +40,12 @@ func exportOrchestrationPropUpdate(result *proto.Result, r *msg.Result) {
 func (m *Model) OrchestrationPropUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionOrchestration
-	request.Action = proto.ActionPropUpdate
+	request := msg.New(
+		r, params,
+		proto.CmdOrchestrationPropUpdate,
+		msg.SectionOrchestration,
+		proto.ActionPropUpdate,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

@@ -46,9 +46,12 @@ func (m *Model) NamespaceList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionNamespace
-	request.Action = proto.ActionList
+	request := msg.New(
+		r, params,
+		proto.CmdNamespaceList,
+		msg.SectionNamespace,
+		proto.ActionList,
+	)
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)

@@ -46,10 +46,12 @@ func (m *Model) ServerList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionServer
-	request.Action = proto.ActionList
-	request.Server = *(proto.NewServer())
+	request := msg.New(
+		r, params,
+		proto.CmdServerList,
+		msg.SectionServer,
+		proto.ActionList,
+	)
 
 	if r.URL.Query().Get(`namespace`) != `` {
 		request.Server.Namespace = r.URL.Query().Get(`namespace`)

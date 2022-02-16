@@ -22,6 +22,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result, dataExport ExportFunc
 
 	result.RequestID = r.ID.String()
 	result.StatusCode = r.Code
+	result.Command = r.Command
 
 	if r.Code >= http.StatusBadRequest {
 		x.LM.GetLogger(`request`).Errorf(

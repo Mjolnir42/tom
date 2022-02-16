@@ -41,14 +41,15 @@ func exportContainerShow(result *proto.Result, r *msg.Result) {
 func (m *Model) ContainerShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionContainer
-	request.Action = proto.ActionShow
-	request.Container = proto.Container{
-		TomID:     params.ByName(`tomID`),
-		Namespace: r.URL.Query().Get(`namespace`),
-		Name:      r.URL.Query().Get(`name`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdContainerShow,
+		msg.SectionContainer,
+		proto.ActionShow,
+	)
+	request.Container.TomID = params.ByName(`tomID`)
+	request.Container.Namespace = r.URL.Query().Get(`namespace`)
+	request.Container.Name = r.URL.Query().Get(`name`)
 
 	if err := request.Container.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {

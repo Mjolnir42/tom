@@ -42,9 +42,12 @@ func exportContainerPropSet(result *proto.Result, r *msg.Result) {
 func (m *Model) ContainerPropSet(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionContainer
-	request.Action = proto.ActionPropSet
+	request := msg.New(
+		r, params,
+		proto.CmdContainerPropSet,
+		msg.SectionContainer,
+		proto.ActionPropSet,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

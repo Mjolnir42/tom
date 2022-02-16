@@ -40,13 +40,14 @@ func exportOrchestrationResolve(result *proto.Result, r *msg.Result) {
 func (m *Model) OrchestrationResolve(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionOrchestration
-	request.Action = proto.ActionResolve
-	request.Orchestration = proto.Orchestration{
-		TomID: params.ByName(`tomID`),
-		Type:  params.ByName(`level`), // resolution detail type
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdOrchestrationResolve,
+		msg.SectionOrchestration,
+		proto.ActionResolve,
+	)
+	request.Orchestration.TomID = params.ByName(`tomID`)
+	request.Orchestration.Type = params.ByName(`level`) // resolution detail type
 
 	if err := request.Orchestration.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)

@@ -7,6 +7,14 @@
 
 package proto //
 
+const (
+	CmdLibrary       = ModelIAM + `::` + EntityLibrary + `:`
+	CmdLibraryAdd    = ModelIAM + `::` + EntityLibrary + `:` + ActionAdd
+	CmdLibraryList   = ModelIAM + `::` + EntityLibrary + `:` + ActionList
+	CmdLibraryRemove = ModelIAM + `::` + EntityLibrary + `:` + ActionRemove
+	CmdLibraryShow   = ModelIAM + `::` + EntityLibrary + `:` + ActionShow
+)
+
 // Library ...
 type Library struct {
 	ID        string `json:"-"`

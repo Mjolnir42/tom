@@ -32,12 +32,13 @@ func (m *Model) UserList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionUser
-	request.Action = proto.ActionList
-	request.User = proto.User{
-		LibraryName: params.ByName(`lib`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdUserList,
+		msg.SectionUser,
+		proto.ActionList,
+	)
+	request.User.LibraryName = params.ByName(`lib`)
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -53,12 +54,13 @@ func (m *Model) UserList(w http.ResponseWriter, r *http.Request,
 func (m *Model) UserShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionUser
-	request.Action = proto.ActionShow
-	request.User = proto.User{
-		LibraryName: params.ByName(`lib`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdUserShow,
+		msg.SectionUser,
+		proto.ActionShow,
+	)
+	request.User.LibraryName = params.ByName(`lib`)
 
 	switch {
 	case r.URL.Query().Get(`name`) != ``:
@@ -82,9 +84,12 @@ func (m *Model) UserAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer rest.PanicCatcher(w, m.x.LM)
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionUser
-	request.Action = proto.ActionAdd
+	request := msg.New(
+		r, params,
+		proto.CmdUserAdd,
+		msg.SectionUser,
+		proto.ActionAdd,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -108,13 +113,14 @@ func (m *Model) UserAdd(w http.ResponseWriter, r *http.Request,
 func (m *Model) UserRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionUser
-	request.Action = proto.ActionRemove
-	request.User = proto.User{
-		LibraryName: params.ByName(`lib`),
-		UserName:    params.ByName(`user`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdUserRemove,
+		msg.SectionUser,
+		proto.ActionRemove,
+	)
+	request.User.LibraryName = params.ByName(`lib`)
+	request.User.UserName = params.ByName(`user`)
 
 	if err := request.Namespace.ParseTomID(); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
@@ -135,13 +141,14 @@ func (m *Model) UserRemove(w http.ResponseWriter, r *http.Request,
 func (m *Model) UserUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionUser
-	request.Action = proto.ActionRemove
-	request.User = proto.User{
-		LibraryName: params.ByName(`lib`),
-		UserName:    params.ByName(`user`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdUserUpdate,
+		msg.SectionUser,
+		proto.ActionUpdate,
+	)
+	request.User.LibraryName = params.ByName(`lib`)
+	request.User.UserName = params.ByName(`user`)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

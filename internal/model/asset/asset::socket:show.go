@@ -43,14 +43,15 @@ func exportSocketShow(result *proto.Result, r *msg.Result) {
 func (m *Model) SocketShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionSocket
-	request.Action = proto.ActionShow
-	request.Socket = proto.Socket{
-		TomID:     params.ByName(`tomID`),
-		Namespace: r.URL.Query().Get(`namespace`),
-		Name:      r.URL.Query().Get(`name`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdSocketShow,
+		msg.SectionSocket,
+		proto.ActionShow,
+	)
+	request.Socket.TomID = params.ByName(`tomID`)
+	request.Socket.Namespace = r.URL.Query().Get(`namespace`)
+	request.Socket.Name = r.URL.Query().Get(`name`)
 
 	if err := request.Socket.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {

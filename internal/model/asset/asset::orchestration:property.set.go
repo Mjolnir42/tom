@@ -41,9 +41,12 @@ func exportOrchestrationPropSet(result *proto.Result, r *msg.Result) {
 func (m *Model) OrchestrationPropSet(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionOrchestration
-	request.Action = proto.ActionPropSet
+	request := msg.New(
+		r, params,
+		proto.CmdOrchestrationPropSet,
+		msg.SectionOrchestration,
+		proto.ActionPropSet,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

@@ -46,10 +46,12 @@ func (m *Model) OrchestrationList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionOrchestration
-	request.Action = proto.ActionList
-	request.Orchestration = *(proto.NewOrchestration())
+	request := msg.New(
+		r, params,
+		proto.CmdOrchestrationList,
+		msg.SectionOrchestration,
+		proto.ActionList,
+	)
 
 	if r.URL.Query().Get(`namespace`) != `` {
 		request.Orchestration.Namespace = r.URL.Query().Get(`namespace`)

@@ -33,12 +33,13 @@ func (m *Model) TeamList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionList
-	request.Team = proto.Team{
-		LibraryName: params.ByName(`lib`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdTeamList,
+		msg.SectionTeam,
+		proto.ActionList,
+	)
+	request.Team.LibraryName = params.ByName(`lib`)
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -54,12 +55,13 @@ func (m *Model) TeamList(w http.ResponseWriter, r *http.Request,
 func (m *Model) TeamShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionShow
-	request.Team = proto.Team{
-		LibraryName: params.ByName(`lib`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdTeamShow,
+		msg.SectionTeam,
+		proto.ActionShow,
+	)
+	request.Team.LibraryName = params.ByName(`lib`)
 
 	switch {
 	case r.URL.Query().Get(`name`) != ``:
@@ -83,9 +85,12 @@ func (m *Model) TeamAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer rest.PanicCatcher(w, m.x.LM)
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionAdd
+	request := msg.New(
+		r, params,
+		proto.CmdTeamAdd,
+		msg.SectionTeam,
+		proto.ActionAdd,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -109,13 +114,14 @@ func (m *Model) TeamAdd(w http.ResponseWriter, r *http.Request,
 func (m *Model) TeamRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionRemove
-	request.Team = proto.Team{
-		LibraryName: params.ByName(`lib`),
-		TeamName:    params.ByName(`team`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdTeamRemove,
+		msg.SectionTeam,
+		proto.ActionRemove,
+	)
+	request.Team.LibraryName = params.ByName(`lib`)
+	request.Team.TeamName = params.ByName(`team`)
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -131,13 +137,14 @@ func (m *Model) TeamRemove(w http.ResponseWriter, r *http.Request,
 func (m *Model) TeamUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionUpdate
-	request.Team = proto.Team{
-		LibraryName: params.ByName(`lib`),
-		TeamName:    params.ByName(`team`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdTeamUpdate,
+		msg.SectionTeam,
+		proto.ActionUpdate,
+	)
+	request.Team.LibraryName = params.ByName(`lib`)
+	request.Team.TeamName = params.ByName(`team`)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -161,9 +168,12 @@ func (m *Model) TeamUpdate(w http.ResponseWriter, r *http.Request,
 func (m *Model) TeamHeadOfSet(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionHdSet
+	request := msg.New(
+		r, params,
+		proto.CmdTeamHdSet,
+		msg.SectionTeam,
+		proto.ActionHdSet,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -194,13 +204,14 @@ func (m *Model) TeamHeadOfSet(w http.ResponseWriter, r *http.Request,
 func (m *Model) TeamHeadOfUnset(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionHdUnset
-	request.Team = proto.Team{
-		LibraryName: params.ByName(`lib`),
-		TeamName:    params.ByName(`team`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdTeamHdUnset,
+		msg.SectionTeam,
+		proto.ActionHdUnset,
+	)
+	request.Team.LibraryName = params.ByName(`lib`)
+	request.Team.TeamName = params.ByName(`team`)
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -216,9 +227,12 @@ func (m *Model) TeamHeadOfUnset(w http.ResponseWriter, r *http.Request,
 func (m *Model) TeamMemberAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionMbrAdd
+	request := msg.New(
+		r, params,
+		proto.CmdTeamMbrAdd,
+		msg.SectionTeam,
+		proto.ActionMbrAdd,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -253,9 +267,12 @@ func (m *Model) TeamMemberAdd(w http.ResponseWriter, r *http.Request,
 func (m *Model) TeamMemberSet(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionMbrSet
+	request := msg.New(
+		r, params,
+		proto.CmdTeamMbrSet,
+		msg.SectionTeam,
+		proto.ActionMbrSet,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
@@ -290,13 +307,14 @@ func (m *Model) TeamMemberSet(w http.ResponseWriter, r *http.Request,
 func (m *Model) TeamMemberList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionMbrList
-	request.Team = proto.Team{
-		LibraryName: params.ByName(`lib`),
-		TeamName:    params.ByName(`team`),
-	}
+	request := msg.New(
+		r, params,
+		proto.CmdTeamMbrList,
+		msg.SectionTeam,
+		proto.ActionMbrList,
+	)
+	request.Team.LibraryName = params.ByName(`lib`)
+	request.Team.TeamName = params.ByName(`team`)
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -312,9 +330,12 @@ func (m *Model) TeamMemberList(w http.ResponseWriter, r *http.Request,
 func (m *Model) TeamMemberRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = proto.ActionMbrRemove
+	request := msg.New(
+		r, params,
+		proto.CmdTeamMbrRemove,
+		msg.SectionTeam,
+		proto.ActionMbrRemove,
+	)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {

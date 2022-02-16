@@ -48,9 +48,12 @@ func (m *Model) SocketList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionSocket
-	request.Action = proto.ActionList
+	request := msg.New(
+		r, params,
+		proto.CmdSocketList,
+		msg.SectionSocket,
+		proto.ActionList,
+	)
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)

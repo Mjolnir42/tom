@@ -46,10 +46,12 @@ func (m *Model) ContainerList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionContainer
-	request.Action = proto.ActionList
-	request.Container = *(proto.NewContainer())
+	request := msg.New(
+		r, params,
+		proto.CmdContainerList,
+		msg.SectionContainer,
+		proto.ActionList,
+	)
 
 	if r.URL.Query().Get(`namespace`) != `` {
 		request.Container.Namespace = r.URL.Query().Get(`namespace`)
