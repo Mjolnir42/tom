@@ -28,6 +28,7 @@ type ServerWriteHandler struct {
 	stmtAttQueryType     *sql.Stmt
 	stmtLink             *sql.Stmt
 	stmtRemove           *sql.Stmt
+	stmtTxProp           *sql.Stmt
 	stmtTxRuntimeShow    *sql.Stmt
 	stmtTxShow           *sql.Stmt
 	stmtTxStackAdd       *sql.Stmt
@@ -123,6 +124,7 @@ func (h *ServerWriteHandler) Run() {
 		stmt.ServerAdd:                   &h.stmtAdd,
 		stmt.ServerLink:                  &h.stmtLink,
 		stmt.ServerTxShow:                &h.stmtTxShow,
+		stmt.ServerTxShowProperties:      &h.stmtTxProp,
 		stmt.ServerTxStackAdd:            &h.stmtTxStackAdd,
 		stmt.ServerTxStackClamp:          &h.stmtTxStackClamp,
 		stmt.ServerTxStdPropertyAdd:      &h.stmtTxStdPropAdd,
