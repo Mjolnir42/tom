@@ -28,10 +28,11 @@ type RuntimeReadHandler struct {
 	stmtList       *sql.Stmt
 	stmtParent     *sql.Stmt
 	stmtProp       *sql.Stmt
-	stmtShow       *sql.Stmt
-	stmtTxChildren *sql.Stmt
 	stmtResolvNext *sql.Stmt
 	stmtResolvPhys *sql.Stmt
+	stmtShow       *sql.Stmt
+	stmtTxChildren *sql.Stmt
+	stmtTxResource *sql.Stmt
 }
 
 // NewRuntimeReadHandler returns a new handler instance
@@ -98,6 +99,7 @@ func (h *RuntimeReadHandler) Run() {
 		stmt.RuntimeParent:           &h.stmtParent,
 		stmt.RuntimeResolvePhysical:  &h.stmtResolvPhys,
 		stmt.RuntimeResolveServer:    &h.stmtResolvNext,
+		stmt.RuntimeTxSelectResource: &h.stmtTxResource,
 		stmt.RuntimeTxShow:           &h.stmtShow,
 		stmt.RuntimeTxShowChildren:   &h.stmtTxChildren,
 		stmt.RuntimeTxShowProperties: &h.stmtProp,

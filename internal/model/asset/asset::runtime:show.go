@@ -103,6 +103,7 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 	txProp := tx.Stmt(h.stmtProp)
 	txParent := tx.Stmt(h.stmtParent)
 	txChildren := tx.Stmt(h.stmtTxChildren)
+	txResource := tx.Stmt(h.stmtTxResource)
 
 	rte := proto.Runtime{
 		Namespace: q.Runtime.Namespace,
@@ -297,6 +298,26 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
+	// fetch resource links for current rteID
+	var resource string
+	noResource := false
+	if err = txResource.QueryRow(
+		q.Runtime.Namespace,
+		rteID,
+		txTime,
+	).Scan(
+		&resource,
+	); err == sql.ErrNoRows {
+		// not an error, might not be a referential namespace
+		noResource = true
+	} else if err != nil {
+		mr.ServerError(err)
+		return
+	}
+	if !noResource {
+		rte.Resources = append(rte.Resources, resource)
+	}
+
 	// fetch linked runtimes
 	linklist := [][]string{}
 	if links, err = tx.Stmt(h.stmtLinked).Query(
@@ -335,6 +356,28 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 	if err = links.Err(); err != nil {
 		mr.ServerError(err)
 		return
+	}
+
+	// fetch linked resources
+	for i := range linklist {
+		noResource = false
+		var linkResource string
+		if err = txResource.QueryRow(
+			linklist[i][3],
+			linklist[i][1],
+			txTime,
+		).Scan(
+			&linkResource,
+		); err == sql.ErrNoRows {
+			// not an error, might not be a referential namespace
+			noResource = true
+		} else if err != nil {
+			mr.ServerError(err)
+			return
+		}
+		if !noResource {
+			rte.Resources = append(rte.Resources, linkResource)
+		}
 	}
 
 	for i := range linklist {
