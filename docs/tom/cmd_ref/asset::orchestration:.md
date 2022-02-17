@@ -7,6 +7,9 @@ it is not desirable to replicate every individual movement into `Tom`,
 then an orchestration environment is of use. Everything above it is
 provided-by everything below it.
 
+The `tomID` of an orchestration environment ends either in `.ore.tom` or
+`.orchestration.tom`.
+
 # SYNOPSIS OVERVIEW
 
 ```
@@ -28,9 +31,10 @@ tom orchestration resolve ${name} namespace ${space} level ${detail}
 tom orchestration resolve ${tomID} level ${detail}
 ```
 
-# PROPERTIES
+# sys PROPERTIES
 
-The following are the properties an orchestration environment should have.
+The following are the properties an orchestration environment should have in
+namespace `sys`.
 Perpetual properties can not be changed, while properties with validity
 can be updated over the lifetime of the orchestration environment.
 

@@ -3,7 +3,8 @@
 This command is used to show full details about a server.
 There are two variants of this command, referencing the server either
 by name and namespace combination, or by tomID.
-The tomID parameter can be given in either DNS or URI format.
+The tomID parameter can be given in either short DNS, long DNS
+or URI format.
 
 # SYNOPSIS
 
