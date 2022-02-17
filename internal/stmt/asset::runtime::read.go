@@ -305,17 +305,68 @@ FROM        view.resolveRuntimeToPhysical($1::uuid) AS resolution
      AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
      AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
 WHERE       meta.unique_attribute.attribute IN ('name');`
+
+	RuntimeTxSelectResource = `
+WITH dict AS ( SELECT meta.dictionary.dictionaryID
+               FROM   meta.dictionary
+               JOIN   meta.standard_attribute
+                 ON   meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+               JOIN   meta.dictionary_standard_attribute_values
+                 ON   meta.dictionary.dictionaryID = meta.dictionary_standard_attribute_values.dictionaryID
+                AND   meta.standard_attribute.attributeID = meta.dictionary_standard_attribute_values.attributeID
+               WHERE  meta.dictionary.name = $1::text
+                 AND  meta.standard_attribute.attribute = 'dict_type'
+                 AND  meta.dictionary_standard_attribute_values.value = 'referential'
+                 AND  $3::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity),
+     look AS ( SELECT meta.dictionary_standard_attribute_values.value AS key
+               FROM   meta.dictionary
+               JOIN   dict
+                 ON   dict.dictionaryID = meta.dictionary.dictionaryID
+               JOIN   meta.standard_attribute
+                 ON   meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+               JOIN   meta.dictionary_standard_attribute_values
+                 ON   meta.dictionary.dictionaryID = meta.dictionary_standard_attribute_values.dictionaryID
+                AND   meta.standard_attribute.attributeID = meta.dictionary_standard_attribute_values.attributeID
+               WHERE  meta.standard_attribute.attribute = 'dict_lookup'
+                 AND  $3::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity),
+      uri AS ( SELECT meta.dictionary_standard_attribute_values.value AS uri
+               FROM   meta.dictionary
+               JOIN   dict
+                 ON   dict.dictionaryID = meta.dictionary.dictionaryID
+               JOIN   meta.standard_attribute
+                 ON   meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+               JOIN   meta.dictionary_standard_attribute_values
+                 ON   meta.dictionary.dictionaryID = meta.dictionary_standard_attribute_values.dictionaryID
+                AND   meta.standard_attribute.attributeID = meta.dictionary_standard_attribute_values.attributeID
+               WHERE  meta.standard_attribute.attribute = 'dict_uri'
+                 AND  $3::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity )
+SELECT                replace(uri.uri, '{{LOOKUP}}', asset.runtime_environment_unique_attribute_values.value) AS resource
+FROM                  asset.runtime_environment
+JOIN                  dict
+  ON                  asset.runtime_environment.dictionaryID = dict.dictionaryID
+JOIN                  meta.unique_attribute
+  ON                  asset.runtime_environment.dictionaryID = meta.unique_attribute.dictionaryID
+JOIN                  asset.runtime_environment_unique_attribute_values
+  ON                  asset.runtime_environment.dictionaryID = asset.runtime_environment_unique_attribute_values.dictionaryID
+ AND                  meta.unique_attribute.attributeID = asset.runtime_environment_unique_attribute_values.attributeID
+ AND                  asset.runtime_environment.rteID = asset.runtime_environment_unique_attribute_values.rteID
+JOIN                  look
+  ON                  meta.unique_attribute.attribute = look.key
+CROSS JOIN            uri
+WHERE                 asset.runtime_environment.rteID = $2::uuid
+  AND                 $3::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity;`
 )
 
 func init() {
 	m[RuntimeListLinked] = `RuntimeListLinked`
 	m[RuntimeList] = `RuntimeList`
 	m[RuntimeParent] = `RuntimeParent`
+	m[RuntimeResolvePhysical] = `RuntimeResolvePhysical`
+	m[RuntimeResolveServer] = `RuntimeResolveServer`
+	m[RuntimeTxSelectResource] = `RuntimeTxSelectResource`
 	m[RuntimeTxShowChildren] = `RuntimeTxShowChildren`
 	m[RuntimeTxShowProperties] = `RuntimeTxShowProperties`
 	m[RuntimeTxShow] = `RuntimeTxShow`
-	m[RuntimeResolveServer] = `RuntimeResolveServer`
-	m[RuntimeResolvePhysical] = `RuntimeResolvePhysical`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
