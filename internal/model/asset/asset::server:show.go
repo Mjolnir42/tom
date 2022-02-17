@@ -320,7 +320,7 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		var linkResource string
 		if err = txResource.QueryRow(
 			linklist[i][3],
-			linklist[i][1],
+			linklist[i][0],
 			txTime,
 		).Scan(
 			&linkResource,
