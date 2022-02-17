@@ -33,6 +33,7 @@ type ServerReadHandler struct {
 	stmtResolvPhys *sql.Stmt
 	stmtTxChildren *sql.Stmt
 	stmtTxProp     *sql.Stmt
+	stmtTxResource *sql.Stmt
 	stmtTxShow     *sql.Stmt
 }
 
@@ -101,6 +102,7 @@ func (h *ServerReadHandler) Run() {
 		stmt.ServerParent:           &h.stmtParent,
 		stmt.ServerResolvePhysical:  &h.stmtResolvPhys,
 		stmt.ServerResolveServer:    &h.stmtResolvNext,
+		stmt.ServerTxSelectResource: &h.stmtTxResource,
 		stmt.ServerTxShow:           &h.stmtTxShow,
 		stmt.ServerTxShowChildren:   &h.stmtTxChildren,
 		stmt.ServerTxShowProperties: &h.stmtTxProp,

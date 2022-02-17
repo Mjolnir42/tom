@@ -94,13 +94,11 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	txShow := tx.Stmt(h.stmtTxShow)
 	txProp := tx.Stmt(h.stmtTxProp)
 	txChildren := tx.Stmt(h.stmtTxChildren)
+	txResource := tx.Stmt(h.stmtTxResource)
 
-	server := proto.Server{
-		Namespace: q.Server.Namespace,
-		Name:      q.Server.Name,
-		Link:      []string{},
-		Children:  []string{},
-	}
+	server := proto.NewServer()
+	server.Namespace = q.Server.Namespace
+	server.Name = q.Server.Name
 	name := proto.PropertyDetail{
 		Attribute: `name`,
 		Value:     q.Server.Name,
@@ -255,6 +253,26 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
+	// fetch resource links for current serverID
+	var resource string
+	noResource := false
+	if err = txResource.QueryRow(
+		q.Server.Namespace,
+		serverID,
+		txTime,
+	).Scan(
+		&resource,
+	); err == sql.ErrNoRows {
+		// not an error, might not be a referential namespace
+		noResource = true
+	} else if err != nil {
+		mr.ServerError(err)
+		return
+	}
+	if !noResource {
+		server.Resources = append(server.Resources, resource)
+	}
+
 	// fetch linked servers
 	linklist := [][]string{}
 	if links, err = tx.Stmt(h.stmtLinked).Query(
@@ -294,6 +312,28 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	if err = links.Err(); err != nil {
 		mr.ServerError(err)
 		return
+	}
+
+	// fetch linked resources
+	for i := range linklist {
+		noResource = false
+		var linkResource string
+		if err = txResource.QueryRow(
+			linklist[i][3],
+			linklist[i][1],
+			txTime,
+		).Scan(
+			&linkResource,
+		); err == sql.ErrNoRows {
+			// not an error, might not be a referential namespace
+			noResource = true
+		} else if err != nil {
+			mr.ServerError(err)
+			return
+		}
+		if !noResource {
+			server.Resources = append(server.Resources, linkResource)
+		}
 	}
 
 	for i := range linklist {
@@ -351,7 +391,7 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		mr.ServerError(err)
 		return
 	}
-	mr.Server = append(mr.Server, server)
+	mr.Server = append(mr.Server, *server)
 	mr.OK()
 }
 
