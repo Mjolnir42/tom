@@ -310,8 +310,8 @@ func init() {
 	m[OrchestrationStdAttrRemove] = `OrchestrationStdAttrRemove`
 	m[OrchestrationTxLink] = `OrchestrationTxLink`
 	m[OrchestrationTxStackAdd] = `OrchestrationTxStackAdd`
-	m[OrchestrationTxStackClamp] = `OrchestrationTxStackClamp`
 	m[OrchestrationTxStackClampAll] = `OrchestrationTxStackClampAll`
+	m[OrchestrationTxStackClamp] = `OrchestrationTxStackClamp`
 	m[OrchestrationTxStdPropertyAdd] = `OrchestrationTxStdPropertyAdd`
 	m[OrchestrationTxStdPropertyClamp] = `OrchestrationTxStdPropertyClamp`
 	m[OrchestrationTxStdPropertyClean] = `OrchestrationTxStdPropertyClean`
