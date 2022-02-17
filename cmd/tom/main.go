@@ -19,6 +19,7 @@ import (
 )
 
 //go:generate go run ../../script/render_markdown.go ../../docs/tom/cmd_ref ../../internal/cli/help/rendered
+//go:generate cp ../../tools/zsh_autocomplete ../../internal/cli/help/rendered/zsh_autocomplete.fmt
 //go:generate go-bindata -pkg help -ignore .gitignore -o ../../internal/cli/help/bindata.go -prefix "../../internal/cli/help/rendered/" ../../internal/cli/help/rendered/...
 
 // global variables
@@ -42,7 +43,6 @@ func main() {
 	app.EnableBashCompletion = true
 
 	app = registerCommands(*app)
-	//app = registerFlags(*app)
 
 	if err := app.Run(os.Args); err != nil {
 		data, jsonError := json.Marshal(&proto.Result{

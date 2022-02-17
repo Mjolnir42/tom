@@ -1,3 +1,5 @@
 PROG=tom
 _CLI_ZSH_AUTOCOMPLETE_HACK=1
 source tools/zsh_autocomplete
+# also available as: source <(tom output-autocomplete)
+alias tom='noglob tom'

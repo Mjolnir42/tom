@@ -21,10 +21,19 @@ The database setup is described in `docs/pgsql.schema/README.md`
 Use `docs/tomd/configuration/tomd.conf` as sample service configuration.
 Start the service using `tomd -c tomd.conf`.
 
-### CLI SETP
+### CLI SETUP
 
 Use `docs/tom/configuration/tom.conf.example` as sample CLI
 configuration. Create a `~/.tom/tom.conf` from it.
+
+#### ENABLE zsh AUTOCOMPLETION
+
+```
+PROG=tom
+_CLI_ZSH_AUTOCOMPLETE_HACK=1
+source <(tom output-autocomplete)
+alias tom='noglob tom'
+```
 
 ## USER MANAGEMENT
 
