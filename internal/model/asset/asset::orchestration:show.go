@@ -95,6 +95,7 @@ func (h *OrchestrationReadHandler) show(q *msg.Request, mr *msg.Result) {
 	txProp := tx.Stmt(h.stmtTxProp)
 	txParent := tx.Stmt(h.stmtTxParent)
 	txChildren := tx.Stmt(h.stmtTxChildren)
+	txResource := tx.Stmt(h.stmtTxResource)
 
 	ore := proto.Orchestration{
 		Namespace: q.Orchestration.Namespace,
@@ -206,6 +207,26 @@ func (h *OrchestrationReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
+	// fetch resource links for current oreID
+	var resource string
+	noResource := false
+	if err = txResource.QueryRow(
+		q.Orchestration.Namespace,
+		oreID,
+		txTime,
+	).Scan(
+		&resource,
+	); err == sql.ErrNoRows {
+		// not an error, might not be a referential namespace
+		noResource = true
+	} else if err != nil {
+		mr.ServerError(err)
+		return
+	}
+	if !noResource {
+		ore.Resources = append(ore.Resources, resource)
+	}
+
 	// fetch linked orchestration environments
 	linklist := [][]string{}
 	if links, err = txLinks.Query(
@@ -244,6 +265,28 @@ func (h *OrchestrationReadHandler) show(q *msg.Request, mr *msg.Result) {
 	if err = links.Err(); err != nil {
 		mr.ServerError(err)
 		return
+	}
+
+	// fetch linked resources
+	for i := range linklist {
+		noResource = false
+		var linkResource string
+		if err = txResource.QueryRow(
+			linklist[i][3],
+			linklist[i][0],
+			txTime,
+		).Scan(
+			&linkResource,
+		); err == sql.ErrNoRows {
+			// not an error, might not be a referential namespace
+			noResource = true
+		} else if err != nil {
+			mr.ServerError(err)
+			return
+		}
+		if !noResource {
+			ore.Resources = append(ore.Resources, linkResource)
+		}
 	}
 
 	// fetch all properties from linked environments
