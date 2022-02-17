@@ -191,6 +191,56 @@ FROM        view.resolveContainerToPhysical($1::uuid) AS resolution
      AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
      AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
 WHERE       meta.unique_attribute.attribute IN ('name');`
+
+	ContainerTxSelectResource = `
+WITH dict AS ( SELECT meta.dictionary.dictionaryID
+               FROM   meta.dictionary
+               JOIN   meta.standard_attribute
+                 ON   meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+               JOIN   meta.dictionary_standard_attribute_values
+                 ON   meta.dictionary.dictionaryID = meta.dictionary_standard_attribute_values.dictionaryID
+                AND   meta.standard_attribute.attributeID = meta.dictionary_standard_attribute_values.attributeID
+               WHERE  meta.dictionary.name = $1::text
+                 AND  meta.standard_attribute.attribute = 'dict_type'
+                 AND  meta.dictionary_standard_attribute_values.value = 'referential'
+                 AND  $3::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity),
+     look AS ( SELECT meta.dictionary_standard_attribute_values.value AS key
+               FROM   meta.dictionary
+               JOIN   dict
+                 ON   dict.dictionaryID = meta.dictionary.dictionaryID
+               JOIN   meta.standard_attribute
+                 ON   meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+               JOIN   meta.dictionary_standard_attribute_values
+                 ON   meta.dictionary.dictionaryID = meta.dictionary_standard_attribute_values.dictionaryID
+                AND   meta.standard_attribute.attributeID = meta.dictionary_standard_attribute_values.attributeID
+               WHERE  meta.standard_attribute.attribute = 'dict_lookup'
+                 AND  $3::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity),
+      uri AS ( SELECT meta.dictionary_standard_attribute_values.value AS uri
+               FROM   meta.dictionary
+               JOIN   dict
+                 ON   dict.dictionaryID = meta.dictionary.dictionaryID
+               JOIN   meta.standard_attribute
+                 ON   meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+               JOIN   meta.dictionary_standard_attribute_values
+                 ON   meta.dictionary.dictionaryID = meta.dictionary_standard_attribute_values.dictionaryID
+                AND   meta.standard_attribute.attributeID = meta.dictionary_standard_attribute_values.attributeID
+               WHERE  meta.standard_attribute.attribute = 'dict_uri'
+                 AND  $3::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity )
+SELECT                replace(uri.uri, '{{LOOKUP}}', asset.container_unique_attribute_values.value) AS resource
+FROM                  asset.container
+JOIN                  dict
+  ON                  asset.container.dictionaryID = dict.dictionaryID
+JOIN                  meta.unique_attribute
+  ON                  asset.container.dictionaryID = meta.unique_attribute.dictionaryID
+JOIN                  asset.container_unique_attribute_values
+  ON                  asset.container.dictionaryID = asset.container_unique_attribute_values.dictionaryID
+ AND                  meta.unique_attribute.attributeID = asset.container_unique_attribute_values.attributeID
+ AND                  asset.container.containerID = asset.container_unique_attribute_values.containerID
+JOIN                  look
+  ON                  meta.unique_attribute.attribute = look.key
+CROSS JOIN            uri
+WHERE                 asset.container.containerID = $2::uuid
+  AND                 $3::timestamptz(3) <@ asset.container_unique_attribute_values.validity;`
 )
 
 func init() {
@@ -201,6 +251,7 @@ func init() {
 	m[ContainerTxParent] = `ContainerTxParent`
 	m[ContainerResolveServer] = `ContainerResolveServer`
 	m[ContainerResolvePhysical] = `ContainerResolvePhysical`
+	m[ContainerTxSelectResource] = `ContainerTxSelectResource`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

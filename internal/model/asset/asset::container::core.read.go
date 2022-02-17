@@ -31,6 +31,7 @@ type ContainerReadHandler struct {
 	stmtResolvPhys *sql.Stmt
 	stmtShow       *sql.Stmt
 	stmtTxParent   *sql.Stmt
+	stmtTxResource *sql.Stmt
 }
 
 // NewContainerReadHandler returns a new handler instance
@@ -97,6 +98,7 @@ func (h *ContainerReadHandler) Run() {
 		stmt.ContainerResolvePhysical:  &h.stmtResolvPhys,
 		stmt.ContainerResolveServer:    &h.stmtResolvNext,
 		stmt.ContainerTxParent:         &h.stmtTxParent,
+		stmt.ContainerTxSelectResource: &h.stmtTxResource,
 		stmt.ContainerTxShow:           &h.stmtShow,
 		stmt.ContainerTxShowProperties: &h.stmtProp,
 	} {

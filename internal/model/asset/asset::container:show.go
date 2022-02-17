@@ -100,12 +100,11 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	txTime := time.Now().UTC()
 	txShow := tx.Stmt(h.stmtShow)
 	txProp := tx.Stmt(h.stmtProp)
+	txResource := tx.Stmt(h.stmtTxResource)
 
-	ct := proto.Container{
-		Namespace: q.Container.Namespace,
-		Name:      q.Container.Name,
-		Link:      []string{},
-	}
+	ct := *(proto.NewContainer())
+	ct.Namespace = q.Container.Namespace
+	ct.Name = q.Container.Name
 	name := proto.PropertyDetail{
 		Attribute: `name`,
 		Value:     q.Container.Name,
@@ -225,6 +224,26 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		}).FormatTomID()
 	}
 
+	// fetch resource links for current containerID
+	var resource string
+	noResource := false
+	if err = txResource.QueryRow(
+		q.Container.Namespace,
+		containerID,
+		txTime,
+	).Scan(
+		&resource,
+	); err == sql.ErrNoRows {
+		// not an error, might not be a referential namespace
+		noResource = true
+	} else if err != nil {
+		mr.ServerError(err)
+		return
+	}
+	if !noResource {
+		ct.Resources = append(ct.Resources, resource)
+	}
+
 	// fetch linked containers
 	linklist := [][]string{}
 	if links, err = tx.Stmt(h.stmtLinked).Query(
@@ -259,6 +278,28 @@ func (h *ContainerReadHandler) show(q *msg.Request, mr *msg.Result) {
 	if err = links.Err(); err != nil {
 		mr.ServerError(err)
 		return
+	}
+
+	// fetch linked resources
+	for i := range linklist {
+		noResource = false
+		var linkResource string
+		if err = txResource.QueryRow(
+			linklist[i][3],
+			linklist[i][0],
+			txTime,
+		).Scan(
+			&linkResource,
+		); err == sql.ErrNoRows {
+			// not an error, might not be a referential namespace
+			noResource = true
+		} else if err != nil {
+			mr.ServerError(err)
+			return
+		}
+		if !noResource {
+			ct.Resources = append(ct.Resources, linkResource)
+		}
 	}
 
 	// fetch properties from linked containers
