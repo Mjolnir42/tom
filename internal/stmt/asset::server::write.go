@@ -223,16 +223,6 @@ WHERE             asset.server_unique_attribute_values.dictionaryID    = cte_dct
   AND             asset.server_unique_attribute_values.serverID        = $3::uuid
   AND             lower(asset.server_unique_attribute_values.validity) > $4::timestamptz(3);`
 
-	ServerStdAttrRemove = `
-DELETE FROM       asset.server_standard_attribute_values
-WHERE             attributeID = $1::uuid
-  AND             dictionaryID = $2::uuid;`
-
-	ServerUniqAttrRemove = `
-DELETE FROM       asset.server_unique_attribute_values
-WHERE             attributeID = $1::uuid
-  AND             dictionaryID = $2::uuid;`
-
 	ServerLink = `
 WITH sel_uid AS ( SELECT inventory.user.userID
                   FROM   inventory.user
@@ -295,12 +285,41 @@ WHERE             asset.runtime_environment_parent.parentServerID = $2::uuid
 DELETE FROM       asset.runtime_environment_parent
 WHERE             asset.runtime_environment_parent.parentServerID = $2::uuid
   AND             lower(asset.runtime_environment_parent.validity) > $1::timestamptz(3);`
+
+	ServerDelNamespaceStdValues = `
+DELETE FROM       asset.server_standard_attribute_values
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	ServerDelNamespaceUniqValues = `
+DELETE FROM       asset.server_unique_attribute_values
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	ServerDelNamespace = `
+DELETE FROM       asset.server
+WHERE             dictionaryID = $1::uuid;`
+
+	ServerDelNamespaceLinking = `
+DELETE FROM       asset.server_linking
+WHERE             dictionaryID_A = $1::uuid
+   OR             dictionaryID_B = $1::uuid;`
+
+	ServerDelNamespaceParent = `
+DELETE FROM       asset.server_parent
+USING             asset.server
+WHERE             asset.server_parent.serverID = asset.server.serverID
+  AND             asset.server.dictionaryID = $1::uuid;`
 )
 
 func init() {
 	m[ServerAdd] = `ServerAdd`
+	m[ServerDelNamespaceLinking] = `ServerDelNamespaceLinking`
+	m[ServerDelNamespaceParent] = `ServerDelNamespaceParent`
+	m[ServerDelNamespaceStdValues] = `ServerDelNamespaceStdValues`
+	m[ServerDelNamespaceUniqValues] = `ServerDelNamespaceUniqValues`
+	m[ServerDelNamespace] = `ServerDelNamespace`
 	m[ServerLink] = `ServerLink`
-	m[ServerStdAttrRemove] = `ServerStdAttrRemove`
 	m[ServerTxStackAdd] = `ServerTxStackAdd`
 	m[ServerTxStackClamp] = `ServerTxStackClamp`
 	m[ServerTxStdPropertyAdd] = `ServerTxStdPropertyAdd`
@@ -313,7 +332,6 @@ func init() {
 	m[ServerTxUniqPropertySelect] = `ServerTxUniqPropertySelect`
 	m[ServerTxUnstackChildren] = `ServerTxUnstackChildren`
 	m[ServerTxUnstackCldClean] = `ServerTxUnstackCldClean`
-	m[ServerUniqAttrRemove] = `ServerUniqAttrRemove`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -133,9 +133,9 @@ func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) 
 		case proto.AttributeUnique:
 			for _, statement := range []string{
 				stmt.ContainerDelNamespaceUniqValues,
-				stmt.OrchestrationUniqAttrRemove,
+				stmt.OrchestrationDelNamespaceUniqValues,
 				stmt.RuntimeDelNamespaceUniqValues,
-				stmt.ServerUniqAttrRemove,
+				stmt.ServerDelNamespaceUniqValues,
 				stmt.SocketUniqAttrRemove,
 				stmt.NamespaceUniqAttrRemoveValue,
 				// TODO ix.deployment_group_unique_attribute_values
@@ -162,9 +162,9 @@ func (h *NamespaceWriteHandler) attributeRemove(q *msg.Request, mr *msg.Result) 
 		case proto.AttributeStandard:
 			for _, statement := range []string{
 				stmt.ContainerDelNamespaceStdValues,
-				stmt.OrchestrationStdAttrRemove,
+				stmt.OrchestrationDelNamespaceStdValues,
 				stmt.RuntimeDelNamespaceStdValues,
-				stmt.ServerStdAttrRemove,
+				stmt.ServerDelNamespaceStdValues,
 				stmt.SocketStdAttrRemove,
 				stmt.NamespaceStdAttrRemoveValue,
 				// TODO ix.deployment_group_standard_attribute_values

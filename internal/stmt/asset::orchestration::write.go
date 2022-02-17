@@ -49,16 +49,6 @@ FROM              ins_orc
   CROSS JOIN      sel_dct
 RETURNING         orchID;`
 
-	OrchestrationStdAttrRemove = `
-DELETE FROM       asset.orchestration_environment_standard_attribute_values
-WHERE             attributeID = $1::uuid
-  AND             dictionaryID = $2::uuid;`
-
-	OrchestrationUniqAttrRemove = `
-DELETE FROM       asset.orchestration_environment_unique_attribute_values
-WHERE             attributeID = $1::uuid
-  AND             dictionaryID = $2::uuid;`
-
 	OrchestrationTxStdPropertyAdd = `
 WITH cte_dct AS ( SELECT      meta.dictionary.dictionaryID AS dictID,
                               inventory.user.userID AS userID
@@ -303,11 +293,40 @@ WHERE             asset.runtime_environment_parent.parentOrchestrationID = $2::u
 DELETE FROM       asset.runtime_environment_parent
 WHERE             asset.runtime_environment_parent.parentOrchestrationID = $2::uuid
   AND             lower(asset.runtime_environment_parent.validity) > $1::timestamptz(3);`
+
+	OrchestrationDelNamespaceStdValues = `
+DELETE FROM       asset.orchestration_environment_standard_attribute_values
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	OrchestrationDelNamespaceUniqValues = `
+DELETE FROM       asset.orchestration_environment_unique_attribute_values
+WHERE             attributeID = $1::uuid
+  AND             dictionaryID = $2::uuid;`
+
+	OrchestrationDelNamespace = `
+DELETE FROM       asset.orchestration_environment
+WHERE             dictionaryID = $1::uuid;`
+
+	OrchestrationDelNamespaceLinking = `
+DELETE FROM       asset.orchestration_environment_linking
+WHERE             dictionaryID_A = $1::uuid
+   OR             dictionaryID_B = $1::uuid;`
+
+	OrchestrationDelNamespaceParent = `
+DELETE FROM       asset.orchestration_environment_mapping
+USING             asset.orchestration_environment
+WHERE             asset.orchestration_environment_mapping.orchID = asset.orchestration_environment.orchID
+  AND             asset.orchestration_environment.dictionaryID = $1::uuid;`
 )
 
 func init() {
 	m[OrchestrationAdd] = `OrchestrationAdd`
-	m[OrchestrationStdAttrRemove] = `OrchestrationStdAttrRemove`
+	m[OrchestrationDelNamespaceLinking] = `OrchestrationDelNamespaceLinking`
+	m[OrchestrationDelNamespaceParent] = `OrchestrationDelNamespaceParent`
+	m[OrchestrationDelNamespaceStdValues] = `OrchestrationDelNamespaceStdValues`
+	m[OrchestrationDelNamespaceUniqValues] = `OrchestrationDelNamespaceUniqValues`
+	m[OrchestrationDelNamespace] = `OrchestrationDelNamespace`
 	m[OrchestrationTxLink] = `OrchestrationTxLink`
 	m[OrchestrationTxStackAdd] = `OrchestrationTxStackAdd`
 	m[OrchestrationTxStackClampAll] = `OrchestrationTxStackClampAll`
@@ -322,7 +341,6 @@ func init() {
 	m[OrchestrationTxUniqPropertySelect] = `OrchestrationTxUniqPropertySelect`
 	m[OrchestrationTxUnstackChildClean] = `OrchestrationTxUnstackChildClean`
 	m[OrchestrationTxUnstackChild] = `OrchestrationTxUnstackChild`
-	m[OrchestrationUniqAttrRemove] = `OrchestrationUniqAttrRemove`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
