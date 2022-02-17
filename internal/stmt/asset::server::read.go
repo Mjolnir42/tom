@@ -328,18 +328,18 @@ WITH dict AS ( SELECT meta.dictionary.dictionaryID
                  AND  $3::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity )
 SELECT                replace(uri.uri, '{{LOOKUP}}', asset.server_unique_attribute_values.value) AS resource
 FROM                  asset.server
-JOIN                   dict
-  ON                   asset.server.dictionaryID = dict.dictionaryID
-JOIN                   meta.unique_attribute
-  ON                   asset.server.dictionaryID = meta.unique_attribute.dictionaryID
-JOIN                   asset.server_unique_attribute_values
+JOIN                  dict
+  ON                  asset.server.dictionaryID = dict.dictionaryID
+JOIN                  meta.unique_attribute
+  ON                  asset.server.dictionaryID = meta.unique_attribute.dictionaryID
+JOIN                  asset.server_unique_attribute_values
   ON                  asset.server.dictionaryID = asset.server_unique_attribute_values.dictionaryID
- AND                   meta.unique_attribute.attributeID = asset.server_unique_attribute_values.attributeID
- AND                   asset.server.serverID = asset.server_unique_attribute_values.serverID
-JOIN                   look
-  ON                   meta.unique_attribute.attribute = look.key
+ AND                  meta.unique_attribute.attributeID = asset.server_unique_attribute_values.attributeID
+ AND                  asset.server.serverID = asset.server_unique_attribute_values.serverID
+JOIN                  look
+  ON                  meta.unique_attribute.attribute = look.key
 CROSS JOIN            uri
-WHERE                  asset.server.serverID = $2::uuid
+WHERE                 asset.server.serverID = $2::uuid
   AND                 $3::timestamptz(3) <@ asset.server_unique_attribute_values.validity;`
 )
 

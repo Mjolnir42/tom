@@ -244,14 +244,14 @@ WHERE                 asset.container.containerID = $2::uuid
 )
 
 func init() {
-	m[ContainerList] = `ContainerList`
 	m[ContainerListLinked] = `ContainerListLinked`
-	m[ContainerTxShow] = `ContainerTxShow`
-	m[ContainerTxShowProperties] = `ContainerTxShowProperties`
-	m[ContainerTxParent] = `ContainerTxParent`
-	m[ContainerResolveServer] = `ContainerResolveServer`
+	m[ContainerList] = `ContainerList`
 	m[ContainerResolvePhysical] = `ContainerResolvePhysical`
+	m[ContainerResolveServer] = `ContainerResolveServer`
+	m[ContainerTxParent] = `ContainerTxParent`
 	m[ContainerTxSelectResource] = `ContainerTxSelectResource`
+	m[ContainerTxShowProperties] = `ContainerTxShowProperties`
+	m[ContainerTxShow] = `ContainerTxShow`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
