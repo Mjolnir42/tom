@@ -9,6 +9,7 @@ package asset // import "github.com/mjolnir42/tom/internal/model/asset/"
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -125,6 +126,7 @@ func (h *ServerWriteHandler) stack(q *msg.Request, mr *msg.Result) {
 		txTime                                           time.Time
 		serverID, dictionaryID, createdAt, createdBy     string
 		nameValidSince, nameValidUntil, namedAt, namedBy string
+		rows                                             *sql.Rows
 		err                                              error
 		tx                                               *sql.Tx
 		res                                              sql.Result
@@ -160,6 +162,55 @@ func (h *ServerWriteHandler) stack(q *msg.Request, mr *msg.Result) {
 		tx.Rollback()
 		return
 	} else if err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+
+	// check server type property - only virtual may be stacked
+	txProp := tx.Stmt(h.stmtTxProp)
+
+	if rows, err = txProp.Query(
+		dictionaryID,
+		serverID,
+		txTime,
+	); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+
+	for rows.Next() {
+		prop := proto.PropertyDetail{}
+
+		if err = rows.Scan(
+			&prop.Attribute,
+			&prop.Value,
+			&prop.ValidSince,
+			&prop.ValidUntil,
+			&prop.CreatedAt,
+			&prop.CreatedBy,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			tx.Rollback()
+			return
+		}
+
+		switch prop.Attribute {
+		case `type`:
+			if prop.Value != `virtual` {
+				rows.Close()
+				mr.BadRequest(fmt.Errorf(
+					`Illegal request to stack a non-virtual server`,
+				))
+				tx.Rollback()
+				return
+			}
+		default:
+		}
+	}
+	if err = rows.Err(); err != nil {
 		mr.ServerError(err)
 		tx.Rollback()
 		return
