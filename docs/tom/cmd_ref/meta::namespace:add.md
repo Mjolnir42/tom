@@ -1,6 +1,6 @@
 # DESCRIPTION
 
-This command is used to add a new namespace to TOM. Namespaces are
+This command is used to add a new namespace to TOM. Namespaces themselves are
 identified by a `name`, and have a `type` attribute that must be either
 `referential` or `authoritative`.
 
@@ -8,11 +8,13 @@ Referential namespaces only hold index information into data stored in a
 different system. They must define a lookup key, which is the name of an
 unique attribute in this namespace. The value of this unique attribute is
 thereby declared as the unique identifier of the object in the other
-system. A lookup URI can be defined, which must contain the placeholder
+system. A lookup URI must also be defined, which must contain the placeholder
 string `{{LOOKUP}}`. If the value of the attribute referenced by
 lookup-key is used to replace the placeholder in the lookup URI, then a
 valid URI of the other system that handles a GET request and returns the
 referenced object.
+The referencing data might be augmented with additional relevant data points
+required for correlation.
 
 Authoritative namespaces hold data directly stored in TOM. Every object in a
 namespace can have a list of associated key value pairs attached to it. The

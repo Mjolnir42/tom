@@ -160,6 +160,11 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 			m.x.ReplyBadRequest(&w, &request, fmt.Errorf(`Missing argument lookup-key`))
 			return
 		}
+		if _, ok := request.Namespace.Property[`dict_uri`]; !ok {
+			// the lookup uri is mandatory for referential namepaces
+			m.x.ReplyBadRequest(&w, &request, fmt.Errorf(`Missing argument lookup-uri`))
+			return
+		}
 	default:
 		m.x.ReplyBadRequest(&w, &request, fmt.Errorf("Invalid type %s",
 			request.Namespace.Property[`dict_type`].Value,
