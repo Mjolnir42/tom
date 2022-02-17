@@ -30,6 +30,13 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{},
 	}
+	Commands[CmdContainerLink] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/container/` + PlHoldTomID + `/link/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
 	Commands[CmdContainerList] = CmdDef{
 		Method:      MethodGET,
 		Path:        `/container/`,
@@ -37,9 +44,9 @@ func init() {
 		ResultTmpl:  TemplateList,
 		Placeholder: []string{},
 	}
-	Commands[CmdContainerLink] = CmdDef{
-		Method:      MethodPOST,
-		Path:        `/container/` + PlHoldTomID + `/link/`,
+	Commands[CmdContainerPropRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/container/` + PlHoldTomID + `/property/`,
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
@@ -58,25 +65,11 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
-	Commands[CmdContainerPropRemove] = CmdDef{
-		Method:      MethodDELETE,
-		Path:        `/container/` + PlHoldTomID + `/property/`,
-		Body:        true,
-		ResultTmpl:  TemplateCommand,
-		Placeholder: []string{PlHoldTomID},
-	}
 	Commands[CmdContainerRemove] = CmdDef{
 		Method:      MethodDELETE,
 		Path:        `/container/` + PlHoldTomID,
 		Body:        false,
 		ResultTmpl:  TemplateCommand,
-		Placeholder: []string{PlHoldTomID},
-	}
-	Commands[CmdContainerShow] = CmdDef{
-		Method:      MethodGET,
-		Path:        `/container/` + PlHoldTomID,
-		Body:        false,
-		ResultTmpl:  TemplateDetail,
 		Placeholder: []string{PlHoldTomID},
 	}
 	Commands[CmdContainerResolve] = CmdDef{
@@ -85,6 +78,13 @@ func init() {
 		Body:        false,
 		ResultTmpl:  TemplateList,
 		Placeholder: []string{PlHoldTomID, PlHoldResolv},
+	}
+	Commands[CmdContainerShow] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/container/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateDetail,
+		Placeholder: []string{PlHoldTomID},
 	}
 	Commands[CmdContainerStack] = CmdDef{
 		Method:      MethodPUT,
