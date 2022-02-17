@@ -31,6 +31,7 @@ type OrchestrationReadHandler struct {
 	stmtTxLinks    *sql.Stmt
 	stmtTxParent   *sql.Stmt
 	stmtTxProp     *sql.Stmt
+	stmtTxResource *sql.Stmt
 	stmtTxShow     *sql.Stmt
 }
 
@@ -97,6 +98,7 @@ func (h *OrchestrationReadHandler) Run() {
 		stmt.OrchestrationResolvePhysical:  &h.stmtResolvPhys,
 		stmt.OrchestrationResolveServer:    &h.stmtResolvNext,
 		stmt.OrchestrationTxParent:         &h.stmtTxParent,
+		stmt.OrchestrationTxSelectResource: &h.stmtTxResource,
 		stmt.OrchestrationTxShow:           &h.stmtTxShow,
 		stmt.OrchestrationTxShowChildren:   &h.stmtTxChildren,
 		stmt.OrchestrationTxShowProperties: &h.stmtTxProp,
