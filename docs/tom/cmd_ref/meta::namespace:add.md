@@ -22,6 +22,12 @@ standard attributes, multiple objects of the same type within the same
 namespace can have the same value at the same time. For unique attributes, only
 one object per type and namespace can have a specific value at any one time.
 
+All namespaces must define a unique attribute `name` for use within them, as
+all entity objects are referenced using this `name` attribute. All
+namespaces must also define a standard attribute `type` for use within them.
+These two attributes are always created for every namespace, even when not
+specified.
+
 # SYNOPSIS
 
 ```

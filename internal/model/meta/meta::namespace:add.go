@@ -70,10 +70,28 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
+	missingUniqueNameAttribute := true
+	conflictingUniqueNameAttribute := false
+	missingStandardTypeAttribute := true
+	conflictingStandardTypeAttribute := false
 	for _, attribute := range request.Namespace.Attributes {
 		if err := proto.OnlyUnreserved(attribute.Key); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
+		}
+
+		if attribute.Key == `name` {
+			missingUniqueNameAttribute = false
+			if !attribute.Unique {
+				conflictingUniqueNameAttribute = true
+			}
+		}
+
+		if attribute.Key == `type` {
+			missingStandardTypeAttribute = false
+			if attribute.Unique {
+				conflictingStandardTypeAttribute = true
+			}
 		}
 
 		if strings.HasPrefix(attribute.Key, `dict_`) {
@@ -91,6 +109,38 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 				return
 			}
 		}
+	}
+
+	if conflictingUniqueNameAttribute {
+		m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
+			`Mandatory attribute must be unique: name`,
+		))
+		return
+	}
+	if missingUniqueNameAttribute {
+		request.Namespace.Attributes = append(
+			request.Namespace.Attributes,
+			proto.AttributeDefinition{
+				Key:    `name`,
+				Unique: true,
+			},
+		)
+	}
+
+	if conflictingStandardTypeAttribute {
+		m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
+			`Mandatory attribute must be standard: type`,
+		))
+		return
+	}
+	if missingStandardTypeAttribute {
+		request.Namespace.Attributes = append(
+			request.Namespace.Attributes,
+			proto.AttributeDefinition{
+				Key:    `type`,
+				Unique: false,
+			},
+		)
 	}
 
 	if _, ok := request.Namespace.Property[`dict_uri`]; ok {
