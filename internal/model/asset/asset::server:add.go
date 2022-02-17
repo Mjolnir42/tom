@@ -96,6 +96,16 @@ func (m *Model) ServerAdd(w http.ResponseWriter, r *http.Request,
 		}
 	}
 
+	switch request.Server.Property[`type`].Value {
+	case `physical`, `virtual`:
+	default:
+		m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
+			"Invalid type property value: %s",
+			request.Server.Property[`type`].Value,
+		))
+		return
+	}
+
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
 		return
