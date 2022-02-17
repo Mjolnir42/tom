@@ -37,6 +37,7 @@ omnipotence | | | no | yes
 
 ```
 tom query example-db01.inv.srv.tom
+tom query example-db01.inv.server.tom
 tom query *.inv.srv.tom
 tom query *.srv.tom
 ```

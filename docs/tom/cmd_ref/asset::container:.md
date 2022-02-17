@@ -3,6 +3,8 @@
 Container are the specially typed object to differentiate them
 from full general purpose software stacks on compute resources.
 
+The `tomID` of a container ends in either `.cnr.tom` or `.container.tom`.
+
 # SYNOPSIS OVERVIEW
 
 ```
@@ -24,9 +26,9 @@ tom container resolve ${name} namespace ${space} level ${detail}
 tom container resolve ${tomID} level ${detail}
 ```
 
-# PROPERTIES
+# sys PROPERTIES
 
-The following are the properties a container should have.
+The following are the properties a container should have in namespace `sys`.
 Perpetual properties can not be changed, while properties with validity
 can be updated over the lifetime of the container.
 

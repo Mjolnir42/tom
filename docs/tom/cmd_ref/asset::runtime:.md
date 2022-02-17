@@ -3,6 +3,8 @@
 Runtime environments are the general purpose object for software
 stacks on compute resources.
 
+The `tomID` of a runtime environment ends in `.rte.tom` or `.runtime.tom`.
+
 # SYNOPSIS OVERVIEW
 
 ```
@@ -24,9 +26,10 @@ tom runtime unstack ${name} namespace ${space}
 tom runtime unstack ${tomID}
 ```
 
-# PROPERTIES
+# sys PROPERTIES
 
-The following are the properties a runtime environment should have.
+The following are the properties a runtime environment should have in
+namespace `sys`.
 Perpetual properties can not be changed, while properties with validity
 can be updated over the lifetime of the runtime environment.
 

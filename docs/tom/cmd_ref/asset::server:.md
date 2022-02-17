@@ -7,6 +7,8 @@ chassis with hardware built into it. For virtual servers, the package
 corresponds to a set of exclusive resources provided by a hypervisor
 software.
 
+The `tomID` of a server ends either in `.srv.tom` or `.server.tom`.
+
 # SYNOPSIS OVERVIEW
 
 ```
@@ -28,9 +30,9 @@ tom server remove ${name} namespace ${space}
 tom server remove ${tomID}
 ```
 
-# PROPERTIES
+# sys PROPERTIES
 
-The following are the properties a server should have.
+The following are the properties a server should have in namespace `sys`.
 Perpetual properties can not be changed, while properties with validity
 can be updated over the lifetime of the server.
 
