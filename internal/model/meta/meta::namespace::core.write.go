@@ -110,19 +110,19 @@ func (h *NamespaceWriteHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.NamespaceAdd:                  &h.stmtAdd,
-		stmt.NamespaceConfigure:            &h.stmtConfig,
-		stmt.NamespaceRemove:               &h.stmtRemove,
-		stmt.NamespaceAttributeAddStandard: &h.stmtAttStdAdd,
-		stmt.NamespaceAttributeAddUnique:   &h.stmtAttUnqAdd,
-		stmt.NamespaceAttributeQueryType:   &h.stmtAttQueryType,
-		stmt.NamespaceAttributeDiscover:    &h.stmtAttDiscover,
-		stmt.NamespaceTxStdPropertyAdd:     &h.stmtTxStdPropAdd,
-		stmt.NamespaceTxStdPropertyClamp:   &h.stmtTxStdPropClamp,
-		stmt.NamespaceTxStdPropertySelect:  &h.stmtTxStdPropSelect,
-		stmt.NamespaceTxUniqPropertyAdd:    &h.stmtTxUniqPropAdd,
-		stmt.NamespaceTxUniqPropertyClamp:  &h.stmtTxUniqPropClamp,
-		stmt.NamespaceTxUniqPropertySelect: &h.stmtTxUniqPropSelect,
+		stmt.NamespaceAdd:                   &h.stmtAdd,
+		stmt.NamespaceConfigure:             &h.stmtConfig,
+		stmt.NamespaceRemove:                &h.stmtRemove,
+		stmt.NamespaceAttributeAddStandard:  &h.stmtAttStdAdd,
+		stmt.NamespaceAttributeAddUnique:    &h.stmtAttUnqAdd,
+		stmt.NamespaceAttributeQueryType:    &h.stmtAttQueryType,
+		stmt.NamespaceAttributeDiscoverSelf: &h.stmtAttDiscover,
+		stmt.NamespaceTxStdPropertyAdd:      &h.stmtTxStdPropAdd,
+		stmt.NamespaceTxStdPropertyClamp:    &h.stmtTxStdPropClamp,
+		stmt.NamespaceTxStdPropertySelect:   &h.stmtTxStdPropSelect,
+		stmt.NamespaceTxUniqPropertyAdd:     &h.stmtTxUniqPropAdd,
+		stmt.NamespaceTxUniqPropertyClamp:   &h.stmtTxUniqPropClamp,
+		stmt.NamespaceTxUniqPropertySelect:  &h.stmtTxUniqPropSelect,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

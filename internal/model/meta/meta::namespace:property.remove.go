@@ -141,6 +141,11 @@ func (h *NamespaceWriteHandler) propertyRemove(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
+	// special handling, do not allow to remove the name
+	// or type of the namespace
+	delete(q.Namespace.Property, `dict_name`)
+	delete(q.Namespace.Property, `dict_type`)
+
 	// for all properties specified in the request, check that the attribute
 	// exists and record its type
 	for key := range q.Namespace.Property {
