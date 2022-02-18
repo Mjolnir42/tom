@@ -147,6 +147,11 @@ func (h *NamespaceWriteHandler) propertySet(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
+	// special handling, do not allow to set the name
+	// or type of the namespace
+	delete(q.Namespace.Property, `dict_name`)
+	delete(q.Namespace.Property, `dict_type`)
+
 	// for all properties specified in the request, check that the attribute
 	// exists and create missing attributes
 	for key := range q.Namespace.Property {
