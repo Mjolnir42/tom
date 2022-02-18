@@ -15,20 +15,20 @@ POST /server/
     "namespace": "<string>",
     "property": {
       "name": {
-        "attribute": "name",
-        "value": "<string>",
+        "attribute":  "name",
+        "value":      "<string>",
         "validSince": "<timespec,optional>"
         "validUntil": "<timespec,optional>"
       },
       "type": {
-        "attribute": "type",
-        "value": "<string>",
+        "attribute":  "type",
+        "value":      "<string>",
         "validSince": "perpetual",
         "validUntil": "perpetual",
       },
       "<string>": {
-        "attribute": "<string>",
-        "value": "<string>",
+        "attribute":  "<string>",
+        "value":      "<string>",
         "validSince": "<timespec,optional>"
         "validUntil": "<timespec,optional>"
       },

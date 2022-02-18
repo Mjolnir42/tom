@@ -8,6 +8,10 @@
 GET /server/:tomID/resolve/:level
 ```
 
+The `level` argument can be `server` to resolve to any server type or
+`physical` to resolve down to physical servers.
+
+
 # REQUEST BODY
 
 ```

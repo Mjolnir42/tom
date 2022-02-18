@@ -13,11 +13,11 @@ POST /server/:tomID/link/
 ```
 { "server": {
     "namespace": "<string>",
-    "name": "<string>",
+    "name":      "<string>",
     "property": {
       "<string>": {
-        "attribute": "asset::meta-cmd::link",
-        "value": "<linkTargetTomID>",
+        "attribute":  "asset::meta-cmd::link",
+        "value":      "<linkTargetTomID>",
         "validSince": "perpetual"
         "validUntil": "perpetual"
       },
@@ -36,11 +36,11 @@ POST /server/:tomID/link/
   "status":    200,
   "server": [{
     "namespace": "<string>",
-    "name": "<string>",
+    "name":      "<string>",
     "property": {
       "<string>": {
-        "attribute": "asset::meta-cmd::link",
-        "value": "<linkTargetTomID>",
+        "attribute":  "asset::meta-cmd::link",
+        "value":      "<linkTargetTomID>",
         "validSince": "perpetual"
         "validUntil": "perpetual"
       },

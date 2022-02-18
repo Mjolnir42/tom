@@ -17,7 +17,7 @@ none
 # RESPONSE
 
 ```
-{ "command":   "asset::container:link",
+{ "command":   "asset::container:unstack",
   "error":     "",
   "requestID": "<uuid>",
   "status":    200,
