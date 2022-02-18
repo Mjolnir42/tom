@@ -13,11 +13,11 @@ PUT /orchestration/:tomID/parent
 ```
 { "orchestration": {
     "namespace": "<string>",
-    "name": "<string>",
+    "name":      "<string>",
     "property": {
       "<string>": {
-        "attribute": "asset::meta-cmd::stack",
-        "value": "<stackTargetTomID>",
+        "attribute":  "asset::meta-cmd::stack",
+        "value":      "<stackTargetTomID>",
         "validSince": "<timespec,optional>"
         "validUntil": "<timespec,optional>"
       },

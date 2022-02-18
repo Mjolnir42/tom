@@ -17,13 +17,13 @@ none
 # RESPONSE
 
 ```
-{ "command":   "asset::server:link",
+{ "command":   "asset::server:unstack",
   "error":     "",
   "requestID": "<uuid>",
   "status":    200,
   "server": [{
     "namespace": "<string>",
-    "name": "<string>",
+    "name":      "<string>",
   }]
 }
 ```

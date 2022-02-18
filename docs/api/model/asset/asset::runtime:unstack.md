@@ -23,7 +23,7 @@ none
   "status":    200,
   "runtime": [{
     "namespace": "<string>",
-    "name": "<string>",
+    "name":      "<string>",
   }]
 }
 ```

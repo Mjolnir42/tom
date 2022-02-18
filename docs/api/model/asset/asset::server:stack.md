@@ -13,11 +13,11 @@ PUT /server/:tomID/parent
 ```
 { "server": {
     "namespace": "<string>",
-    "name": "<string>",
+    "name":      "<string>",
     "property": {
       "<string>": {
-        "attribute": "asset::meta-cmd::stack",
-        "value": "<stackTargetTomID>",
+        "attribute":  "asset::meta-cmd::stack",
+        "value":      "<stackTargetTomID>",
         "validSince": "<timespec,optional>"
         "validUntil": "<timespec,optional>"
       },
@@ -36,7 +36,7 @@ PUT /server/:tomID/parent
   "status":    200,
   "server": [{
     "namespace": "<string>",
-    "name": "<string>",
+    "name":      "<string>",
     "property": {
       "<string>": {
         "attribute":  "asset::meta-cmd::stack",

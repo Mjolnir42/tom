@@ -49,7 +49,31 @@ none
         "createdAt":   "<timespec>",
         "createdBy":   "<string>",
         "validSince":  "<timespec>",
-        ""validUntil": "<timespec>"
+        "validUntil": "<timespec>"
+      },
+      "<string>_list": {
+        "attribute":       "<string>",
+        "value":           "<string>",
+        "structuredValue": [
+          ...
+        ],
+        "namespace":       "<string>",
+        "createdAt":       "<timespec>",
+        "createdBy":       "<string>",
+        "validSince":      "<timespec>",
+        "validUntil":      "<timespec>"
+      },
+      "<string>_json": {
+        "attribute":       "<string>",
+        "value":           "<string>",
+        "structuredValue": {
+          ...
+        },
+        "namespace":       "<string>",
+        "createdAt":       "<timespec>",
+        "createdBy":       "<string>",
+        "validSince":      "<timespec>",
+        "validUntil":      "<timespec>"
       },
       ...
     }

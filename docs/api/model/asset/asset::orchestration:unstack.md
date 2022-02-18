@@ -17,13 +17,13 @@ none
 # RESPONSE
 
 ```
-{ "command":   "asset::orchestration:link",
+{ "command":   "asset::orchestration:unstack",
   "error":     "",
   "requestID": "<uuid>",
   "status":    200,
   "orchestration": [{
     "namespace": "<string>",
-    "name": "<string>",
+    "name":      "<string>",
   }]
 }
 ```

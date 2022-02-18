@@ -13,11 +13,11 @@ POST /orchestration/:tomID/link/
 ```
 { "orchestration": {
     "namespace": "<string>",
-    "name": "<string>",
+    "name":      "<string>",
     "property": {
       "<string>": {
-        "attribute": "asset::meta-cmd::link",
-        "value": "<linkTargetTomID>",
+        "attribute":  "asset::meta-cmd::link",
+        "value":      "<linkTargetTomID>",
         "validSince": "perpetual"
         "validUntil": "perpetual"
       },
@@ -36,11 +36,11 @@ POST /orchestration/:tomID/link/
   "status":    200,
   "orchestration": [{
     "namespace": "<string>",
-    "name": "<string>",
+    "name":      "<string>",
     "property": {
       "<string>": {
-        "attribute": "asset::meta-cmd::link",
-        "value": "<linkTargetTomID>",
+        "attribute":  "asset::meta-cmd::link",
+        "value":      "<linkTargetTomID>",
         "validSince": "perpetual"
         "validUntil": "perpetual"
       },
