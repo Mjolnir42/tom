@@ -260,7 +260,8 @@ WITH dict AS ( SELECT meta.dictionary.dictionaryID
                 AND   meta.standard_attribute.attributeID = meta.dictionary_standard_attribute_values.attributeID
                WHERE  meta.standard_attribute.attribute = 'dict_lookup'
                  AND  $3::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity),
-      uri AS ( SELECT meta.dictionary_standard_attribute_values.value AS uri
+      uri AS ( SELECT meta.dictionary_standard_attribute_values.value AS uri,
+                      meta.dictionary.dictionaryID
                FROM   meta.dictionary
                JOIN   dict
                  ON   dict.dictionaryID = meta.dictionary.dictionaryID
@@ -283,7 +284,8 @@ JOIN                  asset.orchestration_environment_unique_attribute_values
  AND                  asset.orchestration_environment.orchID = asset.orchestration_environment_unique_attribute_values.orchID
 JOIN                  look
   ON                  meta.unique_attribute.attribute = look.key
-CROSS JOIN            uri
+JOIN                  uri
+  ON                  asset.orchestration_environment.dictionaryID = uri.dictionaryID
 WHERE                 asset.orchestration_environment.orchID = $2::uuid
   AND                 $3::timestamptz(3) <@ asset.orchestration_environment_unique_attribute_values.validity;`
 )

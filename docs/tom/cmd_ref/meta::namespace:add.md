@@ -8,7 +8,7 @@ Referential namespaces only hold index information into data stored in a
 different system. They must define a lookup key, which is the name of an
 unique attribute in this namespace. The value of this unique attribute is
 thereby declared as the unique identifier of the object in the other
-system. A lookup URI must also be defined, which must contain the placeholder
+system. A lookup URI should also be defined, which must contain the placeholder
 string `{{LOOKUP}}`. If the value of the attribute referenced by
 lookup-key is used to replace the placeholder in the lookup URI, then a
 valid URI of the other system that handles a GET request and returns the
