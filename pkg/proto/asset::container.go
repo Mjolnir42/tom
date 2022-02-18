@@ -30,19 +30,19 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{},
 	}
-	Commands[CmdContainerLink] = CmdDef{
-		Method:      MethodPOST,
-		Path:        `/container/` + PlHoldTomID + `/link/`,
-		Body:        true,
-		ResultTmpl:  TemplateCommand,
-		Placeholder: []string{PlHoldTomID},
-	}
 	Commands[CmdContainerList] = CmdDef{
 		Method:      MethodGET,
 		Path:        `/container/`,
 		Body:        false,
 		ResultTmpl:  TemplateList,
 		Placeholder: []string{},
+	}
+	Commands[CmdContainerLink] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/container/` + PlHoldTomID + `/link/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
 	}
 	Commands[CmdContainerPropRemove] = CmdDef{
 		Method:      MethodDELETE,

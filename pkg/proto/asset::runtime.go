@@ -30,6 +30,13 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{},
 	}
+	Commands[CmdRuntimeLink] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/runtime/` + PlHoldTomID + `/link/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
 	Commands[CmdRuntimeList] = CmdDef{
 		Method:      MethodGET,
 		Path:        `/runtime/`,
@@ -37,9 +44,9 @@ func init() {
 		ResultTmpl:  TemplateList,
 		Placeholder: []string{},
 	}
-	Commands[CmdRuntimeLink] = CmdDef{
-		Method:      MethodPOST,
-		Path:        `/runtime/` + PlHoldTomID + `/link/`,
+	Commands[CmdRuntimePropRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/runtime/` + PlHoldTomID + `/property/`,
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
@@ -58,19 +65,19 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
-	Commands[CmdRuntimePropRemove] = CmdDef{
-		Method:      MethodDELETE,
-		Path:        `/runtime/` + PlHoldTomID + `/property/`,
-		Body:        true,
-		ResultTmpl:  TemplateCommand,
-		Placeholder: []string{PlHoldTomID},
-	}
 	Commands[CmdRuntimeRemove] = CmdDef{
 		Method:      MethodDELETE,
 		Path:        `/runtime/` + PlHoldTomID,
 		Body:        false,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdRuntimeResolve] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/runtime/` + PlHoldTomID + `/resolve/` + PlHoldResolv,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{PlHoldTomID, PlHoldResolv},
 	}
 	Commands[CmdRuntimeShow] = CmdDef{
 		Method:      MethodGET,
@@ -85,13 +92,6 @@ func init() {
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
-	}
-	Commands[CmdRuntimeResolve] = CmdDef{
-		Method:      MethodGET,
-		Path:        `/runtime/` + PlHoldTomID + `/resolve/` + PlHoldResolv,
-		Body:        false,
-		ResultTmpl:  TemplateList,
-		Placeholder: []string{PlHoldTomID, PlHoldResolv},
 	}
 	Commands[CmdRuntimeUnstack] = CmdDef{
 		Method:      MethodDELETE,

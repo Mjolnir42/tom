@@ -30,6 +30,13 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{},
 	}
+	Commands[CmdOrchestrationLink] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/orchestration/` + PlHoldTomID + `/link/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
 	Commands[CmdOrchestrationList] = CmdDef{
 		Method:      MethodGET,
 		Path:        `/orchestration/`,
@@ -37,9 +44,9 @@ func init() {
 		ResultTmpl:  TemplateList,
 		Placeholder: []string{},
 	}
-	Commands[CmdOrchestrationLink] = CmdDef{
-		Method:      MethodPOST,
-		Path:        `/orchestration/` + PlHoldTomID + `/link/`,
+	Commands[CmdOrchestrationPropRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/orchestration/` + PlHoldTomID + `/property/`,
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
@@ -58,25 +65,25 @@ func init() {
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
-	Commands[CmdOrchestrationPropRemove] = CmdDef{
+	Commands[CmdOrchestrationRemove] = CmdDef{
 		Method:      MethodDELETE,
-		Path:        `/orchestration/` + PlHoldTomID + `/property/`,
-		Body:        true,
+		Path:        `/orchestration/` + PlHoldTomID,
+		Body:        false,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdOrchestrationResolve] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/orchestration/` + PlHoldTomID + `/resolve/` + PlHoldResolv,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{PlHoldTomID, PlHoldResolv},
 	}
 	Commands[CmdOrchestrationShow] = CmdDef{
 		Method:      MethodGET,
 		Path:        `/orchestration/` + PlHoldTomID,
 		Body:        false,
 		ResultTmpl:  TemplateDetail,
-		Placeholder: []string{PlHoldTomID},
-	}
-	Commands[CmdOrchestrationRemove] = CmdDef{
-		Method:      MethodDELETE,
-		Path:        `/orchestration/` + PlHoldTomID,
-		Body:        false,
-		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
 	Commands[CmdOrchestrationStack] = CmdDef{
@@ -92,13 +99,6 @@ func init() {
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
-	}
-	Commands[CmdOrchestrationResolve] = CmdDef{
-		Method:      MethodGET,
-		Path:        `/orchestration/` + PlHoldTomID + `/resolve/` + PlHoldResolv,
-		Body:        false,
-		ResultTmpl:  TemplateList,
-		Placeholder: []string{PlHoldTomID, PlHoldResolv},
 	}
 }
 
