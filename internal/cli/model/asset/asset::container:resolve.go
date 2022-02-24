@@ -27,7 +27,7 @@ func cmdAssetContainerResolve(c *cli.Context) error {
 		return err
 	}
 
-	r := proto.Container{}
+	r := *(proto.NewContainer())
 	if _, ok := opts[`namespace`]; ok {
 		r.Namespace = opts[`namespace`][0]
 		r.Name = c.Args().First()

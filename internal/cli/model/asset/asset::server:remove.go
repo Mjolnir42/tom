@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2021, Jörg Pernfuß
+ * Copyright (c) 2021-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -27,7 +27,7 @@ func cmdAssetServerRemove(c *cli.Context) error {
 		return err
 	}
 
-	r := proto.Server{}
+	r := *(proto.NewServer())
 	if _, ok := opts[`namespace`]; ok {
 		r.Namespace = opts[`namespace`][0]
 		r.Name = c.Args().First()

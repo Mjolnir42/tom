@@ -27,7 +27,7 @@ func cmdAssetOrchestrationRemove(c *cli.Context) error {
 		return err
 	}
 
-	r := proto.Orchestration{}
+	r := *(proto.NewOrchestration())
 	if _, ok := opts[`namespace`]; ok {
 		r.Namespace = opts[`namespace`][0]
 		r.Name = c.Args().First()
