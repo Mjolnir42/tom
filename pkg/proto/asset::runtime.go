@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -111,8 +111,8 @@ type Runtime struct {
 	Link      []string                  `json:"link"`
 	Children  []string                  `json:"children"`
 	Property  map[string]PropertyDetail `json:"property"`
-	CreatedAt string                    `json:"createdAt"`
-	CreatedBy string                    `json:"createdBy"`
+	CreatedAt string                    `json:"createdAt,omitempty"`
+	CreatedBy string                    `json:"createdBy,omitempty"`
 	Resources []string                  `json:"resources"`
 	ID        string                    `json:"-"`
 	TomID     string                    `json:"-"`

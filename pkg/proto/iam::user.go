@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2021, Jörg Pernfuß
+ * Copyright (c) 2021-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -27,8 +27,8 @@ type User struct {
 	ExternalID     string `json:"external-ref,omitempty"`
 	IsActive       bool   `json:"is-active"`
 	IsDeleted      bool   `json:"is-deleted"`
-	CreatedAt      string `json:"createdAt"`
-	CreatedBy      string `json:"createdBy"`
+	CreatedAt      string `json:"createdAt,omitempty"`
+	CreatedBy      string `json:"createdBy,omitempty"`
 	ID             string `json:"-"`
 	LibraryID      string `json:"-"`
 }

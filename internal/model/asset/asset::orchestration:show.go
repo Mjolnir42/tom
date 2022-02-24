@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -11,6 +11,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -51,6 +52,7 @@ func (m *Model) OrchestrationShow(w http.ResponseWriter, r *http.Request,
 	request.Orchestration.TomID = params.ByName(`tomID`)
 	request.Orchestration.Namespace = r.URL.Query().Get(`namespace`)
 	request.Orchestration.Name = r.URL.Query().Get(`name`)
+	request.Verbose, _ = strconv.ParseBool(r.URL.Query().Get(`verbose`))
 
 	if err := request.Orchestration.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {
@@ -132,10 +134,15 @@ func (h *OrchestrationReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	ore.CreatedAt = createdAt.Format(msg.RFC3339Milli)
-	name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
-	name.ValidSince = since.Format(msg.RFC3339Milli)
-	name.ValidUntil = until.Format(msg.RFC3339Milli)
+	if q.Verbose {
+		ore.CreatedAt = createdAt.Format(msg.RFC3339Milli)
+		name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
+		name.ValidSince = since.Format(msg.RFC3339Milli)
+		name.ValidUntil = until.Format(msg.RFC3339Milli)
+	} else {
+		name.CreatedBy = ``
+		ore.CreatedBy = ``
+	}
 	name.Namespace = q.Orchestration.Namespace
 	ore.Property = make(map[string]proto.PropertyDetail)
 	ore.Property[q.Orchestration.Namespace+`::`+ore.Name+`::name`] = name
@@ -168,9 +175,13 @@ func (h *OrchestrationReadHandler) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		prop.ValidSince = since.Format(msg.RFC3339Milli)
-		prop.ValidUntil = until.Format(msg.RFC3339Milli)
-		prop.CreatedAt = at.Format(msg.RFC3339Milli)
+		if q.Verbose {
+			prop.ValidSince = since.Format(msg.RFC3339Milli)
+			prop.ValidUntil = until.Format(msg.RFC3339Milli)
+			prop.CreatedAt = at.Format(msg.RFC3339Milli)
+		} else {
+			prop.CreatedBy = ``
+		}
 
 		// set structured fields
 		switch {
@@ -316,9 +327,13 @@ func (h *OrchestrationReadHandler) show(q *msg.Request, mr *msg.Result) {
 				mr.ServerError(err)
 				return
 			}
-			prop.ValidSince = since.Format(msg.RFC3339Milli)
-			prop.ValidUntil = until.Format(msg.RFC3339Milli)
-			prop.CreatedAt = at.Format(msg.RFC3339Milli)
+			if q.Verbose {
+				prop.ValidSince = since.Format(msg.RFC3339Milli)
+				prop.ValidUntil = until.Format(msg.RFC3339Milli)
+				prop.CreatedAt = at.Format(msg.RFC3339Milli)
+			} else {
+				prop.CreatedBy = ``
+			}
 			prop.Namespace = linklist[i][3] // linkedNsName
 
 			switch {
