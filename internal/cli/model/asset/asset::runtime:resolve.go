@@ -27,7 +27,7 @@ func cmdAssetRuntimeResolve(c *cli.Context) error {
 		return err
 	}
 
-	r := proto.Runtime{}
+	r := *(proto.NewRuntime())
 	if _, ok := opts[`namespace`]; ok {
 		r.Namespace = opts[`namespace`][0]
 		r.Name = c.Args().First()
