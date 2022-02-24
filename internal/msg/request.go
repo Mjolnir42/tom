@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -25,6 +25,7 @@ type Request struct {
 	AuthUser   string
 	RequestURI string
 	Reply      chan Result `json:"-"`
+	Verbose    bool
 
 	Update UpdateData
 

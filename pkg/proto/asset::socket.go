@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -13,8 +13,8 @@ type Socket struct {
 	Name      string                    `json:"name"`
 	Parent    string                    `json:"parent"`
 	Property  map[string]PropertyDetail `json:"property"`
-	CreatedAt string                    `json:"createdAt"`
-	CreatedBy string                    `json:"createdBy"`
+	CreatedAt string                    `json:"createdAt,omitempty"`
+	CreatedBy string                    `json:"createdBy,omitempty"`
 	ID        string                    `json:"-"`
 	TomID     string                    `json:"-"`
 }

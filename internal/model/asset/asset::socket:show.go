@@ -1,7 +1,7 @@
 // +build socket
 
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -13,6 +13,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -52,6 +53,7 @@ func (m *Model) SocketShow(w http.ResponseWriter, r *http.Request,
 	request.Socket.TomID = params.ByName(`tomID`)
 	request.Socket.Namespace = r.URL.Query().Get(`namespace`)
 	request.Socket.Name = r.URL.Query().Get(`name`)
+	request.Verbose, _ = strconv.ParseBool(r.URL.Query().Get(`verbose`))
 
 	if err := request.Socket.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {
@@ -135,10 +137,15 @@ func (h *SocketReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	ct.CreatedAt = createdAt.Format(msg.RFC3339Milli)
-	name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
-	name.ValidSince = since.Format(msg.RFC3339Milli)
-	name.ValidUntil = until.Format(msg.RFC3339Milli)
+	if q.Verbose {
+		ct.CreatedAt = createdAt.Format(msg.RFC3339Milli)
+		name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
+		name.ValidSince = since.Format(msg.RFC3339Milli)
+		name.ValidUntil = until.Format(msg.RFC3339Milli)
+	} else {
+		ct.CreatedBy = ``
+		name.CreatedBy = ``
+	}
 	name.Namespace = q.Socket.Namespace
 	ct.Property = make(map[string]proto.PropertyDetail)
 	ct.Property[q.Socket.Namespace+`::`+ct.Name+`::name`] = name
@@ -169,9 +176,13 @@ func (h *SocketReadHandler) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		prop.ValidSince = since.Format(msg.RFC3339Milli)
-		prop.ValidUntil = until.Format(msg.RFC3339Milli)
-		prop.CreatedAt = at.Format(msg.RFC3339Milli)
+		if q.Verbose {
+			prop.ValidSince = since.Format(msg.RFC3339Milli)
+			prop.ValidUntil = until.Format(msg.RFC3339Milli)
+			prop.CreatedAt = at.Format(msg.RFC3339Milli)
+		} else {
+			prop.CreatedBy = ``
+		}
 		prop.Namespace = q.Socket.Namespace
 
 		// set specialty fields
@@ -263,9 +274,13 @@ func (h *SocketReadHandler) show(q *msg.Request, mr *msg.Result) {
 				mr.ServerError(err)
 				return
 			}
-			prop.ValidSince = since.Format(msg.RFC3339Milli)
-			prop.ValidUntil = until.Format(msg.RFC3339Milli)
-			prop.CreatedAt = at.Format(msg.RFC3339Milli)
+			if q.Verbose {
+				prop.ValidSince = since.Format(msg.RFC3339Milli)
+				prop.ValidUntil = until.Format(msg.RFC3339Milli)
+				prop.CreatedAt = at.Format(msg.RFC3339Milli)
+			} else {
+				prop.CreatedBy = ``
+			}
 			prop.Namespace = linklist[i][3] // linkedDictName
 
 			// linklist[i][2] is linkedContName

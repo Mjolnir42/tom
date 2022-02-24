@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -9,6 +9,7 @@ package proto //
 
 // Request is the request wrapper of Tom's public API
 type Request struct {
+	Verbose       bool           `json:"verbose,omitempty,string"`
 	Container     *Container     `json:"container,omitempty"`
 	Library       *Library       `json:"library,omitempty"`
 	Namespace     *Namespace     `json:"namespace,omitempty"`

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -11,6 +11,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -51,6 +52,7 @@ func (m *Model) RuntimeShow(w http.ResponseWriter, r *http.Request,
 	request.Runtime.TomID = params.ByName(`tomID`)
 	request.Runtime.Namespace = r.URL.Query().Get(`namespace`)
 	request.Runtime.Name = r.URL.Query().Get(`name`)
+	request.Verbose, _ = strconv.ParseBool(r.URL.Query().Get(`verbose`))
 
 	if err := request.Runtime.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {
@@ -138,10 +140,15 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	rte.CreatedAt = createdAt.Format(msg.RFC3339Milli)
-	name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
-	name.ValidSince = since.Format(msg.RFC3339Milli)
-	name.ValidUntil = until.Format(msg.RFC3339Milli)
+	if q.Verbose {
+		rte.CreatedAt = createdAt.Format(msg.RFC3339Milli)
+		name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
+		name.ValidSince = since.Format(msg.RFC3339Milli)
+		name.ValidUntil = until.Format(msg.RFC3339Milli)
+	} else {
+		rte.CreatedBy = ``
+		name.CreatedBy = ``
+	}
 	name.Namespace = q.Runtime.Namespace
 	rte.Property = make(map[string]proto.PropertyDetail)
 	rte.Property[q.Runtime.Namespace+`::`+rte.Name+`::name`] = name
@@ -172,9 +179,13 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		prop.ValidSince = since.Format(msg.RFC3339Milli)
-		prop.ValidUntil = until.Format(msg.RFC3339Milli)
-		prop.CreatedAt = at.Format(msg.RFC3339Milli)
+		if q.Verbose {
+			prop.ValidSince = since.Format(msg.RFC3339Milli)
+			prop.ValidUntil = until.Format(msg.RFC3339Milli)
+			prop.CreatedAt = at.Format(msg.RFC3339Milli)
+		} else {
+			prop.CreatedBy = ``
+		}
 		prop.Namespace = q.Runtime.Namespace
 
 		switch {
@@ -408,9 +419,13 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 				mr.ServerError(err)
 				return
 			}
-			prop.ValidSince = since.Format(msg.RFC3339Milli)
-			prop.ValidUntil = until.Format(msg.RFC3339Milli)
-			prop.CreatedAt = at.Format(msg.RFC3339Milli)
+			if q.Verbose {
+				prop.ValidSince = since.Format(msg.RFC3339Milli)
+				prop.ValidUntil = until.Format(msg.RFC3339Milli)
+				prop.CreatedAt = at.Format(msg.RFC3339Milli)
+			} else {
+				prop.CreatedBy = ``
+			}
 			prop.Namespace = linklist[i][3] // linkedDictName
 
 			switch {
