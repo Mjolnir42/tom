@@ -138,8 +138,8 @@ type ServerHeader struct {
 	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
 	Type      string `json:"type"`
-	CreatedAt string `json:"createdAt"`
-	CreatedBy string `json:"createdBy"`
+	CreatedAt string `json:"createdAt,omitempty"`
+	CreatedBy string `json:"createdBy,omitempty"`
 }
 
 func (s *Server) SetTomID() Entity {

@@ -132,15 +132,10 @@ func (h *OrchestrationReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	if q.Verbose {
-		ore.CreatedAt = createdAt.Format(msg.RFC3339Milli)
-		name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
-		name.ValidSince = since.Format(msg.RFC3339Milli)
-		name.ValidUntil = until.Format(msg.RFC3339Milli)
-	} else {
-		name.CreatedBy = ``
-		ore.CreatedBy = ``
-	}
+	ore.CreatedAt = createdAt.Format(msg.RFC3339Milli)
+	name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
+	name.ValidSince = since.Format(msg.RFC3339Milli)
+	name.ValidUntil = until.Format(msg.RFC3339Milli)
 	name.Namespace = q.Orchestration.Namespace
 	ore.Property = make(map[string]proto.PropertyDetail)
 	ore.Property[q.Orchestration.Namespace+`::`+ore.Name+`::name`] = name
@@ -173,13 +168,9 @@ func (h *OrchestrationReadHandler) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		if q.Verbose {
-			prop.ValidSince = since.Format(msg.RFC3339Milli)
-			prop.ValidUntil = until.Format(msg.RFC3339Milli)
-			prop.CreatedAt = at.Format(msg.RFC3339Milli)
-		} else {
-			prop.CreatedBy = ``
-		}
+		prop.ValidSince = since.Format(msg.RFC3339Milli)
+		prop.ValidUntil = until.Format(msg.RFC3339Milli)
+		prop.CreatedAt = at.Format(msg.RFC3339Milli)
 
 		// set structured fields
 		switch {
@@ -325,13 +316,9 @@ func (h *OrchestrationReadHandler) show(q *msg.Request, mr *msg.Result) {
 				mr.ServerError(err)
 				return
 			}
-			if q.Verbose {
-				prop.ValidSince = since.Format(msg.RFC3339Milli)
-				prop.ValidUntil = until.Format(msg.RFC3339Milli)
-				prop.CreatedAt = at.Format(msg.RFC3339Milli)
-			} else {
-				prop.CreatedBy = ``
-			}
+			prop.ValidSince = since.Format(msg.RFC3339Milli)
+			prop.ValidUntil = until.Format(msg.RFC3339Milli)
+			prop.CreatedAt = at.Format(msg.RFC3339Milli)
 			prop.Namespace = linklist[i][3] // linkedNsName
 
 			switch {

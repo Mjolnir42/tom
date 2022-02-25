@@ -35,6 +35,11 @@ var (
 
 func main() {
 	cli.CommandHelpTemplate = `{{.Description}}`
+	cli.VersionFlag = &cli.BoolFlag{
+		Name:  `version`,
+		Usage: `print the version`,
+		Value: false,
+	}
 
 	app := cli.NewApp()
 	app.Name = `tom`

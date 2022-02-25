@@ -23,6 +23,7 @@ type Result struct {
 	Action     string
 	Code       uint16
 	Err        error
+	Verbose    bool
 
 	Container           []proto.Container
 	ContainerHeader     []proto.ContainerHeader
@@ -47,6 +48,7 @@ func FromRequest(rq *Request) Result {
 		Section:    rq.Section,
 		Action:     rq.Action,
 		Code:       http.StatusNotImplemented,
+		Verbose:    rq.Verbose,
 	}
 }
 
@@ -151,6 +153,130 @@ func (r *Result) AssertOneRowAffected(i int64, err error) bool {
 
 func (r *Result) ExportError() error {
 	return r.Err
+}
+
+func (r *Result) ApplyVerbosity() {
+	if r.Verbose {
+		return
+	}
+	for i := range r.Container {
+		obj := r.Container[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		for k := range obj.Property {
+			prop := obj.Property[k]
+			prop.CreatedAt = ``
+			prop.CreatedBy = ``
+			prop.ValidSince = ``
+			prop.ValidUntil = ``
+			obj.Property[k] = prop
+		}
+		r.Container[i] = obj
+	}
+	for i := range r.ContainerHeader {
+		obj := r.ContainerHeader[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		r.ContainerHeader[i] = obj
+	}
+	for i := range r.Library {
+		obj := r.Library[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		r.Library[i] = obj
+	}
+	for i := range r.Namespace {
+		obj := r.Namespace[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		for k := range obj.Property {
+			prop := obj.Property[k]
+			prop.CreatedAt = ``
+			prop.CreatedBy = ``
+			prop.ValidSince = ``
+			prop.ValidUntil = ``
+			obj.Property[k] = prop
+		}
+		r.Namespace[i] = obj
+	}
+	for i := range r.NamespaceHeader {
+		obj := r.NamespaceHeader[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		r.NamespaceHeader[i] = obj
+	}
+	for i := range r.Orchestration {
+		obj := r.Orchestration[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		for k := range obj.Property {
+			prop := obj.Property[k]
+			prop.CreatedAt = ``
+			prop.CreatedBy = ``
+			prop.ValidSince = ``
+			prop.ValidUntil = ``
+			obj.Property[k] = prop
+		}
+		r.Orchestration[i] = obj
+	}
+	for i := range r.OrchestrationHeader {
+		obj := r.OrchestrationHeader[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		r.OrchestrationHeader[i] = obj
+	}
+	for i := range r.Runtime {
+		obj := r.Runtime[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		for k := range obj.Property {
+			prop := obj.Property[k]
+			prop.CreatedAt = ``
+			prop.CreatedBy = ``
+			prop.ValidSince = ``
+			prop.ValidUntil = ``
+			obj.Property[k] = prop
+		}
+		r.Runtime[i] = obj
+	}
+	for i := range r.RuntimeHeader {
+		obj := r.RuntimeHeader[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		r.RuntimeHeader[i] = obj
+	}
+	for i := range r.Server {
+		obj := r.Server[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		for k := range obj.Property {
+			prop := obj.Property[k]
+			prop.CreatedAt = ``
+			prop.CreatedBy = ``
+			prop.ValidSince = ``
+			prop.ValidUntil = ``
+			obj.Property[k] = prop
+		}
+		r.Server[i] = obj
+	}
+	for i := range r.ServerHeader {
+		obj := r.ServerHeader[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		r.ServerHeader[i] = obj
+	}
+	for i := range r.Team {
+		obj := r.Team[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		r.Team[i] = obj
+	}
+	for i := range r.User {
+		obj := r.User[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		r.User[i] = obj
+	}
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

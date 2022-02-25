@@ -137,8 +137,8 @@ func NewRuntime() *Runtime {
 type RuntimeHeader struct {
 	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
-	CreatedAt string `json:"createdAt"`
-	CreatedBy string `json:"createdBy"`
+	CreatedAt string `json:"createdAt,omitempty"`
+	CreatedBy string `json:"createdBy,omitempty"`
 }
 
 func (r *Runtime) SetTomID() Entity {

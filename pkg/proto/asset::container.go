@@ -134,8 +134,8 @@ func NewContainer() *Container {
 type ContainerHeader struct {
 	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
-	CreatedAt string `json:"createdAt"`
-	CreatedBy string `json:"createdBy"`
+	CreatedAt string `json:"createdAt,omitempty"`
+	CreatedBy string `json:"createdBy,omitempty"`
 }
 
 func (c *Container) SetTomID() Entity {

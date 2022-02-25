@@ -34,9 +34,10 @@ type Specification struct {
 // WRAPPER
 func Perform(cmd Specification, c *cli.Context) error {
 	var (
-		err  error
-		path string
-		resp *resty.Response
+		err     error
+		path    string
+		resp    *resty.Response
+		verbose bool
 	)
 
 	if _, ok := proto.Commands[cmd.Name]; !ok {
@@ -67,37 +68,47 @@ func Perform(cmd Specification, c *cli.Context) error {
 			)
 		}
 	}
+	for _, ctx := range c.Lineage() {
+		verbose = verbose || ctx.IsSet(`verbose`)
+	}
+
+	if verbose {
+		if cmd.QueryParams == nil {
+			cmd.QueryParams = &map[string]string{}
+		}
+		(*cmd.QueryParams)[`verbose`] = `true`
+	}
 
 	switch proto.Commands[cmd.Name].Method {
 	case proto.MethodGET:
 		resp, err = getReq(path, cmd.QueryParams)
 	case proto.MethodHEAD:
-		resp, err = headReq(path)
+		resp, err = headReq(path, cmd.QueryParams)
 	case proto.MethodDELETE:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = deleteReqBody(cmd.Body, path)
+			resp, err = deleteReqBody(cmd.Body, path, cmd.QueryParams)
 		default:
-			resp, err = deleteReq(path)
+			resp, err = deleteReq(path, cmd.QueryParams)
 		}
 	case proto.MethodPUT:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = putReqBody(cmd.Body, path)
+			resp, err = putReqBody(cmd.Body, path, cmd.QueryParams)
 		default:
-			goto unhandledMethod
+			resp, err = putReq(path, cmd.QueryParams)
 		}
 	case proto.MethodPOST:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = postReqBody(cmd.Body, path)
+			resp, err = postReqBody(cmd.Body, path, cmd.QueryParams)
 		default:
 			goto unhandledMethod
 		}
 	case proto.MethodPATCH:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = patchReqBody(cmd.Body, path)
+			resp, err = patchReqBody(cmd.Body, path, cmd.QueryParams)
 		default:
 			goto unhandledMethod
 		}
@@ -147,13 +158,25 @@ func DecodedResponse(resp *resty.Response, res *proto.Result) error {
 // Private functions
 
 // DELETE
-func deleteReq(p string) (*resty.Response, error) {
-	return handleRequestOptions(client.R().Delete(p))
+func deleteReq(p string, q *map[string]string) (*resty.Response, error) {
+	switch q {
+	case nil:
+		return handleRequestOptions(client.R().Delete(p))
+	default:
+		return handleRequestOptions(client.R().SetQueryParams(*q).Delete(p))
+	}
 }
 
-func deleteReqBody(body interface{}, p string) (*resty.Response, error) {
-	return handleRequestOptions(
-		client.R().SetBody(body).SetContentLength(true).Delete(p))
+func deleteReqBody(body interface{}, p string, q *map[string]string) (*resty.Response, error) {
+	switch q {
+	case nil:
+		return handleRequestOptions(
+			client.R().SetBody(body).SetContentLength(true).Delete(p))
+	default:
+		return handleRequestOptions(
+			client.R().SetBody(body).SetContentLength(true).
+				SetQueryParams(*q).Delete(p))
+	}
 }
 
 // GET
@@ -167,30 +190,61 @@ func getReq(p string, q *map[string]string) (*resty.Response, error) {
 }
 
 // HEAD
-func headReq(p string) (*resty.Response, error) {
-	return handleRequestOptions(client.R().Head(p))
+func headReq(p string, q *map[string]string) (*resty.Response, error) {
+	switch q {
+	case nil:
+		return handleRequestOptions(client.R().Head(p))
+	default:
+		return handleRequestOptions(client.R().SetQueryParams(*q).Head(p))
+	}
 }
 
 // PATCH
-func patchReqBody(body interface{}, p string) (*resty.Response, error) {
-	return handleRequestOptions(
-		client.R().SetBody(body).SetContentLength(true).Patch(p))
+func patchReqBody(body interface{}, p string, q *map[string]string) (*resty.Response, error) {
+	switch q {
+	case nil:
+		return handleRequestOptions(
+			client.R().SetBody(body).SetContentLength(true).Patch(p))
+	default:
+		return handleRequestOptions(
+			client.R().SetBody(body).SetContentLength(true).
+				SetQueryParams(*q).Patch(p))
+	}
 }
 
 // POST
-func postReqBody(body interface{}, p string) (*resty.Response, error) {
-	return handleRequestOptions(
-		client.R().SetBody(body).SetContentLength(true).Post(p))
+func postReqBody(body interface{}, p string, q *map[string]string) (*resty.Response, error) {
+	switch q {
+	case nil:
+		return handleRequestOptions(
+			client.R().SetBody(body).SetContentLength(true).Post(p))
+	default:
+		return handleRequestOptions(
+			client.R().SetBody(body).SetContentLength(true).
+				SetQueryParams(*q).Post(p))
+	}
 }
 
 // PUT
-func putReq(p string) (*resty.Response, error) {
-	return handleRequestOptions(client.R().Put(p))
+func putReq(p string, q *map[string]string) (*resty.Response, error) {
+	switch q {
+	case nil:
+		return handleRequestOptions(client.R().Put(p))
+	default:
+		return handleRequestOptions(client.R().SetQueryParams(*q).Put(p))
+	}
 }
 
-func putReqBody(body interface{}, p string) (*resty.Response, error) {
-	return handleRequestOptions(
-		client.R().SetBody(body).SetContentLength(true).Put(p))
+func putReqBody(body interface{}, p string, q *map[string]string) (*resty.Response, error) {
+	switch q {
+	case nil:
+		return handleRequestOptions(
+			client.R().SetBody(body).SetContentLength(true).Put(p))
+	default:
+		return handleRequestOptions(
+			client.R().SetBody(body).SetContentLength(true).
+				SetQueryParams(*q).Put(p))
+	}
 }
 
 func handleRequestOptions(resp *resty.Response, err error) (*resty.Response, error) {

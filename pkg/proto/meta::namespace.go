@@ -95,8 +95,8 @@ type Namespace struct {
 	Constraint []string                  `json:"entity-contraint-list"`
 	Attributes []AttributeDefinition     `json:"attributes"`
 	Property   map[string]PropertyDetail `json:"property,omitempty"`
-	CreatedAt  string                    `json:"createdAt"`
-	CreatedBy  string                    `json:"createdBy"`
+	CreatedAt  string                    `json:"createdAt,omitempty"`
+	CreatedBy  string                    `json:"createdBy,omitempty"`
 	ID         string                    `json:"-"`
 	TomID      string                    `json:"-"`
 }
@@ -118,8 +118,8 @@ func NewNamespace() *Namespace {
 // NamespaceHeader defines ...
 type NamespaceHeader struct {
 	Name      string `json:"name"`
-	CreatedAt string `json:"createdAt"`
-	CreatedBy string `json:"createdBy"`
+	CreatedAt string `json:"createdAt,omitempty"`
+	CreatedBy string `json:"createdBy,omitempty"`
 }
 
 func (n *Namespace) SetTomID() Entity {
