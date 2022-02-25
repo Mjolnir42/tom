@@ -22,6 +22,7 @@ func registerResolver(app cli.App, run ActionFunc) *cli.App {
 				Name:         `query`,
 				Usage:        `Query TOM by tomID`,
 				Description:  help.Text(`model::query:resolver`),
+				Flags:        []cli.Flag{&cli.BoolFlag{Name: `verbose`, Aliases: []string{`v`}, Value: false, Hidden: true}},
 				Action:       cmdQueryResolver,
 				BashComplete: cmpl.QueryResolver,
 			},

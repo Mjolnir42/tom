@@ -105,12 +105,9 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 	txChildren := tx.Stmt(h.stmtTxChildren)
 	txResource := tx.Stmt(h.stmtTxResource)
 
-	rte := proto.Runtime{
-		Namespace: q.Runtime.Namespace,
-		Name:      q.Runtime.Name,
-		Link:      []string{},
-		Children:  []string{},
-	}
+	rte := *(proto.NewRuntime())
+	rte.Namespace = q.Runtime.Namespace
+	rte.Name = q.Runtime.Name
 	name := proto.PropertyDetail{
 		Attribute: `name`,
 		Value:     q.Runtime.Name,
@@ -138,15 +135,10 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	if q.Verbose {
-		rte.CreatedAt = createdAt.Format(msg.RFC3339Milli)
-		name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
-		name.ValidSince = since.Format(msg.RFC3339Milli)
-		name.ValidUntil = until.Format(msg.RFC3339Milli)
-	} else {
-		rte.CreatedBy = ``
-		name.CreatedBy = ``
-	}
+	rte.CreatedAt = createdAt.Format(msg.RFC3339Milli)
+	name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
+	name.ValidSince = since.Format(msg.RFC3339Milli)
+	name.ValidUntil = until.Format(msg.RFC3339Milli)
 	name.Namespace = q.Runtime.Namespace
 	rte.Property = make(map[string]proto.PropertyDetail)
 	rte.Property[q.Runtime.Namespace+`::`+rte.Name+`::name`] = name
@@ -177,13 +169,9 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		if q.Verbose {
-			prop.ValidSince = since.Format(msg.RFC3339Milli)
-			prop.ValidUntil = until.Format(msg.RFC3339Milli)
-			prop.CreatedAt = at.Format(msg.RFC3339Milli)
-		} else {
-			prop.CreatedBy = ``
-		}
+		prop.ValidSince = since.Format(msg.RFC3339Milli)
+		prop.ValidUntil = until.Format(msg.RFC3339Milli)
+		prop.CreatedAt = at.Format(msg.RFC3339Milli)
 		prop.Namespace = q.Runtime.Namespace
 
 		switch {
@@ -417,13 +405,9 @@ func (h *RuntimeReadHandler) show(q *msg.Request, mr *msg.Result) {
 				mr.ServerError(err)
 				return
 			}
-			if q.Verbose {
-				prop.ValidSince = since.Format(msg.RFC3339Milli)
-				prop.ValidUntil = until.Format(msg.RFC3339Milli)
-				prop.CreatedAt = at.Format(msg.RFC3339Milli)
-			} else {
-				prop.CreatedBy = ``
-			}
+			prop.ValidSince = since.Format(msg.RFC3339Milli)
+			prop.ValidUntil = until.Format(msg.RFC3339Milli)
+			prop.CreatedAt = at.Format(msg.RFC3339Milli)
 			prop.Namespace = linklist[i][3] // linkedDictName
 
 			switch {

@@ -126,15 +126,10 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	if q.Verbose {
-		server.CreatedAt = createdAt.Format(msg.RFC3339Milli)
-		name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
-		name.ValidSince = since.Format(msg.RFC3339Milli)
-		name.ValidUntil = until.Format(msg.RFC3339Milli)
-	} else {
-		server.CreatedBy = ``
-		name.CreatedBy = ``
-	}
+	server.CreatedAt = createdAt.Format(msg.RFC3339Milli)
+	name.CreatedAt = namedAt.Format(msg.RFC3339Milli)
+	name.ValidSince = since.Format(msg.RFC3339Milli)
+	name.ValidUntil = until.Format(msg.RFC3339Milli)
 	name.Namespace = q.Server.Namespace
 	server.Property = make(map[string]proto.PropertyDetail)
 	server.Property[q.Server.Namespace+`::`+server.Name+`::name`] = name
@@ -165,13 +160,9 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		if q.Verbose {
-			prop.ValidSince = since.Format(msg.RFC3339Milli)
-			prop.ValidUntil = until.Format(msg.RFC3339Milli)
-			prop.CreatedAt = at.Format(msg.RFC3339Milli)
-		} else {
-			prop.CreatedBy = ``
-		}
+		prop.ValidSince = since.Format(msg.RFC3339Milli)
+		prop.ValidUntil = until.Format(msg.RFC3339Milli)
+		prop.CreatedAt = at.Format(msg.RFC3339Milli)
 		prop.Namespace = q.Server.Namespace
 
 		switch {
@@ -374,13 +365,9 @@ func (h *ServerReadHandler) show(q *msg.Request, mr *msg.Result) {
 				mr.ServerError(err)
 				return
 			}
-			if q.Verbose {
-				prop.ValidSince = since.Format(msg.RFC3339Milli)
-				prop.ValidUntil = until.Format(msg.RFC3339Milli)
-				prop.CreatedAt = at.Format(msg.RFC3339Milli)
-			} else {
-				prop.CreatedBy = ``
-			}
+			prop.ValidSince = since.Format(msg.RFC3339Milli)
+			prop.ValidUntil = until.Format(msg.RFC3339Milli)
+			prop.CreatedAt = at.Format(msg.RFC3339Milli)
 			prop.Namespace = linklist[i][3] // linkedDictName
 
 			switch {

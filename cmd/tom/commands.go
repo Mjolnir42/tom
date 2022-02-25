@@ -33,6 +33,16 @@ func registerCommands(app cli.App) *cli.App {
 			},
 		}...,
 	)
+	app.Flags = append(app.Flags,
+		[]cli.Flag{
+			&cli.BoolFlag{
+				Name:    `verbose`,
+				Aliases: []string{`v`},
+				Usage:   `request verbose service replies`,
+				Value:   false,
+			},
+		}...,
+	)
 
 	app = *meta.Register(app, runtime, Registry)
 	app = *asset.Register(app, runtime, Registry)

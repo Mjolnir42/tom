@@ -14,6 +14,7 @@ import (
 )
 
 func (x *Rest) Send(w *http.ResponseWriter, r *msg.Result, e ExportFunc) {
+	r.ApplyVerbosity()
 	x.send(w, r, e)
 }
 

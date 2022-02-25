@@ -6,6 +6,8 @@
   rte -> srv -> rte -> srv were causing errors.
 - update resolve commands to filter for current validity
 - DB schema update: view.20220225001
+- add --verbose|-v flag to all cli commands to request hidden meta
+  information
 
 ## v0.1.5
 
