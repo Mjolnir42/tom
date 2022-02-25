@@ -1,11 +1,11 @@
 --
 --
 -- VIEW SCHEMA
--- -- resolveRuntimeToServer tracks a specified runtime down across
+-- -- resolveRuntimeToServerAt tracks a specified runtime down across
 -- -- nested/linked runtime and orchestration environments to the
 -- -- next (!) server(s), which are either virtual or physical.
 -- -- It does not drill further into found server(s).
-CREATE OR REPLACE FUNCTION view.resolveRuntimeToServer(rt uuid)
+CREATE OR REPLACE FUNCTION view.resolveRuntimeToServerAt(rt uuid, at timestamptz)
   RETURNS TABLE ( serverID   uuid,
                   serverType text,
                   depth      smallint)
@@ -29,7 +29,7 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToServer(rt uuid)
             arep.parentOrchestrationID,
             0::smallint
     FROM  asset.runtime_environment_parent AS arep
-    WHERE arep.rteid = rt::uuid
+    WHERE ( arep.rteid = rt::uuid
        OR rteID IN (
           SELECT  rteID_A
           FROM    asset.runtime_environment_linking
@@ -38,7 +38,8 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToServer(rt uuid)
           SELECT  rteID_B
           FROM    asset.runtime_environment_linking
           WHERE   rteID_A = rt::uuid
-       )
+       ) )
+      AND at <@ arep.validity
     UNION
     -- recursive iteration query
     SELECT  CASE WHEN t.parentServerID IS NOT NULL
@@ -87,6 +88,8 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToServer(rt uuid)
        AND  (   t.parentRuntimeID       IS NOT NULL
              OR t.parentServerID        IS NOT NULL
              OR t.parentOrchestrationID IS NOT NULL)
+       AND  ( at <@ arep.validity OR arep.validity IS NULL)
+       AND  ( at <@ aoem.validity OR aoem.validity IS NULL)
      )
   SELECT  ssa.serverID AS serverID,
           ssa.value    AS serverType,
@@ -101,14 +104,15 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToServer(rt uuid)
     AND   t.parentServerID IS NULL
     AND   t.parentRuntimeID IS NULL
     AND   t.parentOrchestrationID IS NULL
-    AND   ma.attribute = 'type';
+    AND   ma.attribute = 'type'
+    AND   at <@ ssa.validity;
   $BODY$
   LANGUAGE sql IMMUTABLE;
 
--- -- resolveRuntimeToPhysical tracks a specified runtime down to the
+-- -- resolveRuntimeToPhysicalAt tracks a specified runtime down to the
 -- -- physical server(s), across any nested virtual servers and
 -- -- orchestration environments in between.
-CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
+CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysicalAt(rt uuid, at timestamptz)
   RETURNS TABLE ( serverID   uuid,
                   serverType text,
                   depth      smallint)
@@ -132,7 +136,7 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
             arep.parentOrchestrationID,
             0::smallint
     FROM  asset.runtime_environment_parent AS arep
-    WHERE arep.rteid = rt::uuid
+    WHERE ( arep.rteid = rt::uuid
        OR rteID IN (
           SELECT  rteID_A
           FROM    asset.runtime_environment_linking
@@ -141,7 +145,8 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
           SELECT  rteID_B
           FROM    asset.runtime_environment_linking
           WHERE   rteID_A = rt::uuid
-       )
+       ) )
+      AND at <@ arep.validity
     UNION
     -- recursive iteration query
     SELECT  CASE WHEN asp.serverID IS NOT NULL THEN asp.serverID
@@ -203,6 +208,9 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
        AND  (   t.parentRuntimeID       IS NOT NULL
              OR t.parentServerID        IS NOT NULL
              OR t.parentOrchestrationID IS NOT NULL)
+       AND  ( at <@ arep.validity OR arep.validity IS NULL )
+       AND  ( at <@ aoem.validity OR aoem.validity IS NULL )
+       AND  ( at <@ asp.validity OR asp.validity IS NULL)
      )
   SELECT  ssa.serverID AS serverID,
           ssa.value    AS serverType,
@@ -218,7 +226,8 @@ CREATE OR REPLACE FUNCTION view.resolveRuntimeToPhysical(rt uuid)
     AND   t.parentRuntimeID IS NULL
     AND   t.parentOrchestrationID IS NULL
     AND   ma.attribute = 'type'
-    AND   ssa.value = 'physical';
+    AND   ssa.value = 'physical'
+    AND   at <@ ssa.validity;
   $BODY$
   LANGUAGE sql IMMUTABLE;
 

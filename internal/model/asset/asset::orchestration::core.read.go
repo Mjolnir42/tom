@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -19,20 +19,20 @@ import (
 
 // OrchestrationReadHandler ...
 type OrchestrationReadHandler struct {
-	Input          chan msg.Request
-	Shutdown       chan struct{}
-	name           string
-	conn           *sql.DB
-	lm             *lhm.LogHandleMap
-	stmtList       *sql.Stmt
-	stmtResolvNext *sql.Stmt
-	stmtResolvPhys *sql.Stmt
-	stmtTxChildren *sql.Stmt
-	stmtTxLinks    *sql.Stmt
-	stmtTxParent   *sql.Stmt
-	stmtTxProp     *sql.Stmt
-	stmtTxResource *sql.Stmt
-	stmtTxShow     *sql.Stmt
+	Input            chan msg.Request
+	Shutdown         chan struct{}
+	name             string
+	conn             *sql.DB
+	lm               *lhm.LogHandleMap
+	stmtList         *sql.Stmt
+	stmtTxChildren   *sql.Stmt
+	stmtTxLinks      *sql.Stmt
+	stmtTxParent     *sql.Stmt
+	stmtTxProp       *sql.Stmt
+	stmtTxResolvNext *sql.Stmt
+	stmtTxResolvPhys *sql.Stmt
+	stmtTxResource   *sql.Stmt
+	stmtTxShow       *sql.Stmt
 }
 
 // NewOrchestrationReadHandler returns a new handler instance
@@ -93,15 +93,15 @@ func (h *OrchestrationReadHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.OrchestrationList:             &h.stmtList,
-		stmt.OrchestrationListLinked:       &h.stmtTxLinks,
-		stmt.OrchestrationResolvePhysical:  &h.stmtResolvPhys,
-		stmt.OrchestrationResolveServer:    &h.stmtResolvNext,
-		stmt.OrchestrationTxParent:         &h.stmtTxParent,
-		stmt.OrchestrationTxSelectResource: &h.stmtTxResource,
-		stmt.OrchestrationTxShow:           &h.stmtTxShow,
-		stmt.OrchestrationTxShowChildren:   &h.stmtTxChildren,
-		stmt.OrchestrationTxShowProperties: &h.stmtTxProp,
+		stmt.OrchestrationList:              &h.stmtList,
+		stmt.OrchestrationListLinked:        &h.stmtTxLinks,
+		stmt.OrchestrationTxParent:          &h.stmtTxParent,
+		stmt.OrchestrationTxResolvePhysical: &h.stmtTxResolvPhys,
+		stmt.OrchestrationTxResolveServer:   &h.stmtTxResolvNext,
+		stmt.OrchestrationTxSelectResource:  &h.stmtTxResource,
+		stmt.OrchestrationTxShow:            &h.stmtTxShow,
+		stmt.OrchestrationTxShowChildren:    &h.stmtTxChildren,
+		stmt.OrchestrationTxShowProperties:  &h.stmtTxProp,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -19,20 +19,20 @@ import (
 
 // RuntimeReadHandler ...
 type RuntimeReadHandler struct {
-	Input          chan msg.Request
-	Shutdown       chan struct{}
-	name           string
-	conn           *sql.DB
-	lm             *lhm.LogHandleMap
-	stmtLinked     *sql.Stmt
-	stmtList       *sql.Stmt
-	stmtParent     *sql.Stmt
-	stmtProp       *sql.Stmt
-	stmtResolvNext *sql.Stmt
-	stmtResolvPhys *sql.Stmt
-	stmtShow       *sql.Stmt
-	stmtTxChildren *sql.Stmt
-	stmtTxResource *sql.Stmt
+	Input            chan msg.Request
+	Shutdown         chan struct{}
+	name             string
+	conn             *sql.DB
+	lm               *lhm.LogHandleMap
+	stmtLinked       *sql.Stmt
+	stmtList         *sql.Stmt
+	stmtParent       *sql.Stmt
+	stmtProp         *sql.Stmt
+	stmtShow         *sql.Stmt
+	stmtTxChildren   *sql.Stmt
+	stmtTxResolvNext *sql.Stmt
+	stmtTxResolvPhys *sql.Stmt
+	stmtTxResource   *sql.Stmt
 }
 
 // NewRuntimeReadHandler returns a new handler instance
@@ -94,15 +94,15 @@ func (h *RuntimeReadHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.RuntimeList:             &h.stmtList,
-		stmt.RuntimeListLinked:       &h.stmtLinked,
-		stmt.RuntimeParent:           &h.stmtParent,
-		stmt.RuntimeResolvePhysical:  &h.stmtResolvPhys,
-		stmt.RuntimeResolveServer:    &h.stmtResolvNext,
-		stmt.RuntimeTxSelectResource: &h.stmtTxResource,
-		stmt.RuntimeTxShow:           &h.stmtShow,
-		stmt.RuntimeTxShowChildren:   &h.stmtTxChildren,
-		stmt.RuntimeTxShowProperties: &h.stmtProp,
+		stmt.RuntimeList:              &h.stmtList,
+		stmt.RuntimeListLinked:        &h.stmtLinked,
+		stmt.RuntimeParent:            &h.stmtParent,
+		stmt.RuntimeTxResolvePhysical: &h.stmtTxResolvPhys,
+		stmt.RuntimeTxResolveServer:   &h.stmtTxResolvNext,
+		stmt.RuntimeTxSelectResource:  &h.stmtTxResource,
+		stmt.RuntimeTxShow:            &h.stmtShow,
+		stmt.RuntimeTxShowChildren:    &h.stmtTxChildren,
+		stmt.RuntimeTxShowProperties:  &h.stmtProp,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

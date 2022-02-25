@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -14,6 +14,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/internal/stmt"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
@@ -71,13 +72,29 @@ func (h *OrchestrationReadHandler) resolve(q *msg.Request, mr *msg.Result) {
 		createdAt, createdBy, namedAt, namedBy string
 		since, until                           time.Time
 		rows                                   *sql.Rows
+		tx                                     *sql.Tx
 		err                                    error
 	)
 
-	if err = h.stmtTxShow.QueryRow(
+	// start transaction
+	if tx, err = h.conn.Begin(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	if _, err = tx.Exec(stmt.ReadOnlyTransaction); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	defer tx.Rollback()
+
+	txTime := time.Now().UTC()
+
+	if err = tx.Stmt(
+		h.stmtTxShow,
+	).QueryRow(
 		q.Orchestration.Namespace,
 		q.Orchestration.Name,
-		time.Now().UTC(),
+		txTime,
 	).Scan(
 		&oreID,
 		&nsID,
@@ -96,13 +113,19 @@ func (h *OrchestrationReadHandler) resolve(q *msg.Request, mr *msg.Result) {
 	}
 
 	switch q.Orchestration.Type {
-	case `server`:
-		rows, err = h.stmtResolvNext.Query(
+	case `server`, `next`:
+		rows, err = tx.Stmt(
+			h.stmtTxResolvNext,
+		).Query(
 			oreID,
+			txTime,
 		)
-	case `physical`:
-		rows, err = h.stmtResolvPhys.Query(
+	case `physical`, `full`:
+		rows, err = tx.Stmt(
+			h.stmtTxResolvPhys,
+		).Query(
 			oreID,
+			txTime,
 		)
 	default:
 		mr.BadRequest()
@@ -130,6 +153,11 @@ func (h *OrchestrationReadHandler) resolve(q *msg.Request, mr *msg.Result) {
 		})
 	}
 	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	// close transaction
+	if err = tx.Commit(); err != nil {
 		mr.ServerError(err)
 		return
 	}

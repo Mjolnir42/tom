@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -19,19 +19,19 @@ import (
 
 // ContainerReadHandler ...
 type ContainerReadHandler struct {
-	Input          chan msg.Request
-	Shutdown       chan struct{}
-	name           string
-	conn           *sql.DB
-	lm             *lhm.LogHandleMap
-	stmtLinked     *sql.Stmt
-	stmtList       *sql.Stmt
-	stmtProp       *sql.Stmt
-	stmtResolvNext *sql.Stmt
-	stmtResolvPhys *sql.Stmt
-	stmtShow       *sql.Stmt
-	stmtTxParent   *sql.Stmt
-	stmtTxResource *sql.Stmt
+	Input            chan msg.Request
+	Shutdown         chan struct{}
+	name             string
+	conn             *sql.DB
+	lm               *lhm.LogHandleMap
+	stmtLinked       *sql.Stmt
+	stmtList         *sql.Stmt
+	stmtProp         *sql.Stmt
+	stmtShow         *sql.Stmt
+	stmtTxParent     *sql.Stmt
+	stmtTxResolvNext *sql.Stmt
+	stmtTxResolvPhys *sql.Stmt
+	stmtTxResource   *sql.Stmt
 }
 
 // NewContainerReadHandler returns a new handler instance
@@ -93,14 +93,14 @@ func (h *ContainerReadHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.ContainerList:             &h.stmtList,
-		stmt.ContainerListLinked:       &h.stmtLinked,
-		stmt.ContainerResolvePhysical:  &h.stmtResolvPhys,
-		stmt.ContainerResolveServer:    &h.stmtResolvNext,
-		stmt.ContainerTxParent:         &h.stmtTxParent,
-		stmt.ContainerTxSelectResource: &h.stmtTxResource,
-		stmt.ContainerTxShow:           &h.stmtShow,
-		stmt.ContainerTxShowProperties: &h.stmtProp,
+		stmt.ContainerList:              &h.stmtList,
+		stmt.ContainerListLinked:        &h.stmtLinked,
+		stmt.ContainerTxParent:          &h.stmtTxParent,
+		stmt.ContainerTxResolvePhysical: &h.stmtTxResolvPhys,
+		stmt.ContainerTxResolveServer:   &h.stmtTxResolvNext,
+		stmt.ContainerTxSelectResource:  &h.stmtTxResource,
+		stmt.ContainerTxShow:            &h.stmtShow,
+		stmt.ContainerTxShowProperties:  &h.stmtProp,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
