@@ -48,6 +48,14 @@ ntt | list | UNSUPPORTED | | yes
 std | string | Standard attribute for the namespace | | yes
 uniq | string | Unique attribute for the namespace | | yes
 
+# NOTES
+
+This command has an increased likelyhood to result in the following cli
+error: `Syntax error, back-to-back keyword: type` since `type` is both a
+keyword for the namespace, and the value for a `std-attr` definition.
+Such colliding property values can be stated surrounded by `'"%` characters
+that will be stripped from the request.
+
 # PERMISSIONS
 
 The request is authorized if the user either has at least one
@@ -60,5 +68,5 @@ omnipotence | | | no | yes
 # EXAMPLES
 
 ```
-tom namespace add inventory type authoritative uniq-attr name uniq-attr serial std-attr lifecycle-state
+tom namespace add inventory type authoritative uniq-attr name uniq-attr serial std-attr lifecycle-state std-attr %type%
 ```
