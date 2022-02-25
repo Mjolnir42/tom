@@ -11,8 +11,10 @@ const (
 	ContainerReadStatements = ``
 
 	ContainerList = `
-SELECT            meta.dictionary.name AS dictionaryName,
-                  asset.container_unique_attribute_values.value AS runtimeName,
+SELECT            asset.container.containerID,
+                  meta.dictionary.name AS dictionaryName,
+									meta.unique_attribute.attribute,
+                  asset.container_unique_attribute_values.value,
                   inventory.user.uid AS createdBy,
                   asset.container_unique_attribute_values.createdAt
 FROM              meta.dictionary
@@ -28,7 +30,29 @@ JOIN              inventory.user
   ON              asset.container_unique_attribute_values.createdBy = inventory.user.userID
 WHERE             (meta.dictionary.name = $1::text OR $1::text IS NULL)
   AND             meta.unique_attribute.attribute = 'name'::text
-  AND             now()::timestamptz(3) <@ asset.container_unique_attribute_values.validity;`
+  AND             now()::timestamptz(3) <@ asset.container_unique_attribute_values.validity
+UNION
+SELECT            asset.container.containerID,
+                  meta.dictionary.name AS dictionaryName,
+									meta.standard_attribute.attribute,
+                  asset.container_standard_attribute_values.value,
+                  inventory.user.uid AS createdBy,
+                  asset.container_standard_attribute_values.createdAt
+FROM              meta.dictionary
+JOIN              meta.standard_attribute
+  ON              meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+JOIN              asset.container
+  ON              meta.dictionary.dictionaryID = asset.container.dictionaryID
+JOIN              asset.container_standard_attribute_values
+    ON            meta.dictionary.dictionaryID = asset.container_standard_attribute_values.dictionaryID
+    AND           asset.container.containerID = asset.container_standard_attribute_values.containerID
+    AND           meta.standard_attribute.attributeID = asset.container_standard_attribute_values.attributeID
+JOIN              inventory.user
+  ON              asset.container_standard_attribute_values.createdBy = inventory.user.userID
+WHERE             (meta.dictionary.name = $1::text OR $1::text IS NULL)
+  AND             meta.standard_attribute.attribute = 'type'::text
+  AND             now()::timestamptz(3) <@ asset.container_standard_attribute_values.validity
+	;`
 
 	ContainerListLinked = `
 WITH sel_cte AS ( SELECT linkedViaA.containerID_B AS linkedContainerID,

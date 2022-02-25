@@ -134,6 +134,7 @@ func NewContainer() *Container {
 type ContainerHeader struct {
 	Namespace string `json:"namespace"`
 	Name      string `json:"name"`
+	Type      string `json:"type"`
 	CreatedAt string `json:"createdAt,omitempty"`
 	CreatedBy string `json:"createdBy,omitempty"`
 }
