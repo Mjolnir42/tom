@@ -261,17 +261,20 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 	// remove all containers in the namespace
 	for _, statement := range []string{
 		// TODO asset.Socket
+		// Linking
 		stmt.ContainerDelNamespaceLinking,
-		stmt.ContainerDelNamespaceParent,
-		stmt.ContainerDelNamespace,
 		stmt.OrchestrationDelNamespaceLinking,
-		stmt.OrchestrationDelNamespaceParent,
-		stmt.OrchestrationDelNamespace,
 		stmt.RuntimeDelNamespaceLinking,
-		stmt.RuntimeDelNamespaceParent,
-		stmt.RuntimeDelNamespace,
 		stmt.ServerDelNamespaceLinking,
+		// Stacking Cross-References
+		stmt.ContainerDelNamespaceParent,
+		stmt.OrchestrationDelNamespaceParent,
+		stmt.RuntimeDelNamespaceParent,
 		stmt.ServerDelNamespaceParent,
+		// Base objects
+		stmt.ContainerDelNamespace,
+		stmt.OrchestrationDelNamespace,
+		stmt.RuntimeDelNamespace,
 		stmt.ServerDelNamespace,
 	} {
 		if _, err = tx.Exec(
