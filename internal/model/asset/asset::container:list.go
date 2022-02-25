@@ -74,11 +74,13 @@ func (m *Model) ContainerList(w http.ResponseWriter, r *http.Request,
 // list returns all containers
 func (h *ContainerReadHandler) list(q *msg.Request, mr *msg.Result) {
 	var (
-		dictionaryName, containerName, author string
-		creationTime                          time.Time
-		namespace                             sql.NullString
-		rows                                  *sql.Rows
-		err                                   error
+		cnrID, nsName, key, value, author string
+		creationTime                      time.Time
+		namespace                         sql.NullString
+		rows                              *sql.Rows
+		container                         proto.ContainerHeader
+		err                               error
+		ok                                bool
 	)
 
 	if q.Container.Namespace != `` {
@@ -86,6 +88,7 @@ func (h *ContainerReadHandler) list(q *msg.Request, mr *msg.Result) {
 		namespace.Valid = true
 	}
 
+	list := make(map[string]proto.ContainerHeader)
 	if rows, err = h.stmtList.Query(
 		namespace,
 	); err != nil {
@@ -95,8 +98,10 @@ func (h *ContainerReadHandler) list(q *msg.Request, mr *msg.Result) {
 
 	for rows.Next() {
 		if err = rows.Scan(
-			&dictionaryName,
-			&containerName,
+			&cnrID,
+			&nsName,
+			&key,
+			&value,
 			&author,
 			&creationTime,
 		); err != nil {
@@ -104,16 +109,26 @@ func (h *ContainerReadHandler) list(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		mr.ContainerHeader = append(mr.ContainerHeader, proto.ContainerHeader{
-			Namespace: dictionaryName,
-			Name:      containerName,
-			CreatedAt: creationTime.Format(msg.RFC3339Milli),
-			CreatedBy: author,
-		})
+		if container, ok = list[cnrID]; !ok {
+			container = proto.ContainerHeader{}
+		}
+		container.Namespace = nsName
+		switch {
+		case key == `type`:
+			container.Type = value
+		case key == `name`:
+			container.Name = value
+			container.CreatedBy = author
+			container.CreatedAt = creationTime.Format(msg.RFC3339Milli)
+		}
+		list[cnrID] = container
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err)
 		return
+	}
+	for _, container := range list {
+		mr.ContainerHeader = append(mr.ContainerHeader, container)
 	}
 	mr.OK()
 }

@@ -8,6 +8,7 @@
 - DB schema update: view.20220225001
 - add --verbose|-v flag to all cli commands to request hidden meta
   information
+- add type information to container list command output
 
 ## v0.1.5
 
