@@ -203,11 +203,11 @@ WHERE             meta.dictionary.name = $1::text
      AND          asset.orchestration_environment_unique_attribute_values.value = $2::text
      AND          $3::timestamptz(3) <@ asset.orchestration_environment_unique_attribute_values.validity;`
 
-	OrchestrationResolveServer = `
+	OrchestrationTxResolveServer = `
 SELECT      asset.server_unique_attribute_values.value,
             meta.dictionary.name,
             resolution.serverType
-FROM        view.resolveOrchestrationToServer($1::uuid) AS resolution
+FROM        view.resolveOrchestrationToServerAt($1::uuid, $2::timestamptz) AS resolution
     JOIN    asset.server
       ON    resolution.serverID = asset.server.serverID
     JOIN    meta.dictionary
@@ -218,13 +218,14 @@ FROM        view.resolveOrchestrationToServer($1::uuid) AS resolution
       ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
      AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
      AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
-WHERE       meta.unique_attribute.attribute IN ('name');`
+WHERE       meta.unique_attribute.attribute IN ('name')
+     AND    $2::timestamptz <@ asset.server_unique_attribute_values.validity;`
 
-	OrchestrationResolvePhysical = `
+	OrchestrationTxResolvePhysical = `
 SELECT      asset.server_unique_attribute_values.value,
             meta.dictionary.name,
             resolution.serverType
-FROM        view.resolveOrchestrationToPhysical($1::uuid) AS resolution
+FROM        view.resolveOrchestrationToPhysicalAt($1::uuid, $2::timestamptz) AS resolution
     JOIN    asset.server
       ON    resolution.serverID = asset.server.serverID
     JOIN    meta.dictionary
@@ -235,7 +236,8 @@ FROM        view.resolveOrchestrationToPhysical($1::uuid) AS resolution
       ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
      AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
      AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
-WHERE       meta.unique_attribute.attribute IN ('name');`
+WHERE       meta.unique_attribute.attribute IN ('name')
+     AND    $2::timestamptz <@ asset.server_unique_attribute_values.validity;`
 
 	OrchestrationTxSelectResource = `
 WITH dict AS ( SELECT meta.dictionary.dictionaryID
@@ -293,9 +295,9 @@ WHERE                 asset.orchestration_environment.orchID = $2::uuid
 func init() {
 	m[OrchestrationListLinked] = `OrchestrationListLinked`
 	m[OrchestrationList] = `OrchestrationList`
-	m[OrchestrationResolvePhysical] = `OrchestrationResolvePhysical`
-	m[OrchestrationResolveServer] = `OrchestrationResolveServer`
 	m[OrchestrationTxParent] = `OrchestrationTxParent`
+	m[OrchestrationTxResolvePhysical] = `OrchestrationTxResolvePhysical`
+	m[OrchestrationTxResolveServer] = `OrchestrationTxResolveServer`
 	m[OrchestrationTxSelectResource] = `OrchestrationTxSelectResource`
 	m[OrchestrationTxShowChildren] = `OrchestrationTxShowChildren`
 	m[OrchestrationTxShowProperties] = `OrchestrationTxShowProperties`

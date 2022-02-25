@@ -1,11 +1,11 @@
 --
 --
 -- VIEW SCHEMA
--- -- resolveRuntimeToServer tracks a specified runtime down across
+-- -- resolveOrchestrationToServerAt tracks a specified orchestration down across
 -- -- nested/linked runtime and orchestration environments to the
 -- -- next (!) server(s), which are either virtual or physical.
 -- -- It does not drill further into found server(s).
-CREATE OR REPLACE FUNCTION view.resolveOrchestrationToServer(oreID uuid)
+CREATE OR REPLACE FUNCTION view.resolveOrchestrationToServerAt(oreID uuid, at timestamptz)
   RETURNS TABLE ( serverID   uuid,
                   serverType text,
                   depth      smallint)
@@ -28,7 +28,7 @@ CREATE OR REPLACE FUNCTION view.resolveOrchestrationToServer(oreID uuid)
             null::uuid,
             0::smallint
     FROM  asset.orchestration_environment_mapping
-    WHERE asset.orchestration_environment_mapping.orchID = oreID::uuid
+    WHERE ( asset.orchestration_environment_mapping.orchID = oreID::uuid
        OR asset.orchestration_environment_mapping.orchID IN (
           SELECT  orchID_A
           FROM    asset.orchestration_environment_linking
@@ -37,7 +37,8 @@ CREATE OR REPLACE FUNCTION view.resolveOrchestrationToServer(oreID uuid)
           SELECT  orchID_B
           FROM    asset.orchestration_environment_linking
           WHERE  asset.orchestration_environment_linking.orchID_A = oreID::uuid
-       )
+       ) )
+      AND at <@ asset.orchestration_environment_mapping.validity
     UNION -- recursive iteration query
     SELECT  CASE WHEN t.parentServerID IS NOT NULL
                  THEN t.parentServerID
@@ -89,6 +90,8 @@ CREATE OR REPLACE FUNCTION view.resolveOrchestrationToServer(oreID uuid)
   AND  ( t.parentRuntimeID IS NOT NULL OR
          t.parentServerID IS NOT NULL OR
          t.parentOrchestrationID IS NOT NULL )
+  AND  ( at <@ asset.runtime_environment_parent.validity OR asset.runtime_environment_parent.validity IS NULL )
+  AND  ( at <@ asset.orchestration_environment_mapping.validity OR asset.orchestration_environment_mapping.validity IS NULL )
      )
   SELECT  ssa.serverID AS serverID,
           ssa.value    AS serverType,
@@ -103,14 +106,15 @@ CREATE OR REPLACE FUNCTION view.resolveOrchestrationToServer(oreID uuid)
     AND   t.parentServerID IS NULL
     AND   t.parentRuntimeID IS NULL
     AND   t.parentOrchestrationID IS NULL
-    AND   ma.attribute = 'type';
+    AND   ma.attribute = 'type'
+    AND   at <@ ssa.validity;
   $BODY$
   LANGUAGE sql IMMUTABLE;
 
--- -- resolveRuntimeToPhysical tracks a specified runtime down to the
+-- -- resolveOrchestrationToPhysicalAt tracks a specified orchestration down to the
 -- -- physical server(s), across any nested virtual servers and
 -- -- orchestration environments in between.
-CREATE OR REPLACE FUNCTION view.resolveOrchestrationToPhysical(oreID uuid)
+CREATE OR REPLACE FUNCTION view.resolveOrchestrationToPhysicalAt(oreID uuid, at timestamptz)
         RETURNS TABLE ( serverID uuid,
                         serverType text,
                         depth      smallint)
@@ -133,7 +137,7 @@ SELECT null::uuid,
        null::uuid,
        0::smallint
 FROM   asset.orchestration_environment_mapping
-WHERE  asset.orchestration_environment_mapping.orchID = oreID::uuid
+WHERE  ( asset.orchestration_environment_mapping.orchID = oreID::uuid
    OR  asset.orchestration_environment_mapping.orchID IN (
        SELECT orchID_A
        FROM   asset.orchestration_environment_linking
@@ -142,7 +146,8 @@ WHERE  asset.orchestration_environment_mapping.orchID = oreID::uuid
        SELECT orchID_B
        FROM   asset.orchestration_environment_linking
        WHERE  asset.orchestration_environment_linking.orchID_A = oreID::uuid
-   )
+   ))
+   AND at <@ asset.orchestration_environment_mapping.validity
 UNION -- recursive iteration query
 SELECT CASE WHEN asset.server_parent.serverID IS NOT NULL THEN asset.server_parent.serverID
             WHEN t.parentServerID IS NOT NULL AND asset.server_parent.serverID IS NULL THEN t.parentServerID
@@ -194,8 +199,10 @@ WHERE  t.depth < 32
   AND  ( t.parentRuntimeID IS NOT NULL OR
          t.parentServerID IS NOT NULL OR
          t.parentOrchestrationID IS NOT NULL )
+  AND  ( at <@ asset.runtime_environment_parent.validity OR asset.runtime_environment_parent.validity IS NULL )
+  AND  ( at <@ asset.server_parent.validity OR asset.server_parent.validity IS NULL )
+  AND  ( at <@ asset.orchestration_environment_mapping.validity OR asset.orchestration_environment_mapping.validity IS NULL )
 )
-
 SELECT ssa.serverID AS serverID,
        ssa.value    AS serverType,
        t.depth      AS depth
@@ -210,8 +217,7 @@ FROM    asset.server_standard_attribute_values AS ssa
     AND   t.parentRuntimeID IS NULL
     AND   t.parentOrchestrationID IS NULL
     AND   ma.attribute = 'type'
-    AND   ssa.value = 'physical';
-
+    AND   ssa.value = 'physical'
+    AND   at <@ ssa.validity;
   $BODY$
   LANGUAGE sql IMMUTABLE;
-

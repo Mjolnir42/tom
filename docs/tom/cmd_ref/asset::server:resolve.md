@@ -37,6 +37,11 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 
+# NOTES
+
+Instead of `server`, the alias `next` is also recognized. Instead of
+`physical`, the alias `full` is also recognized.
+
 # EXAMPLES
 
 ```

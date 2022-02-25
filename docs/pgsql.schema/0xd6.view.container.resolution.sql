@@ -1,11 +1,11 @@
 --
 --
 -- VIEW SCHEMA
--- -- resolveContainerToServer tracks a specified container down across
+-- -- resolveContainerToServerAt tracks a specified container down across
 -- -- nested/linked runtime and orchestration environments to the
 -- -- next (!) server(s), which are either virtual or physical.
 -- -- It does not drill further into found server(s).
-CREATE OR REPLACE FUNCTION view.resolveContainerToServer(cnID uuid)
+CREATE OR REPLACE FUNCTION view.resolveContainerToServerAt(cnID uuid, at timestamptz)
   RETURNS TABLE ( serverID   uuid,
                   serverType text,
                   depth      smallint)
@@ -28,7 +28,7 @@ $BODY$
             null::uuid,
             0::smallint
     FROM  asset.container_parent
-    WHERE asset.container_parent.containerID = cnID::uuid
+    WHERE ( asset.container_parent.containerID = cnID::uuid
        OR asset.container_parent.containerID IN (
           SELECT  containerID_A
           FROM    asset.container_linking
@@ -37,7 +37,8 @@ $BODY$
           SELECT  containerID_B
           FROM    asset.container_linking
           WHERE  asset.container_linking.containerID_A = cnID::uuid
-       )
+       ) )
+      AND at <@ asset.container_parent.validity
     UNION -- recursive iteration query
     SELECT  CASE WHEN t.parentServerID IS NOT NULL
                       THEN t.parentServerID
@@ -81,6 +82,8 @@ $BODY$
        AND  (   t.parentRuntimeID       IS NOT NULL
              OR t.parentServerID        IS NOT NULL
              OR t.parentOrchestrationID IS NOT NULL )
+       AND  ( at <@ asset.runtime_environment_parent.validity OR asset.runtime_environment_parent.validity IS NULL )
+       AND  ( at <@ asset.orchestration_environment_mapping.validity OR asset.orchestration_environment_mapping.validity IS NULL )
   )
   SELECT  ssa.serverID AS serverID,
           ssa.value    AS serverType,
@@ -95,14 +98,15 @@ $BODY$
     AND   t.parentServerID IS NULL
     AND   t.parentRuntimeID IS NULL
     AND   t.parentOrchestrationID IS NULL
-    AND   ma.attribute = 'type';
+    AND   ma.attribute = 'type'
+    AND   at <@ ssa.validity;
 $BODY$
 LANGUAGE sql IMMUTABLE;
 
--- -- resolveRuntimeToPhysical tracks a specified runtime down to the
+-- -- resolveContainerToPhysicalAt tracks a specified container down to the
 -- -- physical server(s), across any nested virtual servers and
 -- -- orchestration environments in between.
-CREATE OR REPLACE FUNCTION view.resolveContainerToPhysical(cnID uuid)
+CREATE OR REPLACE FUNCTION view.resolveContainerToPhysicalAt(cnID uuid, at timestamptz)
   RETURNS TABLE ( serverID uuid,
                   serverType text,
                   depth      smallint)
@@ -125,13 +129,14 @@ $BODY$
            null::uuid,
            0::smallint
     FROM  asset.container_parent
-    WHERE asset.container_parent.containerID = cnID::uuid
+    WHERE ( asset.container_parent.containerID = cnID::uuid
        OR asset.container_parent.containerID IN (
           SELECT containerID_A FROM asset.container_linking
           WHERE  asset.container_linking.containerID_B = cnID::uuid
           UNION
           SELECT containerID_B FROM asset.container_linking
-          WHERE  asset.container_linking.containerID_A = cnID::uuid)
+          WHERE  asset.container_linking.containerID_A = cnID::uuid) )
+       AND at <@ asset.container_parent.validity
     UNION -- recursive iteration query
     SELECT CASE WHEN asset.server_parent.serverID IS NOT NULL
                      THEN asset.server_parent.serverID
@@ -187,6 +192,9 @@ $BODY$
       AND  ( t.parentRuntimeID IS NOT NULL OR
              t.parentServerID IS NOT NULL OR
              t.parentOrchestrationID IS NOT NULL )
+      AND  ( at <@ asset.runtime_environment_parent.validity OR asset.runtime_environment_parent.validity IS NULL )
+      AND  ( at <@ asset.server_parent.validity OR asset.server_parent.validity IS NULL )
+      AND  ( at <@ asset.orchestration_environment_mapping.validity OR asset.orchestration_environment_mapping.validity IS NULL )
   )
   SELECT    ssa.serverID AS serverID,
             ssa.value    AS serverType,
@@ -202,6 +210,7 @@ $BODY$
       AND   t.parentRuntimeID       IS NULL
       AND   t.parentOrchestrationID IS NULL
       AND   ma.attribute = 'type'
-      AND   ssa.value = 'physical';
+      AND   ssa.value = 'physical'
+      AND   at <@ ssa.validity;
 $BODY$
 LANGUAGE sql IMMUTABLE;

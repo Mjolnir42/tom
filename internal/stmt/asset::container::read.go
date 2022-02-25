@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -158,11 +158,11 @@ WHERE       asset.container.containerID = $1::uuid
      AND    $2::timestamptz(3) <@ asset.runtime_environment_unique_attribute_values.validity
      AND    meta.unique_attribute.attribute IN ('name');`
 
-	ContainerResolveServer = `
+	ContainerTxResolveServer = `
 SELECT      asset.server_unique_attribute_values.value,
             meta.dictionary.name,
             resolution.serverType
-FROM        view.resolveContainerToServer($1::uuid) AS resolution
+FROM        view.resolveContainerToServerAt($1::uuid, $2::timestamptz) AS resolution
     JOIN    asset.server
       ON    resolution.serverID = asset.server.serverID
     JOIN    meta.dictionary
@@ -173,13 +173,14 @@ FROM        view.resolveContainerToServer($1::uuid) AS resolution
       ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
      AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
      AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
-WHERE       meta.unique_attribute.attribute IN ('name');`
+WHERE       meta.unique_attribute.attribute IN ('name')
+     AND    $2::timestamptz <@ asset.server_unique_attribute_values.validity;`
 
-	ContainerResolvePhysical = `
+	ContainerTxResolvePhysical = `
 SELECT      asset.server_unique_attribute_values.value,
             meta.dictionary.name,
             resolution.serverType
-FROM        view.resolveContainerToPhysical($1::uuid) AS resolution
+FROM        view.resolveContainerToPhysicalAt($1::uuid, $2::timestamptz) AS resolution
     JOIN    asset.server
       ON    resolution.serverID = asset.server.serverID
     JOIN    meta.dictionary
@@ -190,7 +191,8 @@ FROM        view.resolveContainerToPhysical($1::uuid) AS resolution
       ON    asset.server_unique_attribute_values.serverID = asset.server.serverID
      AND    asset.server_unique_attribute_values.dictionaryID = asset.server.dictionaryID
      AND    asset.server_unique_attribute_values.attributeID = meta.unique_attribute.attributeID
-WHERE       meta.unique_attribute.attribute IN ('name');`
+WHERE       meta.unique_attribute.attribute IN ('name')
+     AND    $2::timestamptz <@ asset.server_unique_attribute_values.validity;`
 
 	ContainerTxSelectResource = `
 WITH dict AS ( SELECT meta.dictionary.dictionaryID
@@ -248,9 +250,9 @@ WHERE                 asset.container.containerID = $2::uuid
 func init() {
 	m[ContainerListLinked] = `ContainerListLinked`
 	m[ContainerList] = `ContainerList`
-	m[ContainerResolvePhysical] = `ContainerResolvePhysical`
-	m[ContainerResolveServer] = `ContainerResolveServer`
 	m[ContainerTxParent] = `ContainerTxParent`
+	m[ContainerTxResolvePhysical] = `ContainerTxResolvePhysical`
+	m[ContainerTxResolveServer] = `ContainerTxResolveServer`
 	m[ContainerTxSelectResource] = `ContainerTxSelectResource`
 	m[ContainerTxShowProperties] = `ContainerTxShowProperties`
 	m[ContainerTxShow] = `ContainerTxShow`

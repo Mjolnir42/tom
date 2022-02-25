@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020-2021, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -19,22 +19,22 @@ import (
 
 // ServerReadHandler ...
 type ServerReadHandler struct {
-	Input          chan msg.Request
-	Shutdown       chan struct{}
-	name           string
-	conn           *sql.DB
-	lm             *lhm.LogHandleMap
-	stmtAttribute  *sql.Stmt
-	stmtFind       *sql.Stmt
-	stmtLinked     *sql.Stmt
-	stmtList       *sql.Stmt
-	stmtParent     *sql.Stmt
-	stmtResolvNext *sql.Stmt
-	stmtResolvPhys *sql.Stmt
-	stmtTxChildren *sql.Stmt
-	stmtTxProp     *sql.Stmt
-	stmtTxResource *sql.Stmt
-	stmtTxShow     *sql.Stmt
+	Input            chan msg.Request
+	Shutdown         chan struct{}
+	name             string
+	conn             *sql.DB
+	lm               *lhm.LogHandleMap
+	stmtAttribute    *sql.Stmt
+	stmtFind         *sql.Stmt
+	stmtLinked       *sql.Stmt
+	stmtList         *sql.Stmt
+	stmtParent       *sql.Stmt
+	stmtTxChildren   *sql.Stmt
+	stmtTxProp       *sql.Stmt
+	stmtTxResolvNext *sql.Stmt
+	stmtTxResolvPhys *sql.Stmt
+	stmtTxResource   *sql.Stmt
+	stmtTxShow       *sql.Stmt
 }
 
 // NewServerReadHandler returns a new handler instance
@@ -95,17 +95,17 @@ func (h *ServerReadHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.ServerAttribute:        &h.stmtAttribute,
-		stmt.ServerFind:             &h.stmtFind,
-		stmt.ServerList:             &h.stmtList,
-		stmt.ServerListLinked:       &h.stmtLinked,
-		stmt.ServerParent:           &h.stmtParent,
-		stmt.ServerResolvePhysical:  &h.stmtResolvPhys,
-		stmt.ServerResolveServer:    &h.stmtResolvNext,
-		stmt.ServerTxSelectResource: &h.stmtTxResource,
-		stmt.ServerTxShow:           &h.stmtTxShow,
-		stmt.ServerTxShowChildren:   &h.stmtTxChildren,
-		stmt.ServerTxShowProperties: &h.stmtTxProp,
+		stmt.ServerAttribute:         &h.stmtAttribute,
+		stmt.ServerFind:              &h.stmtFind,
+		stmt.ServerList:              &h.stmtList,
+		stmt.ServerListLinked:        &h.stmtLinked,
+		stmt.ServerParent:            &h.stmtParent,
+		stmt.ServerTxResolvePhysical: &h.stmtTxResolvPhys,
+		stmt.ServerTxResolveServer:   &h.stmtTxResolvNext,
+		stmt.ServerTxSelectResource:  &h.stmtTxResource,
+		stmt.ServerTxShow:            &h.stmtTxShow,
+		stmt.ServerTxShowChildren:    &h.stmtTxChildren,
+		stmt.ServerTxShowProperties:  &h.stmtTxProp,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))
