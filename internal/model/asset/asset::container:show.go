@@ -11,7 +11,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -51,7 +50,6 @@ func (m *Model) ContainerShow(w http.ResponseWriter, r *http.Request,
 	request.Container.TomID = params.ByName(`tomID`)
 	request.Container.Namespace = r.URL.Query().Get(`namespace`)
 	request.Container.Name = r.URL.Query().Get(`name`)
-	request.Verbose, _ = strconv.ParseBool(r.URL.Query().Get(`verbose`))
 
 	if err := request.Container.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {
