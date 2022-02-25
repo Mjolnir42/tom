@@ -11,7 +11,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -52,7 +51,6 @@ func (m *Model) RuntimeShow(w http.ResponseWriter, r *http.Request,
 	request.Runtime.TomID = params.ByName(`tomID`)
 	request.Runtime.Namespace = r.URL.Query().Get(`namespace`)
 	request.Runtime.Name = r.URL.Query().Get(`name`)
-	request.Verbose, _ = strconv.ParseBool(r.URL.Query().Get(`verbose`))
 
 	if err := request.Runtime.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {

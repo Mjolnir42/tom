@@ -9,6 +9,7 @@ package msg // import "github.com/mjolnir42/tom/internal/msg"
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/pkg/proto"
@@ -54,6 +55,7 @@ func New(r *http.Request, params httprouter.Params, cmd, sec, ac string) Request
 		AuthUser:   identity[1],
 		Reply:      returnChannel,
 	}
+	rq.Verbose, _ = strconv.ParseBool(r.URL.Query().Get(`verbose`))
 	switch sec {
 	case SectionContainer:
 		rq.Container = *(proto.NewContainer())

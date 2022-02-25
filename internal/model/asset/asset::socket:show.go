@@ -13,7 +13,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -53,7 +52,6 @@ func (m *Model) SocketShow(w http.ResponseWriter, r *http.Request,
 	request.Socket.TomID = params.ByName(`tomID`)
 	request.Socket.Namespace = r.URL.Query().Get(`namespace`)
 	request.Socket.Name = r.URL.Query().Get(`name`)
-	request.Verbose, _ = strconv.ParseBool(r.URL.Query().Get(`verbose`))
 
 	if err := request.Socket.ParseTomID(); err != nil {
 		if err != proto.ErrEmptyTomID {
