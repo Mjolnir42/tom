@@ -15,6 +15,8 @@ const (
 	DatabaseIsolationLevel = `SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL SERIALIZABLE;`
 
 	ReadOnlyTransaction = `SET TRANSACTION READ ONLY, DEFERRABLE;`
+
+	DeferredTransaction = `SET CONSTRAINTS ALL DEFERRED;`
 )
 
 func init() {

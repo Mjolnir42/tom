@@ -85,7 +85,7 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	if _, err = tx.Exec(`SET CONSTRAINTS ALL DEFERRED;`); err != nil {
+	if _, err = tx.Exec(stmt.DeferredTransaction); err != nil {
 		mr.ServerError(err)
 		tx.Rollback()
 		return
