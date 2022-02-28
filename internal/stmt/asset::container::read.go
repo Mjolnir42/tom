@@ -13,7 +13,7 @@ const (
 	ContainerList = `
 SELECT            asset.container.containerID,
                   meta.dictionary.name AS dictionaryName,
-									meta.unique_attribute.attribute,
+                  meta.unique_attribute.attribute,
                   asset.container_unique_attribute_values.value,
                   inventory.user.uid AS createdBy,
                   asset.container_unique_attribute_values.createdAt
@@ -34,7 +34,7 @@ WHERE             (meta.dictionary.name = $1::text OR $1::text IS NULL)
 UNION
 SELECT            asset.container.containerID,
                   meta.dictionary.name AS dictionaryName,
-									meta.standard_attribute.attribute,
+                  meta.standard_attribute.attribute,
                   asset.container_standard_attribute_values.value,
                   inventory.user.uid AS createdBy,
                   asset.container_standard_attribute_values.createdAt
@@ -51,8 +51,7 @@ JOIN              inventory.user
   ON              asset.container_standard_attribute_values.createdBy = inventory.user.userID
 WHERE             (meta.dictionary.name = $1::text OR $1::text IS NULL)
   AND             meta.standard_attribute.attribute = 'type'::text
-  AND             now()::timestamptz(3) <@ asset.container_standard_attribute_values.validity
-	;`
+  AND             now()::timestamptz(3) <@ asset.container_standard_attribute_values.validity;`
 
 	ContainerListLinked = `
 WITH sel_cte AS ( SELECT linkedViaA.containerID_B AS linkedContainerID,
