@@ -9,6 +9,7 @@
 - add --verbose|-v flag to all cli commands to request hidden meta
   information
 - add type information to container list command output
+- add type information to runtime environment list command output
 
 ## v0.1.5
 
