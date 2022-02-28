@@ -73,11 +73,13 @@ func (m *Model) RuntimeList(w http.ResponseWriter, r *http.Request,
 // list returns all servers
 func (h *RuntimeReadHandler) list(q *msg.Request, mr *msg.Result) {
 	var (
-		dictionaryName, runtimeName, author string
-		creationTime                        time.Time
-		namespace                           sql.NullString
-		rows                                *sql.Rows
-		err                                 error
+		rteID, rteNs, key, value, author string
+		creationTime                     time.Time
+		namespace                        sql.NullString
+		rows                             *sql.Rows
+		rte                              proto.RuntimeHeader
+		err                              error
+		ok                               bool
 	)
 
 	if q.Runtime.Namespace != `` {
@@ -85,6 +87,7 @@ func (h *RuntimeReadHandler) list(q *msg.Request, mr *msg.Result) {
 		namespace.Valid = true
 	}
 
+	list := make(map[string]proto.RuntimeHeader)
 	if rows, err = h.stmtList.Query(
 		namespace,
 	); err != nil {
@@ -94,8 +97,10 @@ func (h *RuntimeReadHandler) list(q *msg.Request, mr *msg.Result) {
 
 	for rows.Next() {
 		if err = rows.Scan(
-			&dictionaryName,
-			&runtimeName,
+			&rteID,
+			&rteNs,
+			&key,
+			&value,
 			&author,
 			&creationTime,
 		); err != nil {
@@ -103,16 +108,26 @@ func (h *RuntimeReadHandler) list(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		mr.RuntimeHeader = append(mr.RuntimeHeader, proto.RuntimeHeader{
-			Namespace: dictionaryName,
-			Name:      runtimeName,
-			CreatedAt: creationTime.Format(msg.RFC3339Milli),
-			CreatedBy: author,
-		})
+		if rte, ok = list[rteID]; !ok {
+			rte = proto.RuntimeHeader{}
+		}
+		rte.Namespace = rteNs
+		switch key {
+		case `type`:
+			rte.Type = value
+		case `name`:
+			rte.Name = value
+			rte.CreatedBy = author
+			rte.CreatedAt = creationTime.Format(msg.RFC3339Milli)
+		}
+		list[rteID] = rte
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err)
 		return
+	}
+	for _, rte := range list {
+		mr.RuntimeHeader = append(mr.RuntimeHeader, rte)
 	}
 	mr.OK()
 }
