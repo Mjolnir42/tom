@@ -11,12 +11,37 @@ const (
 	NamespaceReadStatements = ``
 
 	NamespaceList = `
-SELECT      meta.dictionary.name,
+SELECT      meta.dictionary.dictionaryID,
+            meta.unique_attribute.attribute AS key,
+            meta.dictionary_unique_attribute_values.value AS value,
             meta.dictionary.createdAt,
-            inventory.user.uid
+            inventory.user.uid AS uid
 FROM        meta.dictionary
+    JOIN    meta.unique_attribute
+      ON    meta.dictionary.dictionaryID = meta.unique_attribute.dictionaryID
+    JOIN    meta.dictionary_unique_attribute_values
+      ON    meta.unique_attribute.dictionaryID = meta.dictionary_unique_attribute_values.dictionaryID
+     AND    meta.unique_attribute.attributeID  = meta.dictionary_unique_attribute_values.attributeID
     JOIN    inventory.user
-      ON    meta.dictionary.createdBy = inventory.user.userID;`
+      ON    meta.dictionary.createdBy =  inventory.user.userID
+WHERE       meta.unique_attribute.attribute = 'dict_name'::text
+     AND    now()::timestamptz(3) <@ meta.dictionary_unique_attribute_values.validity
+UNION
+SELECT      meta.dictionary.dictionaryID,
+            meta.standard_attribute.attribute AS key,
+            meta.dictionary_standard_attribute_values.value AS value,
+            meta.dictionary.createdAt,
+            inventory.user.uid AS uid
+FROM        meta.dictionary
+    JOIN    meta.standard_attribute
+      ON    meta.dictionary.dictionaryID = meta.standard_attribute.dictionaryID
+    JOIN    meta.dictionary_standard_attribute_values
+      ON    meta.standard_attribute.dictionaryID = meta.dictionary_standard_attribute_values.dictionaryID
+     AND    meta.standard_attribute.attributeID  = meta.dictionary_standard_attribute_values.attributeID
+    JOIN    inventory.user
+      ON    meta.dictionary.createdBy =  inventory.user.userID
+WHERE       meta.standard_attribute.attribute = 'dict_type'::text
+     AND    now()::timestamptz(3) <@ meta.dictionary_standard_attribute_values.validity;`
 
 	NamespaceTxShow = `
 SELECT      meta.dictionary.dictionaryID,
