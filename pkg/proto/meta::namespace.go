@@ -118,6 +118,7 @@ func NewNamespace() *Namespace {
 // NamespaceHeader defines ...
 type NamespaceHeader struct {
 	Name      string `json:"name"`
+	Type      string `json:"type"`
 	CreatedAt string `json:"createdAt,omitempty"`
 	CreatedBy string `json:"createdBy,omitempty"`
 }

@@ -66,12 +66,15 @@ func (m *Model) NamespaceList(w http.ResponseWriter, r *http.Request,
 // list returns all namespaces
 func (h *NamespaceReadHandler) list(q *msg.Request, mr *msg.Result) {
 	var (
-		dictionaryName, author string
-		creationTime           time.Time
-		rows                   *sql.Rows
-		err                    error
+		nsID, key, value, author string
+		creationTime             time.Time
+		rows                     *sql.Rows
+		header                   proto.NamespaceHeader
+		err                      error
+		ok                       bool
 	)
 
+	list := make(map[string]proto.NamespaceHeader)
 	if rows, err = h.stmtList.Query(); err != nil {
 		mr.ServerError(err)
 		return
@@ -79,7 +82,9 @@ func (h *NamespaceReadHandler) list(q *msg.Request, mr *msg.Result) {
 
 	for rows.Next() {
 		if err = rows.Scan(
-			&dictionaryName,
+			&nsID,
+			&key,
+			&value,
 			&creationTime,
 			&author,
 		); err != nil {
@@ -87,15 +92,25 @@ func (h *NamespaceReadHandler) list(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err)
 			return
 		}
-		mr.NamespaceHeader = append(mr.NamespaceHeader, proto.NamespaceHeader{
-			Name:      dictionaryName,
-			CreatedAt: creationTime.Format(msg.RFC3339Milli),
-			CreatedBy: author,
-		})
+		if header, ok = list[nsID]; !ok {
+			header = proto.NamespaceHeader{}
+		}
+		switch key {
+		case `dict_type`:
+			header.Type = value
+		case `dict_name`:
+			header.Name = value
+			header.CreatedBy = author
+			header.CreatedAt = creationTime.Format(msg.RFC3339Milli)
+		}
+		list[nsID] = header
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err)
 		return
+	}
+	for _, header := range list {
+		mr.NamespaceHeader = append(mr.NamespaceHeader, header)
 	}
 	mr.OK()
 }
