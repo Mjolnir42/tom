@@ -1,0 +1,18 @@
+Abstract Service           -> SCHEMA abstract
+Instance                   -> SCHEMA instance
+
+
+[[ ix.deployment_group
+[[ ix.endpoint
+[[ ix.functional_component
+[[ ix.product
+[[ ix.technical_service
+[[ ix.top_level_service
+
+[[ bulk.technical_instance
+
+yp.corporate_domain
+yp.domain
+yp.information_system
+yp.service
+yp.yp

@@ -1,0 +1,39 @@
+-------------------------------------------------------------
+asset
+    .server                     <<>>
+    .runtime_environment        <<>>
+    .orchestration_environment  <<>>
+    .container                  <<>>
+    .socket                     <<>>
+-------------------------------------------------------------
+abstract
+    .blueprint                  NEW
+    .module
+    .software_asset             NEW
+    .data                       NEW
+-------------------------------------------------------------
+production
+    .technical_product          NEW
+    .deployment_group
+    .instance
+    .shard                      NEW
+    .endpoint
+-------------------------------------------------------------
+ix
+    .consumer_product
+    .top_level_service          <<>>
+-------------------------------------------------------------
+yp
+    .corporate_domain           <<>>
+    .domain                     <<>>
+    .information_system         <<>>
+    .service                    <<>>
+    .artifact                   NEW
+-------------------------------------------------------------
+    ix.   deployment_group     ==> production. deployment_group   REN
+    ix.   endpoint             ==> production. endpoint           REN
+    ix.   technical_service    ==> production. instance           REN++
+    ix.   functional_component ==> abstract.   module             REN++
+    ix.   product              ==> ix.         consumer_product   REN
+    bulk. technical_instance   ==> bulk.       execution          REN
+-------------------------------------------------------------
