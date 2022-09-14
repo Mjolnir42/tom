@@ -12,7 +12,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/url"
-	"path"
+	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/nahanni/go-ucl"
@@ -64,12 +64,12 @@ func configSetup(c *cli.Context) (*Config, error) {
 
 	var confPath string
 	switch {
-	case c.IsSet(`config`) && path.IsAbs(c.String(`config`)):
-		confPath = path.Clean(c.String(`config`))
+	case c.IsSet(`config`) && filepath.IsAbs(c.String(`config`)):
+		confPath = filepath.Clean(c.String(`config`))
 	case c.IsSet(`config`):
-		confPath = path.Clean(path.Join(home, ".tom", c.String(`config`)))
+		confPath = filepath.Clean(filepath.Join(home, ".tom", c.String(`config`)))
 	default:
-		confPath = path.Clean(path.Join(home, ".tom", "tom.conf"))
+		confPath = filepath.Clean(filepath.Join(home, ".tom", "tom.conf"))
 	}
 
 	cfg := &Config{Run: RunTimeConfig{}}
@@ -80,6 +80,8 @@ func configSetup(c *cli.Context) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	cfg.Run.PathLogs = filepath.Clean(cfg.LogDir)
 
 	return cfg, nil
 }
