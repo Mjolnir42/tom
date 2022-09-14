@@ -8,7 +8,9 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/mjolnir42/tom/internal/cli/adm"
@@ -18,6 +20,7 @@ import (
 var client *resty.Client
 
 func initCommon(c *cli.Context) error {
+	var session tls.ClientSessionCache
 
 	cfg, err := configSetup(c)
 	if err != nil {
@@ -28,6 +31,16 @@ func initCommon(c *cli.Context) error {
 		SetDisableWarn(true).
 		SetHeader(`User-Agent`, fmt.Sprintf("%s %s", c.App.Name, c.App.Version)).
 		SetHostURL(cfg.Run.API.String())
+
+	if cfg.Run.API.Scheme == `https` {
+		session = tls.NewLRUClientSessionCache(64)
+
+		client = client.SetTLSClientConfig(&tls.Config{
+			ServerName:         strings.SplitN(cfg.Run.API.Host, `:`, 2)[0],
+			ClientSessionCache: session,
+			MinVersion:         tls.VersionTLS12,
+		}).SetRootCertificate(cfg.Run.PathCA)
+	}
 
 	// configure adm client library
 	adm.ConfigureClient(client)

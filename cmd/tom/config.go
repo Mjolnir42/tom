@@ -23,12 +23,14 @@ type Config struct {
 	API      string        `json:"api"`
 	LogDir   string        `json:"logdir"`
 	ProcJSON string        `json:"json.output.processor"`
+	CAFile   string        `json:"ca.file"`
 	Run      RunTimeConfig `json:"-"`
 }
 
 type RunTimeConfig struct {
 	API      *url.URL `json:"-"`
 	PathLogs string   `json:"-"`
+	PathCA   string   `json:"-"`
 }
 
 func (c *Config) populateFromFile(fname string) error {
@@ -82,6 +84,9 @@ func configSetup(c *cli.Context) (*Config, error) {
 	}
 
 	cfg.Run.PathLogs = filepath.Clean(cfg.LogDir)
+	if cfg.CAFile != `` {
+		cfg.Run.PathCA = filepath.Clean(cfg.CAFile)
+	}
 
 	return cfg, nil
 }
