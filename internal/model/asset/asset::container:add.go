@@ -70,7 +70,7 @@ func (m *Model) ContainerAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	for prop, obj := range request.Container.Property {
-		if err := proto.OnlyUnreserved(prop); err != nil {
+		if err := proto.ValidAttribute(prop); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}
