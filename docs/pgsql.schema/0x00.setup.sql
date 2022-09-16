@@ -32,8 +32,10 @@ CREATE SCHEMA IF NOT EXISTS ix;
 CREATE SCHEMA IF NOT EXISTS meta;
 CREATE SCHEMA IF NOT EXISTS view;
 CREATE SCHEMA IF NOT EXISTS yp;
+CREATE SCHEMA IF NOT EXISTS production;
+CREATE SCHEMA IF NOT EXISTS abstract;
 
-SET search_path TO ix, meta, filter, yp, asset, 'view', bulk, inventory;
-ALTER DATABASE tom SET search_path TO ix, meta, filter, yp, asset, 'view', bulk, inventory;
+SET search_path TO ix, meta, filter, yp, asset, 'view', bulk, inventory, abstract, production;
+ALTER DATABASE tom SET search_path TO ix, meta, filter, yp, asset, 'view', bulk, inventory, abstract, production;
 -- configure client session
 SET TIME ZONE 'UTC';
