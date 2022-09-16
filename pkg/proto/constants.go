@@ -86,8 +86,10 @@ const (
 	CharDot         = `.`
 	CharTilde       = `~`
 	CharAsterisk    = `*`
+	CharColon       = `:`
 	CharUnreserved  = CharAlpha + CharDigit + CharTilde + CharDot + CharPunctuation
 	CharNamespace   = CharAlpha + CharDigit + CharTilde + CharPunctuation
+	CharAttribute   = CharUnreserved + CharColon
 )
 
 const (

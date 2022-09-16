@@ -72,7 +72,7 @@ func (m *Model) ServerAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	for prop, obj := range request.Server.Property {
-		if err := proto.OnlyUnreserved(prop); err != nil {
+		if err := proto.ValidAttribute(prop); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}

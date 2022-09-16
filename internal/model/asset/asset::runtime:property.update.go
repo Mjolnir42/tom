@@ -77,7 +77,7 @@ func (m *Model) RuntimePropUpdate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	for prop, obj := range request.Runtime.Property {
-		if err := proto.OnlyUnreserved(prop); err != nil {
+		if err := proto.ValidAttribute(prop); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}

@@ -63,6 +63,20 @@ func ValidNamespace(s string) error {
 	return nil
 }
 
+// ValidAttribute checks that s only contains characters from proto.CharAttribute
+func ValidAttribute(s string) error {
+	for _, b := range []byte(s) {
+		if !strings.Contains(CharAttribute, string(b)) {
+			return fmt.Errorf(
+				"String <%s> contains illegal character <%s>",
+				s,
+				string(b),
+			)
+		}
+	}
+	return nil
+}
+
 // CheckPropertyConstraints checks that if the property attribute end
 // with one of the suffixes _list, _json or _xml, then the value must
 // decode appropriately.
