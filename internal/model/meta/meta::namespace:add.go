@@ -75,7 +75,7 @@ func (m *Model) NamespaceAdd(w http.ResponseWriter, r *http.Request,
 	missingStandardTypeAttribute := true
 	conflictingStandardTypeAttribute := false
 	for _, attribute := range request.Namespace.Attributes {
-		if err := proto.OnlyUnreserved(attribute.Key); err != nil {
+		if err := proto.ValidAttribute(attribute.Key); err != nil {
 			m.x.ReplyBadRequest(&w, &request, err)
 			return
 		}
