@@ -1,4 +1,8 @@
 =======================================================
+XXX         supervisor::authenticate
+XXX         supervisor::enrollment:machine.add
+XXX         supervisor::bootstrap
+=======================================================
     └── tomd/iam
         ├── iam::library:add
         ├── iam::library:list
@@ -9,6 +13,8 @@
         ├── iam::library:list
         ├── iam::library:remove
         ├── iam::library:show
+=======================================================
+XXX         iam::library:update??
 =======================================================
     └── tomd/iam
         ├── iam::user:add
@@ -22,6 +28,8 @@
         ├── iam::user:remove
         ├── iam::user:show
         ├── iam::user:update
+=======================================================
+XXX         iam::machine:xxxx
 =======================================================
     └── tomd/iam
         ├── iam::team:add
