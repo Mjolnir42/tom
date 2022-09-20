@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS asset.socket_mapping (
     createdBy                     uuid            NOT NULL,
     createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
     CONSTRAINT __fk_asm_sockID    FOREIGN KEY     ( socketID, socketDictionaryID ) REFERENCES asset.socket ( socketID, dictionaryID ) ON DELETE RESTRICT,
-    CONSTRAINT __fk_asm_endpID    FOREIGN KEY     ( endpointID, endpointDictionaryID ) REFERENCES ix.endpoint ( endpointID, dictionaryID ) ON DELETE RESTRICT,
+    CONSTRAINT __fk_asm_endpID    FOREIGN KEY     ( endpointID, endpointDictionaryID ) REFERENCES production.endpoint ( endpointID, dictionaryID ) ON DELETE RESTRICT,
     CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
     CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
     CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
