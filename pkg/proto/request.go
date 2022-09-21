@@ -19,6 +19,7 @@ type Request struct {
 	Socket        *Socket        `json:"socket,omitempty"`
 	Team          *Team          `json:"team,omitempty"`
 	User          *User          `json:"user,omitempty"`
+	Auth          Authorization  `json:"authorization"`
 }
 
 func (r *Request) Serialize() []byte {
