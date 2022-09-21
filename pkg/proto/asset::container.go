@@ -7,6 +7,10 @@
 
 package proto //
 
+import (
+	"sort"
+)
+
 const (
 	CmdContainer           = ModelAsset + `::` + EntityContainer + `:`
 	CmdContainerAdd        = ModelAsset + `::` + EntityContainer + `:` + ActionAdd
@@ -189,6 +193,30 @@ func (c *Container) ExportName() string {
 
 func (c *Container) ExportNamespace() string {
 	return c.Namespace
+}
+
+func (c *Container) Serialize() []byte {
+	data := make([]byte, 0)
+	data = append(data, []byte(c.Namespace)...)
+	data = append(data, []byte(c.Name)...)
+	data = append(data, []byte(c.Type)...)
+	data = append(data, []byte(c.Parent)...)
+	for _, lnk := range c.Link {
+		data = append(data, []byte(lnk)...)
+	}
+	keys := make([]string, 0, len(c.Property))
+	for k := range c.Property {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		data = append(data, []byte(c.Property[k].Attribute)...)
+		data = append(data, []byte(c.Property[k].Value)...)
+		data = append(data, []byte(c.Property[k].Namespace)...)
+		data = append(data, []byte(c.Property[k].ValidSince)...)
+		data = append(data, []byte(c.Property[k].ValidUntil)...)
+	}
+	return data
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

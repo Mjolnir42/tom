@@ -21,4 +21,14 @@ type Request struct {
 	User          *User          `json:"user,omitempty"`
 }
 
+func (r *Request) Serialize() []byte {
+	data := make([]byte, 0)
+
+	if r.Container != nil {
+		data = append(data, r.Container.Serialize()...)
+	}
+
+	return data
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
