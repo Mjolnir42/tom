@@ -149,23 +149,23 @@
 [ ] Parent
 [ ] Mapping
 ### Service                   [SER-    ]
-[ ] Base
-[ ] SA
-[ ] QA
+[x] Base
+[x] SA
+[x] QA
 [ ] Linking
 [ ] Parent
 [ ] Mapping
 ### Software Asset            [YP-     ]
-[ ] Base
-[ ] SA
-[ ] QA
+[x] Base
+[x] SA
+[x] QA
 [ ] Linking
 [ ] Parent
 [ ] Mapping
 ### Technology Reference Card [TRC-    ]
-[ ] Base
-[ ] SA
-[ ] QA
+[x] Base
+[x] SA
+[x] QA
 [ ] Linking
 [ ] Parent
 [ ] Mapping

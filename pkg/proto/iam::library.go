@@ -19,6 +19,9 @@ const (
 type Library struct {
 	ID        string `json:"-"`
 	Name      string `json:"name"`
+	IsSelfEnr bool   `json:"is-selfenrollment-enabled"`
+	IsMachine bool   `json:"is-machine-library"`
+	EnrollKey string `json:"-"`
 	CreatedAt string `json:"createdAt,omitempty"`
 	CreatedBy string `json:"createdBy,omitempty"`
 }

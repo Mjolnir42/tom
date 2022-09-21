@@ -5,18 +5,26 @@ BEGIN;
   ALTER DATABASE tom SET search_path TO ix, meta, filter, yp, asset, 'view', bulk, inventory, abstract, production;
 
   DROP  FUNCTION view.deployment_group_details_at;
+  DROP  FUNCTION view.filter_value_assignment_at;
   DROP  FUNCTION view.functional_component_details_at;
   DROP  FUNCTION view.information_system_details_at;
   DROP  VIEW     view.deployment_group_details;
+  DROP  VIEW     view.filter_value_assignment;
   DROP  VIEW     view.functional_component_details;
   DROP  VIEW     view.information_system_details;
+  DROP  TABLE    filter.assignable_entity;
+  DROP  TABLE    filter.value_assignment__many;
+  DROP  TABLE    filter.value_assignment__one;
   DROP  TABLE    ix.deployment_group_mapping;
   DROP  TABLE    ix.endpoint_mapping;
   DROP  TABLE    ix.functional_component_parent;
   DROP  TABLE    ix.product_mapping;
   DROP  TABLE    ix.top_level_service_mapping;
+  DROP  TABLE    yp.information_system_linking;
   DROP  TABLE    yp.information_system_parent;
   DROP  TABLE    yp.service_mapping;
+  DROP  TABLE    yp.service_parent;
+  DROP  TYPE     flt_ntt;
 
   -- SCHEMA: abstract
   -- abstract BLUEPRINT
@@ -535,9 +543,9 @@ BEGIN;
 
 
   -- SCHEMA iX
-  ALTER TABLE ix.product                                              RENAME TO consumer_product;
-  ALTER TABLE ix.product_standard_attribute_values                    RENAME TO consumer_product_standard_attribute_values;
-  ALTER TABLE ix.product_unique_attribute_values                      RENAME TO consumer_product_unique_attribute_values;
+  ALTER TABLE ix.product                                                 RENAME TO consumer_product;
+  ALTER TABLE ix.product_standard_attribute_values                       RENAME TO consumer_product_standard_attribute_values;
+  ALTER TABLE ix.product_unique_attribute_values                         RENAME TO consumer_product_unique_attribute_values;
   -- SCHEMA bulk
   ALTER TABLE    bulk.technical_instance                                 RENAME TO execution;
   ALTER TABLE    bulk.execution                                          RENAME COLUMN techsrvID TO instanceID;
@@ -560,12 +568,187 @@ BEGIN;
                                                              public.uuid_to_bytea(orchID) WITH =,
                                                              activity WITH &&);
 
-
   -- SCHEMA yp
-  -- XXX service_parent -> the table needs to be information_system_parent
-  --                       since the service is the child
+  -- corporate domain
+  -- domain
+  -- information system
+  CREATE TABLE IF NOT EXISTS yp.information_system_parent (
+      isID                          uuid            NOT NULL,
+      serID                         uuid            NOT NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_tomd_isID     FOREIGN KEY     ( isID ) REFERENCES yp.information_system ( isID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_tomd_serID    FOREIGN KEY     ( serID ) REFERENCES yp.ypservice ( serID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __tois_temporal    EXCLUDE         USING gist (public.uuid_to_bytea(serID) WITH =,
+                                                                validity WITH &&)
+  );
+  -- yp YPSERVICE
+  ALTER TABLE    yp.service                                              RENAME TO ypservice;
+  ALTER TABLE    yp.service_standard_attribute_values                    RENAME TO ypservice_standard_attribute_values;
+  ALTER TABLE    yp.service_unique_attribute_values                      RENAME TO ypservice_unique_attribute_values;
+  ALTER TABLE    yp.ypservice                                            RENAME COLUMN serviceID TO serID;
+  ALTER TABLE    yp.ypservice_standard_attribute_values                  RENAME COLUMN serviceID TO serID;
+  ALTER TABLE    yp.ypservice_unique_attribute_values                    RENAME COLUMN serviceID TO serID;
+  -- software asset
+  CREATE TABLE IF NOT EXISTS yp.software_asset (
+      ypID                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
+      dictionaryID                  uuid            NOT NULL,
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __pk_ypsa          PRIMARY KEY     ( ypID ),
+      CONSTRAINT __fk_ypsa_dictID   FOREIGN KEY     ( dictionaryID ) REFERENCES meta.dictionary ( dictionaryID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __ypsa_fk_origin   UNIQUE          ( ypID, dictionaryID )
+  );
+  CREATE TABLE IF NOT EXISTS yp.software_asset_standard_attribute_values (
+      ypID                          uuid            NOT NULL,
+      attributeID                   uuid            NOT NULL,
+      dictionaryID                  uuid            NOT NULL,
+      value                         text            NOT NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_ypsaa_serID   FOREIGN KEY     ( ypID ) REFERENCES yp.software_asset ( ypID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_ypsaa_attrID  FOREIGN KEY     ( attributeID ) REFERENCES meta.standard_attribute ( attributeID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_ypsaa_dictID  FOREIGN KEY     ( dictionaryID ) REFERENCES meta.dictionary ( dictionaryID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_ypsaa_uq_dict FOREIGN KEY     ( ypID, dictionaryID ) REFERENCES yp.software_asset ( ypID, dictionaryID ),
+      CONSTRAINT __fk_ypsaa_uq_att  FOREIGN KEY     ( dictionaryID, attributeID ) REFERENCES meta.standard_attribute ( dictionaryID, attributeID ),
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __ypsaa_temporal   EXCLUDE         USING gist (public.uuid_to_bytea(ypID) WITH =,
+                                                                public.uuid_to_bytea(attributeID) WITH =,
+                                                                validity WITH &&)
+  );
+  CREATE TABLE IF NOT EXISTS yp.software_asset_unique_attribute_values (
+      ypID                          uuid            NOT NULL,
+      attributeID                   uuid            NOT NULL,
+      dictionaryID                  uuid            NOT NULL,
+      value                         text            NOT NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_ypsaq_serID   FOREIGN KEY     ( ypID ) REFERENCES yp.software_asset ( ypID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_ypsaq_attrID  FOREIGN KEY     ( attributeID ) REFERENCES meta.unique_attribute ( attributeID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_ypsaq_dictID  FOREIGN KEY     ( dictionaryID ) REFERENCES meta.dictionary ( dictionaryID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_ypsaq_uq_dict FOREIGN KEY     ( ypID, dictionaryID ) REFERENCES yp.software_asset ( ypID, dictionaryID ),
+      CONSTRAINT __fk_ypsaq_uq_att  FOREIGN KEY     ( dictionaryID, attributeID ) REFERENCES meta.unique_attribute ( dictionaryID, attributeID ),
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __ypsaq_temporal   EXCLUDE         USING gist (public.uuid_to_bytea(ypID) WITH =,
+                                                                public.uuid_to_bytea(attributeID) WITH =,
+                                                                validity WITH &&),
+      CONSTRAINT __ypsaq_temp_uniq  EXCLUDE         USING gist (public.uuid_to_bytea(attributeID) WITH =,
+                                                                public.uuid_to_bytea(dictionaryID) WITH =,
+                                                                value WITH =,
+                                                                validity WITH &&)
+  );
+  -- technology reference card
+  CREATE TABLE IF NOT EXISTS yp.technology_reference_card (
+      trcID                         uuid            NOT NULL DEFAULT public.gen_random_uuid(),
+      dictionaryID                  uuid            NOT NULL,
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __pk_yptr          PRIMARY KEY     ( trcID ),
+      CONSTRAINT __fk_yptr_dictID   FOREIGN KEY     ( dictionaryID ) REFERENCES meta.dictionary ( dictionaryID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __yptr_fk_origin   UNIQUE          ( trcID, dictionaryID )
+  );
+  CREATE TABLE IF NOT EXISTS yp.technology_reference_card_standard_attribute_values (
+      trcID                         uuid            NOT NULL,
+      attributeID                   uuid            NOT NULL,
+      dictionaryID                  uuid            NOT NULL,
+      value                         text            NOT NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_yptra_serID   FOREIGN KEY     ( trcID ) REFERENCES yp.technology_reference_card ( trcID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_yptra_attrID  FOREIGN KEY     ( attributeID ) REFERENCES meta.standard_attribute ( attributeID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_yptra_dictID  FOREIGN KEY     ( dictionaryID ) REFERENCES meta.dictionary ( dictionaryID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_yptra_uq_dict FOREIGN KEY     ( trcID, dictionaryID ) REFERENCES yp.technology_reference_card ( trcID, dictionaryID ),
+      CONSTRAINT __fk_yptra_uq_att  FOREIGN KEY     ( dictionaryID, attributeID ) REFERENCES meta.standard_attribute ( dictionaryID, attributeID ),
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __yptra_temporal   EXCLUDE         USING gist (public.uuid_to_bytea(trcID) WITH =,
+                                                                public.uuid_to_bytea(attributeID) WITH =,
+                                                                validity WITH &&)
+  );
+  CREATE TABLE IF NOT EXISTS yp.technology_reference_card_unique_attribute_values (
+      trcID                         uuid            NOT NULL,
+      attributeID                   uuid            NOT NULL,
+      dictionaryID                  uuid            NOT NULL,
+      value                         text            NOT NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_yptrq_serID   FOREIGN KEY     ( trcID ) REFERENCES yp.technology_reference_card ( trcID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_yptrq_attrID  FOREIGN KEY     ( attributeID ) REFERENCES meta.unique_attribute ( attributeID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_yptrq_dictID  FOREIGN KEY     ( dictionaryID ) REFERENCES meta.dictionary ( dictionaryID ) ON DELETE RESTRICT,
+      CONSTRAINT __fk_yptrq_uq_dict FOREIGN KEY     ( trcID, dictionaryID ) REFERENCES yp.technology_reference_card ( trcID, dictionaryID ),
+      CONSTRAINT __fk_yptrq_uq_att  FOREIGN KEY     ( dictionaryID, attributeID ) REFERENCES meta.unique_attribute ( dictionaryID, attributeID ),
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __yptrq_temporal   EXCLUDE         USING gist (public.uuid_to_bytea(trcID) WITH =,
+                                                                public.uuid_to_bytea(attributeID) WITH =,
+                                                                validity WITH &&),
+      CONSTRAINT __yptrq_temp_uniq  EXCLUDE         USING gist (public.uuid_to_bytea(attributeID) WITH =,
+                                                                public.uuid_to_bytea(dictionaryID) WITH =,
+                                                                value WITH =,
+                                                                validity WITH &&)
+  );
 
+  -- filter FLT_NTT
+  CREATE TYPE flt_ntt AS ENUM(
+      'blueprint',
+      'module',
+      'artifact',
+      'data',
+      'service',
+      'technical_product',
+      'deployment',
+      'instance',
+      'shard',
+      'endpoint',
+      'netrange',
+      'consumer_product',
+      'top_level_service',
+      'server',
+      'runtime_environment',
+      'orchestration_environment',
+      'container'
+  );
+  -- filter ASSIGNABLE ENTITY
+  CREATE TABLE IF NOT EXISTS filter.assignable_entity (
+      filterID                      uuid            NOT NULL,
+      entity                        flt_ntt         NOT NULL,
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_ffae_filterID FOREIGN KEY     ( filterID ) REFERENCES filter.filter ( filterID ) DEFERRABLE,
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __ffae_fk_origin   UNIQUE          ( filterID, entity )
+  );
 
+  -- SCHEMA inventory
+  ALTER TABLE inventory.identity_library ADD COLUMN isSelfEnrollmentEnabled boolean NOT NULL DEFAULT 'no';
+  ALTER TABLE inventory.identity_library ADD COLUMN isMachineLibrary        boolean NOT NULL DEFAULT 'no';
+  ALTER TABLE inventory.identity_library ADD COLUMN enrollmentKey           varchar(384) NULL;
+  ALTER TABLE inventory.user             ADD COLUMN publicKey               varchar(384) NULL;
+  --
 
 
 

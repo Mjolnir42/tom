@@ -4,6 +4,9 @@
 CREATE TABLE IF NOT EXISTS inventory.identity_library (
     identityLibraryID             uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     name                          varchar(128)    NOT NULL,
+    isSelfEnrollmentEnabled       boolean         NOT NULL DEFAULT 'no',
+    isMachineLibrary              boolean         NOT NULL DEFAULT 'no',
+    enrollmentKey                 varchar(384)    NULL,
     createdBy                     uuid            NOT NULL,
     createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
     CONSTRAINT __pk_iil           PRIMARY KEY     ( identityLibraryID ),
@@ -19,6 +22,7 @@ CREATE TABLE IF NOT EXISTS inventory.user (
     employeeNumber                numeric(16,0)   NULL,
     mailAddress                   text            NULL,
     externalID                    text            NULL,
+    publicKey                     varchar(384)    NULL,
     isActive                      boolean         NOT NULL DEFAULT 'no',
     isDeleted                     boolean         NOT NULL DEFAULT 'no',
     createdBy                     uuid            NOT NULL,

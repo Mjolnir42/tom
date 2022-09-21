@@ -12,14 +12,21 @@ CREATE TYPE flt_aggr AS ENUM(
     'last'
 );
 CREATE TYPE flt_ntt AS ENUM(
+    'blueprint',
+    'module',
+    'artifact',
+    'data',
+    'service',
+    'technical_product',
+    'deployment',
+    'instance',
+    'shard',
+    'endpoint',
+    'netrange',
+    'consumer_product',
     'top_level_service',
-    'product',
-    'information_system',
-    'functional_component',
-    'deployment_group',
+    'server',
     'runtime_environment',
     'orchestration_environment',
-    'server',
-    'endpoint',
     'container'
 );

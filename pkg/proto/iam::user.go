@@ -25,6 +25,7 @@ type User struct {
 	EmployeeNumber string `json:"employee-number,omitempty"`
 	MailAddress    string `json:"mailaddress,omitempty"`
 	ExternalID     string `json:"external-ref,omitempty"`
+	PublicKey      string `json:"public-key,omitempty"`
 	IsActive       bool   `json:"is-active"`
 	IsDeleted      bool   `json:"is-deleted"`
 	CreatedAt      string `json:"createdAt,omitempty"`
