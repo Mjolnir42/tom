@@ -32,7 +32,8 @@ EnrollmentKey?
   CSR:
     - uid         => key fingerprint
     - identityLib => engineroom
-    - externalID  => publicKey
+    - externalID  => fqdn
+    - publicKey   => publicKey
     - time        => timestamp.created()
 
   -> fingerprint.engineroom.machine.tom
