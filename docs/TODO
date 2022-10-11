@@ -196,3 +196,12 @@ XXX         iam::machine:xxxx
         ├── asset::orchestration:stack           [DONE]
         ├── asset::orchestration:unstack         [DONE]
 =======================================================
+## modelupdate...origin/modelupdate
+?? docs/pgsql.schema/0x64.yp.software_asset.sql
+?? docs/pgsql.schema/0x65.yp.technology_reference_card.sql
+?? docs/pgsql.schema/0x80.abstract.relationship:parent.sql
+?? docs/pgsql.schema/0x81.abstract.relationship:mapping.sql
+?? docs/pgsql.schema/0x82.production.relationship:parent.sql
+?? docs/pgsql.schema/0x83.production.relationship:mapping.sql
+?? docs/pgsql.schema/0x86.ix.relationship:parent.sql
+?? docs/pgsql.schema/0x87.ix.relationship:mapping.sql
