@@ -181,4 +181,19 @@ func (n *Namespace) ExportNamespace() string {
 	return n.Name
 }
 
+// Serialize ...
+func (n *Namespace) Serialize() []byte {
+	data := make([]byte, 0)
+	data = append(data, []byte(n.Name)...)
+	data = append(data, []byte(n.Type)...)
+	data = append(data, []byte(n.LookupKey)...)
+	data = append(data, []byte(n.LookupURI)...)
+	for _, cstr := range n.Constraint {
+		data = append(data, []byte(cstr)...)
+	}
+	data = append(data, SerializeAttributeSlice(n.Attributes)...)
+	data = append(data, SerializeMapPropertyDetail(n.Property)...)
+	return data
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

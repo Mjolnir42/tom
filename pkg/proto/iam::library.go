@@ -26,4 +26,23 @@ type Library struct {
 	CreatedBy string `json:"createdBy,omitempty"`
 }
 
+// Serialize ...
+func (l *Library) Serialize() []byte {
+	data := make([]byte, 0)
+	data = append(data, []byte(l.Name)...)
+	switch l.IsSelfEnr {
+	case true:
+		data = append(data, []byte(`true`)...)
+	default:
+		data = append(data, []byte(`false`)...)
+	}
+	switch l.IsMachine {
+	case true:
+		data = append(data, []byte(`true`)...)
+	default:
+		data = append(data, []byte(`false`)...)
+	}
+	return data
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
