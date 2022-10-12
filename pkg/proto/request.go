@@ -22,11 +22,21 @@ type Request struct {
 	Auth          Authorization  `json:"authorization"`
 }
 
+// Serialize ...
 func (r *Request) Serialize() []byte {
 	data := make([]byte, 0)
 
 	if r.Container != nil {
 		data = append(data, r.Container.Serialize()...)
+	}
+	if r.Library != nil {
+		data = append(data, r.Library.Serialize()...)
+	}
+	if r.Namespace != nil {
+		data = append(data, r.Namespace.Serialize()...)
+	}
+	if r.Orchestration != nil {
+		data = append(data, r.Orchestration.Serialize()...)
 	}
 
 	return data
