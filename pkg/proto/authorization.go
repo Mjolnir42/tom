@@ -15,4 +15,12 @@ type Authorization struct {
 	Signature string `json:"signature"`
 }
 
+// Serialize ...
+func (a *Authorization) Serialize() []byte {
+	data := make([]byte, 0)
+	data = append(data, []byte(a.Timestamp)...)
+	data = append(data, []byte(a.UserID)...)
+	return data
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

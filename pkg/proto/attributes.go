@@ -72,4 +72,13 @@ func SerializeStringSlice(s []string) []byte {
 	return data
 }
 
+// SerializeUserSlice ...
+func SerializeUserSlice(m *[]User) []byte {
+	data := make([]byte, 0)
+	for _, mbr := range *m {
+		data = append(data, mbr.Serialize()...)
+	}
+	return data
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
