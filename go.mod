@@ -18,4 +18,5 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
+	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
 )

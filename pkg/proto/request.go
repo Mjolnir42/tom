@@ -7,6 +7,13 @@
 
 package proto //
 
+import (
+	"encoding/base64"
+	"hash"
+
+	"golang.org/x/crypto/blake2b"
+)
+
 // Request is the request wrapper of Tom's public API
 type Request struct {
 	Verbose       bool           `json:"verbose,omitempty,string"`
@@ -54,6 +61,24 @@ func (r *Request) Serialize() []byte {
 	}
 	data = append(data, r.Auth.Serialize()...)
 	return data
+}
+
+// CalculateDataHash ...
+func (r *Request) CalculateDataHash() error {
+	var (
+		err   error
+		dgst  []byte
+		hfunc hash.Hash
+	)
+
+	if hfunc, err = blake2b.New512(nil); err != nil {
+		return err
+	}
+	hfunc.Write(r.Serialize())
+	dgst = hfunc.Sum(nil)
+
+	r.Auth.DataHash = base64.StdEncoding.EncodeToString(dgst)
+	return nil
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
