@@ -25,7 +25,6 @@ type Request struct {
 // Serialize ...
 func (r *Request) Serialize() []byte {
 	data := make([]byte, 0)
-
 	if r.Container != nil {
 		data = append(data, r.Container.Serialize()...)
 	}
@@ -38,7 +37,22 @@ func (r *Request) Serialize() []byte {
 	if r.Orchestration != nil {
 		data = append(data, r.Orchestration.Serialize()...)
 	}
-
+	if r.Runtime != nil {
+		data = append(data, r.Runtime.Serialize()...)
+	}
+	if r.Server != nil {
+		data = append(data, r.Server.Serialize()...)
+	}
+	if r.Socket != nil {
+		data = append(data, r.Socket.Serialize()...)
+	}
+	if r.Team != nil {
+		data = append(data, r.Team.Serialize()...)
+	}
+	if r.User != nil {
+		data = append(data, r.User.Serialize()...)
+	}
+	data = append(data, r.Auth.Serialize()...)
 	return data
 }
 

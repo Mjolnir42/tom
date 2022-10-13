@@ -34,4 +34,14 @@ type User struct {
 	LibraryID      string `json:"-"`
 }
 
+// Serialize ...
+func (u *User) Serialize() []byte {
+	data := make([]byte, 0)
+	data = append(data, []byte(u.LibraryName)...)
+	data = append(data, []byte(u.FirstName)...)
+	data = append(data, []byte(u.LastName)...)
+	data = append(data, []byte(u.UserName)...)
+	return data
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
