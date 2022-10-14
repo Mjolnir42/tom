@@ -64,47 +64,48 @@
 [x] QA
 [ ] Linking
 [-] Parent
-[ ] Mapping       n:m Deployment
+[x] Mapping       n:m Deployment
 ### Deployment
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
 [-] Parent
-[ ] Mapping       n:m Instance
+[x] Mapping       n:m Instance
 ### Instance
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
 [-] Parent
-[ ] Mapping
+[-] Mapping
 ### Shard
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
-[ ] Parent
-[ ] Processing    1:n Technical Product
+[x] Parent        1:n Technical Product
                   1:n Deployment
                   1:n Instance
+[-] Mapping
 ### Endpoint
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
-[ ] Parent
-[ ] Mapping       1:n Technical Product
+[x] Parent        1:n Technical Product
                   1:n Deployment
                   1:n Instance
+[-] Mapping
 ### Netrange
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
-[ ] Mapping       n:m Technical Product
+[-] Parent
+[x] Mapping       n:m Technical Product
                   n:m Deployment
-
+                  n:m Instance
 
 ## Reporting Domain
 
