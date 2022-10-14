@@ -20,9 +20,13 @@ CREATE TABLE IF NOT EXISTS bulk.execution (
     CONSTRAINT __bkexec_nonnull   CHECK           (   (( rteID IS NOT NULL ) AND ( containerID IS     NULL ) AND ( orchID IS     NULL))
                                                    OR (( rteID IS     NULL ) AND ( containerID IS NOT NULL ) AND ( orchID IS     NULL))
                                                    OR (( rteID IS     NULL ) AND ( containerID IS     NULL ) AND ( orchID IS NOT NULL))),
-    CONSTRAINT __bkexec_temporal  EXCLUDE         USING gist (public.uuid_to_bytea(instanceID) WITH =,
+    CONSTRAINT __bkexec_temp_rte  EXCLUDE         USING gist (public.uuid_to_bytea(instanceID) WITH =,
                                                               public.uuid_to_bytea(rteID) WITH =,
+                                                              activity WITH &&) WHERE (rteID IS NOT NULL),
+    CONSTRAINT __bkexec_temp_ctr  EXCLUDE         USING gist (public.uuid_to_bytea(instanceID) WITH =,
                                                               public.uuid_to_bytea(containerID) WITH =,
+                                                              activity WITH &&) WHERE (containerID IS NOT NULL),
+    CONSTRAINT __bkexec_temp_orch EXCLUDE         USING gist (public.uuid_to_bytea(instanceID) WITH =,
                                                               public.uuid_to_bytea(orchID) WITH =,
-                                                              activity WITH &&)
+                                                              activity WITH &&) WHERE (orchID IS NOT NULL)
 );

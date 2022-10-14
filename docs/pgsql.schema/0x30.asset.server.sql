@@ -68,10 +68,10 @@ CREATE TABLE IF NOT EXISTS asset.server_unique_attribute_values (
     CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
     CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
     CONSTRAINT __asq_temporal     EXCLUDE         USING gist (public.uuid_to_bytea(serverID) WITH =,
-                                                          public.uuid_to_bytea(attributeID) WITH =,
-                                                          validity WITH &&),
+                                                              public.uuid_to_bytea(attributeID) WITH =,
+                                                              validity WITH &&),
     CONSTRAINT __asq_temp_uniq    EXCLUDE         USING gist (public.uuid_to_bytea(attributeID) WITH =,
-                                                          public.uuid_to_bytea(dictionaryID) WITH =,
-                                                          value WITH =,
-                                                          validity WITH &&)
+                                                              public.uuid_to_bytea(dictionaryID) WITH =,
+                                                              value WITH =,
+                                                              validity WITH &&)
 );

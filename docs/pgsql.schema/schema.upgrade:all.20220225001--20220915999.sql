@@ -540,7 +540,164 @@ BEGIN;
                                                                 value WITH =,
                                                                 validity WITH &&)
   );
-
+  -- production RELATIONSHIPS
+  CREATE TABLE IF NOT EXISTS production.technical_product_mapping (
+      tpID                          uuid            NOT NULL,
+      tpDictionaryID                uuid            NOT NULL,
+      deployID                      uuid            NOT NULL,
+      deployDictionaryID            uuid            NOT NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_ptpm_tpID     FOREIGN KEY     ( tpID, tpDictionaryID ) REFERENCES production.technical_product ( tpID, dictionaryID ),
+      CONSTRAINT __fk_ptpm_dplID    FOREIGN KEY     ( deployID, deployDictionaryID ) REFERENCES production.deployment ( deployID, dictionaryID ),
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __ptpm_temporal    EXCLUDE         USING gist (public.uuid_to_bytea(tpID) WITH =,
+                                                                public.uuid_to_bytea(deployID) WITH =,
+                                                                validity WITH &&)
+  );
+  CREATE TABLE IF NOT EXISTS production.deployment_mapping (
+      deployID                      uuid            NOT NULL,
+      deployDictionaryID            uuid            NOT NULL,
+      instanceID                    uuid            NOT NULL,
+      instanceDictionaryID          uuid            NOT NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_pdm_dplID     FOREIGN KEY     ( deployID, deployDictionaryID ) REFERENCES production.deployment ( deployID, dictionaryID ),
+      CONSTRAINT __fk_pdm_insID     FOREIGN KEY     ( instanceID, instanceDictionaryID ) REFERENCES production.instance ( instanceID, dictionaryID ),
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __pdm_temporal     EXCLUDE         USING gist (public.uuid_to_bytea(deployID) WITH =,
+                                                                public.uuid_to_bytea(instanceID) WITH =,
+                                                                validity WITH &&)
+  );
+  CREATE TABLE IF NOT EXISTS production.shard_parent (
+      shID                          uuid            NOT NULL,
+      shDictionaryID                uuid            NOT NULL,
+      tpID                          uuid            NULL,
+      tpDictionaryID                uuid            NULL,
+      deployID                      uuid            NULL,
+      deployDictionaryID            uuid            NULL,
+      instanceID                    uuid            NULL,
+      instanceDictionaryID          uuid            NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_psm_shID      FOREIGN KEY     ( shID, shDictionaryID ) REFERENCES production.shard ( shID, dictionaryID ),
+      CONSTRAINT __fk_psm_tpID      FOREIGN KEY     ( tpID, tpDictionaryID ) REFERENCES production.technical_product ( tpID, dictionaryID ),
+      CONSTRAINT __fk_psm_dplID     FOREIGN KEY     ( deployID, deployDictionaryID ) REFERENCES production.deployment ( deployID, dictionaryID ),
+      CONSTRAINT __fk_psm_insID     FOREIGN KEY     ( instanceID, instanceDictionaryID ) REFERENCES production.instance ( instanceID, dictionaryID ),
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __psm_nonnull      CHECK           (   ((tpID IS NOT NULL) AND (deployID IS     NULL) AND (instanceID IS     NULL))
+                                                     OR ((tpID IS     NULL) AND (deployID IS NOT NULL) AND (instanceID IS     NULL))
+                                                     OR ((tpID IS     NULL) AND (deployID IS     NULL) AND (instanceID IS NOT NULL))),
+      CONSTRAINT __psm_null_tp      CHECK           (   ((tpID IS NOT NULL) AND (tpDictionaryID IS NOT NULL))
+                                                     OR ((tpID IS     NULL) AND (tpDictionaryID IS     NULL))),
+      CONSTRAINT __psm_null_dpl     CHECK           (   ((deployID IS NOT NULL) AND (deployDictionaryID IS NOT NULL))
+                                                     OR ((deployID IS     NULL) AND (deployDictionaryID IS     NULL))),
+      CONSTRAINT __psm_null_ins     CHECK           (   ((instanceID IS NOT NULL) AND (instanceDictionaryID IS NOT NULL))
+                                                     OR ((instanceID IS     NULL) AND (instanceDictionaryID IS     NULL))),
+      CONSTRAINT __psm_temporal     EXCLUDE         USING gist (public.uuid_to_bytea(shID) WITH =,
+                                                                validity WITH &&),
+      CONSTRAINT __psm_temp_tp      EXCLUDE         USING gist (public.uuid_to_bytea(shID) WITH =,
+                                                                public.uuid_to_bytea(tpID) WITH =,
+                                                                validity WITH &&) WHERE (tpID IS NOT NULL),
+      CONSTRAINT __psm_temp_deploy  EXCLUDE         USING gist (public.uuid_to_bytea(shID) WITH =,
+                                                                public.uuid_to_bytea(deployID) WITH =,
+                                                                validity WITH &&) WHERE (deployID IS NOT NULL),
+      CONSTRAINT __psm_temp_ins     EXCLUDE         USING gist (public.uuid_to_bytea(shID) WITH =,
+                                                                public.uuid_to_bytea(instanceID) WITH =,
+                                                                validity WITH &&) WHERE (instanceID IS NOT NULL)
+  );
+  CREATE TABLE IF NOT EXISTS production.endpoint_parent (
+      endpointID                    uuid            NOT NULL,
+      epDictionaryID                uuid            NOT NULL,
+      tpID                          uuid            NULL,
+      tpDictionaryID                uuid            NULL,
+      deployID                      uuid            NULL,
+      deployDictionaryID            uuid            NULL,
+      instanceID                    uuid            NULL,
+      instanceDictionaryID          uuid            NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_pem_endpID    FOREIGN KEY     ( endpointID, epDictionaryID ) REFERENCES production.endpoint ( endpointID, dictionaryID ),
+      CONSTRAINT __fk_pem_tpID      FOREIGN KEY     ( tpID, tpDictionaryID ) REFERENCES production.technical_product ( tpID, dictionaryID ),
+      CONSTRAINT __fk_pem_dplID     FOREIGN KEY     ( deployID, deployDictionaryID ) REFERENCES production.deployment ( deployID, dictionaryID ),
+      CONSTRAINT __fk_pem_insID     FOREIGN KEY     ( instanceID, instanceDictionaryID ) REFERENCES production.instance ( instanceID, dictionaryID ),
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __pem_nonnull      CHECK           (   ((tpID IS NOT NULL) AND (deployID IS     NULL) AND (instanceID IS     NULL))
+                                                     OR ((tpID IS     NULL) AND (deployID IS NOT NULL) AND (instanceID IS     NULL))
+                                                     OR ((tpID IS     NULL) AND (deployID IS     NULL) AND (instanceID IS NOT NULL))),
+      CONSTRAINT __pem_null_tp      CHECK           (   ((tpID IS NOT NULL) AND (tpDictionaryID IS NOT NULL))
+                                                     OR ((tpID IS     NULL) AND (tpDictionaryID IS     NULL))),
+      CONSTRAINT __pem_null_dpl     CHECK           (   ((deployID IS NOT NULL) AND (deployDictionaryID IS NOT NULL))
+                                                     OR ((deployID IS     NULL) AND (deployDictionaryID IS     NULL))),
+      CONSTRAINT __pem_null_ins     CHECK           (   ((instanceID IS NOT NULL) AND (instanceDictionaryID IS NOT NULL))
+                                                     OR ((instanceID IS     NULL) AND (instanceDictionaryID IS     NULL))),
+      CONSTRAINT __pem_temporal     EXCLUDE         USING gist (public.uuid_to_bytea(endpointID) WITH =,
+                                                                validity WITH &&),
+      CONSTRAINT __pem_temp_tp      EXCLUDE         USING gist (public.uuid_to_bytea(endpointID) WITH =,
+                                                                public.uuid_to_bytea(tpID) WITH =,
+                                                                validity WITH &&) WHERE (tpID IS NOT NULL),
+      CONSTRAINT __pem_temp_deploy  EXCLUDE         USING gist (public.uuid_to_bytea(endpointID) WITH =,
+                                                                public.uuid_to_bytea(deployID) WITH =,
+                                                                validity WITH &&) WHERE (deployID IS NOT NULL),
+      CONSTRAINT __pem_temp_ins     EXCLUDE         USING gist (public.uuid_to_bytea(endpointID) WITH =,
+                                                                public.uuid_to_bytea(instanceID) WITH =,
+                                                                validity WITH &&) WHERE (instanceID IS NOT NULL)
+  );
+  CREATE TABLE IF NOT EXISTS production.netrange_mapping (
+      rangeID                       uuid            NOT NULL,
+      rangeDictionaryID             uuid            NOT NULL,
+      tpID                          uuid            NULL,
+      tpDictionaryID                uuid            NULL,
+      deployID                      uuid            NULL,
+      deployDictionaryID            uuid            NULL,
+      instanceID                    uuid            NULL,
+      instanceDictionaryID          uuid            NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdBy                     uuid            NOT NULL,
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_pnm_rangeID   FOREIGN KEY     ( rangeID, rangeDictionaryID ) REFERENCES production.netrange ( rangeID, dictionaryID ),
+      CONSTRAINT __fk_pnm_tpID      FOREIGN KEY     ( tpID, tpDictionaryID ) REFERENCES production.technical_product ( tpID, dictionaryID ),
+      CONSTRAINT __fk_pnm_dplID     FOREIGN KEY     ( deployID, deployDictionaryID ) REFERENCES production.deployment ( deployID, dictionaryID ),
+      CONSTRAINT __fk_pnm_insID     FOREIGN KEY     ( instanceID, instanceDictionaryID ) REFERENCES production.instance ( instanceID, dictionaryID ),
+      CONSTRAINT __fk_createdBy     FOREIGN KEY     ( createdBy ) REFERENCES inventory.user ( userID ),
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __pnm_nonnull      CHECK           (   ((tpID IS NOT NULL) AND (deployID IS     NULL) AND (instanceID IS     NULL))
+                                                     OR ((tpID IS     NULL) AND (deployID IS NOT NULL) AND (instanceID IS     NULL))
+                                                     OR ((tpID IS     NULL) AND (deployID IS     NULL) AND (instanceID IS NOT NULL))),
+      CONSTRAINT __pnm_null_tp      CHECK           (   ((tpID IS NOT NULL) AND (tpDictionaryID IS NOT NULL))
+                                                     OR ((tpID IS     NULL) AND (tpDictionaryID IS     NULL))),
+      CONSTRAINT __pnm_null_dpl     CHECK           (   ((deployID IS NOT NULL) AND (deployDictionaryID IS NOT NULL))
+                                                     OR ((deployID IS     NULL) AND (deployDictionaryID IS     NULL))),
+      CONSTRAINT __pnm_null_ins     CHECK           (   ((instanceID IS NOT NULL) AND (instanceDictionaryID IS NOT NULL))
+                                                     OR ((instanceID IS     NULL) AND (instanceDictionaryID IS     NULL))),
+      CONSTRAINT __pnm_temp_tp      EXCLUDE         USING gist (public.uuid_to_bytea(rangeID) WITH =,
+                                                                public.uuid_to_bytea(tpID) WITH =,
+                                                                validity WITH &&) WHERE (tpID IS NOT NULL),
+      CONSTRAINT __pnm_temp_deploy  EXCLUDE         USING gist (public.uuid_to_bytea(rangeID) WITH =,
+                                                                public.uuid_to_bytea(deployID) WITH =,
+                                                                validity WITH &&) WHERE (deployID IS NOT NULL),
+      CONSTRAINT __pnm_temp_ins     EXCLUDE         USING gist (public.uuid_to_bytea(rangeID) WITH =,
+                                                                public.uuid_to_bytea(instanceID) WITH =,
+                                                                validity WITH &&) WHERE (instanceID IS NOT NULL)
+  );
 
   -- SCHEMA iX
   ALTER TABLE ix.product                                                 RENAME TO consumer_product;
@@ -556,17 +713,23 @@ BEGIN;
   ALTER TABLE    bulk.execution                                          ADD CONSTRAINT __fk_bkexec_orchID FOREIGN KEY     ( orchID )
                                                                              REFERENCES asset.orchestration_environment ( orchID ) ON DELETE RESTRICT;
   ALTER TABLE    bulk.execution                                          DROP CONSTRAINT __bktssi_nonnull;
-  ALTER TABLE    bulk.execution                                          ADD CONSTRAINT __bkexec_nonnull CHECK
-                                                            (   (( rteID IS NOT NULL ) AND ( containerID IS     NULL ) AND ( orchID IS     NULL))
-                                                             OR (( rteID IS     NULL ) AND ( containerID IS NOT NULL ) AND ( orchID IS     NULL))
-                                                             OR (( rteID IS     NULL ) AND ( containerID IS     NULL ) AND ( orchID IS NOT NULL)));
+  ALTER TABLE    bulk.execution                                          ADD CONSTRAINT __bkexec_nonnull
+                                                                         CHECK (   (( rteID IS NOT NULL ) AND ( containerID IS     NULL ) AND ( orchID IS     NULL))
+                                                                                OR (( rteID IS     NULL ) AND ( containerID IS NOT NULL ) AND ( orchID IS     NULL))
+                                                                                OR (( rteID IS     NULL ) AND ( containerID IS     NULL ) AND ( orchID IS NOT NULL)));
   ALTER TABLE    bulk.execution                                          DROP CONSTRAINT __bktssi_temporal;
-  ALTER TABLE    bulk.execution                                          ADD CONSTRAINT __bkexec_temporal EXCLUDE USING gist
-                                                            (public.uuid_to_bytea(instanceID) WITH =,
-                                                             public.uuid_to_bytea(rteID) WITH =,
-                                                             public.uuid_to_bytea(containerID) WITH =,
-                                                             public.uuid_to_bytea(orchID) WITH =,
-                                                             activity WITH &&);
+  ALTER TABLE    bulk.execution                                          ADD CONSTRAINT __bkexec_temp_rte
+                                                                         EXCLUDE USING gist (public.uuid_to_bytea(instanceID) WITH =,
+                                                                                             public.uuid_to_bytea(rteID) WITH =,
+                                                                                             activity WITH &&) WHERE (rteID IS NOT NULL);
+  ALTER TABLE    bulk.execution                                          ADD CONSTRAINT __bkexec_temp_ctr
+                                                                         EXCLUDE USING gist (public.uuid_to_bytea(instanceID) WITH =,
+                                                                                             public.uuid_to_bytea(containerID) WITH =,
+                                                                                             activity WITH &&) WHERE (containerID IS NOT NULL);
+  ALTER TABLE    bulk.execution                                          ADD CONSTRAINT __bkexec_temp_orch
+                                                                         EXCLUDE USING gist (public.uuid_to_bytea(instanceID) WITH =,
+                                                                                             public.uuid_to_bytea(orchID) WITH =,
+                                                                                             activity WITH &&) WHERE (orchID IS NOT NULL);
 
   -- SCHEMA yp
   -- corporate domain
