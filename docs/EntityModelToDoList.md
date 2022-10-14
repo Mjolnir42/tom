@@ -21,7 +21,7 @@
 [x] SA
 [x] QA
 [ ] Linking
-[ ] Realization 1:n TechnicalProduct
+[x] Realization 1:n TechnicalProduct
 [-] Parent
 [x] Mapping     n:m Module
 ### Module
@@ -29,7 +29,7 @@
 [x] SA
 [x] QA
 [ ] Linking
-[ ] Realization 1:n Deployment
+[x] Realization 1:n Deployment
 [-] Parent
 [x] Mapping     n:m Artifact
 ### Artifact
@@ -37,7 +37,7 @@
 [x] SA
 [x] QA
 [ ] Linking
-[ ] Realization 1:n Instance
+[x] Realization 1:n Instance
 [-] Parent
 [-] Mapping
 ### Data
@@ -45,7 +45,7 @@
 [x] SA
 [x] QA
 [ ] Linking
-[ ] Realization 1:n Shard
+[x] Realization 1:n Shard
 [x] Parent      n:1 Artifact
                 n:1 Module
                 n:1 Blueprint
@@ -55,8 +55,8 @@
 [x] SA
 [x] QA
 [ ] Linking
-[ ] Realization 1:n Endpoint
-[ ] Parent      n:1 Blueprint
+[x] Realization 1:n Endpoint
+[x] Parent      n:1 Blueprint
                 n:1 Module
                 n:1 Artifact
 [-] Mapping
