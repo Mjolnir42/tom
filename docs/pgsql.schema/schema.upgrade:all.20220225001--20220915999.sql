@@ -1132,7 +1132,17 @@ BEGIN;
   ALTER TABLE inventory.user             ADD COLUMN publicKey               varchar(384) NULL;
   --
 
-
+  INSERT INTO inventory.identity_library (
+                name,
+                createdBy,
+                isSelfEnrollmentEnabled,
+                isMachineLibrary
+              ) VALUES (
+                'engineroom',
+                '00000000-0000-0000-0000-000000000000'::uuid,
+                true,
+                true
+              );
 
   INSERT INTO public.schema_versions ( schema, version, description )
               VALUES ( 'abstract',   20220915999, 'modelupdate' ),
