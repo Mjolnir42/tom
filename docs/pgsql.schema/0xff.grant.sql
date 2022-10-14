@@ -105,4 +105,15 @@ BEGIN;
     '[-infinity,infinity]'::tstzrange,
     '00000000-0000-0000-0000-000000000000'::uuid
   );
+  INSERT INTO inventory.identity_library (
+    name,
+    createdBy,
+    isSelfEnrollmentEnabled,
+    isMachineLibrary
+  ) VALUES (
+    'engineroom',
+    '00000000-0000-0000-0000-000000000000'::uuid,
+    true,
+    true
+  );
 COMMIT;
