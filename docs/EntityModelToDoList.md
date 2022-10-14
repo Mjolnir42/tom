@@ -22,20 +22,23 @@
 [x] QA
 [ ] Linking
 [ ] Realization 1:n TechnicalProduct
-[ ] Mapping     n:m Module
+[-] Parent
+[x] Mapping     n:m Module
 ### Module
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
 [ ] Realization 1:n Deployment
-[ ] Mapping     n:m Artifact
+[-] Parent
+[x] Mapping     n:m Artifact
 ### Artifact
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
 [ ] Realization 1:n Instance
+[-] Parent
 [-] Mapping
 ### Data
 [x] Base
@@ -43,18 +46,20 @@
 [x] QA
 [ ] Linking
 [ ] Realization 1:n Shard
-[ ] Processing  n:m Artifact
-                n:m Module
-                n:m Blueprint
+[x] Parent      n:1 Artifact
+                n:1 Module
+                n:1 Blueprint
+[-] Mapping
 ### Service
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
 [ ] Realization 1:n Endpoint
-[ ] Mapping     1:n Blueprint
-                1:n Module
-                1:n Artifact
+[ ] Parent      n:1 Blueprint
+                n:1 Module
+                n:1 Artifact
+[-] Mapping
 
 ## Production Domain
 
@@ -84,18 +89,18 @@
 [x] SA
 [x] QA
 [ ] Linking
-[x] Parent        1:n Technical Product
-                  1:n Deployment
-                  1:n Instance
+[x] Parent        n:1 Technical Product
+                  n:1 Deployment
+                  n:1 Instance
 [-] Mapping
 ### Endpoint
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
-[x] Parent        1:n Technical Product
-                  1:n Deployment
-                  1:n Instance
+[x] Parent        n:1 Technical Product
+                  n:1 Deployment
+                  n:1 Instance
 [-] Mapping
 ### Netrange
 [x] Base
