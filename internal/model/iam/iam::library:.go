@@ -15,10 +15,6 @@ import (
 // routeRegisterLibrary registers the library routes with the
 // request router
 func (m *Model) routeRegisterLibrary(rt *httprouter.Router) {
-	rt.GET(`/idlib/`, m.x.Authenticated(m.LibraryList))
-	rt.GET(`/idlib/:lib`, m.x.Authenticated(m.LibraryShow))
-	rt.POST(`/idlib/`, m.x.Authenticated(m.LibraryAdd))
-	rt.DELETE(`/idlib/:lib`, m.x.Authenticated(m.LibraryRemove))
 }
 
 // handleRegisterLibrary registers library application core handlers in
