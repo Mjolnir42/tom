@@ -14,25 +14,44 @@ const (
 	CmdUserRemove = ModelIAM + `::` + EntityUser + `:` + ActionRemove
 	CmdUserShow   = ModelIAM + `::` + EntityUser + `:` + ActionShow
 	CmdUserUpdate = ModelIAM + `::` + EntityUser + `:` + ActionUpdate
+	CmdMachEnrol  = ModelIAM + `::` + EntityMachine + `:` + ActionEnrolment
 )
+
+func init() {
+	Commands[CmdMachEnrol] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/idlib/` + PlHoldTomID + `/machine/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+}
 
 // User ...
 type User struct {
-	LibraryName    string `json:"library-name"`
-	FirstName      string `json:"first-name,omitempty"`
-	LastName       string `json:"last-name,omitempty"`
-	UserName       string `json:"user-name"`
-	EmployeeNumber string `json:"employee-number,omitempty"`
-	MailAddress    string `json:"mailaddress,omitempty"`
-	ExternalID     string `json:"external-ref,omitempty"`
-	PublicKey      string `json:"public-key,omitempty"`
-	IsActive       bool   `json:"is-active"`
-	IsDeleted      bool   `json:"is-deleted"`
-	CreatedAt      string `json:"createdAt,omitempty"`
-	CreatedBy      string `json:"createdBy,omitempty"`
-	ID             string `json:"-"`
-	LibraryID      string `json:"-"`
+	LibraryName    string      `json:"library-name"`
+	FirstName      string      `json:"first-name,omitempty"`
+	LastName       string      `json:"last-name,omitempty"`
+	UserName       string      `json:"user-name"`
+	EmployeeNumber string      `json:"employee-number,omitempty"`
+	MailAddress    string      `json:"mailaddress,omitempty"`
+	ExternalID     string      `json:"external-ref,omitempty"`
+	Credential     *Credential `json:"credential,omitempty"`
+	IsActive       bool        `json:"is-active"`
+	IsDeleted      bool        `json:"is-deleted"`
+	CreatedAt      string      `json:"createdAt,omitempty"`
+	CreatedBy      string      `json:"createdBy,omitempty"`
+	ID             string      `json:"-"`
+	LibraryID      string      `json:"-"`
+	TomID          string      `json:"-"`
 }
+
+type Credential struct {
+	Category string `json:"category"`
+	Value    string `json:"value"`
+}
+
+//
 
 // Serialize ...
 func (u *User) Serialize() []byte {

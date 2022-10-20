@@ -17,7 +17,49 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// Implementation of the handler.Handler interface
+// LibraryReadHandler ...
+type LibraryReadHandler struct {
+	Input    chan msg.Request
+	Shutdown chan struct{}
+	name     string
+	conn     *sql.DB
+	lm       *lhm.LogHandleMap
+	stmtList *sql.Stmt
+	stmtShow *sql.Stmt
+}
+
+func NewLibraryReadHandler(length int) (string, *LibraryReadHandler) {
+	h := &LibraryReadHandler{}
+	h.name = handler.GenerateName(msg.CategoryIAM+`::`+msg.SectionLibrary) + `/read`
+	h.Input = make(chan msg.Request, length)
+	h.Shutdown = make(chan struct{})
+	return h.name, h
+}
+
+// Register the handlername for the requests it wants to receive
+func (h *LibraryReadHandler) Register(hm *handler.Map) {
+	for _, action := range []string{
+		proto.ActionList,
+		proto.ActionShow,
+	} {
+		hm.Request(msg.SectionLibrary, action, h.name)
+	}
+}
+
+// process is the request dispatcher
+func (h *LibraryReadHandler) process(q *msg.Request) {
+	result := msg.FromRequest(q)
+
+	switch q.Action {
+	case proto.ActionList:
+		h.list(q, &result)
+	case proto.ActionShow:
+		h.show(q, &result)
+	default:
+		result.UnknownRequest(q)
+	}
+	q.Reply <- result
+}
 
 // Configure injects the handler with db connection and logging
 func (h *LibraryReadHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
@@ -33,16 +75,6 @@ func (h *LibraryReadHandler) Intake() chan msg.Request {
 // PriorityIntake aliases Intake as part of the handler interface
 func (h *LibraryReadHandler) PriorityIntake() chan msg.Request {
 	return h.Intake()
-}
-
-// Register the handlername for the requests it wants to receive
-func (h *LibraryReadHandler) Register(hm *handler.Map) {
-	for _, action := range []string{
-		proto.ActionList,
-		proto.ActionShow,
-	} {
-		hm.Request(msg.SectionLibrary, action, h.name)
-	}
 }
 
 // Run is the event loop for LibraryReadHandler
