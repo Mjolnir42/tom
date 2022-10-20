@@ -1129,8 +1129,43 @@ BEGIN;
   ALTER TABLE inventory.identity_library ADD COLUMN isSelfEnrollmentEnabled boolean NOT NULL DEFAULT 'no';
   ALTER TABLE inventory.identity_library ADD COLUMN isMachineLibrary        boolean NOT NULL DEFAULT 'no';
   ALTER TABLE inventory.identity_library ADD COLUMN enrollmentKey           varchar(384) NULL;
-  ALTER TABLE inventory.user             ADD COLUMN publicKey               varchar(384) NULL;
-  --
+  CREATE TABLE IF NOT EXISTS inventory.user_credential (
+      userID                        uuid            NOT NULL,
+      crypt                         text            NOT NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_userID        FOREIGN KEY     ( userID ) REFERENCES inventory.user ( userID ) DEFERRABLE,
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __iuc_temporal     EXCLUDE         USING gist (public.uuid_to_bytea(userID) WITH =,
+                                                                validity WITH &&)
+  );
+  CREATE TABLE IF NOT EXISTS inventory.user_token (
+      userID                        uuid            NOT NULL,
+      token                         text            NOT NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_userID        FOREIGN KEY     ( userID ) REFERENCES inventory.user ( userID ) DEFERRABLE,
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __iut_temporal     EXCLUDE         USING gist (public.uuid_to_bytea(userID) WITH =,
+                                                                validity WITH &&)
+  );
+  CREATE TABLE IF NOT EXISTS inventory.user_key (
+      userID                        uuid            NOT NULL,
+      publicKey                     varchar(384)    NOT NULL,
+      fingerprint                   varchar(128)    NOT NULL,
+      validity                      tstzrange       NOT NULL DEFAULT tstzrange((NOW() AT TIME ZONE 'utc'), 'infinity', '[]'),
+      createdAt                     timestamptz(3)  NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
+      CONSTRAINT __fk_userID        FOREIGN KEY     ( userID ) REFERENCES inventory.user ( userID ) DEFERRABLE,
+      CONSTRAINT __validFrom_utc    CHECK           ( EXTRACT( TIMEZONE FROM lower( validity ) ) = '0' ),
+      CONSTRAINT __validUntil_utc   CHECK           ( EXTRACT( TIMEZONE FROM upper( validity ) ) = '0' ),
+      CONSTRAINT __createdAt_utc    CHECK           ( EXTRACT( TIMEZONE FROM createdAt ) = '0' ),
+      CONSTRAINT __iuk_temporal     EXCLUDE         USING gist (public.uuid_to_bytea(userID) WITH =,
+                                                                validity WITH &&)
+  );
 
   INSERT INTO inventory.identity_library (
                 name,
