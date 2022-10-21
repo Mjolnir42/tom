@@ -95,6 +95,20 @@ func (u *User) Serialize() []byte {
 	data = append(data, []byte(u.FirstName)...)
 	data = append(data, []byte(u.LastName)...)
 	data = append(data, []byte(u.UserName)...)
+	data = append(data, []byte(u.EmployeeNumber)...)
+	data = append(data, []byte(u.MailAddress)...)
+	data = append(data, []byte(u.ExternalID)...)
+	if u.Credential != nil {
+		data = append(data, []byte(u.Credential.Serialize())...)
+	}
+	return data
+}
+
+// Serialize ...
+func (c *Credential) Serialize() []byte {
+	data := make([]byte, 0)
+	data = append(data, []byte(c.Category)...)
+	data = append(data, []byte(c.Value)...)
 	return data
 }
 
