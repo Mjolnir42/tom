@@ -17,7 +17,53 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// Implementation of the handler.Handler interface
+// UserWriteHandler ...
+type UserWriteHandler struct {
+	Input      chan msg.Request
+	Shutdown   chan struct{}
+	name       string
+	conn       *sql.DB
+	lm         *lhm.LogHandleMap
+	stmtAdd    *sql.Stmt
+	stmtRemove *sql.Stmt
+	stmtUpdate *sql.Stmt
+}
+
+func NewUserWriteHandler(length int) (string, *UserWriteHandler) {
+	h := &UserWriteHandler{}
+	h.name = handler.GenerateName(msg.CategoryIAM+`::`+msg.SectionUser) + `/write`
+	h.Input = make(chan msg.Request, length)
+	h.Shutdown = make(chan struct{})
+	return h.name, h
+}
+
+// Register the handlername for the requests it wants to receive
+func (h *UserWriteHandler) Register(hm *handler.Map) {
+	for _, action := range []string{
+		proto.ActionAdd,
+		proto.ActionRemove,
+		proto.ActionUpdate,
+	} {
+		hm.Request(msg.SectionUser, action, h.name)
+	}
+}
+
+// process is the request dispatcher
+func (h *UserWriteHandler) process(q *msg.Request) {
+	result := msg.FromRequest(q)
+
+	switch q.Action {
+	case proto.ActionAdd:
+		h.add(q, &result)
+	case proto.ActionRemove:
+		h.remove(q, &result)
+	case proto.ActionUpdate:
+		h.update(q, &result)
+	default:
+		result.UnknownRequest(q)
+	}
+	q.Reply <- result
+}
 
 // Configure injects the handler with db connection and logging
 func (h *UserWriteHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
@@ -33,17 +79,6 @@ func (h *UserWriteHandler) Intake() chan msg.Request {
 // PriorityIntake aliases Intake as part of the handler interface
 func (h *UserWriteHandler) PriorityIntake() chan msg.Request {
 	return h.Intake()
-}
-
-// Register the handlername for the requests it wants to receive
-func (h *UserWriteHandler) Register(hm *handler.Map) {
-	for _, action := range []string{
-		proto.ActionAdd,
-		proto.ActionRemove,
-		proto.ActionUpdate,
-	} {
-		hm.Request(msg.SectionUser, action, h.name)
-	}
 }
 
 // Run is the event loop for UserWriteHandler
