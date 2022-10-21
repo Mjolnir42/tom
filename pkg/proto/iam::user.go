@@ -18,9 +18,44 @@ const (
 )
 
 func init() {
-	Commands[CmdMachEnrol] = CmdDef{
+	Commands[CmdUserAdd] = CmdDef{
 		Method:      MethodPOST,
-		Path:        `/idlib/` + PlHoldTomID + `/machine/`,
+		Path:        `/user/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{},
+	}
+	Commands[CmdUserList] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/user/`,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{},
+	}
+	Commands[CmdUserRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/user/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdUserShow] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/user/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateDetail,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdUserUpdate] = CmdDef{
+		Method:      MethodPATCH,
+		Path:        `/user/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdMachEnrol] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/machine/` + PlHoldTomID,
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
