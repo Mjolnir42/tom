@@ -1,3 +1,5 @@
+//go:build exclude
+
 /*-
  * Copyright (c) 2022, Jörg Pernfuß
  *
