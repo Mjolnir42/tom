@@ -17,7 +17,53 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// Implementation of the handler.Handler interface
+// TeamReadHandler ...
+type TeamReadHandler struct {
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	name        string
+	conn        *sql.DB
+	lm          *lhm.LogHandleMap
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	stmtMbrList *sql.Stmt
+}
+
+func NewTeamReadHandler(length int) (string, *TeamReadHandler) {
+	h := &TeamReadHandler{}
+	h.name = handler.GenerateName(msg.CategoryIAM+`::`+msg.SectionTeam) + `/read`
+	h.Input = make(chan msg.Request, length)
+	h.Shutdown = make(chan struct{})
+	return h.name, h
+}
+
+// Register the handlername for the requests it wants to receive
+func (h *TeamReadHandler) Register(hm *handler.Map) {
+	for _, action := range []string{
+		proto.ActionList,
+		proto.ActionMbrList,
+		proto.ActionShow,
+	} {
+		hm.Request(msg.SectionTeam, action, h.name)
+	}
+}
+
+// process is the request dispatcher
+func (h *TeamReadHandler) process(q *msg.Request) {
+	result := msg.FromRequest(q)
+
+	switch q.Action {
+	case proto.ActionList:
+		h.list(q, &result)
+	case proto.ActionMbrList:
+		h.memberList(q, &result)
+	case proto.ActionShow:
+		h.show(q, &result)
+	default:
+		result.UnknownRequest(q)
+	}
+	q.Reply <- result
+}
 
 // Configure injects the handler with db connection and logging
 func (h *TeamReadHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
@@ -33,17 +79,6 @@ func (h *TeamReadHandler) Intake() chan msg.Request {
 // PriorityIntake aliases Intake as part of the handler interface
 func (h *TeamReadHandler) PriorityIntake() chan msg.Request {
 	return h.Intake()
-}
-
-// Register the handlername for the requests it wants to receive
-func (h *TeamReadHandler) Register(hm *handler.Map) {
-	for _, action := range []string{
-		proto.ActionList,
-		proto.ActionMbrList,
-		proto.ActionShow,
-	} {
-		hm.Request(msg.SectionTeam, action, h.name)
-	}
 }
 
 // Run is the event loop for TeamReadHandler

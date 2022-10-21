@@ -79,6 +79,7 @@ const (
 	PlHoldTomID    = `:tomID`
 	PlHoldTargetID = `:targetID`
 	PlHoldResolv   = `:level`
+	PlHoldUID      = `:uID`
 )
 
 const (

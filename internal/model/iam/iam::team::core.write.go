@@ -17,22 +17,29 @@ import (
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-// Implementation of the handler.Handler interface
-
-// Configure injects the handler with db connection and logging
-func (h *TeamWriteHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
-	h.conn = conn
-	h.lm = lm
+// TeamWriteHandler ...
+type TeamWriteHandler struct {
+	Input         chan msg.Request
+	Shutdown      chan struct{}
+	name          string
+	conn          *sql.DB
+	lm            *lhm.LogHandleMap
+	stmtAdd       *sql.Stmt
+	stmtRemove    *sql.Stmt
+	stmtUpdate    *sql.Stmt
+	stmtHdSet     *sql.Stmt
+	stmtHdUnset   *sql.Stmt
+	stmtMbrAdd    *sql.Stmt
+	stmtMbrSet    *sql.Stmt
+	stmtMbrRemove *sql.Stmt
 }
 
-// Intake exposes the Input channel as part of the handler interface
-func (h *TeamWriteHandler) Intake() chan msg.Request {
-	return h.Input
-}
-
-// PriorityIntake aliases Intake as part of the handler interface
-func (h *TeamWriteHandler) PriorityIntake() chan msg.Request {
-	return h.Intake()
+func NewTeamWriteHandler(length int) (string, *TeamWriteHandler) {
+	h := &TeamWriteHandler{}
+	h.name = handler.GenerateName(msg.CategoryIAM+`::`+msg.SectionTeam) + `/write`
+	h.Input = make(chan msg.Request, length)
+	h.Shutdown = make(chan struct{})
+	return h.name, h
 }
 
 // Register the handlername for the requests it wants to receive
@@ -49,6 +56,49 @@ func (h *TeamWriteHandler) Register(hm *handler.Map) {
 	} {
 		hm.Request(msg.SectionTeam, action, h.name)
 	}
+}
+
+// process is the request dispatcher
+func (h *TeamWriteHandler) process(q *msg.Request) {
+	result := msg.FromRequest(q)
+
+	switch q.Action {
+	case proto.ActionAdd:
+		h.add(q, &result)
+	case proto.ActionRemove:
+		h.remove(q, &result)
+	case proto.ActionUpdate:
+		h.update(q, &result)
+	case proto.ActionHdSet:
+		h.headOfSet(q, &result)
+	case proto.ActionHdUnset:
+		h.headOfUnset(q, &result)
+	case proto.ActionMbrAdd:
+		h.memberAdd(q, &result)
+	case proto.ActionMbrSet:
+		h.memberSet(q, &result)
+	case proto.ActionMbrRemove:
+		h.memberRemove(q, &result)
+	default:
+		result.UnknownRequest(q)
+	}
+	q.Reply <- result
+}
+
+// Configure injects the handler with db connection and logging
+func (h *TeamWriteHandler) Configure(conn *sql.DB, lm *lhm.LogHandleMap) {
+	h.conn = conn
+	h.lm = lm
+}
+
+// Intake exposes the Input channel as part of the handler interface
+func (h *TeamWriteHandler) Intake() chan msg.Request {
+	return h.Input
+}
+
+// PriorityIntake aliases Intake as part of the handler interface
+func (h *TeamWriteHandler) PriorityIntake() chan msg.Request {
+	return h.Intake()
 }
 
 // Run is the event loop for TeamWriteHandler
