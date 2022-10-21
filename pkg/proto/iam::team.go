@@ -22,6 +22,86 @@ const (
 	CmdTeamUpdate    = ModelIAM + `::` + EntityTeam + `:` + ActionUpdate
 )
 
+func init() {
+	Commands[CmdTeamAdd] = CmdDef{
+		Method:      MethodPOST,
+		Path:        `/team/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{},
+	}
+	Commands[CmdTeamHdSet] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/team/` + PlHoldTomID + `/headof`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdTeamHdUnset] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/team/` + PlHoldTomID + `/headof`,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdTeamList] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/team/`,
+		Body:        false,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{},
+	}
+	Commands[CmdTeamMbrAdd] = CmdDef{
+		Method:      MethodPATCH,
+		Path:        `/team/` + PlHoldTomID + `/member/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdTeamMbrList] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/team/` + PlHoldTomID + `/member/`,
+		Body:        true,
+		ResultTmpl:  TemplateList,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdTeamMbrRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/team/` + PlHoldTomID + `/member/` + PlHoldUID,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID, PlHoldUID},
+	}
+	Commands[CmdTeamMbrSet] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/team/` + PlHoldTomID + `/member/`,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdTeamRemove] = CmdDef{
+		Method:      MethodDELETE,
+		Path:        `/team/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdTeamUpdate] = CmdDef{
+		Method:      MethodPATCH,
+		Path:        `/team/` + PlHoldTomID,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
+	}
+	Commands[CmdTeamShow] = CmdDef{
+		Method:      MethodGET,
+		Path:        `/team/` + PlHoldTomID,
+		Body:        false,
+		ResultTmpl:  TemplateDetail,
+		Placeholder: []string{PlHoldTomID},
+	}
+}
+
 // User ...
 type Team struct {
 	LibraryName string  `json:"library-name"`

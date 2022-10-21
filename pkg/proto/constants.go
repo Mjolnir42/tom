@@ -100,6 +100,7 @@ const (
 	PlHoldTargetID = `:targetID`
 	PlHoldAsset    = `:asset`
 	PlHoldResolv   = `:level`
+	PlHoldUID      = `:uID`
 )
 
 const (
