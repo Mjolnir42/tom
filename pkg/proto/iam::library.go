@@ -52,7 +52,7 @@ type Library struct {
 	Name      string `json:"name"`
 	IsSelfEnr bool   `json:"is-selfenrollment-enabled"`
 	IsMachine bool   `json:"is-machine-library"`
-	EnrollKey string `json:"-"`
+	EnrolKey  string `json:"enrolment-key"`
 	CreatedAt string `json:"createdAt,omitempty"`
 	CreatedBy string `json:"createdBy,omitempty"`
 	TomID     string `json:"-"`
