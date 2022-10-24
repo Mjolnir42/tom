@@ -46,6 +46,11 @@ func (h *UserWriteHandler) Register(hm *handler.Map) {
 	} {
 		hm.Request(msg.SectionUser, action, h.name)
 	}
+	for _, action := range []string{
+		proto.ActionEnrolment,
+	} {
+		hm.Request(msg.SectionMachine, action, h.name)
+	}
 }
 
 // process is the request dispatcher
@@ -59,6 +64,8 @@ func (h *UserWriteHandler) process(q *msg.Request) {
 		h.remove(q, &result)
 	case proto.ActionUpdate:
 		h.update(q, &result)
+	case proto.ActionEnrolment:
+		h.enrolment(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
