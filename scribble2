@@ -1,0 +1,19 @@
+. Blueprint   [ Blueprint n:m Module   ]
+. Module      [ Module    n:m Artifact ]
+. Artifact
+. Data        [:processing:]     --> n:m Artifact, Module, Blueprint
+. Service     [:provided_by:]    --> 1:n Blueprint, Module, Artifact
+
+================================================
+. Technical Product   [ TechnicalProduct  n:m   Deployment ]      (DONE)
+. Deployment Group    [ Deployment        n:m   Instance   ]      (DONE)
+. Instance                                                        (DONE)
+. Shard               1:n TechnicalProduct, Deployment, Instance  (DONE)
+. Endpoint            1:n TechnicalProduct, Deployment, Instance  (DONE)
+. Netrange            1:n TechnicalProduct, Deployment, Instance  (DONE)
+-------------------------------------------------------------------------------------------------------------------
+0x80  .abstract.relationship:parent
+0x81  .abstract.relationship:mapping
+
+0x82  .production.relationship:parent
+0x83  .production.relationship:mapping
