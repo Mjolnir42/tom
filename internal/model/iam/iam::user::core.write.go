@@ -19,14 +19,18 @@ import (
 
 // UserWriteHandler ...
 type UserWriteHandler struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	name       string
-	conn       *sql.DB
-	lm         *lhm.LogHandleMap
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	stmtUpdate *sql.Stmt
+	Input         chan msg.Request
+	Shutdown      chan struct{}
+	name          string
+	conn          *sql.DB
+	lm            *lhm.LogHandleMap
+	stmtAdd       *sql.Stmt
+	stmtAddKey    *sql.Stmt
+	stmtDetect    *sql.Stmt
+	stmtEnrolment *sql.Stmt
+	stmtRemove    *sql.Stmt
+	stmtUpdate    *sql.Stmt
+	stmtUpdateUID *sql.Stmt
 }
 
 func NewUserWriteHandler(length int) (string, *UserWriteHandler) {
@@ -93,9 +97,13 @@ func (h *UserWriteHandler) Run() {
 	var err error
 
 	for statement, prepared := range map[string]**sql.Stmt{
-		stmt.UserAdd:    &h.stmtAdd,
-		stmt.UserRemove: &h.stmtRemove,
-		stmt.UserUpdate: &h.stmtUpdate,
+		stmt.LibraryDetect:    &h.stmtDetect,
+		stmt.MachineEnrol:     &h.stmtEnrolment,
+		stmt.MachineUpdateUID: &h.stmtUpdateUID,
+		stmt.UserAdd:          &h.stmtAdd,
+		stmt.UserAddKey:       &h.stmtAddKey,
+		stmt.UserRemove:       &h.stmtRemove,
+		stmt.UserUpdate:       &h.stmtUpdate,
 	} {
 		if *prepared, err = h.conn.Prepare(statement); err != nil {
 			h.lm.GetLogger(`error`).Fatal(handler.StmtErr(h.name, err, stmt.Name(statement)))

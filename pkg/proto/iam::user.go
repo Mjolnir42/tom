@@ -86,7 +86,27 @@ type Credential struct {
 	Value    string `json:"value"`
 }
 
-//
+func NewUser() *User {
+	return &User{
+		Credential: &Credential{},
+	}
+}
+
+func (u *User) ParseTomID() error {
+	var typeID string
+	switch {
+	case u.TomID == ``:
+		return ErrEmptyTomID
+	case isTomIDFormatDNS(u.TomID):
+		u.UserName, u.LibraryName, typeID = parseTomIDFormatDNS(u.TomID)
+		return assessTomID(EntityMachine, typeID)
+	case isTomIDFormatURI(u.TomID):
+		u.UserName, u.LibraryName, typeID = parseTomIDFormatURI(u.TomID)
+		return assessTomID(EntityMachine, typeID)
+	default:
+		return ErrInvalidTomID
+	}
+}
 
 // Serialize ...
 func (u *User) Serialize() []byte {

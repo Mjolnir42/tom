@@ -15,9 +15,19 @@ SELECT      'TODO::LibraryList'::text;`  // TODO
 
 	LibraryShow = `
 SELECT      'TODO::LibraryShow'::text;`  // TODO
+
+	LibraryDetect = `
+SELECT      identityLibraryID,
+            isSelfEnrollmentEnabled,
+            isMachineLibrary,
+            enrollmentKey
+FROM        inventory.identity_library
+WHERE       inventory.identity_library.name = $1::text;
+`
 )
 
 func init() {
+	m[LibraryDetect] = `LibraryDetect`
 	m[LibraryList] = `LibraryList`
 	m[LibraryShow] = `LibraryShow`
 }

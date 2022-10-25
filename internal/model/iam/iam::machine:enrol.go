@@ -44,16 +44,33 @@ func (m *Model) MachineEnrol(w http.ResponseWriter, r *http.Request,
 		msg.SectionMachine,
 		proto.ActionEnrolment,
 	)
-	request.User.LibraryName = params.ByName(`lib`)
-	request.User.UserName = params.ByName(`user`)
 
 	req := proto.Request{}
 	if err := rest.DecodeJSONBody(r, &req); err != nil {
 		m.x.ReplyBadRequest(&w, &request, err)
 		return
 	}
-	request.Update.User = *req.User
-	request.Update.User.LibraryName = request.User.LibraryName
+	request.User = *req.User
+	request.User.TomID = params.ByName(`tomID`)
+
+	if err := request.User.ParseTomID(); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
+	}
+	if err := proto.OnlyUnreserved(request.User.UserName); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
+	}
+
+	switch request.User.Credential.Category {
+	case proto.CredentialPubKey:
+	default:
+		m.x.ReplyBadRequest(&w, &request, fmt.Errorf(
+			"Invalid credential type for machine registrations: %s",
+			request.User.Credential.Category,
+		))
+		return
+	}
 
 	if !m.x.IsAuthorized(&request) {
 		m.x.ReplyForbidden(&w, &request)
@@ -65,9 +82,88 @@ func (m *Model) MachineEnrol(w http.ResponseWriter, r *http.Request,
 	m.x.Send(&w, &result, exportMachineEnrol)
 }
 
-// update ...
+// enrolment is the handler for registering machine accounts
 func (h *UserWriteHandler) enrolment(q *msg.Request, mr *msg.Result) {
-	mr.NotImplemented() // TODO
+	var (
+		isMachine, isSelfEnrolment bool
+		enrolmentKey               sql.NullString
+		tx                         *sql.Tx
+	)
+
+	if tx, err = h.conn.Begin(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	defer tx.Rollback()
+
+	if _, err = tx.Exec(stmt.DeferredTransaction); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	if err = tx.Stmt(h.stmtDetect).QueryRow(
+		q.User.LibraryName,
+	).Scan(
+		&q.User.LibraryID,
+		&isSelfEnrolment,
+		&isMachine,
+		&enrolmentKey,
+	); err == sql.ErrNoRows {
+		mr.NotFound(err)
+		return
+	} else if err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	if !isMachine {
+		mr.ExpectationFailed(
+			fmt.Errorf(`Only registered machine libraries support machine enrolment`),
+		)
+		return
+	}
+
+	switch {
+	case isSelfEnrolment:
+	case !isSelfEnrolment && enrolmentKey.Valid:
+	case !isSelfEnrolment && !enrolmentKey.Valid:
+		mr.ExpectationFailed(
+			fmt.Errorf(`Machine library without self-enrolment requires enrolment key`),
+		)
+		return
+	default:
+	}
+
+	// create registration
+	if err = tx.Stmt(h.stmtEnrolment).QueryRow(
+		q.User.LibraryID,
+		q.User.FirstName,
+		q.User.LastName,
+		q.User.UserName,
+	).Scan(
+		&q.User.ID,
+	); err == sql.ErrNoRows {
+		mr.ServerError(err)
+		return
+	} else if err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	if res, err = tx.Stmt(h.stmtUpdateUID).Exec(
+		q.User.ID,
+		q.User.LibraryID,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	if err = tx.Commit(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	mr.User = append(mr.User, q.User)
+	mr.OK()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
