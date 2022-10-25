@@ -25,6 +25,7 @@ type LibraryWriteHandler struct {
 	conn       *sql.DB
 	lm         *lhm.LogHandleMap
 	stmtAdd    *sql.Stmt
+	stmtDetect *sql.Stmt
 	stmtRemove *sql.Stmt
 }
 

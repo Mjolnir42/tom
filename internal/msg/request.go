@@ -73,6 +73,8 @@ func New(r *http.Request, params httprouter.Params, cmd, sec, ac string) Request
 		rq.Team = proto.Team{} // TODO when implementing model
 	case SectionUser:
 		rq.User = proto.User{} // TODO when implementing model
+	case SectionMachine:
+		rq.User = *(proto.NewUser())
 	}
 	return rq
 }
