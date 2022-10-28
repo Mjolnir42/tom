@@ -23,10 +23,26 @@ type SlamConfiguration struct {
 	LogLevel   string                   `json:"log.level"`
 	LogPath    string                   `json:"log.path"`
 	CredPath   string                   `json:"credential.path"`
+	IPFIX      SettingsIPFIX            `json:"settings.ipfix"`
 	Version    string                   `json:"-"`
 	Passphrase string                   `json:"-"`
 	PubKey     ed25519.PublicKey        `json:"-"`
 	PrivEPK    *epk.EncryptedPrivateKey `json:"-"`
+}
+
+type SettingsIPFIX struct {
+	Enabled      bool   `json:"enabled,string"`
+	ServerProto  string `json:"listen.protocol"`
+	ListenADDR   string `json:"listen.address"`
+	Forwarding   bool   `json:"forwarding.enabled,string"`
+	ForwardADDR  string `json:"forwarding.address"`
+	ForwardProto string `json:"forwarding.protocol"`
+	ServerName   string `json:"tls.servername"`
+	CAFile       string `json:"ca.file"`
+	CertFile     string `json:"certificate.file"`
+	CertKeyFile  string `json:"certificate.keyfile"`
+	Processing   bool   `json:"processing.enabled,string"`
+	ProcessType  string `json:"processing.type"`
 }
 
 func (c *SlamConfiguration) Parse(fname string, lh *lhm.LogHandleMap) error {
