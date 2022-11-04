@@ -11,6 +11,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"net/url"
+	"path/filepath"
 
 	"github.com/mjolnir42/epk"
 	"github.com/mjolnir42/lhm"
@@ -24,10 +26,13 @@ type SlamConfiguration struct {
 	LogPath    string                   `json:"log.path"`
 	CredPath   string                   `json:"credential.path"`
 	IPFIX      SettingsIPFIX            `json:"settings.ipfix"`
+	API        string                   `json:"api"`
+	CAFile     string                   `json:"api.ca.file"`
 	Version    string                   `json:"-"`
 	Passphrase string                   `json:"-"`
 	PubKey     ed25519.PublicKey        `json:"-"`
 	PrivEPK    *epk.EncryptedPrivateKey `json:"-"`
+	Run        RunTimeConfig            `json:"-"`
 }
 
 type SettingsIPFIX struct {
@@ -75,6 +80,15 @@ func (c *SlamConfiguration) Parse(fname string, lh *lhm.LogHandleMap) error {
 		lh.EarlyFatal(`Invalid log.level specified: `, c.LogLevel, `. Valid levels are: `,
 			`debug, info (default), warn, error, fatal, panic`)
 	}
+
+	if c.Run.API, err = url.Parse(c.API); err != nil {
+		return err
+	}
+
+	if c.CAFile != `` {
+		c.Run.PathCA = filepath.Clean(c.CAFile)
+	}
+
 	return nil
 }
 
