@@ -8,25 +8,36 @@
 package proto //
 
 import (
+	cryptorand "crypto/rand"
 	"encoding/base64"
 	"hash"
+	"io"
 
 	"golang.org/x/crypto/blake2b"
 )
 
 // Authorization ...
 type Authorization struct {
-	Timestamp string     `json:"timestamp"`
-	UserID    string     `json:"userID"`
-	Sig       *Signature `json:"signature,omitempty"`
-	CSR       *DataCSR   `json:"csr,omitempty"`
+	Timestamp   string     `json:"timestamp"`
+	UserID      string     `json:"userID"`
+	Nonce       string     `json:"nonce"`
+	Sig         *Signature `json:"signature,omitempty"`
+	CSR         *DataCSR   `json:"csr,omitempty"`
 }
 
 // Serialize ...
 func (a *Authorization) Serialize() []byte {
+	if a.Nonce == `` {
+		nonce := make([]byte, 6)
+		io.ReadFull(cryptorand.Reader, nonce[:6])
+		a.Nonce = base64.StdEncoding.EncodeToString(nonce)
+	}
+
 	data := make([]byte, 0)
 	data = append(data, []byte(a.Timestamp)...)
 	data = append(data, []byte(a.UserID)...)
+	nonceBytes, _ := base64.StdEncoding.DecodeString(a.Nonce)
+	data = append(data, nonceBytes...)
 	if a.CSR != nil {
 		if a.CSR.Sig != nil {
 			data = append(data, []byte(a.CSR.Sig.DataHash)...)
