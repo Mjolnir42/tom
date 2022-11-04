@@ -23,7 +23,7 @@ import (
 
 func registerMachineEnrollment(pub *ed25519.PublicKey, priv *epk.EncryptedPrivateKey, phrase string, ctx *cli.Context) error {
 	var err error
-	var sig []byte
+	var msgBytes, sig []byte
 
 	req := proto.NewUserRequest()
 	req.User.LibraryName = `engineroom`
@@ -41,13 +41,17 @@ func registerMachineEnrollment(pub *ed25519.PublicKey, priv *epk.EncryptedPrivat
 
 	req.Auth.Timestamp = time.Now().Format(time.RFC3339)
 	req.Auth.UserID = req.User.UserName
+	req.Auth.Fingerprint = req.User.UserName
 	if err = req.CalculateDataHash(); err != nil {
 		return err
 	}
-	if sig, err = priv.Sign(phrase, []byte(req.Auth.Sig.DataHash)); err != nil {
+	if msgBytes, err = base64.StdEncoding.DecodeString(req.Auth.Sig.DataHash); err != nil {
 		return err
 	}
-	req.Auth.Sig.Signature = string(sig)
+	if sig, err = priv.Sign(phrase, msgBytes); err != nil {
+		return err
+	}
+	req.Auth.Sig.Signature = base64.StdEncoding.EncodeToString(sig)
 
 	spec := adm.Specification{
 		Name: proto.CmdMachEnrol,
