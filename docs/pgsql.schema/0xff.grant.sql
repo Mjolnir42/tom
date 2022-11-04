@@ -5,17 +5,17 @@ GRANT   SELECT
    ON   ALL TABLES IN SCHEMA view, public
    TO   tomsvc;
 GRANT   USAGE
-   ON   SCHEMA asset, bulk, filter, inventory, ix, meta, yp, view
+   ON   SCHEMA abstract, asset, bulk, filter, inventory, ix, meta, production, view, yp
    TO   tomsvc;
 GRANT   SELECT,
         INSERT,
         UPDATE,
         DELETE
-   ON   ALL TABLES IN SCHEMA asset, bulk, filter, inventory, ix, meta, yp
+   ON   ALL TABLES IN SCHEMA abstract, asset, bulk, filter, inventory, ix, meta, production, view, yp
    TO   tomsvc;
 GRANT   USAGE,
         SELECT
-   ON   ALL SEQUENCES IN SCHEMA asset, bulk, filter, inventory, ix, meta, yp
+   ON   ALL SEQUENCES IN SCHEMA abstract, asset, bulk, filter, inventory, ix, meta, production, view, yp
    TO   tomsvc;
 --
 --
