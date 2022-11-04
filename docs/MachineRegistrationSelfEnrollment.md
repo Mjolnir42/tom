@@ -14,14 +14,22 @@
    - input raw keybytes
 3. use hexadecimal output of the hash as machine fingerprint uid:
    - f748a40a96e9c1500aa4f251c5d27b89
+   this leads to the following tomID
    => f748a40a96e9c1500aa4f251c5d27b89.engineroom.machine.tom
 4. generate JSON body
 ```
-  library-name: 'engineroom' identity library
-  user-name:    machine fingerprint uid
-  first-name:   hostname (short)
-  last-name:    fqdn
-  credential.category:  the registered 
+  library-name:                         'engineroom' identity library
+  user-name:                            machine fingerprint uid
+  first-name:                           hostname (short)
+  last-name:                            fqdn
+  credential.category:                  magic value `public-key` for machines
+  credential.value:                     base64 encoding of the generated public key
+  authorization.timestamp:              request timestamp
+  authorization.userID:                 userID that the request is authorized with
+  authorization.fingerprint:            fingerprint of the pubKey used for authorization
+  authorization.nonce:                  base64 encoding of 6 bytes of per-request randomness
+  authorization.signature.datahash:     hash of the request serialization (not transmitted)
+  authorization.signature.signature:    privatekey signature of the untransmitted datahash
 
   {
     "user": {
@@ -37,12 +45,13 @@
     "authorization": {
       "timestamp":    "2022-10-21T14:01:05+02:00",
       "userID":       "f748a40a96e9c1500aa4f251c5d27b89",
+      "fingerprint":  "f748a40a96e9c1500aa4f251c5d27b89",
+      "nonce":        "fNGq3Ifu",
       "signature": {
-        "dataHash":     "9f4f35402f04c9be310f5c900b09f30fe00fdadeebd3b1a81a9bda5c23419749230c4b35ace59ba7d275be430bb348e65d39b5634b52b52a51b887617bf3c7aa",
         "signature":    "uEnpAqJU3PuTYEbhH6ie8+AYQ4NGoyA9IJAT+d2nymbO/SDsVtjovCP9zUCKyZ9uwqADExBln3tFdLqh4IhqBw=="
       }
     }
   }
 ```
-5. send the request body as `PUT` request to `/machine/${uid}`
-   - /machine/f748a40a96e9c1500aa4f251c5d27b89
+5. send the request body as `PUT` request to `/machine/${tomID}`
+   - /machine/f748a40a96e9c1500aa4f251c5d27b89.engineroom.machine.tom
