@@ -8,12 +8,18 @@
 package main // import "github.com/mjolnir42/tom/cmd/slamdd-go"
 
 import (
+	"crypto/tls"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/droundy/goopt"
+	"github.com/go-resty/resty/v2"
 	"github.com/mjolnir42/lhm"
+	"github.com/mjolnir42/tom/internal/cli/adm"
 	"github.com/mjolnir42/tom/internal/config"
+	"github.com/mjolnir42/tom/internal/cred"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,6 +31,8 @@ var (
 	lm *lhm.LogHandleMap
 	// populated via Makefile
 	slamVersion string
+	//
+	client *resty.Client
 )
 
 const (
@@ -54,6 +62,7 @@ func run() int {
 	var (
 		err        error
 		configFile string
+		session    tls.ClientSessionCache
 	)
 	//
 	cliConfigPath := goopt.String([]string{`-c`, `--config`}, `./slam.conf`, `Configuration file location`)
@@ -87,6 +96,23 @@ func run() int {
 		logrus.Error(e)
 		os.Exit(EX_ABORT)
 	})
+
+	// setup REST client
+	client = resty.New().
+		SetDisableWarn(true).
+		SetHeader(`User-Agent`, fmt.Sprintf("%s %s", goopt.Summary, goopt.Version)).
+		SetHostURL(SlamCfg.Run.API.String())
+	if SlamCfg.Run.API.Scheme == `https` {
+		session = tls.NewLRUClientSessionCache(64)
+
+		client = client.SetTLSClientConfig(&tls.Config{
+			ServerName:         strings.SplitN(SlamCfg.Run.API.Host, `:`, 2)[0],
+			ClientSessionCache: session,
+			MinVersion:         tls.VersionTLS12,
+		}).SetRootCertificate(SlamCfg.Run.PathCA)
+	}
+
+	adm.ConfigureClient(client)
 
 	lm.GetLogger(`application`).Infoln(`Loading credentials`)
 	if err = loadCredentials(); err != nil {
