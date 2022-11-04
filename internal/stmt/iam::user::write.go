@@ -25,13 +25,15 @@ INSERT INTO       inventory.user (
                          firstName,
                          lastName,
                          uid,
-                         isActive
+                         isActive,
+                         createdBy
                   )
 SELECT            $1::uuid,
                   $2::text,
                   $3::text,
                   $4::text,
-                  'yes'::boolean
+                  'yes'::boolean,
+                  $5::uuid
 RETURNING         userID;`
 
 	MachineUpdateUID = `
