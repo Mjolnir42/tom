@@ -115,7 +115,14 @@ func run() int {
 	adm.ConfigureClient(client)
 
 	lm.GetLogger(`application`).Infoln(`Loading credentials`)
-	if err = loadCredentials(); err != nil {
+	if err = cred.LoadCredentials(
+		SlamCfg.CredPath,
+		&SlamCfg.Passphrase,
+		lm,
+		SlamCfg.PrivEPK,
+		&SlamCfg.PubKey,
+		nil,
+	); err != nil {
 		lm.GetLogger(`error`).Errorln(err)
 		return EX_ERROR
 	}
