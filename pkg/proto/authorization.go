@@ -37,7 +37,7 @@ func (a *Authorization) Serialize() []byte {
 
 // Signature ...
 type Signature struct {
-	DataHash  string `json:"hash"`
+	DataHash  string `json:"-"`
 	Signature string `json:"signature"`
 }
 
