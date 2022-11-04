@@ -1197,3 +1197,19 @@ BEGIN;
                      ( 'ix',         20220915999, 'modelupdate' ),
                      ( 'production', 20220915999, 'modelupdate' );
 COMMIT;
+GRANT   SELECT
+   ON   ALL TABLES IN SCHEMA view, public
+   TO   tomsvc;
+GRANT   USAGE
+   ON   SCHEMA abstract, asset, bulk, filter, inventory, ix, meta, production, view, yp
+   TO   tomsvc;
+GRANT   SELECT,
+        INSERT,
+        UPDATE,
+        DELETE
+   ON   ALL TABLES IN SCHEMA abstract, asset, bulk, filter, inventory, ix, meta, production, view, yp
+   TO   tomsvc;
+GRANT   USAGE,
+        SELECT
+   ON   ALL SEQUENCES IN SCHEMA abstract, asset, bulk, filter, inventory, ix, meta, production, view, yp
+   TO   tomsvc;
