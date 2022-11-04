@@ -8,11 +8,14 @@
 package iam // import "github.com/mjolnir42/tom/internal/model/iam"
 
 import (
+	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/rest"
+	"github.com/mjolnir42/tom/internal/stmt"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
@@ -85,9 +88,11 @@ func (m *Model) MachineEnrol(w http.ResponseWriter, r *http.Request,
 // enrolment is the handler for registering machine accounts
 func (h *UserWriteHandler) enrolment(q *msg.Request, mr *msg.Result) {
 	var (
+		err                        error
 		isMachine, isSelfEnrolment bool
 		enrolmentKey               sql.NullString
 		tx                         *sql.Tx
+		res                        sql.Result
 	)
 
 	if tx, err = h.conn.Begin(); err != nil {
