@@ -78,8 +78,13 @@ func (r *Request) CalculateDataHash() error {
 	hfunc.Write(r.Serialize())
 	dgst = hfunc.Sum(nil)
 
-	r.Auth.Sig = &Signature{
-		DataHash: base64.StdEncoding.EncodeToString(dgst),
+	switch r.Auth.Sig {
+	case nil:
+		r.Auth.Sig = &Signature{
+			DataHash: base64.StdEncoding.EncodeToString(dgst),
+		}
+	default:
+		r.Auth.Sig.DataHash = base64.StdEncoding.EncodeToString(dgst)
 	}
 
 	return nil
