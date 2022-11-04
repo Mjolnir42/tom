@@ -89,6 +89,7 @@ type Credential struct {
 func NewUserRequest() Request {
 	return Request{
 		User: NewUser(),
+		Auth: Authorization{},
 	}
 }
 
