@@ -3,6 +3,7 @@ module github.com/mjolnir42/tom
 go 1.15
 
 require (
+	github.com/Showmax/go-fqdn v1.0.0 // indirect
 	github.com/boltdb/bolt v1.3.1
 	github.com/droundy/goopt v0.0.0-20170604162106-0b8effe182da
 	github.com/gholt/blackfridaytext v0.0.0-20190816214545-16f7b9b9742e
