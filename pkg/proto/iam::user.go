@@ -86,6 +86,12 @@ type Credential struct {
 	Value    string `json:"value"`
 }
 
+func NewUserRequest() Request {
+	return Request{
+		User: NewUser(),
+	}
+}
+
 func NewUser() *User {
 	return &User{
 		Credential: &Credential{},
