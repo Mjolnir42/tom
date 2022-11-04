@@ -20,6 +20,7 @@ import (
 type Authorization struct {
 	Timestamp   string     `json:"timestamp"`
 	UserID      string     `json:"userID"`
+	Fingerprint string     `json:"key.fingerprint"`
 	Nonce       string     `json:"nonce"`
 	Sig         *Signature `json:"signature,omitempty"`
 	CSR         *DataCSR   `json:"csr,omitempty"`
@@ -36,6 +37,7 @@ func (a *Authorization) Serialize() []byte {
 	data := make([]byte, 0)
 	data = append(data, []byte(a.Timestamp)...)
 	data = append(data, []byte(a.UserID)...)
+	data = append(data, []byte(a.Fingerprint)...)
 	nonceBytes, _ := base64.StdEncoding.DecodeString(a.Nonce)
 	data = append(data, nonceBytes...)
 	if a.CSR != nil {
