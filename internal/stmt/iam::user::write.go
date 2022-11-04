@@ -48,20 +48,20 @@ WITH sel_usr AS ( SELECT inventory.user.userID
                   JOIN   inventory.identity_library
                     ON   inventory.identity_library.identityLibraryID
                      =   inventory.user.identityLibraryID
-                  WHERE  inventory.user.uid             = $6::text
+                  WHERE  inventory.user.uid              = $6::text
                     AND  inventory.identity_library.name = $7::text )
 INSERT INTO       inventory.user_key (
-	                     userID,
+                         userID,
                          publicKey,
                          fingerprint,
-						 validity,
-						 createdBy
+                         validity,
+                         createdBy
                   )
 SELECT            $1::uuid,
                   $2::text,
                   $3::text,
                   tstzrange( $4::timestamptz(3), $5::timestamptz(3), '[]'),
-                  $6::uuid;`
+                  $8::uuid;`
 )
 
 func init() {
