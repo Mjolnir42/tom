@@ -162,6 +162,9 @@ func (h *UserWriteHandler) enrolment(q *msg.Request, mr *msg.Result) {
 		mr.ServerError(err)
 		return
 	}
+	if !mr.AssertOneRowAffected(res.RowsAffected()) {
+		return
+	}
 
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err)
