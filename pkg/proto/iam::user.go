@@ -98,6 +98,14 @@ func NewUser() *User {
 	}
 }
 
+func (u *User) FormatDNS() string {
+	return u.UserName + `.` + u.LibraryName + `.` + EntityUser + `.tom`
+}
+
+func (u *User) FormatMachineDNS() string {
+	return u.UserName + `.` + u.LibraryName + `.` + EntityMachine + `.tom`
+}
+
 func (u *User) ParseTomID() error {
 	var typeID string
 	switch {
