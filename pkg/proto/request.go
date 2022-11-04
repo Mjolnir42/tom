@@ -8,6 +8,7 @@
 package proto //
 
 import (
+	"crypto/ed25519"
 	"encoding/base64"
 	"hash"
 
@@ -80,7 +81,39 @@ func (r *Request) CalculateDataHash() error {
 	r.Auth.Sig = &Signature{
 		DataHash: base64.StdEncoding.EncodeToString(dgst),
 	}
+
 	return nil
+}
+
+// Verify ....
+func (r *Request) Verify() (bool, error) {
+	var err error
+	var pubKeyBytes, msgBytes, sigBytes []byte
+	var res bool
+
+	if err = r.CalculateDataHash(); err != nil {
+		return res, err
+	}
+	if r.User.Credential.Category != CredentialPubKey {
+		return res, err
+	}
+	if r.Auth.Sig.Signature == `` {
+		return res, err
+	}
+
+	if msgBytes, err = base64.StdEncoding.DecodeString(r.Auth.Sig.DataHash); err != nil {
+		return res, err
+	}
+
+	if sigBytes, err = base64.StdEncoding.DecodeString(r.Auth.Sig.Signature); err != nil {
+		return res, err
+	}
+
+	if pubKeyBytes, err = base64.StdEncoding.DecodeString(r.User.Credential.Value); err != nil {
+		return res, err
+	}
+	res = ed25519.Verify(ed25519.PublicKey(pubKeyBytes), msgBytes, sigBytes)
+	return res, err
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
