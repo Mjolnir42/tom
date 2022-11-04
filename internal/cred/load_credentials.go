@@ -77,11 +77,9 @@ func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *ep
 	); err != nil && errors.Is(err, os.ErrNotExist) {
 		if initialize {
 			lm.GetLogger(`application`).Infoln(`initializing machine keypair`)
-			if err = createKeypairFiles(
+			if priv, pub, err = createKeypairFiles(
 				path,
 				*phrase,
-				priv,
-				pub,
 			); err != nil {
 				return err
 			}
@@ -107,6 +105,7 @@ func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *ep
 	lm.GetLogger(`application`).Infoln(`successfully unlocked public key from private key`)
 
 	if initialize {
+		lm.GetLogger(`application`).Infoln(`registering newly initialized credentials with TOM service`)
 		if err = registerMachineEnrollment(pub, priv, *phrase, ctx); err != nil {
 			return err
 		}
