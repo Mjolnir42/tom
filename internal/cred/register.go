@@ -52,7 +52,7 @@ func registerMachineEnrollment(pub *ed25519.PublicKey, priv *epk.EncryptedPrivat
 	spec := adm.Specification{
 		Name: proto.CmdMachEnrol,
 		Placeholder: map[string]string{
-			proto.PlHoldTomID: req.User.UserName,
+			proto.PlHoldTomID: req.User.FormatMachineDNS(),
 		},
 		Body: req,
 	}
