@@ -57,24 +57,39 @@
 
 ## Production Domain
 
-### Technical Product
+### Technical Product (Blueprint)
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
 [x] Mapping       n:m Deployment
-### Deployment
+    [ ] :add
+    [ ] :list
+    [ ] :remove
+    [ ] :show
+    [ ] :contains Deployment
+### Deployment  (Module)
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
 [x] Mapping       n:m Instance
-### Instance
+    [ ] :add
+    [ ] :list
+    [ ] :remove
+    [ ] :show
+    [ ] :partof Deployment
+### Instance (Artifact)
 [x] Base
 [x] SA
 [x] QA
 [ ] Linking
-### Shard
+    [ ] :add
+    [ ] :list
+    [ ] :remove
+    [ ] :show
+    [ ] :connects-to  Endpoint
+### Shard (Data)
 [x] Base
 [x] SA
 [x] QA
@@ -82,7 +97,7 @@
 [x] Parent        n:1 Technical Product
                   n:1 Deployment
                   n:1 Instance
-### Endpoint
+### Endpoint (Service)
 [x] Base
 [x] SA
 [x] QA
@@ -90,6 +105,11 @@
 [x] Parent        n:1 Technical Product
                   n:1 Deployment
                   n:1 Instance
+    [ ] :add
+    [ ] :list
+    [ ] :remove
+    [ ] :show
+    [ ] :provided-by  asset::*
 ### Netrange
 [x] Base
 [x] SA
@@ -98,6 +118,11 @@
 [x] Mapping       n:m Technical Product
                   n:m Deployment
                   n:m Instance
+    [ ] :add
+    [ ] :list
+    [ ] :remove
+    [ ] :show
+    [ ] :uses  Endpoint
 
 ## Reporting Domain
 
