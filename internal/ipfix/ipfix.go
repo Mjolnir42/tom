@@ -11,8 +11,11 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"os"
+	"os/signal"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/mjolnir42/lhm"
@@ -48,6 +51,12 @@ func init() {
 	}
 }
 
+type IPFIXServer interface {
+	Err() chan error
+	Exit() chan interface{}
+	Stop() chan error
+}
+
 type registry struct {
 	udpServer     *udpServer
 	udpClient     *udpClient
@@ -62,10 +71,12 @@ type registry struct {
 
 type ping struct{}
 
-func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (err error) {
+func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interface{}, err error) {
+	exit = make(chan interface{})
 	lm.GetLogger(`application`).Println(`IPFIX subsystem: starting`)
 	if !conf.IPFIX.Enabled {
 		lm.GetLogger(`application`).Println(`IPFIX subsystem: disabled by configuration`)
+		close(exit)
 		return
 	}
 	if !conf.IPFIX.Forwarding && !conf.IPFIX.Processing {
@@ -167,6 +178,56 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (err error) {
 	if err != nil {
 		return
 	}
+
+	go func() {
+		cancel := make(chan os.Signal, 1)
+		signal.Notify(cancel, os.Interrupt, syscall.SIGTERM)
+
+		var ipfixSrv IPFIXServer
+		var errordrain chan error
+
+		switch conf.IPFIX.ServerProto {
+		case ProtoUDP:
+			ipfixSrv = reg.udpServer
+		case ProtoTCP:
+			ipfixSrv = reg.tcpServer
+		case ProtoTLS:
+			ipfixSrv = reg.tlsServer
+		}
+	runloop:
+		for {
+			select {
+			case <-cancel:
+				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: received shutdown signal`)
+				errordrain = ipfixSrv.Stop()
+				break runloop
+			case <-ipfixSrv.Exit():
+				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: server process died`)
+				lm.GetLogger(`error`).Infoln(`IPFIX subsystem: server process died`)
+				break runloop
+			case err := <-ipfixSrv.Err():
+				lm.GetLogger(`error`).Errorln(err)
+			}
+		}
+
+		lm.GetLogger(`application`).Infoln(`IPFIX subsystem: flushing pending errors during shutdown`)
+	graceful:
+		for {
+			select {
+			case <-time.After(time.Second * 15):
+				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: breaking graceful shutdown after 15s`)
+				break graceful
+			case err := <-errordrain:
+				if err != nil {
+					lm.GetLogger(`error`).Errorln(err)
+					continue graceful
+				}
+				break graceful
+			}
+		}
+		close(exit)
+	}()
+
 	return
 }
 
