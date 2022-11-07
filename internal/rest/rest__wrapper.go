@@ -42,6 +42,15 @@ func (x *Rest) Authenticated(h httprouter.Handle) httprouter.Handle {
 	)
 }
 
+// Deny is the request wrapper to straight up refuse processing
+func (x *Rest) Deny(h httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request,
+		ps httprouter.Params) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized),
+			http.StatusUnauthorized)
+	}
+}
+
 // enrich is a wrapper that adds metadata information to the request
 func (x *Rest) enrich(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
