@@ -10,9 +10,9 @@
 package adm
 
 import (
-	"github.com/mjolnir42/tom/internal/cli/db"
-
 	"github.com/go-resty/resty/v2"
+	"github.com/mjolnir42/epk"
+	"github.com/mjolnir42/tom/internal/cli/db"
 )
 
 var (
@@ -21,6 +21,10 @@ var (
 	async         bool
 	jobSave       bool
 	postProcessor string
+	idLibID       string
+	userID        string
+	authenticate  bool
+	priv          *epk.EncryptedPrivateKey
 )
 
 func ConfigureClient(c *resty.Client) {
@@ -29,6 +33,23 @@ func ConfigureClient(c *resty.Client) {
 
 func ConfigureCache(c *db.DB) {
 	cache = c
+}
+
+func ConfigureIdentity(lib, user string) {
+	idLibID = lib
+	userID = user
+
+	if priv != nil {
+		authenticate = true
+	}
+}
+
+func ConfigureEPK(pk *epk.EncryptedPrivateKey) {
+	priv = pk
+
+	if idLibID != `` && userID != `` {
+		authenticate = true
+	}
 }
 
 func ActivateAsyncWait(b bool) {
