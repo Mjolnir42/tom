@@ -54,12 +54,14 @@ const (
 )
 
 const (
-	MethodDELETE = `DELETE`
-	MethodGET    = `GET`
-	MethodHEAD   = `HEAD`
-	MethodPATCH  = `PATCH`
-	MethodPOST   = `POST`
-	MethodPUT    = `PUT`
+	MethodDELETE    = `DELETE`
+	MethodGET       = `GET`
+	MethodHEAD      = `HEAD`
+	MethodPATCH     = `PATCH`
+	MethodPOST      = `POST`
+	MethodPUT       = `PUT`
+	AuthSchemeBasic = `Basic`
+	AuthSchemeEPK   = `TOM-epk`
 )
 
 const (
