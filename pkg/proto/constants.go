@@ -30,6 +30,11 @@ const (
 )
 
 const (
+	ModelInternal    = `internal`
+	EntitySupervisor = `supervisor`
+)
+
+const (
 	ActionAdd             = `add`
 	ActionAttrAdd         = `attribute.add`
 	ActionAttrRemove      = `attribute.remove`
