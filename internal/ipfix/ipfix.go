@@ -80,7 +80,8 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 		return
 	}
 	if !conf.IPFIX.Forwarding && !conf.IPFIX.Processing {
-		lm.GetLogger(`error`).Println(`IPFIX receiving is activated, but both forwarding and processing disabled - skipping`)
+		lm.GetLogger(`application`).Errorln(`IPFIX receiving is activated, but both forwarding and processing disabled - skipping`)
+		close(exit)
 		return
 	}
 
