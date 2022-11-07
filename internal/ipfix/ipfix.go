@@ -63,7 +63,9 @@ type registry struct {
 type ping struct{}
 
 func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (err error) {
+	lm.GetLogger(`application`).Println(`IPFIX subsystem: starting`)
 	if !conf.IPFIX.Enabled {
+		lm.GetLogger(`application`).Println(`IPFIX subsystem: disabled by configuration`)
 		return
 	}
 	if !conf.IPFIX.Forwarding && !conf.IPFIX.Processing {
@@ -110,6 +112,7 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (err error) {
 
 	// start client stage
 	if conf.IPFIX.Forwarding {
+		lm.GetLogger(`application`).Println(`IPFIX subsystem: starting forwarding client`)
 		switch conf.IPFIX.ForwardProto {
 		case ProtoUDP:
 			reg.udpClient, err = newUDPClient(conf.IPFIX, outpipe, pool, lm)
@@ -125,11 +128,14 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (err error) {
 		if err != nil {
 			return
 		}
+	} else {
+		lm.GetLogger(`application`).Println(`IPFIX subsystem: forwarding disabled`)
 	}
 
 	// start processing stage
 	if conf.IPFIX.Processing {
 		for _, s := range strings.Split(conf.IPFIX.ProcessType, `,`) {
+			lm.GetLogger(`application`).Println(`IPFIX subsystem: starting processing functions`)
 			switch s {
 			case ProcFilter:
 				reg.procFilter, err = newFilter(conf.IPFIX, inpipe, outpipe, mirror, pool, lm)
@@ -142,9 +148,12 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (err error) {
 				return
 			}
 		}
+	} else {
+		lm.GetLogger(`application`).Println(`IPFIX subsystem: processing disabled`)
 	}
 
 	// start server stage
+	lm.GetLogger(`application`).Printf("IPFIX subsystem: starting server protocol %s", conf.IPFIX.ServerProto)
 	switch conf.IPFIX.ServerProto {
 	case ProtoUDP:
 		reg.udpServer, err = newUDPServer(conf.IPFIX, pipe, pool, lm)

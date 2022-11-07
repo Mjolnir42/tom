@@ -94,7 +94,7 @@ func (s *tlsServer) Exit() chan interface{} {
 
 func (s *tlsServer) serve() {
 	defer s.wg.Done()
-	log.Println(`tlsServer: start serving clients`)
+	s.lm.GetLogger(`application`).Infoln(`IPFIX|tlsServer: start serving clients`)
 
 	connections := make(chan net.Conn)
 
@@ -125,17 +125,17 @@ serveloop:
 		case conn := <-connections:
 			s.wg.Add(1)
 			go func() {
-				log.Printf("tlsServer: accepted connection from: %s\n",
+				s.lm.GetLogger(`application`).Printf("IPFIX|tlsServer: accepted connection from: %s\n",
 					conn.RemoteAddr().String(),
 				)
 				s.handleConnection(conn)
 				s.wg.Done()
 			}()
 		case <-s.exit:
-			log.Println(`tlsServer: goroutine indicated fatal error`)
+			s.lm.GetLogger(`application`).Println(`IPFIX|tlsServer: goroutine indicated fatal error`)
 			break serveloop
 		case <-s.quit:
-			log.Println(`tlsServer: received shutdown signal`)
+			s.lm.GetLogger(`application`).Println(`IPFIX|tlsServer: received shutdown signal`)
 			break serveloop
 		}
 	}
@@ -182,7 +182,7 @@ ReadLoop:
 				// been closed yet
 				select {
 				case <-s.quit:
-					log.Printf("tlsServer: forcing close on connection from: %s\n",
+					s.lm.GetLogger(`application`).Printf("IPFIX|tlsServer: forcing close on connection from: %s\n",
 						conn.RemoteAddr().String(),
 					)
 					break ReadLoop
