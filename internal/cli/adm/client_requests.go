@@ -34,11 +34,11 @@ type Specification struct {
 // WRAPPER
 func Perform(cmd Specification, c *cli.Context) error {
 	var (
-		err     error
-		path    string
-		resp    *resty.Response
-		verbose bool
-		r       *resty.Request
+		err         error
+		path, token string
+		resp        *resty.Response
+		verbose     bool
+		r           *resty.Request
 	)
 
 	if _, ok := proto.Commands[cmd.Name]; !ok {
@@ -82,8 +82,17 @@ func Perform(cmd Specification, c *cli.Context) error {
 	//
 	r = client.R()
 	if authenticate {
+		if token, err = cred.CalcEpkAuthToken(msg.Super{
+			PK:         priv,
+			Phrase:     epkPhrase,
+			RequestURI: path,
+			IDLib:      idLibID,
+			UserID:     userID,
+		}); err != nil {
+			return err
+		}
 		r = r.SetAuthScheme(proto.AuthSchemeEPK)
-		r = r.SetAuthToken(generateTokenEPK(path))
+		r = r.SetAuthToken(token)
 	}
 
 	switch proto.Commands[cmd.Name].Method {
@@ -292,8 +301,17 @@ func asyncWait(result *proto.Result) {
 
 	r := client.R()
 	if authenticate {
+		if token, err = cred.CalcEpkAuthToken(msg.Super{
+			PK:         priv,
+			Phrase:     epkPhrase,
+			RequestURI: path,
+			IDLib:      idLibID,
+			UserID:     userID,
+		}); err != nil {
+			return err
+		}
 		r = r.SetAuthScheme(proto.AuthSchemeEPK)
-		r = r.SetAuthToken(generateTokenEPK(path))
+		r = r.SetAuthToken(token)
 	}
 
 	if result.StatusCode == 202 && result.JobID != "" {
