@@ -28,6 +28,8 @@ type Request struct {
 	Reply      chan Result `json:"-"`
 	Verbose    bool
 
+	Auth Super
+
 	Update UpdateData
 
 	Container     proto.Container
@@ -82,6 +84,14 @@ func New(r *http.Request, params httprouter.Params, cmd, sec, ac string) Request
 type UpdateData struct {
 	Team proto.Team
 	User proto.User
+}
+
+type Super struct {
+	Nonce      []byte
+	RequestURI string
+	IDLib      string
+	UserID     string
+	Sig        []byte
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
