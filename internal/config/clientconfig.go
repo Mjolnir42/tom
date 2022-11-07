@@ -21,6 +21,7 @@ type ClientConfig struct {
 	LogDir   string        `json:"logdir"`
 	ProcJSON string        `json:"json.output.processor"`
 	CAFile   string        `json:"ca.file"`
+	CredPath string        `json:"credential.path"`
 	Run      RunTimeConfig `json:"-"`
 }
 

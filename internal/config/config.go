@@ -38,11 +38,6 @@ type DbConfig struct {
 	TLSMode string `json:"tlsmode"`
 }
 
-type AuthConfig struct {
-	TokenSeed string `json:"token.seed"`
-	TokenKey  string `json:"token.key"`
-}
-
 type Daemon struct {
 	URL    *url.URL `json:"-"`
 	Listen string   `json:"listen"`
