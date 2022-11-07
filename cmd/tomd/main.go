@@ -25,6 +25,7 @@ import (
 	"github.com/mjolnir42/tom/internal/model/iam"
 	"github.com/mjolnir42/tom/internal/model/meta"
 	"github.com/mjolnir42/tom/internal/model/page"
+	"github.com/mjolnir42/tom/internal/model/super"
 	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/rest"
 	"github.com/sirupsen/logrus"
@@ -132,6 +133,7 @@ func run() int {
 		meta.New(api).RouteRegister(router)
 		asset.New(api).RouteRegister(router)
 		page.New(api).RouteRegister(router)
+		super.New(api).RouteRegister(router)
 
 		lm.GetLogger(`application`).Infof(
 			"Running API router interface %d for %s",
