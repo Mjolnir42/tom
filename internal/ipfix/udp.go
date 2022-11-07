@@ -31,6 +31,7 @@ type udpServer struct {
 	pipe       chan []byte
 	pool       *sync.Pool
 	lm         *lhm.LogHandleMap
+	shutdown   bool
 }
 
 func newUDPServer(conf config.SettingsIPFIX, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpServer, error) {
@@ -84,6 +85,13 @@ UDPDataLoop:
 				} else if opErr, ok := err.(*net.OpError); ok && opErr.Timeout() {
 					// net package triggered timeout
 					continue UDPDataLoop
+				} else if errors.Is(err, net.ErrClosed) {
+					// listener was closed
+					if !s.shutdown {
+						s.err <- fmt.Errorf("udpServer/ReadFromUDP/fatal: %w", err)
+						close(s.exit)
+					}
+					break UDPDataLoop
 				} else if err != io.EOF {
 					s.err <- fmt.Errorf("udpServer/ReadFromUDP/fatal: %w", err)
 					close(s.exit)
@@ -135,6 +143,7 @@ func (s *udpServer) Exit() chan interface{} {
 }
 
 func (s *udpServer) Stop() chan error {
+	s.shutdown = true
 	go func(e chan error) {
 		s.lm.GetLogger(`application`).Println(`UDP|STOP: Closing quit indicator channel`)
 		close(s.quit)
