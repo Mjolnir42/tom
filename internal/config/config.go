@@ -25,6 +25,7 @@ type Configuration struct {
 	LogPath  string     `json:"log.path"`
 	Version  string     `json:"-"`
 	QueueLen int        `json:"handler.queue.length,string"`
+	Enforce  bool       `json:"enforcement,string"`
 }
 
 type DbConfig struct {
