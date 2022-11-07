@@ -25,6 +25,7 @@ var (
 	userID        string
 	authenticate  bool
 	priv          *epk.EncryptedPrivateKey
+	epkPhrase     string
 )
 
 func ConfigureClient(c *resty.Client) {
@@ -39,13 +40,14 @@ func ConfigureIdentity(lib, user string) {
 	idLibID = lib
 	userID = user
 
-	if priv != nil {
+	if priv != nil && epkPhrase != `` {
 		authenticate = true
 	}
 }
 
-func ConfigureEPK(pk *epk.EncryptedPrivateKey) {
+func ConfigureEPK(pk *epk.EncryptedPrivateKey, ph string) {
 	priv = pk
+	epkPhrase = ph
 
 	if idLibID != `` && userID != `` {
 		authenticate = true
