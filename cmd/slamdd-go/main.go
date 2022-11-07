@@ -20,6 +20,7 @@ import (
 	"github.com/mjolnir42/tom/internal/cli/adm"
 	"github.com/mjolnir42/tom/internal/config"
 	"github.com/mjolnir42/tom/internal/cred"
+	"github.com/mjolnir42/tom/internal/ipfix"
 	"github.com/sirupsen/logrus"
 )
 
@@ -125,6 +126,21 @@ func run() int {
 	); err != nil {
 		lm.GetLogger(`error`).Errorln(err)
 		return EX_ERROR
+	}
+
+	var ipfEx chan interface{}
+	if ipfEx, err = ipfix.New(SlamCfg, lm); err != nil {
+		lm.GetLogger(`error`).Errorln(err)
+		return EX_ERROR
+	}
+
+	lm.GetLogger(`application`).Println(`Waiting for signals`)
+runloop:
+	for {
+		select {
+		case <-ipfEx:
+			break runloop
+		}
 	}
 
 	return EX_OK
