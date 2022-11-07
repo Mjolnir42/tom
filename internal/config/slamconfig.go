@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"net/url"
 	"path/filepath"
+	"strings"
 
 	"github.com/mjolnir42/epk"
 	"github.com/mjolnir42/lhm"
@@ -25,7 +26,7 @@ type SlamConfiguration struct {
 	LogLevel   string                   `json:"log.level"`
 	LogPath    string                   `json:"log.path"`
 	CredPath   string                   `json:"credential.path"`
-	IPFIX      SettingsIPFIX            `json:"settings.ipfix"`
+	IPFIX      SettingsIPFIX            `json:"ipfix"`
 	API        string                   `json:"api"`
 	CAFile     string                   `json:"api.ca.file"`
 	Version    string                   `json:"-"`
@@ -88,6 +89,16 @@ func (c *SlamConfiguration) Parse(fname string, lh *lhm.LogHandleMap) error {
 	if c.CAFile != `` {
 		c.Run.PathCA = filepath.Clean(c.CAFile)
 	}
+
+	c.IPFIX.ServerProto = strings.TrimSpace(c.IPFIX.ServerProto)
+	c.IPFIX.ListenADDR = strings.TrimSpace(c.IPFIX.ListenADDR)
+	c.IPFIX.ForwardADDR = strings.TrimSpace(c.IPFIX.ForwardADDR)
+	c.IPFIX.ForwardProto = strings.TrimSpace(c.IPFIX.ForwardProto)
+	c.IPFIX.ServerName = strings.TrimSpace(c.IPFIX.ServerName)
+	c.IPFIX.CAFile = strings.TrimSpace(c.IPFIX.CAFile)
+	c.IPFIX.CertFile = strings.TrimSpace(c.IPFIX.CertFile)
+	c.IPFIX.CertKeyFile = strings.TrimSpace(c.IPFIX.CertKeyFile)
+	c.IPFIX.ProcessType = strings.TrimSpace(c.IPFIX.ProcessType)
 
 	return nil
 }
