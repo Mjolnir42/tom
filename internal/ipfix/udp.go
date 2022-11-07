@@ -53,7 +53,7 @@ func newUDPServer(conf config.SettingsIPFIX, pipe chan []byte, pool *sync.Pool, 
 		return nil, fmt.Errorf("udpServer/ListenUDP: %w", err)
 	}
 	s.lm.GetLogger(`application`).Printf(
-		"udpServer: listening on %s\n", conf.ListenADDR,
+		"udpServer: listening on %s", conf.ListenADDR,
 	)
 
 	s.wg.Add(1)

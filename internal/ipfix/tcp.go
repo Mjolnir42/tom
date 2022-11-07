@@ -31,6 +31,7 @@ type tcpServer struct {
 	pipe     chan []byte
 	pool     *sync.Pool
 	lm       *lhm.LogHandleMap
+	shutdown bool
 }
 
 func newTCPServer(conf config.SettingsIPFIX, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*tcpServer, error) {
@@ -111,6 +112,7 @@ serveloop:
 }
 
 func (s *tcpServer) Stop() chan error {
+	s.shutdown = true
 	go func(e chan error) {
 		close(s.quit)
 		s.listener.Close()
