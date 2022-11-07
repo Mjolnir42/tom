@@ -3,13 +3,13 @@
 ## Asset Domain
 
 ### Server
-[ ] Done.
+[x] Done.
 ### Runtime Environment
-[ ] Done.
+[x] Done.
 ### Orchestration Environment
-[ ] Done.
+[x] Done.
 ### Container
-[ ] Done.
+[x] Done.
 ### Socket
 [ ] ToDo
 
