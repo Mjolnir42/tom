@@ -30,27 +30,28 @@ const (
 )
 
 const (
-	ActionAdd        = `add`
-	ActionAttrAdd    = `attribute.add`
-	ActionAttrRemove = `attribute.remove`
-	ActionEnrolment  = `enrolment`
-	ActionHdSet      = `headof.set`
-	ActionHdUnset    = `headof.unset`
-	ActionLink       = `link`
-	ActionList       = `list`
-	ActionMbrAdd     = `member.add`
-	ActionMbrList    = `member.list`
-	ActionMbrRemove  = `member.remove`
-	ActionMbrSet     = `member.set`
-	ActionPropRemove = `property.remove`
-	ActionPropSet    = `property.set`
-	ActionPropUpdate = `property.update`
-	ActionRemove     = `remove`
-	ActionResolve    = `resolve`
-	ActionShow       = `show`
-	ActionStack      = `stack`
-	ActionUnstack    = `unstack`
-	ActionUpdate     = `update`
+	ActionAdd             = `add`
+	ActionAttrAdd         = `attribute.add`
+	ActionAttrRemove      = `attribute.remove`
+	ActionAuthenticateEPK = `authenticate-epk`
+	ActionEnrolment       = `enrolment`
+	ActionHdSet           = `headof.set`
+	ActionHdUnset         = `headof.unset`
+	ActionLink            = `link`
+	ActionList            = `list`
+	ActionMbrAdd          = `member.add`
+	ActionMbrList         = `member.list`
+	ActionMbrRemove       = `member.remove`
+	ActionMbrSet          = `member.set`
+	ActionPropRemove      = `property.remove`
+	ActionPropSet         = `property.set`
+	ActionPropUpdate      = `property.update`
+	ActionRemove          = `remove`
+	ActionResolve         = `resolve`
+	ActionShow            = `show`
+	ActionStack           = `stack`
+	ActionUnstack         = `unstack`
+	ActionUpdate          = `update`
 )
 
 const (
