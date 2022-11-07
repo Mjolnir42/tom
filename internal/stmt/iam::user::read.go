@@ -24,7 +24,7 @@ JOIN        inventory.user
   ON        inventory.user_key.userID = inventory.user.userID
 JOIN        inventory.identity_library
   ON        inventory.user.identityLibraryID = inventory.identity_library.identityLibraryID
-WHERE       now()::timestamptz(3) <@ inventory.user_key.validity
+WHERE       $3::timestamptz(3) <@ inventory.user_key.validity
   AND       inventory.user.uID = $1::text
   AND       inventory.identity_library.name = $2::text
   AND       inventory.user.isActive
