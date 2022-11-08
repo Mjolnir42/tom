@@ -5,7 +5,7 @@
  * that can be found in the LICENSE file.
  */
 
-package super // import "github.com/mjolnir42/tom/internal/model/super/"
+package supervisor // import "github.com/mjolnir42/tom/internal/model/supervisor/"
 
 import (
 	"database/sql"
@@ -35,6 +35,7 @@ func supervisorAuthEPK(m *Model) httprouter.Handle {
 func (m *Model) SupervisorAuth(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
+	// wrapped in Rest.Deny() this function should never be reached
 	request := msg.New(
 		r, params,
 		proto.CmdSupervisorAuthEPK,
