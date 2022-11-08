@@ -12,6 +12,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/epk"
 	"github.com/mjolnir42/tom/pkg/proto"
 	uuid "github.com/satori/go.uuid"
 )
@@ -87,11 +88,12 @@ type UpdateData struct {
 }
 
 type Super struct {
-	Nonce      []byte
+	PK         *epk.EncryptedPrivateKey
+	Phrase     string
 	RequestURI string
 	IDLib      string
 	UserID     string
-	Sig        []byte
+	Token      string
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
