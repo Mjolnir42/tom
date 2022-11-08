@@ -25,6 +25,8 @@ type Result struct {
 	Err        error
 	Verbose    bool
 
+	Auth Super
+
 	Container           []proto.Container
 	ContainerHeader     []proto.ContainerHeader
 	Library             []proto.Library
