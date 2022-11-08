@@ -14,33 +14,31 @@ import (
 	"path/filepath"
 
 	"github.com/mjolnir42/epk"
-	"golang.org/x/crypto/ed25519"
+	"github.com/mjolnir42/tom/internal/config"
 )
 
-func createKeypairFiles(path, phrase string) (*epk.EncryptedPrivateKey, *ed25519.PublicKey, error) {
+func createKeypairFiles(cfg *config.AuthConfiguration) error {
 	var err error
 	var fd *os.File
-	var priv *epk.EncryptedPrivateKey
-	var pub ed25519.PublicKey
 
-	if priv, pub, err = epk.New(phrase); err != nil {
-		return nil, nil, err
+	if cfg.PrivEPK, cfg.PubKey, err = epk.New(cfg.Passphrase); err != nil {
+		return err
 	}
 
-	if fd, err = os.Create(filepath.Join(path, `machinekey.epk`)); err != nil {
-		return nil, nil, err
+	if fd, err = os.Create(filepath.Join(cfg.CredPath, `machinekey.epk`)); err != nil {
+		return err
 	}
-	if err = priv.Store(fd); err != nil {
-		return nil, nil, err
+	if err = cfg.PrivEPK.Store(fd); err != nil {
+		return err
 	}
 	fd.Close()
 
-	if fd, err = os.Create(filepath.Join(path, `machinekey.pub`)); err != nil {
-		return nil, nil, err
+	if fd, err = os.Create(filepath.Join(cfg.CredPath, `machinekey.pub`)); err != nil {
+		return err
 	}
-	fmt.Fprintf(fd, "%s %s\n", `ed25519-epk-pub`, base64.StdEncoding.EncodeToString(pub))
+	fmt.Fprintf(fd, "%s %s\n", `ed25519-epk-pub`, base64.StdEncoding.EncodeToString(cfg.PubKey))
 	fd.Close()
-	return priv, &pub, nil
+	return nil
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

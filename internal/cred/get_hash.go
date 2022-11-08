@@ -17,18 +17,16 @@ import (
 
 const magicHashKey string = `engineroom.machine.tom`
 
-func GetHash(pub *ed25519.PublicKey) (string, error) {
+func GetHash(pub ed25519.PublicKey) (string, error) {
 	var err error
 	var hfunc hash.Hash
-	var dgst, keyBytes []byte
+	var dgst []byte
 
 	if hfunc, err = blake2b.New(16, []byte(magicHashKey)); err != nil {
 		return ``, err
 	}
 
-	keyBytes = []byte(*pub)
-	hfunc.Write(keyBytes)
-
+	hfunc.Write([]byte(pub))
 	dgst = hfunc.Sum(nil)
 	return fmt.Sprintf("%x", dgst), nil
 }

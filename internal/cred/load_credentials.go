@@ -15,11 +15,11 @@ import (
 
 	"github.com/mjolnir42/epk"
 	"github.com/mjolnir42/lhm"
+	"github.com/mjolnir42/tom/internal/config"
 	"github.com/urfave/cli/v2"
-	"golang.org/x/crypto/ed25519"
 )
 
-func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *epk.EncryptedPrivateKey, pub *ed25519.PublicKey, ctx *cli.Context) (bool, error) {
+func LoadCredentials(cfg *config.AuthConfiguration, lm *lhm.LogHandleMap, ctx *cli.Context) (bool, error) {
 	var (
 		err        error
 		initialize bool = true
@@ -28,17 +28,17 @@ func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *ep
 	)
 
 	// fix up credential path
-	if path, err = filepath.Abs(path); err != nil {
+	if cfg.CredPath, err = filepath.Abs(cfg.CredPath); err != nil {
 		return false, err
 	}
-	if path, err = filepath.EvalSymlinks(path); err != nil {
+	if cfg.CredPath, err = filepath.EvalSymlinks(cfg.CredPath); err != nil {
 		return false, err
 	}
-	if _, err = os.Open(path); err != nil {
+	if _, err = os.Open(cfg.CredPath); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			lm.GetLogger(`application`).Infoln(`Credential directory missing, attempting create.`)
 
-			if err = os.Mkdir(path, os.FileMode(0750)); err == nil {
+			if err = os.Mkdir(cfg.CredPath, os.FileMode(0750)); err == nil {
 				lm.GetLogger(`application`).Infoln(`successfully created credential directory.`)
 			}
 		} else {
@@ -48,11 +48,11 @@ func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *ep
 
 	// load passphrase for private key from file
 	if rawPass, err = ioutil.ReadFile(
-		filepath.Join(path, `passphrase`),
+		filepath.Join(cfg.CredPath, `passphrase`),
 	); err != nil && errors.Is(err, os.ErrNotExist) {
 		if initialize {
 			lm.GetLogger(`application`).Infoln(`initializing passphrase file`)
-			if err = createPassphraseFile(filepath.Join(path, `passphrase`), phrase); err != nil {
+			if err = createPassphraseFile(filepath.Join(cfg.CredPath, `passphrase`), cfg); err != nil {
 				return false, err
 			}
 		} else {
@@ -67,20 +67,17 @@ func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *ep
 		if len(rawPass) == 0 {
 			return false, errors.New(`passphrase file is empty`)
 		}
-		*phrase = string(mask(rawPass))
+		cfg.Passphrase = string(mask(rawPass))
 		lm.GetLogger(`application`).Infoln(`successfully loaded passphrase from file`)
 	}
 
 	// load keypair from file
 	if fd, err = os.Open(
-		filepath.Join(path, `machinekey.epk`),
+		filepath.Join(cfg.CredPath, `machinekey.epk`),
 	); err != nil && errors.Is(err, os.ErrNotExist) {
 		if initialize {
 			lm.GetLogger(`application`).Infoln(`initializing machine keypair`)
-			if priv, pub, err = createKeypairFiles(
-				path,
-				*phrase,
-			); err != nil {
+			if err = createKeypairFiles(cfg); err != nil {
 				return false, err
 			}
 		} else {
@@ -92,14 +89,14 @@ func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *ep
 	} else {
 		// successfully read private keyfile, deactivate initialize mode
 		initialize = false
-		if priv, err = epk.ReadFrom(fd); err != nil {
+		if cfg.PrivEPK, err = epk.ReadFrom(fd); err != nil {
 			return false, err
 		}
 		lm.GetLogger(`application`).Infoln(`successfully loaded private key from file`)
 	}
 
 	// test loaded credentials
-	if *pub, err = priv.Public(*phrase); err != nil {
+	if cfg.PubKey, err = cfg.PrivEPK.Public(cfg.Passphrase); err != nil {
 		return false, err
 	}
 	lm.GetLogger(`application`).Infoln(`successfully unlocked public key from private key`)

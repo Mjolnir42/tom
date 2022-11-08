@@ -17,12 +17,12 @@ import (
 )
 
 type ClientConfig struct {
-	API      string        `json:"api"`
-	LogDir   string        `json:"logdir"`
-	ProcJSON string        `json:"json.output.processor"`
-	CAFile   string        `json:"ca.file"`
-	CredPath string        `json:"credential.path"`
-	Run      RunTimeConfig `json:"-"`
+	API      string             `json:"api"`
+	LogDir   string             `json:"logdir"`
+	ProcJSON string             `json:"json.output.processor"`
+	CAFile   string             `json:"ca.file"`
+	Auth     *AuthConfiguration `json:"authentication"`
+	Run      RunTimeConfig      `json:"-"`
 }
 
 type RunTimeConfig struct {

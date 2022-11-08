@@ -12,9 +12,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/mjolnir42/tom/internal/config"
 )
 
-func createPassphraseFile(path string, phrase *string) error {
+func createPassphraseFile(path string, cfg *config.AuthConfiguration) error {
 	d := make([]byte, 32)
 	if _, err := io.ReadFull(cryptorand.Reader, d[:32]); err != nil {
 		return err
@@ -26,7 +28,7 @@ func createPassphraseFile(path string, phrase *string) error {
 	}
 	fmt.Fprintf(f, "%x\n", d)
 	f.Close()
-	*phrase = string(mask([]byte(fmt.Sprintf("%x", d))))
+	cfg.Passphrase = string(mask([]byte(fmt.Sprintf("%x", d))))
 	return nil
 }
 
