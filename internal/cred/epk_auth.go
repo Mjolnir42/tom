@@ -48,7 +48,7 @@ func CalcEpkAuthToken(data msg.Super) (string, error) {
 	}
 
 	// generate key fingerprint
-	if fp, err = GetHash(&pubkey); err != nil {
+	if fp, err = GetHash(pubkey); err != nil {
 		return ``, err
 	}
 

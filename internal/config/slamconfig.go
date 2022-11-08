@@ -22,18 +22,22 @@ import (
 )
 
 type SlamConfiguration struct {
-	Daemon     []Daemon                 `json:"daemon"`
-	LogLevel   string                   `json:"log.level"`
-	LogPath    string                   `json:"log.path"`
-	CredPath   string                   `json:"credential.path"`
-	IPFIX      SettingsIPFIX            `json:"ipfix"`
-	API        string                   `json:"api"`
-	CAFile     string                   `json:"api.ca.file"`
-	Version    string                   `json:"-"`
+	Daemon   []Daemon           `json:"daemon"`
+	LogLevel string             `json:"log.level"`
+	LogPath  string             `json:"log.path"`
+	IPFIX    SettingsIPFIX      `json:"ipfix"`
+	API      string             `json:"api"`
+	CAFile   string             `json:"api.ca.file"`
+	Auth     *AuthConfiguration `json:"authentication"`
+	Version  string             `json:"-"`
+	Run      RunTimeConfig      `json:"-"`
+}
+
+type AuthConfiguration struct {
 	Passphrase string                   `json:"-"`
 	PubKey     ed25519.PublicKey        `json:"-"`
 	PrivEPK    *epk.EncryptedPrivateKey `json:"-"`
-	Run        RunTimeConfig            `json:"-"`
+	CredPath   string                   `json:"credential.path"`
 }
 
 type SettingsIPFIX struct {

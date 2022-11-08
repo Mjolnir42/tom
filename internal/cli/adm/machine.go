@@ -14,21 +14,20 @@ import (
 	"time"
 
 	"github.com/Showmax/go-fqdn"
-	"github.com/mjolnir42/epk"
+	"github.com/mjolnir42/tom/internal/config"
 	"github.com/mjolnir42/tom/internal/cred"
 	"github.com/mjolnir42/tom/pkg/proto"
 	"github.com/urfave/cli/v2"
-	"golang.org/x/crypto/ed25519"
 )
 
-func RegisterMachineEnrollment(pub *ed25519.PublicKey, priv *epk.EncryptedPrivateKey, phrase string, ctx *cli.Context) error {
+func RegisterMachineEnrollment(cfg *config.AuthConfiguration, ctx *cli.Context) error {
 	var err error
 
-	ConfigureEPK(priv, phrase)
+	ConfigureEPK(cfg.PrivEPK, cfg.Passphrase)
 
 	req := proto.NewUserRequest()
 	req.User.LibraryName = `engineroom`
-	if req.User.UserName, err = cred.GetHash(pub); err != nil {
+	if req.User.UserName, err = cred.GetHash(cfg.PubKey); err != nil {
 		return err
 	}
 	if req.User.FirstName, err = os.Hostname(); err != nil {
@@ -38,13 +37,13 @@ func RegisterMachineEnrollment(pub *ed25519.PublicKey, priv *epk.EncryptedPrivat
 		return err
 	}
 	req.User.Credential.Category = proto.CredentialPubKey
-	req.User.Credential.Value = base64.StdEncoding.EncodeToString(*pub)
+	req.User.Credential.Value = base64.StdEncoding.EncodeToString(cfg.PubKey)
 
 	req.Auth.Timestamp = time.Now().Format(time.RFC3339)
 	req.Auth.UserID = req.User.UserName
 	req.Auth.Fingerprint = req.User.UserName
 
-	if err = cred.SignRequestBody(&req, priv, phrase); err != nil {
+	if err = cred.SignRequestBody(&req, cfg); err != nil {
 		return err
 	}
 

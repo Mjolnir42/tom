@@ -10,11 +10,11 @@ package cred // import "github.com/mjolnir42/tom/internal/cred"
 import (
 	"encoding/base64"
 
-	"github.com/mjolnir42/epk"
+	"github.com/mjolnir42/tom/internal/config"
 	"github.com/mjolnir42/tom/pkg/proto"
 )
 
-func SignRequestBody(req *proto.Request, priv *epk.EncryptedPrivateKey, phrase string) error {
+func SignRequestBody(req *proto.Request, cfg *config.AuthConfiguration) error {
 	var err error
 	var msgBytes, sig []byte
 
@@ -24,7 +24,7 @@ func SignRequestBody(req *proto.Request, priv *epk.EncryptedPrivateKey, phrase s
 	if msgBytes, err = base64.StdEncoding.DecodeString(req.Auth.Sig.DataHash); err != nil {
 		return err
 	}
-	if sig, err = priv.Sign(phrase, msgBytes); err != nil {
+	if sig, err = cfg.PrivEPK.Sign(cfg.Passphrase, msgBytes); err != nil {
 		return err
 	}
 	req.Auth.Sig.Signature = base64.StdEncoding.EncodeToString(sig)

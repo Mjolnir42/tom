@@ -16,12 +16,14 @@ import (
 
 	"github.com/droundy/goopt"
 	"github.com/go-resty/resty/v2"
+	"github.com/mjolnir42/epk"
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/cli/adm"
 	"github.com/mjolnir42/tom/internal/config"
 	"github.com/mjolnir42/tom/internal/cred"
 	"github.com/mjolnir42/tom/internal/ipfix"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/ed25519"
 )
 
 // global variables
@@ -98,6 +100,11 @@ func run() int {
 		os.Exit(EX_ABORT)
 	})
 
+	SlamCfg.Auth = &config.AuthConfiguration{
+		PrivEPK: &epk.EncryptedPrivateKey{},
+		PubKey:  ed25519.PublicKey{},
+	}
+
 	// setup REST client
 	client = resty.New().
 		SetDisableWarn(true).
@@ -118,18 +125,15 @@ func run() int {
 	var initialize bool
 	lm.GetLogger(`application`).Infoln(`Loading credentials`)
 	if initialize, err = cred.LoadCredentials(
-		SlamCfg.CredPath,
-		&SlamCfg.Passphrase,
+		SlamCfg.Auth,
 		lm,
-		SlamCfg.PrivEPK,
-		&SlamCfg.PubKey,
 		nil,
 	); err != nil {
 		lm.GetLogger(`error`).Errorln(err)
 		return EX_ERROR
 	} else if initialize {
 		lm.GetLogger(`application`).Infoln(`registering newly initialized credentials with TOM service`)
-		adm.RegisterMachineEnrollment(&SlamCfg.PubKey, SlamCfg.PrivEPK, SlamCfg.Passphrase, nil)
+		adm.RegisterMachineEnrollment(SlamCfg.Auth, nil)
 	}
 
 	var ipfEx chan interface{}
