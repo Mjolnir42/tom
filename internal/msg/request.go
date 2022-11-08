@@ -15,6 +15,7 @@ import (
 	"github.com/mjolnir42/epk"
 	"github.com/mjolnir42/tom/pkg/proto"
 	uuid "github.com/satori/go.uuid"
+	"golang.org/x/crypto/ed25519"
 )
 
 type Request struct {
@@ -94,6 +95,11 @@ type Super struct {
 	IDLib      string
 	UserID     string
 	Token      string
+	Nonce      []byte
+	Time       []byte
+	FP         string
+	Signature  []byte
+	Public     ed25519.PublicKey
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

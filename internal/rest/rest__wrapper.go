@@ -209,7 +209,7 @@ func (x *Rest) epkAuth(h httprouter.Handle) httprouter.Handle {
 		}
 
 	unauthorized:
-		w.Header().Set(`WWW-Authenticate`, `Basic realm=Restricted`)
+		w.Header().Set(`WWW-Authenticate`, `TOM-epk realm=Restricted`)
 		http.Error(w, http.StatusText(http.StatusUnauthorized),
 			http.StatusUnauthorized)
 	}

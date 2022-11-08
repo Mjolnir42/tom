@@ -22,6 +22,7 @@ import (
 	"golang.org/x/crypto/ed25519"
 )
 
+// CalcEpkAuthToken ...
 func CalcEpkAuthToken(data msg.Super) (string, error) {
 	var (
 		err                         error
@@ -81,6 +82,29 @@ func CalcEpkAuthToken(data msg.Super) (string, error) {
 	)
 	// return base64 encoded token
 	return base64.StdEncoding.EncodeToString([]byte(token)), nil
+}
+
+// VerifyEpkAuthToken ...
+func VerifyEpkAuthToken(data msg.Super) bool {
+	var (
+		err   error
+		hfunc hash.Hash
+		dgst  []byte
+	)
+
+	// generate digest
+	if hfunc, err = blake2b.New(16, nil); err != nil {
+		return false
+	}
+	hfunc.Write(data.Nonce)
+	hfunc.Write(data.Time)
+	hfunc.Write([]byte(data.FP))
+	hfunc.Write([]byte(data.RequestURI))
+	hfunc.Write([]byte(data.IDLib))
+	hfunc.Write([]byte(data.UserID))
+	dgst = hfunc.Sum(nil)
+
+	return ed25519.Verify(data.Public, dgst, data.Signature)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
