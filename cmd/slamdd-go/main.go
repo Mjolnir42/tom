@@ -115,8 +115,9 @@ func run() int {
 
 	adm.ConfigureClient(client)
 
+	var initialize bool
 	lm.GetLogger(`application`).Infoln(`Loading credentials`)
-	if err = cred.LoadCredentials(
+	if initialize, err = cred.LoadCredentials(
 		SlamCfg.CredPath,
 		&SlamCfg.Passphrase,
 		lm,
@@ -126,6 +127,9 @@ func run() int {
 	); err != nil {
 		lm.GetLogger(`error`).Errorln(err)
 		return EX_ERROR
+	} else if initialize {
+		lm.GetLogger(`application`).Infoln(`registering newly initialized credentials with TOM service`)
+		adm.RegisterMachineEnrollment(&SlamCfg.PubKey, SlamCfg.PrivEPK, SlamCfg.Passphrase, nil)
 	}
 
 	var ipfEx chan interface{}
