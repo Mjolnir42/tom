@@ -4,17 +4,17 @@ BEGIN;
   SET search_path TO ix, meta, filter, yp, asset, 'view', bulk, inventory, abstract, production;
   ALTER DATABASE tom SET search_path TO ix, meta, filter, yp, asset, 'view', bulk, inventory, abstract, production;
 
-  DROP  FUNCTION view.deployment_group_details_at;
   DROP  FUNCTION view.filter_value_assignment_at;
+  DROP  FUNCTION view.deployment_group_details_at;
   DROP  FUNCTION view.functional_component_details_at;
   DROP  FUNCTION view.information_system_details_at;
-  DROP  VIEW     view.deployment_group_details;
   DROP  VIEW     view.filter_value_assignment;
+  DROP  VIEW     view.deployment_group_details;
   DROP  VIEW     view.functional_component_details;
   DROP  VIEW     view.information_system_details;
-  DROP  TABLE    filter.assignable_entity;
   DROP  TABLE    filter.value_assignment__many;
   DROP  TABLE    filter.value_assignment__one;
+  DROP  TABLE    filter.assignable_entity;
   DROP  TABLE    ix.deployment_group_mapping;
   DROP  TABLE    ix.endpoint_mapping;
   DROP  TABLE    ix.functional_component_parent;
@@ -953,6 +953,13 @@ BEGIN;
   -- SCHEMA yp
   -- corporate domain
   -- domain
+  -- yp YPSERVICE
+  ALTER TABLE    yp.service                                              RENAME TO ypservice;
+  ALTER TABLE    yp.service_standard_attribute_values                    RENAME TO ypservice_standard_attribute_values;
+  ALTER TABLE    yp.service_unique_attribute_values                      RENAME TO ypservice_unique_attribute_values;
+  ALTER TABLE    yp.ypservice                                            RENAME COLUMN serviceID TO serID;
+  ALTER TABLE    yp.ypservice_standard_attribute_values                  RENAME COLUMN serviceID TO serID;
+  ALTER TABLE    yp.ypservice_unique_attribute_values                    RENAME COLUMN serviceID TO serID;
   -- information system
   CREATE TABLE IF NOT EXISTS yp.information_system_parent (
       isID                          uuid            NOT NULL,
@@ -969,13 +976,6 @@ BEGIN;
       CONSTRAINT __tois_temporal    EXCLUDE         USING gist (public.uuid_to_bytea(serID) WITH =,
                                                                 validity WITH &&)
   );
-  -- yp YPSERVICE
-  ALTER TABLE    yp.service                                              RENAME TO ypservice;
-  ALTER TABLE    yp.service_standard_attribute_values                    RENAME TO ypservice_standard_attribute_values;
-  ALTER TABLE    yp.service_unique_attribute_values                      RENAME TO ypservice_unique_attribute_values;
-  ALTER TABLE    yp.ypservice                                            RENAME COLUMN serviceID TO serID;
-  ALTER TABLE    yp.ypservice_standard_attribute_values                  RENAME COLUMN serviceID TO serID;
-  ALTER TABLE    yp.ypservice_unique_attribute_values                    RENAME COLUMN serviceID TO serID;
   -- software asset
   CREATE TABLE IF NOT EXISTS yp.software_asset (
       ypID                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
