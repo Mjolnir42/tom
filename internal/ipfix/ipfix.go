@@ -124,7 +124,7 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 
 	// start client stage
 	if conf.IPFIX.Forwarding {
-		lm.GetLogger(`application`).Println(`IPFIX subsystem: starting forwarding client`)
+		lm.GetLogger(`application`).Printf("IPFIX subsystem: starting forwarding client: %s", conf.IPFIX.ForwardProto)
 		switch conf.IPFIX.ForwardProto {
 		case ProtoUDP:
 			reg.udpClient, err = newUDPClient(conf.IPFIX, outpipe, pool, lm)
