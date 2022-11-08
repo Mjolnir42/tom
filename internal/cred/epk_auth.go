@@ -8,9 +8,16 @@
 package cred // import "github.com/mjolnir42/tom/internal/cred"
 
 import (
+	cryptorand "crypto/rand"
+	"encoding/base64"
+	"encoding/binary"
 	"fmt"
 	"hash"
+	"io"
+	"strconv"
+	"time"
 
+	"github.com/mjolnir42/tom/internal/msg"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/ed25519"
 )
@@ -57,7 +64,7 @@ func CalcEpkAuthToken(data msg.Super) (string, error) {
 	dgst = hfunc.Sum(nil)
 
 	// sign digest
-	if sig, err = pk.Sign(data.Phrase, dgst); err != nil {
+	if sig, err = data.PK.Sign(data.Phrase, dgst); err != nil {
 		return ``, err
 	}
 
@@ -65,11 +72,11 @@ func CalcEpkAuthToken(data msg.Super) (string, error) {
 	token = fmt.Sprintf(
 		"%s:%s:%s:%s:%s:%s:%s",
 		base64.StdEncoding.EncodeToString(nonce),
-		strconv.Itoa(tstp.Unix()),
+		strconv.FormatInt(tstp.Unix(), 10),
 		data.RequestURI,
 		fp,
-		IDlib,
-		userID,
+		data.IDLib,
+		data.UserID,
 		base64.StdEncoding.EncodeToString(sig),
 	)
 	// return base64 encoded token
