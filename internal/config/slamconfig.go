@@ -26,6 +26,7 @@ type SlamConfiguration struct {
 	LogLevel string             `json:"log.level"`
 	LogPath  string             `json:"log.path"`
 	IPFIX    SettingsIPFIX      `json:"ipfix"`
+	IPFIXSrv []IPDaemon         `json:"ipfix.server"`
 	API      string             `json:"api"`
 	CAFile   string             `json:"api.ca.file"`
 	Auth     *AuthConfiguration `json:"authentication"`
@@ -40,17 +41,22 @@ type AuthConfiguration struct {
 	CredPath   string                   `json:"credential.path"`
 }
 
+type IPDaemon struct {
+	Enabled     bool   `json:"enabled,string"`
+	ServerProto string `json:"listen.protocol"`
+	ListenADDR  string `json:"listen.address"`
+	ServerName  string `json:"tls.servername"`
+	CAFile      string `json:"ca.file"`
+	CertFile    string `json:"certificate.file"`
+	CertKeyFile string `json:"certificate.keyfile"`
+}
+
 type SettingsIPFIX struct {
 	Enabled      bool   `json:"enabled,string"`
-	ServerProto  string `json:"listen.protocol"`
-	ListenADDR   string `json:"listen.address"`
 	Forwarding   bool   `json:"forwarding.enabled,string"`
 	ForwardADDR  string `json:"forwarding.address"`
 	ForwardProto string `json:"forwarding.protocol"`
-	ServerName   string `json:"tls.servername"`
 	CAFile       string `json:"ca.file"`
-	CertFile     string `json:"certificate.file"`
-	CertKeyFile  string `json:"certificate.keyfile"`
 	Processing   bool   `json:"processing.enabled,string"`
 	ProcessType  string `json:"processing.type"`
 }
@@ -94,15 +100,19 @@ func (c *SlamConfiguration) Parse(fname string, lh *lhm.LogHandleMap) error {
 		c.Run.PathCA = filepath.Clean(c.CAFile)
 	}
 
-	c.IPFIX.ServerProto = strings.TrimSpace(c.IPFIX.ServerProto)
-	c.IPFIX.ListenADDR = strings.TrimSpace(c.IPFIX.ListenADDR)
+	c.IPFIX.CAFile = strings.TrimSpace(c.IPFIX.CAFile)
 	c.IPFIX.ForwardADDR = strings.TrimSpace(c.IPFIX.ForwardADDR)
 	c.IPFIX.ForwardProto = strings.TrimSpace(c.IPFIX.ForwardProto)
-	c.IPFIX.ServerName = strings.TrimSpace(c.IPFIX.ServerName)
-	c.IPFIX.CAFile = strings.TrimSpace(c.IPFIX.CAFile)
-	c.IPFIX.CertFile = strings.TrimSpace(c.IPFIX.CertFile)
-	c.IPFIX.CertKeyFile = strings.TrimSpace(c.IPFIX.CertKeyFile)
 	c.IPFIX.ProcessType = strings.TrimSpace(c.IPFIX.ProcessType)
+
+	for i := range c.IPFIXSrv {
+		c.IPFIXSrv[i].CAFile = strings.TrimSpace(c.IPFIXSrv[i].CAFile)
+		c.IPFIXSrv[i].CertFile = strings.TrimSpace(c.IPFIXSrv[i].CertFile)
+		c.IPFIXSrv[i].CertKeyFile = strings.TrimSpace(c.IPFIXSrv[i].CertKeyFile)
+		c.IPFIXSrv[i].ListenADDR = strings.TrimSpace(c.IPFIXSrv[i].ListenADDR)
+		c.IPFIXSrv[i].ServerName = strings.TrimSpace(c.IPFIXSrv[i].ServerName)
+		c.IPFIXSrv[i].ServerProto = strings.TrimSpace(c.IPFIXSrv[i].ServerProto)
+	}
 
 	return nil
 }

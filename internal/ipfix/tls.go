@@ -37,7 +37,7 @@ type tlsServer struct {
 	lm          *lhm.LogHandleMap
 }
 
-func newTLSServer(conf config.SettingsIPFIX, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsServer, error) {
+func newTLSServer(conf config.IPDaemon, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsServer, error) {
 	s := &tlsServer{
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),

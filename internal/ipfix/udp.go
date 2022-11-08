@@ -34,7 +34,7 @@ type udpServer struct {
 	shutdown   bool
 }
 
-func newUDPServer(conf config.SettingsIPFIX, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpServer, error) {
+func newUDPServer(conf config.IPDaemon, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpServer, error) {
 	s := &udpServer{
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),

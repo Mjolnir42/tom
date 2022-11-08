@@ -58,11 +58,11 @@ type IPFIXServer interface {
 }
 
 type registry struct {
-	udpServer     *udpServer
+	udpServer     IPFIXServer
 	udpClient     *udpClient
-	tcpServer     *tcpServer
+	tcpServer     IPFIXServer
 	tcpClient     *tcpClient
-	tlsServer     *tlsServer
+	tlsServer     IPFIXServer
 	tlsClient     *tlsClient
 	procFilter    *procFilter
 	procAggregate *procAggregate
@@ -135,7 +135,7 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 		case ProtoJSON:
 		// TODO reg.jsonClient, err = newJSONClient(conf.IPFIX, outpipe, pool, lm)
 		default:
-			err = fmt.Errorf("Unsupported IPFIX output protocol: %s\n", conf.IPFIX.ServerProto)
+			err = fmt.Errorf("Unsupported IPFIX output protocol: %s\n", conf.IPFIX.ForwardProto)
 		}
 		if err != nil {
 			return
@@ -165,53 +165,108 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 	}
 
 	// start server stage
-	lm.GetLogger(`application`).Printf("IPFIX subsystem: starting server protocol %s", conf.IPFIX.ServerProto)
-	switch conf.IPFIX.ServerProto {
-	case ProtoUDP:
-		reg.udpServer, err = newUDPServer(conf.IPFIX, pipe, pool, lm)
-	case ProtoTCP:
-		reg.tcpServer, err = newTCPServer(conf.IPFIX, pipe, pool, lm)
-	case ProtoTLS:
-		reg.tlsServer, err = newTLSServer(conf.IPFIX, pipe, pool, lm)
-	default:
-		err = fmt.Errorf("Unsupported IPFIX input protocol: %s\n", conf.IPFIX.ServerProto)
-	}
-	if err != nil {
-		return
+protoloop:
+	for _, fixproto := range []string{ProtoUDP, ProtoTCP, ProtoTLS} {
+
+		for _, srv := range conf.IPFIXSrv {
+			if fixproto == srv.ServerProto {
+				if !srv.Enabled {
+					continue
+				}
+				lm.GetLogger(`application`).Printf("IPFIX subsystem: starting server protocol %s", srv.ServerProto)
+				switch srv.ServerProto {
+				case ProtoUDP:
+					reg.udpServer, err = newUDPServer(srv, pipe, pool, lm)
+				case ProtoTCP:
+					reg.tcpServer, err = newTCPServer(srv, pipe, pool, lm)
+				case ProtoTLS:
+					reg.tlsServer, err = newTLSServer(srv, pipe, pool, lm)
+				}
+				if err != nil {
+					return
+				}
+				continue protoloop
+			}
+		}
+		lm.GetLogger(`application`).Printf("IPFIX subsystem: starting mock server protocol %s", fixproto)
+		switch fixproto {
+		case ProtoUDP:
+			reg.udpServer, err = newMockServer()
+		case ProtoTCP:
+			reg.tcpServer, err = newMockServer()
+		case ProtoTLS:
+			reg.tlsServer, err = newMockServer()
+		}
+		if err != nil {
+			return
+		}
 	}
 
 	go func() {
 		cancel := make(chan os.Signal, 1)
 		signal.Notify(cancel, os.Interrupt, syscall.SIGTERM)
 
-		var ipfixSrv IPFIXServer
-		var errordrain chan error
+		var ipfixSrvUDP, ipfixSrvTCP, ipfixSrvTLS IPFIXServer
+		errordrain := make(chan error)
 
-		switch conf.IPFIX.ServerProto {
-		case ProtoUDP:
-			ipfixSrv = reg.udpServer
-		case ProtoTCP:
-			ipfixSrv = reg.tcpServer
-		case ProtoTLS:
-			ipfixSrv = reg.tlsServer
+		for _, srv := range conf.IPFIXSrv {
+			switch srv.ServerProto {
+			case ProtoUDP:
+				ipfixSrvUDP = reg.udpServer
+			case ProtoTCP:
+				ipfixSrvTCP = reg.tcpServer
+			case ProtoTLS:
+				ipfixSrvTLS = reg.tlsServer
+			}
 		}
+		drainUDP := make(chan interface{})
+		drainTCP := make(chan interface{})
+		drainTLS := make(chan interface{})
 	runloop:
 		for {
 			select {
 			case <-cancel:
 				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: received shutdown signal`)
-				errordrain = ipfixSrv.Stop()
+				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
+				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
+				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
 				break runloop
-			case <-ipfixSrv.Exit():
-				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: server process died`)
-				lm.GetLogger(`error`).Infoln(`IPFIX subsystem: server process died`)
+
+			case <-ipfixSrvUDP.Exit():
+				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: UDP server process died`)
+				lm.GetLogger(`error`).Infoln(`IPFIX subsystem: UDP server process died`)
+				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
+				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
 				break runloop
-			case err := <-ipfixSrv.Err():
+
+			case <-ipfixSrvTCP.Exit():
+				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: TCP server process died`)
+				lm.GetLogger(`error`).Infoln(`IPFIX subsystem: TCP server process died`)
+				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
+				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
+				break runloop
+
+			case <-ipfixSrvTLS.Exit():
+				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: TLS server process died`)
+				lm.GetLogger(`error`).Infoln(`IPFIX subsystem: TLS server process died`)
+				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
+				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
+				break runloop
+
+			case err := <-ipfixSrvUDP.Err():
+				lm.GetLogger(`error`).Errorln(err)
+
+			case err := <-ipfixSrvTCP.Err():
+				lm.GetLogger(`error`).Errorln(err)
+
+			case err := <-ipfixSrvTLS.Err():
 				lm.GetLogger(`error`).Errorln(err)
 			}
 		}
 
 		lm.GetLogger(`application`).Infoln(`IPFIX subsystem: flushing pending errors during shutdown`)
+		var servers uint8
+		closed := false
 	graceful:
 		for {
 			select {
@@ -224,6 +279,24 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 					continue graceful
 				}
 				break graceful
+			case <-drainUDP:
+				servers = servers | 0b00000001
+				if servers == 7 && !closed {
+					close(errordrain)
+					closed = true
+				}
+			case <-drainTCP:
+				servers = servers | 0b00000010
+				if servers == 7 && !closed {
+					close(errordrain)
+					closed = true
+				}
+			case <-drainTLS:
+				servers = servers | 0b00000100
+				if servers == 7 && !closed {
+					close(errordrain)
+					closed = true
+				}
 			}
 		}
 		close(exit)
@@ -289,6 +362,19 @@ func split(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 
 	return packLenByte, data[0:packLenByte], nil
+}
+
+func chanCopy(i, o chan error, x chan interface{}) {
+	for {
+		select {
+		case err := <-i:
+			if err == nil {
+				close(x)
+				return
+			}
+			o <- err
+		}
+	}
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
