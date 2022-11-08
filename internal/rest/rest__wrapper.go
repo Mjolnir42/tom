@@ -165,10 +165,8 @@ func (x *Rest) basicAuth(h httprouter.Handle) httprouter.Handle {
 func (x *Rest) epkAuth(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
 		ps httprouter.Params) {
-		var payload, nonceBytes, sigBytes []byte
+		var payload []byte
 		var err error
-		var data []string
-		var nonce, requestURI, idLib, userID, sig string
 		var result msg.Result
 		var request msg.Request
 
@@ -182,25 +180,6 @@ func (x *Rest) epkAuth(h httprouter.Handle) httprouter.Handle {
 			goto unauthorized
 		}
 
-		data = strings.Split(string(payload), `:`)
-		nonce = data[0]
-		requestURI = data[1]
-		idLib = data[2]
-		userID = data[3]
-		sig = data[4]
-
-		if nonceBytes, err = base64.StdEncoding.DecodeString(nonce); err != nil {
-			goto unauthorized
-		}
-		if sigBytes, err = base64.StdEncoding.DecodeString(sig); err != nil {
-			goto unauthorized
-		}
-
-		if requestURI != r.URL.Path {
-			x.LM.GetLogger(`error`).Errorf("Mismatched request path in epkAuth: %s vs %s", requestURI, r.URL.Path)
-			goto unauthorized
-		}
-
 		request = msg.New(
 			r, ps,
 			proto.CmdSupervisorAuthEPK,
@@ -208,11 +187,8 @@ func (x *Rest) epkAuth(h httprouter.Handle) httprouter.Handle {
 			proto.ActionAuthenticateEPK,
 		)
 		request.Auth = msg.Super{
-			Nonce:      nonceBytes,
-			RequestURI: requestURI,
-			IDLib:      idLib,
-			UserID:     userID,
-			Sig:        sigBytes,
+			RequestURI: r.URL.Path,
+			Token:      string(payload),
 		}
 		x.HM.MustLookup(&request).Intake() <- request
 		result = <-request.Reply
@@ -223,7 +199,7 @@ func (x *Rest) epkAuth(h httprouter.Handle) httprouter.Handle {
 		case 200:
 			ps = append(ps, httprouter.Param{
 				Key:   `AuthenticatedUser`,
-				Value: idLib + `~` + userID,
+				Value: result.Auth.IDLib + `~` + result.Auth.UserID,
 			})
 			h(w, r, ps)
 			return
