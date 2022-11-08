@@ -11,7 +11,7 @@ import (
 	"github.com/mjolnir42/tom/internal/model/asset"
 	"github.com/mjolnir42/tom/internal/model/iam"
 	"github.com/mjolnir42/tom/internal/model/meta"
-	"github.com/mjolnir42/tom/internal/model/super"
+	"github.com/mjolnir42/tom/internal/model/supervisor"
 )
 
 // Start launches all application handlers
@@ -25,8 +25,8 @@ func (x *Core) Start() {
 	// asset model
 	asset.HandleRegister(x.hm, x.conf.QueueLen)
 
-	// super model
-	super.HandleRegister(x.hm, x.conf.QueueLen)
+	// supervisor engine
+	supervisor.HandleRegister(x.hm, x.conf.QueueLen)
 
 	for handlerName := range x.hm.Range() {
 		x.hm.Configure(

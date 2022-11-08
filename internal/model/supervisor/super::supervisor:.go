@@ -5,7 +5,7 @@
  * that can be found in the LICENSE file.
  */
 
-package super // import "github.com/mjolnir42/tom/internal/model/super/"
+package supervisor // import "github.com/mjolnir42/tom/internal/model/supervisor/"
 
 import (
 	"github.com/mjolnir42/tom/internal/handler"
