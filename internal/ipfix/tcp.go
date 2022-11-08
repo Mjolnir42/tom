@@ -34,7 +34,7 @@ type tcpServer struct {
 	shutdown bool
 }
 
-func newTCPServer(conf config.SettingsIPFIX, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*tcpServer, error) {
+func newTCPServer(conf config.IPDaemon, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*tcpServer, error) {
 	s := &tcpServer{
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),
