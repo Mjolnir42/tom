@@ -78,6 +78,8 @@ func (r *Result) Clear(err ...error) {
 	case SectionContainer:
 		r.Container = []proto.Container{}
 		r.ContainerHeader = []proto.ContainerHeader{}
+	case proto.EntitySupervisor:
+		r.Auth = Super{}
 	}
 }
 
@@ -87,6 +89,11 @@ func (r *Result) OK() {
 
 func (r *Result) BadRequest(err ...error) {
 	r.Code = http.StatusBadRequest
+	r.Clear(err...)
+}
+
+func (r *Result) Unauthorized(err ...error) {
+	r.Code = http.StatusUnauthorized
 	r.Clear(err...)
 }
 
