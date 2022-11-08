@@ -18,14 +18,13 @@ import (
 )
 
 type Configuration struct {
-	Database DbConfig   `json:"database"`
-	Daemon   []Daemon   `json:"daemon"`
-	Auth     AuthConfig `json:"authentication"`
-	LogLevel string     `json:"log.level"`
-	LogPath  string     `json:"log.path"`
-	Version  string     `json:"-"`
-	QueueLen int        `json:"handler.queue.length,string"`
-	Enforce  bool       `json:"enforcement,string"`
+	Database DbConfig `json:"database"`
+	Daemon   []Daemon `json:"daemon"`
+	LogLevel string   `json:"log.level"`
+	LogPath  string   `json:"log.path"`
+	Version  string   `json:"-"`
+	QueueLen int      `json:"handler.queue.length,string"`
+	Enforce  bool     `json:"enforcement,string"`
 }
 
 type DbConfig struct {
