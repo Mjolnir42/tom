@@ -19,7 +19,7 @@ import (
 	"golang.org/x/crypto/ed25519"
 )
 
-func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *epk.EncryptedPrivateKey, pub *ed25519.PublicKey, ctx *cli.Context) error {
+func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *epk.EncryptedPrivateKey, pub *ed25519.PublicKey, ctx *cli.Context) (bool, error) {
 	var (
 		err        error
 		initialize bool = true
@@ -29,10 +29,10 @@ func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *ep
 
 	// fix up credential path
 	if path, err = filepath.Abs(path); err != nil {
-		return err
+		return false, err
 	}
 	if path, err = filepath.EvalSymlinks(path); err != nil {
-		return err
+		return false, err
 	}
 	if _, err = os.Open(path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -42,7 +42,7 @@ func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *ep
 				lm.GetLogger(`application`).Infoln(`successfully created credential directory.`)
 			}
 		} else {
-			return err
+			return false, err
 		}
 	}
 
@@ -53,19 +53,19 @@ func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *ep
 		if initialize {
 			lm.GetLogger(`application`).Infoln(`initializing passphrase file`)
 			if err = createPassphraseFile(filepath.Join(path, `passphrase`), phrase); err != nil {
-				return err
+				return false, err
 			}
 		} else {
-			return err
+			return false, err
 		}
 	} else if err != nil {
 		// error opening file
-		return err
+		return false, err
 	} else {
 		// successfully read passphrase file, deactivate initialize mode
 		initialize = false
 		if len(rawPass) == 0 {
-			return errors.New(`passphrase file is empty`)
+			return false, errors.New(`passphrase file is empty`)
 		}
 		*phrase = string(mask(rawPass))
 		lm.GetLogger(`application`).Infoln(`successfully loaded passphrase from file`)
@@ -81,37 +81,30 @@ func LoadCredentials(path string, phrase *string, lm *lhm.LogHandleMap, priv *ep
 				path,
 				*phrase,
 			); err != nil {
-				return err
+				return false, err
 			}
 		} else {
-			return err
+			return false, err
 		}
 	} else if err != nil {
 		// error opening file
-		return err
+		return false, err
 	} else {
 		// successfully read private keyfile, deactivate initialize mode
 		initialize = false
 		if priv, err = epk.ReadFrom(fd); err != nil {
-			return err
+			return false, err
 		}
 		lm.GetLogger(`application`).Infoln(`successfully loaded private key from file`)
 	}
 
 	// test loaded credentials
 	if *pub, err = priv.Public(*phrase); err != nil {
-		return err
+		return false, err
 	}
 	lm.GetLogger(`application`).Infoln(`successfully unlocked public key from private key`)
 
-	if initialize {
-		lm.GetLogger(`application`).Infoln(`registering newly initialized credentials with TOM service`)
-		if err = registerMachineEnrollment(pub, priv, *phrase, ctx); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return initialize, nil
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
