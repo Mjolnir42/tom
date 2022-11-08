@@ -18,6 +18,8 @@ import (
 	"strings"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/mjolnir42/tom/internal/cred"
+	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/pkg/proto"
 	"github.com/urfave/cli/v2"
 )
@@ -301,14 +303,15 @@ func asyncWait(result *proto.Result) {
 
 	r := client.R()
 	if authenticate {
-		if token, err = cred.CalcEpkAuthToken(msg.Super{
+		token, err := cred.CalcEpkAuthToken(msg.Super{
 			PK:         priv,
 			Phrase:     epkPhrase,
 			RequestURI: path,
 			IDLib:      idLibID,
 			UserID:     userID,
-		}); err != nil {
-			return err
+		})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Wait error: %s\n", err.Error())
 		}
 		r = r.SetAuthScheme(proto.AuthSchemeEPK)
 		r = r.SetAuthToken(token)
