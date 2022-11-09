@@ -32,12 +32,12 @@ type tlsServer struct {
 	exit        chan interface{}
 	wg          sync.WaitGroup
 	err         chan error
-	pipe        chan []byte
+	pipe        chan IPFIXMessage
 	pool        *sync.Pool
 	lm          *lhm.LogHandleMap
 }
 
-func newTLSServer(conf config.IPDaemon, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsServer, error) {
+func newTLSServer(conf config.IPDaemon, pipe chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsServer, error) {
 	s := &tlsServer{
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),
@@ -167,15 +167,18 @@ ReadLoop:
 			scanner.Buffer(make([]byte, IPFIXMaxSize+1, IPFIXMaxSize+1), IPFIXMaxSize)
 
 			for scanner.Scan() {
-				token := s.pool.Get().([]byte)
-				i := copy(token, scanner.Bytes())
+				frame := IPFIXMessage{
+					body: s.pool.Get().([]byte),
+				}
+				i := copy(frame.body, scanner.Bytes())
+				frame.body = frame.body[:i]
 				// send via UDP, but discard if buffered channel is full
 				go func() {
 					select {
-					case s.pipe <- token[:i]:
+					case s.pipe <- frame:
 					default:
+						s.pool.Put(frame.body)
 					}
-					s.pool.Put(token)
 				}()
 
 				// refresh deadline after a read and s.quit has not
@@ -211,7 +214,7 @@ ReadLoop:
 }
 
 type tlsClient struct {
-	inqueue   chan []byte
+	inqueue   chan IPFIXMessage
 	ping      chan ping
 	quit      chan interface{}
 	wg        sync.WaitGroup
@@ -224,7 +227,7 @@ type tlsClient struct {
 	conf      config.SettingsIPFIX
 }
 
-func newTLSClient(conf config.SettingsIPFIX, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsClient, error) {
+func newTLSClient(conf config.SettingsIPFIX, pipe chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsClient, error) {
 	c := &tlsClient{
 		inqueue:   pipe,
 		ping:      make(chan ping),
@@ -277,7 +280,7 @@ func (c *tlsClient) Err() chan error {
 	return c.err
 }
 
-func (c *tlsClient) Input() chan []byte {
+func (c *tlsClient) Input() chan IPFIXMessage {
 	return c.inqueue
 }
 
@@ -289,7 +292,9 @@ func (c *tlsClient) run() {
 
 dataloop:
 	for {
-		msg := c.pool.Get().([]byte)
+		frame := IPFIXMessage{
+			body: c.pool.Get().([]byte),
+		}
 		select {
 		case <-c.quit:
 			log.Println(`TLSClient: shutdown signal received`)
@@ -300,10 +305,10 @@ dataloop:
 			break dataloop
 		case <-c.ping:
 			continue dataloop
-		case msg = <-c.inqueue:
+		case frame = <-c.inqueue:
 			if !c.connected {
 				select {
-				case c.inqueue <- msg:
+				case c.inqueue <- frame:
 				default:
 					// discard data while not connected and buffer is full
 				}
@@ -312,22 +317,22 @@ dataloop:
 			}
 
 			if n, err := c.conn.Write(
-				msg,
+				frame.body,
 			); err != nil {
 				c.err <- fmt.Errorf("TLSClient/Write: %w", err)
 				c.connected = false
 				c.conn.Close()
 				select {
-				case c.inqueue <- msg:
+				case c.inqueue <- frame:
 				default:
 					// discard data while if buffer is full
 				}
-			} else if n != len(msg) {
+			} else if n != len(frame.body) {
 				c.connected = false
 				c.conn.Close()
 			}
-			msg = msg[:0]
-			c.pool.Put(msg)
+			frame.body = frame.body[:0]
+			c.pool.Put(frame.body)
 		}
 	}
 }
