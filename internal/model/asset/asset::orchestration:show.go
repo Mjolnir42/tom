@@ -97,13 +97,9 @@ func (h *OrchestrationReadHandler) show(q *msg.Request, mr *msg.Result) {
 	txChildren := tx.Stmt(h.stmtTxChildren)
 	txResource := tx.Stmt(h.stmtTxResource)
 
-	ore := proto.Orchestration{
-		Namespace: q.Orchestration.Namespace,
-		Name:      q.Orchestration.Name,
-		Link:      []string{},
-		Children:  []string{},
-		Parent:    []string{},
-	}
+	ore := *(proto.NewOrchestration())
+	ore.Namespace = q.Orchestration.Namespace
+	ore.Name = q.Orchestration.Name
 	name := proto.PropertyDetail{
 		Attribute: `name`,
 		Value:     q.Orchestration.Name,
