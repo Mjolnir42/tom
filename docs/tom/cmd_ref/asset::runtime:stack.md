@@ -11,8 +11,8 @@ Either the DNS or URI form of the tomID is valid in either case.
 # SYNOPSIS
 
 ```
-tom runtime stack ${name} namespace ${space} provided-by ${providerID}
-tom runtime stack ${tomID} provided-by ${providerID}
+tom runtime stack ${name} namespace ${space} runs-on ${providerID}
+tom runtime stack ${tomID} runs-on ${providerID}
 ```
 
 # ARGUMENT TYPES
@@ -36,7 +36,7 @@ omnipotence | | | no | yes
 # EXAMPLES
 
 ```
-tom runtime stack example-db01 namespace inventory provided-by example-db01.inventory.server.tom
-tom runtime stack hypervisor01-kvm.inventory.runtime.tom provided-by hypervisor01-virt.inventory.orchestration.tom
-tom runtime stack hypervisor01-chroot.inventory.runtime.tom provided-by hypervisor01.inventory.runtime.tom
+tom runtime stack example-db01 namespace inventory runs-on example-db01.inventory.server.tom
+tom runtime stack hypervisor01-kvm.inventory.runtime.tom runs-on hypervisor01-virt.inventory.orchestration.tom
+tom runtime stack hypervisor01-chroot.inventory.runtime.tom runs-on hypervisor01.inventory.runtime.tom
 ```
