@@ -100,18 +100,18 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 	//    [server] -> inpipe  -> [filter]  -> outpipe -> [client]
 	//                   \___> mirror  -> [aggregate]
 
-	var pipe, inpipe, mirror, outpipe chan []byte
+	var pipe, inpipe, mirror, outpipe chan IPFIXMessage
 	if conf.IPFIX.Processing {
-		inpipe = make(chan []byte, 1024)  // 1024 * 64 * 1024 = 64 MiB
-		outpipe = make(chan []byte, 1024) // 1024 * 64 * 1024 = 64 MiB
-		mirror = make(chan []byte, 1024)  // 1024 * 64 * 1024 = 64 MiB
+		inpipe = make(chan IPFIXMessage, 1024)  // 1024 * 64 * 1024 = 64 MiB
+		outpipe = make(chan IPFIXMessage, 1024) // 1024 * 64 * 1024 = 64 MiB
+		mirror = make(chan IPFIXMessage, 1024)  // 1024 * 64 * 1024 = 64 MiB
 		if conf.IPFIX.ProcessType == ProcAggregate {
 			pipe = mirror
 		} else {
 			pipe = inpipe
 		}
 	} else {
-		outpipe = make(chan []byte, 2048) // 2048 * 64 * 1024 = 128 MiB
+		outpipe = make(chan IPFIXMessage, 2048) // 2048 * 64 * 1024 = 128 MiB
 		pipe = outpipe
 	}
 

@@ -28,13 +28,13 @@ type udpServer struct {
 	err        chan error
 	remoteAddr string
 	caFile     string
-	pipe       chan []byte
+	pipe       chan IPFIXMessage
 	pool       *sync.Pool
 	lm         *lhm.LogHandleMap
 	shutdown   bool
 }
 
-func newUDPServer(conf config.IPDaemon, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpServer, error) {
+func newUDPServer(conf config.IPDaemon, pipe chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpServer, error) {
 	s := &udpServer{
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),
@@ -77,7 +77,11 @@ UDPDataLoop:
 		default:
 			s.listener.SetDeadline(time.Now().Add(750 * time.Millisecond))
 
-			n, _, err := s.listener.ReadFromUDP(buf)
+			frame := IPFIXMessage{
+				body: s.pool.Get().([]byte),
+			}
+
+			n, addr, err := s.listener.ReadFromUDP(buf)
 			if err != nil {
 				if errors.Is(err, os.ErrDeadlineExceeded) {
 					// deadline triggered
@@ -105,11 +109,12 @@ UDPDataLoop:
 			}
 
 			// make a data copy in an exact sized []byte
-			data := make([]byte, n)
-			copy(data, buf)
+			frame.body = frame.body[:n]
+			frame.raddr = &addr.IP
+			copy(frame.body, buf)
 
 			select {
-			case s.pipe <- data:
+			case s.pipe <- frame:
 			default:
 				// discard if buffered channel is full
 			}
@@ -159,7 +164,7 @@ func (s *udpServer) Stop() chan error {
 }
 
 type udpClient struct {
-	inqueue chan []byte
+	inqueue chan IPFIXMessage
 	quit    chan interface{}
 	err     chan error
 	wg      sync.WaitGroup
@@ -170,7 +175,7 @@ type udpClient struct {
 	UDPConn *net.UDPConn
 }
 
-func newUDPClient(conf config.SettingsIPFIX, pipe chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpClient, error) {
+func newUDPClient(conf config.SettingsIPFIX, pipe chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpClient, error) {
 	c := &udpClient{
 		inqueue: pipe,
 		quit:    make(chan interface{}),
@@ -206,7 +211,7 @@ func (c *udpClient) Err() chan error {
 	return c.err
 }
 
-func (c *udpClient) Input() chan []byte {
+func (c *udpClient) Input() chan IPFIXMessage {
 	return c.inqueue
 }
 
@@ -215,15 +220,17 @@ func (c *udpClient) run() {
 
 runloop:
 	for {
-		msg := c.pool.Get().([]byte)
+		frame := IPFIXMessage{
+			body: c.pool.Get().([]byte),
+		}
 		select {
 		case <-c.quit:
 			c.lm.GetLogger(`application`).Println("UDPClient: received shutdown signal")
 			break runloop
 
-		case msg = <-c.inqueue:
+		case frame = <-c.inqueue:
 		retryonerror:
-			n, err := c.UDPConn.Write(msg)
+			n, err := c.UDPConn.Write(frame.body)
 			c.wg.Add(1)
 			go func(e error) {
 				defer c.wg.Done()
@@ -233,7 +240,7 @@ runloop:
 			}(err)
 
 		redial:
-			if n != len(msg) {
+			if n != len(frame.body) {
 				c.lm.GetLogger(`application`).Println("UDPClient: reconnecting after transient error....")
 				// check if quit signal arrives during redial
 				select {
@@ -273,8 +280,8 @@ runloop:
 				// retry sending current msg
 				goto retryonerror
 			}
-			msg = msg[:0]
-			c.pool.Put(msg)
+			frame.body = frame.body[:0]
+			c.pool.Put(frame.body)
 		}
 	}
 }

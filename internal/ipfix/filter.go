@@ -19,14 +19,14 @@ type procFilter struct {
 	quit    chan interface{}
 	exit    chan interface{}
 	err     chan error
-	inpipe  chan []byte
-	outpipe chan []byte
-	mirror  chan []byte
+	inpipe  chan IPFIXMessage
+	outpipe chan IPFIXMessage
+	mirror  chan IPFIXMessage
 	pool    *sync.Pool
 	lm      *lhm.LogHandleMap
 }
 
-func newFilter(conf config.SettingsIPFIX, inpipe, outpipe, mirror chan []byte, pool *sync.Pool, lm *lhm.LogHandleMap) (*procFilter, error) {
+func newFilter(conf config.SettingsIPFIX, inpipe, outpipe, mirror chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*procFilter, error) {
 	f := &procFilter{
 		conf:    conf,
 		quit:    make(chan interface{}),
