@@ -115,9 +115,9 @@ func ParseValidUntil(s string, txNow *time.Time) (until *time.Time, err error) {
 	switch s {
 	case `always`:
 		err = ErrInvalidValidity
-	case `forever`, `perpetual`:
+	case ``, `forever`, `perpetual`:
 		*(until) = PosTimeInf
-	case ``, `now`:
+	case `now`:
 		until = txNow
 	default:
 		*(until), err = time.Parse(
