@@ -10,6 +10,7 @@ package ipfix
 import (
 	"sync"
 
+	flow "github.com/EdgeCast/vflow/ipfix"
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/config"
 )
@@ -43,6 +44,23 @@ func newFilter(conf config.SettingsIPFIX, inpipe, outpipe, mirror chan IPFIXMess
 	// if processing contains aggregate
 	//		copy to mirror
 	// write to outpipe
+
+	decoder := vflow.NewDecoder(msg.raddr.IP, msg.body)
+	// mCache = ipfix.MemCache
+	if decodedMsg, err = d.Decode(mCache); err != nil {
+		logger.Println(err)
+		if decodedMsg == nil {
+			continue
+		}
+	}
+	// decodedMsg = ipfix.Message
+	if len(decodedMsg.DataSets) > 0 {
+		b, err = decodedMsg.JSONMarshal(buf)
+		if err != nil {
+			logger.Println(err)
+			continue
+		}
+	}
 
 	return f, nil
 }
