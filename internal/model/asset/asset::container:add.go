@@ -133,7 +133,7 @@ func (h *ContainerWriteHandler) add(q *msg.Request, mr *msg.Result) {
 	case `now`:
 		validUntil = txTime
 	default:
-		if validSince, err = time.Parse(
+		if validUntil, err = time.Parse(
 			msg.RFC3339Milli, q.Container.Property[`name`].ValidUntil,
 		); err != nil {
 			mr.BadRequest(err)
