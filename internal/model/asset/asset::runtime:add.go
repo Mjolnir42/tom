@@ -111,7 +111,7 @@ func (h *RuntimeWriteHandler) add(q *msg.Request, mr *msg.Result) {
 	case `forever`:
 		mr.BadRequest()
 		return
-	case ``:
+	case ``, `now`:
 		validSince = txTime
 	default:
 		if validSince, err = time.Parse(
@@ -130,6 +130,8 @@ func (h *RuntimeWriteHandler) add(q *msg.Request, mr *msg.Result) {
 		validUntil = msg.PosTimeInf
 	case ``:
 		validUntil = msg.PosTimeInf
+	case `now`:
+		validUntil = txTime
 	default:
 		if validSince, err = time.Parse(
 			msg.RFC3339Milli, q.Runtime.Property[`name`].ValidUntil,

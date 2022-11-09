@@ -51,7 +51,7 @@ func (h *ServerWriteHandler) txPropUpdate(
 	case `forever`:
 		mr.BadRequest()
 		return false
-	case ``:
+	case ``, `now`:
 		reqValidSince = *txTime
 	default:
 		if reqValidSince, err = time.Parse(
@@ -71,6 +71,8 @@ func (h *ServerWriteHandler) txPropUpdate(
 		reqValidUntil = msg.PosTimeInf
 	case ``:
 		reqValidUntil = msg.PosTimeInf
+	case `now`:
+		reqValidUntil = *txTime
 	default:
 		if reqValidUntil, err = time.Parse(
 			msg.RFC3339Milli,
