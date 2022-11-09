@@ -12,14 +12,13 @@ import (
 	"time"
 )
 
-//
 func ResolveValidSince(s string, t, tx *time.Time) (err error) {
 	switch s {
 	case `always`:
 		*t = NegTimeInf
 	case `forever`, `perpetual`:
 		err = fmt.Errorf("Invalid keyword for ValidSince: %s", s)
-	case ``:
+	case ``, `now`:
 		*t = *tx
 	default:
 		*t, err = time.Parse(
@@ -30,14 +29,13 @@ func ResolveValidSince(s string, t, tx *time.Time) (err error) {
 	return
 }
 
-//
 func ResolvePValidSince(s string, t, tx *time.Time) (err error) {
 	switch s {
 	case `always`, `perpetual`:
 		*t = NegTimeInf
 	case `forever`:
 		err = fmt.Errorf("Invalid keyword for ValidSince: %s", s)
-	case ``:
+	case ``, `now`:
 		*t = *tx
 	default:
 		*t, err = time.Parse(
@@ -48,7 +46,6 @@ func ResolvePValidSince(s string, t, tx *time.Time) (err error) {
 	return
 }
 
-//
 func ResolveValidUntil(s string, t, tx *time.Time) (err error) {
 	switch s {
 	case `always`, `perpetual`:
@@ -57,6 +54,8 @@ func ResolveValidUntil(s string, t, tx *time.Time) (err error) {
 		*t = PosTimeInf
 	case ``:
 		*t = PosTimeInf
+	case `now`:
+		*t = *tx
 	default:
 		*t, err = time.Parse(
 			RFC3339Milli,
@@ -66,7 +65,6 @@ func ResolveValidUntil(s string, t, tx *time.Time) (err error) {
 	return
 }
 
-//
 func ResolvePValidUntil(s string, t, tx *time.Time) (err error) {
 	switch s {
 	case `always`:
@@ -75,6 +73,8 @@ func ResolvePValidUntil(s string, t, tx *time.Time) (err error) {
 		*t = PosTimeInf
 	case ``:
 		*t = PosTimeInf
+	case `now`:
+		*t = *tx
 	default:
 		*t, err = time.Parse(
 			RFC3339Milli,
@@ -84,7 +84,6 @@ func ResolvePValidUntil(s string, t, tx *time.Time) (err error) {
 	return
 }
 
-//
 func ParseValidSince(s string, txNow *time.Time) (since *time.Time, err error) {
 	// no consistent transaction timestamp for now was supplied
 	if txNow == nil {
@@ -107,7 +106,6 @@ func ParseValidSince(s string, txNow *time.Time) (since *time.Time, err error) {
 	return since, err
 }
 
-//
 func ParseValidUntil(s string, txNow *time.Time) (until *time.Time, err error) {
 	// no consistent transaction timestamp for now was supplied
 	if txNow == nil {

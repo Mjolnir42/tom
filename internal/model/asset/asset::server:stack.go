@@ -243,7 +243,7 @@ func (h *ServerWriteHandler) stack(q *msg.Request, mr *msg.Result) {
 			mr.BadRequest()
 			tx.Rollback()
 			return
-		case ``:
+		case ``, `now`:
 			reqValidSince = txTime
 		default:
 			if reqValidSince, err = time.Parse(
@@ -265,6 +265,8 @@ func (h *ServerWriteHandler) stack(q *msg.Request, mr *msg.Result) {
 			reqValidUntil = msg.PosTimeInf
 		case ``:
 			reqValidUntil = msg.PosTimeInf
+		case `now`:
+			reqValidUntil = txTime
 		default:
 			if reqValidUntil, err = time.Parse(
 				msg.RFC3339Milli,
