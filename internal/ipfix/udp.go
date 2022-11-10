@@ -28,18 +28,18 @@ type udpServer struct {
 	err        chan error
 	remoteAddr string
 	caFile     string
-	pipe       chan IPFIXMessage
+	mux        *ipfixMux
 	pool       *sync.Pool
 	lm         *lhm.LogHandleMap
 	shutdown   bool
 }
 
-func newUDPServer(conf config.IPDaemon, pipe chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpServer, error) {
+func newUDPServer(conf config.IPDaemon, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpServer, error) {
 	s := &udpServer{
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),
 		err:  make(chan error),
-		pipe: pipe,
+		mux:  mux,
 		pool: pool,
 		lm:   lm,
 	}
@@ -114,7 +114,8 @@ UDPDataLoop:
 			copy(frame.body, buf)
 
 			select {
-			case s.pipe <- frame:
+			case s.mux.Pipe(`inUDP`) <- frame:
+				s.lm.GetLogger(`application`).Printf("udpServer: received frame of length %d bytes", len(frame.body))
 			default:
 				// discard if buffered channel is full
 			}
@@ -164,29 +165,33 @@ func (s *udpServer) Stop() chan error {
 }
 
 type udpClient struct {
-	inqueue chan IPFIXMessage
+	mux     *ipfixMux
+	pipe    chan IPFIXMessage
 	quit    chan interface{}
 	err     chan error
 	wg      sync.WaitGroup
 	conf    config.SettingsIPFIX
+	client  config.IPClient
 	pool    *sync.Pool
 	lm      *lhm.LogHandleMap
 	UDPAddr *net.UDPAddr
 	UDPConn *net.UDPConn
 }
 
-func newUDPClient(conf config.SettingsIPFIX, pipe chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpClient, error) {
+func newUDPClient(conf config.SettingsIPFIX, cl config.IPClient, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpClient, error) {
 	c := &udpClient{
-		inqueue: pipe,
-		quit:    make(chan interface{}),
-		err:     make(chan error),
-		conf:    conf,
-		pool:    pool,
-		lm:      lm,
+		mux:    mux,
+		quit:   make(chan interface{}),
+		err:    make(chan error),
+		conf:   conf,
+		client: cl,
+		pool:   pool,
+		lm:     lm,
 	}
+	c.pipe = c.mux.Pipe(`outUDP`)
 
 	var err error
-	if c.UDPAddr, err = net.ResolveUDPAddr(ProtoUDP, c.conf.ForwardADDR); err != nil {
+	if c.UDPAddr, err = net.ResolveUDPAddr(ProtoUDP, c.client.ForwardADDR); err != nil {
 		return nil, fmt.Errorf("UDPClient/ResolveAddr: %w", err)
 	}
 	if c.UDPConn, err = net.DialUDP(ProtoUDP, nil, c.UDPAddr); err != nil {
@@ -212,7 +217,7 @@ func (c *udpClient) Err() chan error {
 }
 
 func (c *udpClient) Input() chan IPFIXMessage {
-	return c.inqueue
+	return c.pipe
 }
 
 func (c *udpClient) run() {
@@ -228,7 +233,7 @@ runloop:
 			c.lm.GetLogger(`application`).Println("UDPClient: received shutdown signal")
 			break runloop
 
-		case frame = <-c.inqueue:
+		case frame = <-c.pipe:
 		retryonerror:
 			n, err := c.UDPConn.Write(frame.body)
 			c.wg.Add(1)
@@ -252,7 +257,7 @@ runloop:
 
 				// re-resolve UDP address
 				if c.UDPAddr, err = net.ResolveUDPAddr(
-					ProtoUDP, c.conf.ForwardADDR,
+					ProtoUDP, c.client.ForwardADDR,
 				); err != nil {
 					c.wg.Add(1)
 					go func(e error) {
@@ -280,6 +285,7 @@ runloop:
 				// retry sending current msg
 				goto retryonerror
 			}
+			c.lm.GetLogger(`application`).Printf("udpClient: sent frame with length %d bytes", len(frame.body))
 			frame.body = frame.body[:0]
 			c.pool.Put(frame.body)
 		}

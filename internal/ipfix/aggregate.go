@@ -15,18 +15,18 @@ import (
 )
 
 type procAggregate struct {
-	conf   config.SettingsIPFIX
-	mirror chan IPFIXMessage
-	pool   *sync.Pool
-	lm     *lhm.LogHandleMap
+	conf config.SettingsIPFIX
+	pool *sync.Pool
+	lm   *lhm.LogHandleMap
+	mux  *ipfixMux
 }
 
-func newAggregate(conf config.SettingsIPFIX, mirror chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*procAggregate, error) {
+func newAggregate(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*procAggregate, error) {
 	m := &procAggregate{
-		conf:   conf,
-		mirror: mirror,
-		pool:   pool,
-		lm:     lm,
+		conf: conf,
+		mux:  mux,
+		pool: pool,
+		lm:   lm,
 	}
 	return m, nil
 }

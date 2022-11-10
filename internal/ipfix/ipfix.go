@@ -85,60 +85,38 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 		return
 	}
 
-	// Message routing overview
-	//
-	// Enabled + Forwarding
-	//    [server] -> outpipe -> [client]
-	//
-	// Enabled + Processing[Filter] + Forwarding
-	//    [server] -> inpipe  -> [filter] -> outpipe -> [client]
-	//
-	// Enabled + Processing[Aggregate]
-	//    [server] -> mirror -> [aggregate]
-	//
-	// Enabled + Processing[Filter,Aggregate] + Forwarding
-	//    [server] -> inpipe  -> [filter]  -> outpipe -> [client]
-	//                   \___> mirror  -> [aggregate]
-
-	var pipe, inpipe, mirror, outpipe chan IPFIXMessage
-	if conf.IPFIX.Processing {
-		inpipe = make(chan IPFIXMessage, 1024)  // 1024 * 64 * 1024 = 64 MiB
-		outpipe = make(chan IPFIXMessage, 1024) // 1024 * 64 * 1024 = 64 MiB
-		mirror = make(chan IPFIXMessage, 1024)  // 1024 * 64 * 1024 = 64 MiB
-		if conf.IPFIX.ProcessType == ProcAggregate {
-			pipe = mirror
-		} else {
-			pipe = inpipe
-		}
-	} else {
-		outpipe = make(chan IPFIXMessage, 2048) // 2048 * 64 * 1024 = 128 MiB
-		pipe = outpipe
-	}
-
 	pool := &sync.Pool{
 		New: func() interface{} {
 			return make([]byte, IPFIXMaxSize, IPFIXMaxSize)
 		},
 	}
+
+	mux := newIPFIXMux(conf.IPFIX, pool, lm)
+
 	reg := registry{}
 
 	// start client stage
 	if conf.IPFIX.Forwarding {
-		lm.GetLogger(`application`).Printf("IPFIX subsystem: starting forwarding client: %s", conf.IPFIX.ForwardProto)
-		switch conf.IPFIX.ForwardProto {
-		case ProtoUDP:
-			reg.udpClient, err = newUDPClient(conf.IPFIX, outpipe, pool, lm)
-		case ProtoTCP:
-			reg.tcpClient, err = newTCPClient(conf.IPFIX, outpipe, pool, lm)
-		case ProtoTLS:
-			reg.tlsClient, err = newTLSClient(conf.IPFIX, outpipe, pool, lm)
-		case ProtoJSON:
-		// TODO reg.jsonClient, err = newJSONClient(conf.IPFIX, outpipe, pool, lm)
-		default:
-			err = fmt.Errorf("Unsupported IPFIX output protocol: %s\n", conf.IPFIX.ForwardProto)
-		}
-		if err != nil {
-			return
+		for i := range conf.IPFIX.Clients {
+			if !conf.IPFIX.Clients[i].Enabled {
+				continue
+			}
+			lm.GetLogger(`application`).Printf("IPFIX subsystem: starting forwarding client: %s", conf.IPFIX.Clients[i].ForwardProto)
+			switch conf.IPFIX.Clients[i].ForwardProto {
+			case ProtoUDP:
+				reg.udpClient, err = newUDPClient(conf.IPFIX, conf.IPFIX.Clients[i], mux, pool, lm)
+			case ProtoTCP:
+				reg.tcpClient, err = newTCPClient(conf.IPFIX, conf.IPFIX.Clients[i], mux, pool, lm)
+			case ProtoTLS:
+				reg.tlsClient, err = newTLSClient(conf.IPFIX, conf.IPFIX.Clients[i], mux, pool, lm)
+			case ProtoJSON:
+			// TODO reg.jsonClient, err = newJSONClient(conf.IPFIX, outpipe, pool, lm)
+			default:
+				err = fmt.Errorf("Unsupported IPFIX output protocol: %s\n", conf.IPFIX.Clients[i].ForwardProto)
+			}
+			if err != nil {
+				return
+			}
 		}
 	} else {
 		lm.GetLogger(`application`).Println(`IPFIX subsystem: forwarding disabled`)
@@ -150,9 +128,9 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 			lm.GetLogger(`application`).Println(`IPFIX subsystem: starting processing functions`)
 			switch s {
 			case ProcFilter:
-				reg.procFilter, err = newFilter(conf.IPFIX, inpipe, outpipe, mirror, pool, lm)
+				reg.procFilter, err = newFilter(conf.IPFIX, mux, pool, lm)
 			case ProcAggregate:
-				reg.procAggregate, err = newAggregate(conf.IPFIX, mirror, pool, lm)
+				reg.procAggregate, err = newAggregate(conf.IPFIX, mux, pool, lm)
 			default:
 				err = fmt.Errorf("Unsupported IPFIX processing: %s\n", s)
 			}
@@ -168,7 +146,7 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 protoloop:
 	for _, fixproto := range []string{ProtoUDP, ProtoTCP, ProtoTLS} {
 
-		for _, srv := range conf.IPFIXSrv {
+		for _, srv := range conf.IPFIX.Servers {
 			if fixproto == srv.ServerProto {
 				if !srv.Enabled {
 					continue
@@ -176,11 +154,11 @@ protoloop:
 				lm.GetLogger(`application`).Printf("IPFIX subsystem: starting server protocol %s", srv.ServerProto)
 				switch srv.ServerProto {
 				case ProtoUDP:
-					reg.udpServer, err = newUDPServer(srv, pipe, pool, lm)
+					reg.udpServer, err = newUDPServer(srv, mux, pool, lm)
 				case ProtoTCP:
-					reg.tcpServer, err = newTCPServer(srv, pipe, pool, lm)
+					reg.tcpServer, err = newTCPServer(srv, mux, pool, lm)
 				case ProtoTLS:
-					reg.tlsServer, err = newTLSServer(srv, pipe, pool, lm)
+					reg.tlsServer, err = newTLSServer(srv, mux, pool, lm)
 				}
 				if err != nil {
 					return
@@ -209,7 +187,7 @@ protoloop:
 		var ipfixSrvUDP, ipfixSrvTCP, ipfixSrvTLS IPFIXServer
 		errordrain := make(chan error)
 
-		for _, srv := range conf.IPFIXSrv {
+		for _, srv := range conf.IPFIX.Servers {
 			switch srv.ServerProto {
 			case ProtoUDP:
 				ipfixSrvUDP = reg.udpServer

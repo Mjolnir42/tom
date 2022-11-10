@@ -26,23 +26,23 @@ import (
 )
 
 type tlsServer struct {
+	mux         *ipfixMux
 	listener    net.Listener
 	certificate tls.Certificate
 	quit        chan interface{}
 	exit        chan interface{}
 	wg          sync.WaitGroup
 	err         chan error
-	pipe        chan IPFIXMessage
 	pool        *sync.Pool
 	lm          *lhm.LogHandleMap
 }
 
-func newTLSServer(conf config.IPDaemon, pipe chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsServer, error) {
+func newTLSServer(conf config.IPDaemon, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsServer, error) {
 	s := &tlsServer{
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),
 		err:  make(chan error),
-		pipe: pipe,
+		mux:  mux,
 		pool: pool,
 		lm:   lm,
 	}
@@ -153,6 +153,13 @@ func (s *tlsServer) Stop() chan error {
 
 func (s *tlsServer) handleConnection(conn net.Conn) {
 	defer conn.Close()
+	raddr := net.IP{}
+	if tcp, err := net.ResolveTCPAddr(conn.RemoteAddr().Network(), conn.RemoteAddr().String()); err != nil {
+		s.lm.GetLogger(`error`).Errorln(err)
+		return
+	} else {
+		raddr = net.ParseIP(tcp.IP.String())
+	}
 
 ReadLoop:
 	for {
@@ -168,14 +175,16 @@ ReadLoop:
 
 			for scanner.Scan() {
 				frame := IPFIXMessage{
-					body: s.pool.Get().([]byte),
+					raddr: &raddr,
+					body:  s.pool.Get().([]byte),
 				}
 				i := copy(frame.body, scanner.Bytes())
 				frame.body = frame.body[:i]
 				// send via UDP, but discard if buffered channel is full
 				go func() {
 					select {
-					case s.pipe <- frame:
+					case s.mux.Pipe(`inTLS`) <- frame:
+						s.lm.GetLogger(`application`).Printf("tlsServer: received frame with length %d bytes", len(frame.body))
 					default:
 						s.pool.Put(frame.body)
 					}
@@ -214,7 +223,8 @@ ReadLoop:
 }
 
 type tlsClient struct {
-	inqueue   chan IPFIXMessage
+	pipe      chan IPFIXMessage
+	mux       *ipfixMux
 	ping      chan ping
 	quit      chan interface{}
 	wg        sync.WaitGroup
@@ -225,22 +235,25 @@ type tlsClient struct {
 	pool      *sync.Pool
 	lm        *lhm.LogHandleMap
 	conf      config.SettingsIPFIX
+	client    config.IPClient
 }
 
-func newTLSClient(conf config.SettingsIPFIX, pipe chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsClient, error) {
+func newTLSClient(conf config.SettingsIPFIX, cl config.IPClient, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsClient, error) {
 	c := &tlsClient{
-		inqueue:   pipe,
+		mux:       mux,
 		ping:      make(chan ping),
 		quit:      make(chan interface{}),
 		err:       make(chan error),
 		connected: false,
 		conf:      conf,
+		client:    cl,
 		pool:      pool,
 		lm:        lm,
 	}
+	c.pipe = c.mux.Pipe(`outTLS`)
 
 	caPool := x509.NewCertPool()
-	if ca, err := ioutil.ReadFile(c.conf.CAFile); err != nil {
+	if ca, err := ioutil.ReadFile(c.client.CAFile); err != nil {
 		return nil, fmt.Errorf("TLSClient/CA certificate: %w", err)
 	} else {
 		caPool.AppendCertsFromPEM(ca)
@@ -281,7 +294,7 @@ func (c *tlsClient) Err() chan error {
 }
 
 func (c *tlsClient) Input() chan IPFIXMessage {
-	return c.inqueue
+	return c.pipe
 }
 
 func (c *tlsClient) run() {
@@ -305,10 +318,10 @@ dataloop:
 			break dataloop
 		case <-c.ping:
 			continue dataloop
-		case frame = <-c.inqueue:
+		case frame = <-c.mux.Pipe(`outTLS`):
 			if !c.connected {
 				select {
-				case c.inqueue <- frame:
+				case c.mux.Pipe(`outTLS`) <- frame:
 				default:
 					// discard data while not connected and buffer is full
 				}
@@ -323,7 +336,7 @@ dataloop:
 				c.connected = false
 				c.conn.Close()
 				select {
-				case c.inqueue <- frame:
+				case c.mux.Pipe(`outTLS`) <- frame:
 				default:
 					// discard data while if buffer is full
 				}
@@ -331,6 +344,7 @@ dataloop:
 				c.connected = false
 				c.conn.Close()
 			}
+			c.lm.GetLogger(`application`).Printf("tlsClient: wrote frame with length %d bytes", len(frame.body))
 			frame.body = frame.body[:0]
 			c.pool.Put(frame.body)
 		}
@@ -357,7 +371,7 @@ connectloop:
 			KeepAlive: 20 * time.Second,
 		}
 		var err error
-		c.conn, err = tls.DialWithDialer(dialer, ProtoTCP, c.conf.ForwardADDR, c.tlsConf)
+		c.conn, err = tls.DialWithDialer(dialer, ProtoTCP, c.client.ForwardADDR, c.tlsConf)
 		if err != nil {
 			c.err <- fmt.Errorf("TLSClient/Reconnect: %w", err)
 			time.Sleep(time.Second)
@@ -368,7 +382,7 @@ connectloop:
 				continue connectloop
 			}
 		}
-		log.Printf("TLSClient: connected to %s\n", c.conf.ForwardADDR)
+		log.Printf("TLSClient: connected to %s\n", c.client.ForwardADDR)
 		break connectloop
 	}
 
@@ -404,7 +418,7 @@ connectloop:
 		case <-c.quit:
 			// intentional noop
 		default:
-			log.Printf("TLSClient: reconnecting to %s\n", c.conf.ForwardADDR)
+			log.Printf("TLSClient: reconnecting to %s\n", c.client.ForwardADDR)
 			c.wg.Add(1)
 			c.Reconnect()
 		}

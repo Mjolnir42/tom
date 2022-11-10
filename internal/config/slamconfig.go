@@ -22,14 +22,12 @@ import (
 )
 
 type SlamConfiguration struct {
-	Daemon   []Daemon           `json:"daemon"`
+	Auth     *AuthConfiguration `json:"authentication"`
+	IPFIX    SettingsIPFIX      `json:"ipfix"`
 	LogLevel string             `json:"log.level"`
 	LogPath  string             `json:"log.path"`
-	IPFIX    SettingsIPFIX      `json:"ipfix"`
-	IPFIXSrv []IPDaemon         `json:"ipfix.server"`
 	API      string             `json:"api"`
 	CAFile   string             `json:"api.ca.file"`
-	Auth     *AuthConfiguration `json:"authentication"`
 	Version  string             `json:"-"`
 	Run      RunTimeConfig      `json:"-"`
 }
@@ -39,6 +37,17 @@ type AuthConfiguration struct {
 	PubKey     ed25519.PublicKey        `json:"-"`
 	PrivEPK    *epk.EncryptedPrivateKey `json:"-"`
 	CredPath   string                   `json:"credential.path"`
+}
+
+type SettingsIPFIX struct {
+	Enabled     bool       `json:"enabled,string"`
+	Forwarding  bool       `json:"forwarding.enabled,string"`
+	Processing  bool       `json:"processing.enabled,string"`
+	ProcessType string     `json:"processing.type"`
+	TemplFile   string     `json:"template.file"`
+	Servers     []IPDaemon `json:"server"`
+	Clients     []IPClient `json:"client"`
+	Filters     IPFilter   `json:"filter"`
 }
 
 type IPDaemon struct {
@@ -51,14 +60,16 @@ type IPDaemon struct {
 	CertKeyFile string `json:"certificate.keyfile"`
 }
 
-type SettingsIPFIX struct {
+type IPClient struct {
 	Enabled      bool   `json:"enabled,string"`
-	Forwarding   bool   `json:"forwarding.enabled,string"`
 	ForwardADDR  string `json:"forwarding.address"`
 	ForwardProto string `json:"forwarding.protocol"`
 	CAFile       string `json:"ca.file"`
-	Processing   bool   `json:"processing.enabled,string"`
-	ProcessType  string `json:"processing.type"`
+	Raw          bool   `json:"raw.copy,string"`
+}
+
+type IPFilter struct {
+	Rules []string `json:"rules"`
 }
 
 func (c *SlamConfiguration) Parse(fname string, lh *lhm.LogHandleMap) error {
@@ -100,18 +111,25 @@ func (c *SlamConfiguration) Parse(fname string, lh *lhm.LogHandleMap) error {
 		c.Run.PathCA = filepath.Clean(c.CAFile)
 	}
 
-	c.IPFIX.CAFile = strings.TrimSpace(c.IPFIX.CAFile)
-	c.IPFIX.ForwardADDR = strings.TrimSpace(c.IPFIX.ForwardADDR)
-	c.IPFIX.ForwardProto = strings.TrimSpace(c.IPFIX.ForwardProto)
 	c.IPFIX.ProcessType = strings.TrimSpace(c.IPFIX.ProcessType)
+	c.IPFIX.TemplFile = strings.TrimSpace(c.IPFIX.TemplFile)
 
-	for i := range c.IPFIXSrv {
-		c.IPFIXSrv[i].CAFile = strings.TrimSpace(c.IPFIXSrv[i].CAFile)
-		c.IPFIXSrv[i].CertFile = strings.TrimSpace(c.IPFIXSrv[i].CertFile)
-		c.IPFIXSrv[i].CertKeyFile = strings.TrimSpace(c.IPFIXSrv[i].CertKeyFile)
-		c.IPFIXSrv[i].ListenADDR = strings.TrimSpace(c.IPFIXSrv[i].ListenADDR)
-		c.IPFIXSrv[i].ServerName = strings.TrimSpace(c.IPFIXSrv[i].ServerName)
-		c.IPFIXSrv[i].ServerProto = strings.TrimSpace(c.IPFIXSrv[i].ServerProto)
+	for i := range c.IPFIX.Servers {
+		c.IPFIX.Servers[i].CAFile = strings.TrimSpace(c.IPFIX.Servers[i].CAFile)
+		c.IPFIX.Servers[i].CAFile = filepath.Clean(c.IPFIX.Servers[i].CAFile)
+		c.IPFIX.Servers[i].CertFile = strings.TrimSpace(c.IPFIX.Servers[i].CertFile)
+		c.IPFIX.Servers[i].CertFile = filepath.Clean(c.IPFIX.Servers[i].CertFile)
+		c.IPFIX.Servers[i].CertKeyFile = strings.TrimSpace(c.IPFIX.Servers[i].CertKeyFile)
+		c.IPFIX.Servers[i].CertKeyFile = filepath.Clean(c.IPFIX.Servers[i].CertKeyFile)
+		c.IPFIX.Servers[i].ListenADDR = strings.TrimSpace(c.IPFIX.Servers[i].ListenADDR)
+		c.IPFIX.Servers[i].ServerName = strings.TrimSpace(c.IPFIX.Servers[i].ServerName)
+		c.IPFIX.Servers[i].ServerProto = strings.TrimSpace(c.IPFIX.Servers[i].ServerProto)
+	}
+	for i := range c.IPFIX.Clients {
+		c.IPFIX.Clients[i].CAFile = strings.TrimSpace(c.IPFIX.Clients[i].CAFile)
+		c.IPFIX.Clients[i].CAFile = filepath.Clean(c.IPFIX.Clients[i].CAFile)
+		c.IPFIX.Clients[i].ForwardADDR = strings.TrimSpace(c.IPFIX.Clients[i].ForwardADDR)
+		c.IPFIX.Clients[i].ForwardProto = strings.TrimSpace(c.IPFIX.Clients[i].ForwardProto)
 	}
 
 	return nil
