@@ -23,23 +23,23 @@ import (
 )
 
 type tcpServer struct {
+	mux      *ipfixMux
 	listener net.Listener
 	quit     chan interface{}
 	exit     chan interface{}
 	wg       sync.WaitGroup
 	err      chan error
-	pipe     chan IPFIXMessage
 	pool     *sync.Pool
 	lm       *lhm.LogHandleMap
 	shutdown bool
 }
 
-func newTCPServer(conf config.IPDaemon, pipe chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*tcpServer, error) {
+func newTCPServer(conf config.IPDaemon, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*tcpServer, error) {
 	s := &tcpServer{
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),
 		err:  make(chan error),
-		pipe: pipe,
+		mux:  mux,
 		pool: pool,
 		lm:   lm,
 	}
@@ -124,6 +124,13 @@ func (s *tcpServer) Stop() chan error {
 
 func (s *tcpServer) handleConnection(conn net.Conn) {
 	defer conn.Close()
+	raddr := net.IP{}
+	if tcp, err := net.ResolveTCPAddr(conn.RemoteAddr().Network(), conn.RemoteAddr().String()); err != nil {
+		s.lm.GetLogger(`error`).Errorln(err)
+		return
+	} else {
+		raddr = net.ParseIP(tcp.IP.String())
+	}
 
 ReadLoop:
 	for {
@@ -139,14 +146,15 @@ ReadLoop:
 
 			for scanner.Scan() {
 				frame := IPFIXMessage{
-					body: s.pool.Get().([]byte),
+					raddr: &raddr,
+					body:  s.pool.Get().([]byte),
 				}
 				i := copy(frame.body, scanner.Bytes())
 				frame.body = frame.body[:i]
 				// send via UDP, but discard if buffered channel is full
 				go func() {
 					select {
-					case s.pipe <- frame:
+					case s.mux.Pipe(`inTCP`) <- frame:
 					default:
 						s.pool.Put(frame.body)
 					}
@@ -185,7 +193,8 @@ ReadLoop:
 }
 
 type tcpClient struct {
-	inqueue   chan IPFIXMessage
+	pipe      chan IPFIXMessage
+	mux       *ipfixMux
 	ping      chan ping
 	quit      chan interface{}
 	wg        sync.WaitGroup
@@ -195,19 +204,22 @@ type tcpClient struct {
 	pool      *sync.Pool
 	lm        *lhm.LogHandleMap
 	conf      config.SettingsIPFIX
+	client    config.IPClient
 }
 
-func newTCPClient(conf config.SettingsIPFIX, pipe chan IPFIXMessage, pool *sync.Pool, lm *lhm.LogHandleMap) (*tcpClient, error) {
+func newTCPClient(conf config.SettingsIPFIX, cl config.IPClient, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*tcpClient, error) {
 	c := &tcpClient{
-		inqueue:   pipe,
+		mux:       mux,
 		ping:      make(chan ping),
 		quit:      make(chan interface{}),
 		err:       make(chan error),
 		connected: false,
 		conf:      conf,
+		client:    cl,
 		pool:      pool,
 		lm:        lm,
 	}
+	c.pipe = c.mux.Pipe(`outTCP`)
 
 	c.wg.Add(1)
 	go c.run()
@@ -228,7 +240,7 @@ func (c *tcpClient) Err() chan error {
 }
 
 func (c *tcpClient) Input() chan IPFIXMessage {
-	return c.inqueue
+	return c.pipe
 }
 
 func (c *tcpClient) run() {
@@ -252,10 +264,10 @@ dataloop:
 			break dataloop
 		case <-c.ping:
 			continue dataloop
-		case frame = <-c.inqueue:
+		case frame = <-c.mux.Pipe(`outTCP`):
 			if !c.connected {
 				select {
-				case c.inqueue <- frame:
+				case c.mux.Pipe(`outTCP`) <- frame:
 				default:
 					// discard data while not connected and buffer is full
 				}
@@ -270,7 +282,7 @@ dataloop:
 				c.connected = false
 				c.conn.Close()
 				select {
-				case c.inqueue <- frame:
+				case c.mux.Pipe(`outTCP`) <- frame:
 				default:
 					// discard data while if buffer is full
 				}
@@ -304,7 +316,7 @@ connectloop:
 			KeepAlive: 20 * time.Second,
 		}
 		var err error
-		c.conn, err = dialer.Dial(ProtoTCP, c.conf.ForwardADDR)
+		c.conn, err = dialer.Dial(ProtoTCP, c.client.ForwardADDR)
 		if err != nil {
 			c.err <- fmt.Errorf("TLSClient/Reconnect: %w", err)
 			time.Sleep(time.Second)
@@ -315,7 +327,7 @@ connectloop:
 				continue connectloop
 			}
 		}
-		log.Printf("TLSClient: connected to %s\n", c.conf.ForwardADDR)
+		log.Printf("TLSClient: connected to %s\n", c.client.ForwardADDR)
 		break connectloop
 	}
 
@@ -351,7 +363,7 @@ connectloop:
 		case <-c.quit:
 			// intentional noop
 		default:
-			log.Printf("TLSClient: reconnecting to %s\n", c.conf.ForwardADDR)
+			log.Printf("TLSClient: reconnecting to %s\n", c.client.ForwardADDR)
 			c.wg.Add(1)
 			c.Reconnect()
 		}
