@@ -11,29 +11,40 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/mjolnir42/flowdata"
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/config"
 )
 
 type ipfixMux struct {
-	conf        config.SettingsIPFIX
-	quit        chan interface{}
-	exit        chan interface{}
-	err         chan error
-	wg          sync.WaitGroup
-	inUDP       chan IPFIXMessage
-	inTCP       chan IPFIXMessage
-	inTLS       chan IPFIXMessage
-	inJSN       chan IPFIXMessage
-	outUDP      chan IPFIXMessage
-	outTCP      chan IPFIXMessage
-	outTLS      chan IPFIXMessage
-	outJSN      chan IPFIXMessage
-	outFLT      chan IPFIXMessage
-	inFLT       chan IPFIXMessage
-	inFLJ       chan IPFIXMessage
-	outAGG      chan IPFIXMessage
+	conf config.SettingsIPFIX
+	quit chan interface{}
+	exit chan interface{}
+	err  chan error
+	wg   sync.WaitGroup
+	// input channels from server listeners
+	inUDP chan IPFIXMessage
+	inTCP chan IPFIXMessage
+	inTLS chan IPFIXMessage
+	inJSN chan []byte
+	// output channels to clients
+	outUDP chan IPFIXMessage
+	outTCP chan IPFIXMessage
+	outTLS chan IPFIXMessage
+	outJSN chan []byte
+	// output and input channels to filter
+	outFLT chan IPFIXMessage
+	inFLT  chan IPFIXMessage
+	inFLJ  chan []byte
+	inFLR  chan flowdata.Record
+	// output channel to TOM aggregator
+	outAGG chan flowdata.Record
+	// discard channels are served whenever an incorrect
+	// channel is requested from a pipe() method
 	discard     chan IPFIXMessage
+	discardJSON chan []byte
+	discardFDR  chan flowdata.Record
+
 	pool        *sync.Pool
 	lm          *lhm.LogHandleMap
 	fOutUDP     bool
@@ -51,25 +62,33 @@ type ipfixMux struct {
 
 func newIPFIXMux(conf config.SettingsIPFIX, pool *sync.Pool, lm *lhm.LogHandleMap) *ipfixMux {
 	m := &ipfixMux{
-		conf:    conf,
-		quit:    make(chan interface{}),
-		exit:    make(chan interface{}),
-		err:     make(chan error),
-		pool:    pool,
-		lm:      lm,
-		inUDP:   make(chan IPFIXMessage, 128), // input from udpServer
-		inTCP:   make(chan IPFIXMessage, 128), // input from tcpServer
-		inTLS:   make(chan IPFIXMessage, 128), // input from tlsServer
-		inJSN:   make(chan IPFIXMessage, 128), // input from jsonServer
-		outUDP:  make(chan IPFIXMessage, 128), // output to udpClient
-		outTCP:  make(chan IPFIXMessage, 128), // output to tcpClient
-		outTLS:  make(chan IPFIXMessage, 128), // output to tlsClient
-		outJSN:  make(chan IPFIXMessage, 128), // output to jsonClient
-		outFLT:  make(chan IPFIXMessage, 256), // output to procFilter
-		inFLT:   make(chan IPFIXMessage, 128), // input from procFilter, ipfix encoding
-		inFLJ:   make(chan IPFIXMessage, 128), // input from procFilter, JSON encoding
-		outAGG:  make(chan IPFIXMessage, 128), // output to procAggregate
-		discard: make(chan IPFIXMessage, 2),
+		conf: conf,
+		quit: make(chan interface{}),
+		exit: make(chan interface{}),
+		err:  make(chan error),
+		pool: pool,
+		lm:   lm,
+		// input channels from server listeners
+		inUDP: make(chan IPFIXMessage, 128), // input from udpServer
+		inTCP: make(chan IPFIXMessage, 128), // input from tcpServer
+		inTLS: make(chan IPFIXMessage, 128), // input from tlsServer
+		inJSN: make(chan []byte, 128),       // input from jsonServer
+		// output channels to clients
+		outUDP: make(chan IPFIXMessage, 128), // output to udpClient
+		outTCP: make(chan IPFIXMessage, 128), // output to tcpClient
+		outTLS: make(chan IPFIXMessage, 128), // output to tlsClient
+		outJSN: make(chan []byte, 128),       // output to jsonClient
+		// output and input channels to filter
+		outFLT: make(chan IPFIXMessage, 256),    // output to procFilter
+		inFLT:  make(chan IPFIXMessage, 128),    // ipfix encoding
+		inFLJ:  make(chan []byte, 128),          // JSON encoding
+		inFLR:  make(chan flowdata.Record, 128), // flowdata encoding
+		// output channel to TOM aggregator
+		outAGG: make(chan flowdata.Record, 128), // flowdata encoding
+		// discard channels
+		discard:     make(chan IPFIXMessage, 2),
+		discardJSON: make(chan []byte, 2),
+		discardFDR:  make(chan flowdata.Record, 2),
 	}
 
 	for _, c := range conf.Clients {
@@ -153,13 +172,45 @@ runloop:
 			case m.outFLT <- frame:
 			default:
 			}
-		case frame := <-m.inJSN:
+		case buf := <-m.inJSN:
 			select {
-			case m.outFLT <- frame:
+			case m.outJSN <- buf:
 			default:
 			}
-			//case frame := <-m.inFLT: TODO
-
+		case frame := <-m.inFLT:
+			if m.fOutUDP && !m.fRawUDP {
+				go func(frame IPFIXMessage) {
+					select {
+					case m.outUDP <- frame:
+					default:
+					}
+				}(frame.Copy())
+			}
+			if m.fOutTCP && !m.fRawTCP {
+				go func(frame IPFIXMessage) {
+					select {
+					case m.outTCP <- frame:
+					default:
+					}
+				}(frame.Copy())
+			}
+			if m.fOutTLS && !m.fRawTLS {
+				go func(frame IPFIXMessage) {
+					select {
+					case m.outTLS <- frame:
+					default:
+					}
+				}(frame.Copy())
+			}
+		case buf := <-m.inFLJ:
+			if m.fOutJSN && !m.fRawJSN {
+				go func(b []byte) {
+					select {
+					case m.outJSN <- b:
+					default:
+					}
+				}(buf)
+			}
 		}
 	}
 }
@@ -201,13 +252,64 @@ func (m *ipfixMux) pipe(p string) chan IPFIXMessage {
 		return m.outFLT
 	case `inFLT`:
 		return m.inFLT
+
+	default:
+		return m.discard
+	}
+}
+
+func (m *ipfixMux) jsonPipe(p string) chan []byte {
+	switch p {
+	case `inJSN`:
+		return m.inJSN
+	case `outJSN`:
+		return m.outJSN
 	case `inFLJ`:
 		return m.inFLJ
 
+	default:
+		return m.discardJSON
+	}
+}
+
+func (m *ipfixMux) flowdataPipe(p string) chan flowdata.Record {
+	switch p {
 	case `outAGG`:
 		return m.outAGG
 	default:
-		return m.discard
+		return m.discardFDR
+	}
+}
+
+func (m *ipfixMux) connectFilterChannel() {
+	defer m.wg.Done()
+
+	for {
+		select {
+		case <-m.quit:
+			break
+		case frame := <-m.outFLT:
+			select {
+			case m.inFLT <- frame:
+			default:
+			}
+		}
+	}
+}
+
+func (m *ipfixMux) connectJSONChannel() {
+	defer m.wg.Done()
+
+	for {
+		select {
+		case <-m.quit:
+			break
+		case buf := <-m.inJSN:
+			select {
+			case m.outJSN <- buf:
+			default:
+			}
+		}
 	}
 }
 
