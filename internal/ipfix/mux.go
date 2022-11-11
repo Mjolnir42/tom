@@ -132,24 +132,15 @@ func (m *ipfixMux) run() {
 	m.lm.GetLogger(`application`).Infoln(`mux: switching board running`)
 
 	// if filtering is disabled, nobody is reading from outFLT and
-	// writing back into inFLT
-	if !m.filtering {
+	// writing back into inFLT.
+	// the filtering module is also started if there is a JSON output
+	if !m.filtering && !m.fOutJSN {
 		m.wg.Add(1)
-		go func() {
-			defer m.wg.Done()
-			for {
-				select {
-				case <-m.quit:
-					break
-				case frame := <-m.outFLT:
-					select {
-					case m.inFLT <- frame:
-					default:
-					}
-				}
-			}
-		}()
+		go m.connectFilterChannel()
 	}
+
+	m.wg.Add(1)
+	go m.connectJSONChannel()
 
 runloop:
 	for {
