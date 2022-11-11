@@ -22,6 +22,7 @@ import (
 
 type udpServer struct {
 	listener   *net.UDPConn
+	pipe       chan IPFIXMessage
 	quit       chan interface{}
 	exit       chan interface{}
 	wg         sync.WaitGroup
@@ -36,6 +37,7 @@ type udpServer struct {
 
 func newUDPServer(conf config.IPDaemon, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*udpServer, error) {
 	s := &udpServer{
+		pipe: mux.pipe(`inUDP`),
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),
 		err:  make(chan error),
@@ -43,6 +45,7 @@ func newUDPServer(conf config.IPDaemon, mux *ipfixMux, pool *sync.Pool, lm *lhm.
 		pool: pool,
 		lm:   lm,
 	}
+
 	var err error
 	var lUDPAddr *net.UDPAddr
 	if lUDPAddr, err = net.ResolveUDPAddr(`udp`, conf.ListenADDR); err != nil {
@@ -114,7 +117,7 @@ UDPDataLoop:
 			copy(frame.body, buf)
 
 			select {
-			case s.mux.Pipe(`inUDP`) <- frame:
+			case s.pipe <- frame:
 				s.lm.GetLogger(`application`).Printf("udpServer: received frame of length %d bytes", len(frame.body))
 			default:
 				// discard if buffered channel is full
@@ -188,7 +191,7 @@ func newUDPClient(conf config.SettingsIPFIX, cl config.IPClient, mux *ipfixMux, 
 		pool:   pool,
 		lm:     lm,
 	}
-	c.pipe = c.mux.Pipe(`outUDP`)
+	c.pipe = c.mux.pipe(`outUDP`)
 
 	var err error
 	if c.UDPAddr, err = net.ResolveUDPAddr(ProtoUDP, c.client.ForwardADDR); err != nil {
