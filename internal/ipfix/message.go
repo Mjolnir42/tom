@@ -9,11 +9,20 @@ package ipfix
 
 import (
 	"net"
+
+	"github.com/mjolnir42/flowdata"
 )
 
 type IPFIXMessage struct {
 	raddr *net.IP
 	body  []byte
+}
+
+type MessagePack struct {
+	raddr   *net.IP
+	ipfix   []byte
+	records []*flowdata.Record
+	jsons   [][]byte
 }
 
 func (i IPFIXMessage) Copy() IPFIXMessage {
