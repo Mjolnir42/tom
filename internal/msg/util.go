@@ -25,6 +25,7 @@ func ResolveValidSince(s string, t, tx *time.Time) (err error) {
 			RFC3339Milli,
 			s,
 		)
+			*t = t.UTC()
 	}
 	return
 }
@@ -42,6 +43,7 @@ func ResolvePValidSince(s string, t, tx *time.Time) (err error) {
 			RFC3339Milli,
 			s,
 		)
+			*t = t.UTC()
 	}
 	return
 }
@@ -61,6 +63,7 @@ func ResolveValidUntil(s string, t, tx *time.Time) (err error) {
 			RFC3339Milli,
 			s,
 		)
+			*t = t.UTC()
 	}
 	return
 }
@@ -80,6 +83,7 @@ func ResolvePValidUntil(s string, t, tx *time.Time) (err error) {
 			RFC3339Milli,
 			s,
 		)
+			*t = t.UTC()
 	}
 	return
 }
