@@ -66,6 +66,7 @@ type IPClient struct {
 	ForwardProto string `json:"forwarding.protocol"`
 	CAFile       string `json:"ca.file"`
 	Unfiltered   bool   `json:"unfiltered.copy,string"`
+	Format       string `json:"json.format"` // vflow,flowdata
 }
 
 type IPFilter struct {

@@ -142,66 +142,22 @@ func (m *ipfixMux) run() {
 	m.wg.Add(1)
 	go m.connectJSONChannel()
 
+	m.wg.Add(1)
+	go m.runInputLoop()
+
 runloop:
 	for {
 		select {
 		case <-m.quit:
-			m.lm.GetLogger(`application`).Infoln(`mux: shutdown signal received`)
+			m.lm.GetLogger(`application`).
+				Infoln(`mux: shutdown signal received`)
 			break runloop
-		case frame := <-m.inUDP:
-			select {
-			case m.outFLT <- frame:
-			default:
-			}
-		case frame := <-m.inTCP:
-			select {
-			case m.outFLT <- frame:
-			default:
-			}
-		case frame := <-m.inTLS:
-			select {
-			case m.outFLT <- frame:
-			default:
-			}
-		case buf := <-m.inJSN:
-			select {
-			case m.outJSN <- buf:
-			default:
-			}
 		case frame := <-m.inFLT:
-			if m.fOutUDP && !m.fRawUDP {
-				go func(frame IPFIXMessage) {
-					select {
-					case m.outUDP <- frame:
-					default:
-					}
-				}(frame.Copy())
-			}
-			if m.fOutTCP && !m.fRawTCP {
-				go func(frame IPFIXMessage) {
-					select {
-					case m.outTCP <- frame:
-					default:
-					}
-				}(frame.Copy())
-			}
-			if m.fOutTLS && !m.fRawTLS {
-				go func(frame IPFIXMessage) {
-					select {
-					case m.outTLS <- frame:
-					default:
-					}
-				}(frame.Copy())
-			}
+			go m.outputIPFIX(frame)
 		case buf := <-m.inFLJ:
-			if m.fOutJSN && !m.fRawJSN {
-				go func(b []byte) {
-					select {
-					case m.outJSN <- b:
-					default:
-					}
-				}(buf)
-			}
+			go m.outputJSON(buf)
+		case r := <-m.inFLR:
+			go m.outputFlowdata(r)
 		}
 	}
 }
@@ -231,19 +187,16 @@ func (m *ipfixMux) pipe(p string) chan IPFIXMessage {
 		return m.inTCP
 	case `inTLS`:
 		return m.inTLS
-
 	case `outUDP`:
 		return m.outUDP
 	case `outTCP`:
 		return m.outTCP
 	case `outTLS`:
 		return m.outTLS
-
 	case `outFLT`:
 		return m.outFLT
 	case `inFLT`:
 		return m.inFLT
-
 	default:
 		return m.discard
 	}
@@ -257,7 +210,6 @@ func (m *ipfixMux) jsonPipe(p string) chan []byte {
 		return m.outJSN
 	case `inFLJ`:
 		return m.inFLJ
-
 	default:
 		return m.discardJSON
 	}
@@ -265,6 +217,8 @@ func (m *ipfixMux) jsonPipe(p string) chan []byte {
 
 func (m *ipfixMux) flowdataPipe(p string) chan flowdata.Record {
 	switch p {
+	case `inFLR`:
+		return m.inFLR
 	case `outAGG`:
 		return m.outAGG
 	default:
@@ -288,6 +242,8 @@ func (m *ipfixMux) connectFilterChannel() {
 	}
 }
 
+// connectJSONChannel is a direct connection between the JSON input and
+// output as received JSON data is not further processed
 func (m *ipfixMux) connectJSONChannel() {
 	defer m.wg.Done()
 
@@ -300,6 +256,119 @@ func (m *ipfixMux) connectJSONChannel() {
 			case m.outJSN <- buf:
 			default:
 			}
+		}
+	}
+}
+
+func (m *ipfixMux) drainDiscardChannels() {
+	defer m.wg.Done()
+
+drainloop:
+	for {
+		select {
+		case <-m.quit:
+			break drainloop
+		case <-m.discard:
+			m.lm.GetLogger(`error`).
+				Errorln(`ipfix.mux: drained stray message from channel discard`)
+		case <-m.discardJSON:
+			m.lm.GetLogger(`error`).
+				Errorln(`ipfix.mux: drained stray message from channel discardJSON`)
+		case <-m.discardFDR:
+			m.lm.GetLogger(`error`).
+				Errorln(`ipfix.mux: drained stray message from channel discardFDR`)
+		}
+	}
+}
+
+func (m *ipfixMux) unfiltereredForward(frame IPFIXMessage) {
+	if m.fRawUDP {
+		select {
+		case m.outUDP <- frame.Copy():
+		default:
+		}
+	}
+	if m.fRawTCP {
+		select {
+		case m.outTCP <- frame.Copy():
+		default:
+		}
+	}
+	if m.fRawTLS {
+		select {
+		case m.outTLS <- frame.Copy():
+		default:
+		}
+	}
+}
+
+func (m *ipfixMux) runInputLoop() {
+	defer m.wg.Done()
+
+inputloop:
+	for {
+		select {
+		case <-m.quit:
+			break inputloop
+		case frame := <-m.inUDP:
+			go m.unfiltereredForward(frame)
+			select {
+			case m.outFLT <- frame:
+			default:
+			}
+		case frame := <-m.inTCP:
+			go m.unfiltereredForward(frame)
+			select {
+			case m.outFLT <- frame:
+			default:
+			}
+		case frame := <-m.inTLS:
+			go m.unfiltereredForward(frame)
+			select {
+			case m.outFLT <- frame:
+			default:
+			}
+		}
+	}
+}
+
+func (m *ipfixMux) outputIPFIX(frame IPFIXMessage) {
+	if m.fOutUDP && !m.fRawUDP {
+		select {
+		case m.outUDP <- frame.Copy():
+		default:
+		}
+	}
+
+	if m.fOutTCP && !m.fRawTCP {
+		select {
+		case m.outTCP <- frame.Copy():
+		default:
+		}
+	}
+
+	if m.fOutTLS && !m.fRawTLS {
+		select {
+		case m.outTLS <- frame.Copy():
+		default:
+		}
+	}
+}
+
+func (m *ipfixMux) outputJSON(b []byte) {
+	if m.fOutJSN && !m.fRawJSN {
+		select {
+		case m.outJSN <- b:
+		default:
+		}
+	}
+}
+
+func (m *ipfixMux) outputFlowdata(r flowdata.Record) {
+	if m.aggregation {
+		select {
+		case m.outAGG <- r:
+		default:
 		}
 	}
 }
