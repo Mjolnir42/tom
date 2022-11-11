@@ -32,6 +32,7 @@ type procFilter struct {
 	fRawUDP bool
 	fRawTCP bool
 	fRawTLS bool
+	fRawJSN bool
 	mux     *ipfixMux
 }
 
@@ -56,11 +57,13 @@ func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lh
 		}
 		switch c.ForwardProto {
 		case ProtoUDP:
-			f.fRawUDP = c.Raw
+			f.fRawUDP = c.Unfiltered
 		case ProtoTCP:
-			f.fRawTCP = c.Raw
+			f.fRawTCP = c.Unfiltered
 		case ProtoTLS:
-			f.fRawTLS = c.Raw
+			f.fRawTLS = c.Unfiltered
+		case ProtoJSON:
+			f.fRawJSN = c.Unfiltered
 		}
 	}
 
