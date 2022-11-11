@@ -23,6 +23,7 @@ import (
 )
 
 type tcpServer struct {
+	pipe     chan IPFIXMessage
 	mux      *ipfixMux
 	listener net.Listener
 	quit     chan interface{}
@@ -36,6 +37,7 @@ type tcpServer struct {
 
 func newTCPServer(conf config.IPDaemon, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*tcpServer, error) {
 	s := &tcpServer{
+		pipe: mux.pipe(`inTCP`),
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),
 		err:  make(chan error),
@@ -154,7 +156,7 @@ ReadLoop:
 				// send via UDP, but discard if buffered channel is full
 				go func() {
 					select {
-					case s.mux.Pipe(`inTCP`) <- frame:
+					case s.pipe <- frame:
 					default:
 						s.pool.Put(frame.body)
 					}
@@ -219,7 +221,7 @@ func newTCPClient(conf config.SettingsIPFIX, cl config.IPClient, mux *ipfixMux, 
 		pool:      pool,
 		lm:        lm,
 	}
-	c.pipe = c.mux.Pipe(`outTCP`)
+	c.pipe = c.mux.pipe(`outTCP`)
 
 	c.wg.Add(1)
 	go c.run()
@@ -264,10 +266,10 @@ dataloop:
 			break dataloop
 		case <-c.ping:
 			continue dataloop
-		case frame = <-c.mux.Pipe(`outTCP`):
+		case frame = <-c.pipe:
 			if !c.connected {
 				select {
-				case c.mux.Pipe(`outTCP`) <- frame:
+				case c.pipe <- frame:
 				default:
 					// discard data while not connected and buffer is full
 				}
@@ -282,7 +284,7 @@ dataloop:
 				c.connected = false
 				c.conn.Close()
 				select {
-				case c.mux.Pipe(`outTCP`) <- frame:
+				case c.pipe <- frame:
 				default:
 					// discard data while if buffer is full
 				}

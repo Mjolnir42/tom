@@ -27,6 +27,7 @@ import (
 
 type tlsServer struct {
 	mux         *ipfixMux
+	pipe        chan IPFIXMessage
 	listener    net.Listener
 	certificate tls.Certificate
 	quit        chan interface{}
@@ -39,6 +40,7 @@ type tlsServer struct {
 
 func newTLSServer(conf config.IPDaemon, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*tlsServer, error) {
 	s := &tlsServer{
+		pipe: mux.pipe(`inTLS`),
 		quit: make(chan interface{}),
 		exit: make(chan interface{}),
 		err:  make(chan error),
@@ -183,7 +185,7 @@ ReadLoop:
 				// send via UDP, but discard if buffered channel is full
 				go func() {
 					select {
-					case s.mux.Pipe(`inTLS`) <- frame:
+					case s.pipe <- frame:
 						s.lm.GetLogger(`application`).Printf("tlsServer: received frame with length %d bytes", len(frame.body))
 					default:
 						s.pool.Put(frame.body)
@@ -250,7 +252,7 @@ func newTLSClient(conf config.SettingsIPFIX, cl config.IPClient, mux *ipfixMux, 
 		pool:      pool,
 		lm:        lm,
 	}
-	c.pipe = c.mux.Pipe(`outTLS`)
+	c.pipe = c.mux.pipe(`outTLS`)
 
 	caPool := x509.NewCertPool()
 	if ca, err := ioutil.ReadFile(c.client.CAFile); err != nil {
@@ -318,10 +320,10 @@ dataloop:
 			break dataloop
 		case <-c.ping:
 			continue dataloop
-		case frame = <-c.mux.Pipe(`outTLS`):
+		case frame = <-c.pipe:
 			if !c.connected {
 				select {
-				case c.mux.Pipe(`outTLS`) <- frame:
+				case c.pipe <- frame:
 				default:
 					// discard data while not connected and buffer is full
 				}
@@ -336,7 +338,7 @@ dataloop:
 				c.connected = false
 				c.conn.Close()
 				select {
-				case c.mux.Pipe(`outTLS`) <- frame:
+				case c.pipe <- frame:
 				default:
 					// discard data while if buffer is full
 				}

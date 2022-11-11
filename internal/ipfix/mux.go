@@ -181,7 +181,7 @@ func (m *ipfixMux) Stop() chan error {
 	return m.Err()
 }
 
-func (m *ipfixMux) Pipe(p string) chan IPFIXMessage {
+func (m *ipfixMux) pipe(p string) chan IPFIXMessage {
 	switch p {
 	case `inUDP`:
 		return m.inUDP
@@ -189,8 +189,6 @@ func (m *ipfixMux) Pipe(p string) chan IPFIXMessage {
 		return m.inTCP
 	case `inTLS`:
 		return m.inTLS
-	case `inJSN`:
-		return m.inJSN
 
 	case `outUDP`:
 		return m.outUDP
@@ -198,8 +196,6 @@ func (m *ipfixMux) Pipe(p string) chan IPFIXMessage {
 		return m.outTCP
 	case `outTLS`:
 		return m.outTLS
-	case `outJSN`:
-		return m.outJSN
 
 	case `outFLT`:
 		return m.outFLT
