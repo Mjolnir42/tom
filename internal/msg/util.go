@@ -9,6 +9,7 @@ package msg // import "github.com/mjolnir42/tom/internal/msg"
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -21,11 +22,24 @@ func ResolveValidSince(s string, t, tx *time.Time) (err error) {
 	case ``, `now`:
 		*t = *tx
 	default:
-		*t, err = time.Parse(
-			RFC3339Milli,
-			s,
-		)
+		switch {
+		case strings.HasPrefix(s, `-`), strings.HasPrefix(s, `+`):
+			var d time.Duration
+			d, err = time.ParseDuration(s)
+			if err != nil {
+				return
+			}
+			*t = tx.Add(d).UTC()
+		default:
+			*t, err = time.Parse(
+				RFC3339Milli,
+				s,
+			)
+			if err != nil {
+				return
+			}
 			*t = t.UTC()
+		}
 	}
 	return
 }
@@ -39,11 +53,24 @@ func ResolvePValidSince(s string, t, tx *time.Time) (err error) {
 	case ``, `now`:
 		*t = *tx
 	default:
-		*t, err = time.Parse(
-			RFC3339Milli,
-			s,
-		)
+		switch {
+		case strings.HasPrefix(s, `-`), strings.HasPrefix(s, `+`):
+			var d time.Duration
+			d, err = time.ParseDuration(s)
+			if err != nil {
+				return
+			}
+			*t = tx.Add(d).UTC()
+		default:
+			*t, err = time.Parse(
+				RFC3339Milli,
+				s,
+			)
+			if err != nil {
+				return
+			}
 			*t = t.UTC()
+		}
 	}
 	return
 }
@@ -59,11 +86,24 @@ func ResolveValidUntil(s string, t, tx *time.Time) (err error) {
 	case `now`:
 		*t = *tx
 	default:
-		*t, err = time.Parse(
-			RFC3339Milli,
-			s,
-		)
+		switch {
+		case strings.HasPrefix(s, `-`), strings.HasPrefix(s, `+`):
+			var d time.Duration
+			d, err = time.ParseDuration(s)
+			if err != nil {
+				return
+			}
+			*t = tx.Add(d).UTC()
+		default:
+			*t, err = time.Parse(
+				RFC3339Milli,
+				s,
+			)
+			if err != nil {
+				return
+			}
 			*t = t.UTC()
+		}
 	}
 	return
 }
@@ -79,11 +119,24 @@ func ResolvePValidUntil(s string, t, tx *time.Time) (err error) {
 	case `now`:
 		*t = *tx
 	default:
-		*t, err = time.Parse(
-			RFC3339Milli,
-			s,
-		)
+		switch {
+		case strings.HasPrefix(s, `-`), strings.HasPrefix(s, `+`):
+			var d time.Duration
+			d, err = time.ParseDuration(s)
+			if err != nil {
+				return
+			}
+			*t = tx.Add(d).UTC()
+		default:
+			*t, err = time.Parse(
+				RFC3339Milli,
+				s,
+			)
+			if err != nil {
+				return
+			}
 			*t = t.UTC()
+		}
 	}
 	return
 }
