@@ -236,46 +236,19 @@ func (h *ServerWriteHandler) stack(q *msg.Request, mr *msg.Result) {
 		var ntt proto.Entity
 		var rteID string
 
-		switch prop.ValidSince {
-		case `always`:
-			reqValidSince = msg.NegTimeInf
-		case `forever`:
-			mr.BadRequest()
-			tx.Rollback()
+		if err = msg.ResolveValidSince(
+			prop.ValidSince,
+			&reqValidSince, &txTime,
+		); err != nil {
+			mr.BadRequest(err)
 			return
-		case ``, `now`:
-			reqValidSince = txTime
-		default:
-			if reqValidSince, err = time.Parse(
-				msg.RFC3339Milli,
-				prop.ValidSince,
-			); err != nil {
-				mr.BadRequest(err)
-				tx.Rollback()
-				return
-			}
 		}
-
-		switch prop.ValidUntil {
-		case `always`:
-			mr.BadRequest()
-			tx.Rollback()
+		if err = msg.ResolveValidUntil(
+			prop.ValidUntil,
+			&reqValidUntil, &txTime,
+		); err != nil {
+			mr.BadRequest(err)
 			return
-		case `forever`:
-			reqValidUntil = msg.PosTimeInf
-		case ``:
-			reqValidUntil = msg.PosTimeInf
-		case `now`:
-			reqValidUntil = txTime
-		default:
-			if reqValidUntil, err = time.Parse(
-				msg.RFC3339Milli,
-				prop.ValidUntil,
-			); err != nil {
-				mr.BadRequest(err)
-				tx.Rollback()
-				return
-			}
 		}
 
 		// clamp validity of existing records to the lower bound of the new

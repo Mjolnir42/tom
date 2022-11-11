@@ -131,40 +131,20 @@ func (h *ServerWriteHandler) add(q *msg.Request, mr *msg.Result) {
 	// records
 	txTime = time.Now().UTC()
 
-	switch q.Server.Property[`name`].ValidSince {
-	case `always`:
-		validSince = msg.NegTimeInf
-	case `forever`:
-		mr.BadRequest()
+	if err = msg.ResolveValidSince(
+		q.Server.Property[`name`].ValidSince,
+		&validSince, &txTime,
+	); err != nil {
+		mr.BadRequest(err)
 		return
-	case ``, `now`:
-		validSince = txTime
-	default:
-		if validSince, err = time.Parse(
-			msg.RFC3339Milli, q.Server.Property[`name`].ValidSince,
-		); err != nil {
-			mr.BadRequest(err)
-			return
-		}
 	}
 
-	switch q.Server.Property[`name`].ValidUntil {
-	case `always`:
-		mr.BadRequest()
+	if err = msg.ResolveValidUntil(
+		q.Server.Property[`name`].ValidUntil,
+		&validUntil, &txTime,
+	); err != nil {
+		mr.BadRequest(err)
 		return
-	case `forever`:
-		validUntil = msg.PosTimeInf
-	case ``:
-		validUntil = msg.PosTimeInf
-	case `now`:
-		validUntil = txTime
-	default:
-		if validUntil, err = time.Parse(
-			msg.RFC3339Milli, q.Server.Property[`name`].ValidUntil,
-		); err != nil {
-			mr.BadRequest(err)
-			return
-		}
 	}
 
 	// open transaction
