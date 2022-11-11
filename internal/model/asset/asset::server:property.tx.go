@@ -45,42 +45,20 @@ func (h *ServerWriteHandler) txPropUpdate(
 	}
 
 	var reqValidSince, reqValidUntil time.Time
-	switch prop.ValidSince {
-	case `always`, `perpetual`:
-		reqValidSince = msg.NegTimeInf
-	case `forever`:
-		mr.BadRequest()
+	if err = msg.ResolvePValidSince(
+		prop.ValidSince,
+		&reqValidSince, txTime,
+	); err != nil {
+		mr.BadRequest(err)
 		return false
-	case ``, `now`:
-		reqValidSince = *txTime
-	default:
-		if reqValidSince, err = time.Parse(
-			msg.RFC3339Milli,
-			prop.ValidSince,
-		); err != nil {
-			mr.BadRequest(err)
-			return false
-		}
 	}
 
-	switch prop.ValidUntil {
-	case `always`:
-		mr.BadRequest()
+	if err = msg.ResolvePValidUntil(
+		prop.ValidUntil,
+		&reqValidUntil, txTime,
+	); err != nil {
+		mr.BadRequest(err)
 		return false
-	case `forever`, `perpetual`:
-		reqValidUntil = msg.PosTimeInf
-	case ``:
-		reqValidUntil = msg.PosTimeInf
-	case `now`:
-		reqValidUntil = *txTime
-	default:
-		if reqValidUntil, err = time.Parse(
-			msg.RFC3339Milli,
-			prop.ValidUntil,
-		); err != nil {
-			mr.BadRequest(err)
-			return false
-		}
 	}
 
 	// check the use of the perpetual keyword
