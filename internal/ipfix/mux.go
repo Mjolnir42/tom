@@ -98,16 +98,16 @@ func newIPFIXMux(conf config.SettingsIPFIX, pool *sync.Pool, lm *lhm.LogHandleMa
 		switch c.ForwardProto {
 		case ProtoUDP:
 			m.fOutUDP = true
-			m.fRawUDP = c.Raw
+			m.fRawUDP = c.Unfiltered
 		case ProtoTCP:
 			m.fOutTCP = true
-			m.fRawTCP = c.Raw
+			m.fRawTCP = c.Unfiltered
 		case ProtoTLS:
 			m.fOutTLS = true
-			m.fRawTLS = c.Raw
+			m.fRawTLS = c.Unfiltered
 		case ProtoJSON:
 			m.fOutJSN = true
-			m.fRawJSN = c.Raw
+			m.fRawJSN = c.Unfiltered
 		}
 	}
 	if conf.Processing {

@@ -65,7 +65,7 @@ type IPClient struct {
 	ForwardADDR  string `json:"forwarding.address"`
 	ForwardProto string `json:"forwarding.protocol"`
 	CAFile       string `json:"ca.file"`
-	Raw          bool   `json:"raw.copy,string"`
+	Unfiltered   bool   `json:"unfiltered.copy,string"`
 }
 
 type IPFilter struct {
