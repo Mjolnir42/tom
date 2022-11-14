@@ -202,6 +202,14 @@ func (m *ipfixMux) setup() {
 
 	m.wg.Add(1)
 	go m.connectJSONChannel()
+
+	// start opportunistic drain of deactivated outputs
+	m.wg.Add(5)
+	go m.opportunUDP()
+	go m.opportunTCP()
+	go m.opportunTLS()
+	go m.opportunJSON()
+	go m.opportunAGG()
 }
 
 func (m *ipfixMux) Err() chan error {
