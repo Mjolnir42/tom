@@ -231,6 +231,14 @@ protoloop:
 				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
 				break runloop
 
+			case <-mux.Exit():
+				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: mux switchboard died`)
+				lm.GetLogger(`error`).Errorln(`IPFIX subsystem: mux switchboard died`)
+				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
+				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
+				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
+				break runloop
+
 			case err := <-ipfixSrvUDP.Err():
 				lm.GetLogger(`error`).Errorln(err)
 
