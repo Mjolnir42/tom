@@ -147,9 +147,6 @@ drainloop:
 		case <-m.exit:
 			break drainloop
 		case <-m.outAGG:
-			m.err <- fmt.Errorf(
-				"ipfix.mux: drained stray message from channel %s", `outAGG`,
-			)
 		}
 	}
 }
