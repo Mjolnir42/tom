@@ -183,6 +183,9 @@ runloop:
 		case frame := <-m.inFLT:
 			go m.outputIPFIX(frame)
 		case buf := <-m.inFLJ:
+			if buf == nil {
+				continue runloop
+			}
 			go m.outputJSON(buf)
 		case r := <-m.inFLR:
 			go m.outputFlowdata(r)
