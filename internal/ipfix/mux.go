@@ -8,6 +8,7 @@
 package ipfix
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 
@@ -192,8 +193,24 @@ runloop:
 func (m *ipfixMux) setup() {
 	defer m.wg.Done()
 
+	// check for invalid configurations
+	if m.fInJSN && !m.fOutJSN {
+		m.err <- fmt.Errorf("%s",
+			`JSON input can only be forwarded to JSON output`,
+		)
+		close(m.exit)
+		return
+	}
 	m.wg.Add(1)
 	go m.connectJSONChannel()
+
+	if !m.forwarding && !m.aggregation {
+		m.err <- fmt.Errorf("%s",
+			`No IPFIX output module or aggregation activated`,
+		)
+		close(m.exit)
+		return
+	}
 
 	// start opportunistic drain of deactivated outputs
 	m.wg.Add(5)
