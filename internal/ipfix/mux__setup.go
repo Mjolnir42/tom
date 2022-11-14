@@ -146,4 +146,24 @@ func (m *ipfixMux) flowdataPipe(p string) chan flowdata.Record {
 	}
 }
 
+// Err returns the error channel
+func (m *ipfixMux) Err() chan error {
+	return m.err
+}
+
+// Exit returns the exit indicator channel
+func (m *ipfixMux) Exit() chan interface{} {
+	return m.exit
+}
+
+// Stop shuts down m and returns the error channel
+func (m *ipfixMux) Stop() chan error {
+	go func(e chan error) {
+		close(m.quit)
+		m.wg.Wait()
+		close(e)
+	}(m.Err())
+	return m.Err()
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
