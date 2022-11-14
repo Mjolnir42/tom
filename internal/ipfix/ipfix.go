@@ -66,6 +66,8 @@ type registry struct {
 	tlsClient     *tlsClient
 	procFilter    *procFilter
 	procAggregate *procAggregate
+	filterActive  bool
+	jsClntActive  bool
 	//jsonClient *jsonClient
 }
 
@@ -111,6 +113,7 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 				reg.tlsClient, err = newTLSClient(conf.IPFIX, conf.IPFIX.Clients[i], mux, pool, lm)
 			case ProtoJSON:
 			// TODO reg.jsonClient, err = newJSONClient(conf.IPFIX, outpipe, pool, lm)
+			// TODO reg.jsClntActive = true
 			default:
 				err = fmt.Errorf("Unsupported IPFIX output protocol: %s\n", conf.IPFIX.Clients[i].ForwardProto)
 			}
@@ -129,6 +132,7 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 			switch s {
 			case ProcFilter:
 				reg.procFilter, err = newFilter(conf.IPFIX, mux, pool, lm)
+				reg.filterActive = true
 			case ProcAggregate:
 				reg.procAggregate, err = newAggregate(conf.IPFIX, mux, pool, lm)
 			default:
@@ -140,6 +144,13 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 		}
 	} else {
 		lm.GetLogger(`application`).Println(`IPFIX subsystem: processing disabled`)
+	}
+	if reg.jsClntActive && !reg.filterActive {
+		reg.procFilter, err = newFilter(conf.IPFIX, mux, pool, lm)
+		reg.filterActive = true
+		if err != nil {
+			return
+		}
 	}
 
 	// start server stage
