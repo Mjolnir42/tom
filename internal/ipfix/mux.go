@@ -149,8 +149,11 @@ func newIPFIXMux(conf config.SettingsIPFIX, pool *sync.Pool, lm *lhm.LogHandleMa
 		}
 	}
 
-	m.wg.Add(1)
-	go m.run()
+	m.wg.Add(2)
+	go func() {
+		m.setup()
+		m.run()
+	}()
 	return m
 }
 
@@ -175,9 +178,6 @@ func (m *ipfixMux) run() {
 	}
 
 	m.wg.Add(1)
-	go m.connectJSONChannel()
-
-	m.wg.Add(1)
 	go m.runInputLoop()
 
 runloop:
@@ -195,6 +195,13 @@ runloop:
 			go m.outputFlowdata(r)
 		}
 	}
+}
+
+func (m *ipfixMux) setup() {
+	defer m.wg.Done()
+
+	m.wg.Add(1)
+	go m.connectJSONChannel()
 }
 
 func (m *ipfixMux) Err() chan error {
@@ -285,6 +292,8 @@ func (m *ipfixMux) connectJSONChannel() {
 	for {
 		select {
 		case <-m.quit:
+			break
+		case <-m.exit:
 			break
 		case buf := <-m.inJSN:
 			select {
