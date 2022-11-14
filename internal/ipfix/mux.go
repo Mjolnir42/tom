@@ -47,6 +47,10 @@ type ipfixMux struct {
 
 	pool        *sync.Pool
 	lm          *lhm.LogHandleMap
+	fInUDP      bool
+	fInTCP      bool
+	fInTLS      bool
+	fInJSN      bool
 	fOutUDP     bool
 	fOutTCP     bool
 	fOutTLS     bool
@@ -91,25 +95,42 @@ func newIPFIXMux(conf config.SettingsIPFIX, pool *sync.Pool, lm *lhm.LogHandleMa
 		discardFDR:  make(chan flowdata.Record, 2),
 	}
 
-	for _, c := range conf.Clients {
-		if !c.Enabled {
+	for _, s := range conf.Servers {
+		if !s.Enabled {
 			continue
 		}
-		switch c.ForwardProto {
+		switch s.ServerProto {
 		case ProtoUDP:
-			m.fOutUDP = true
-			m.fRawUDP = c.Unfiltered
+			m.fInUDP = true
 		case ProtoTCP:
-			m.fOutTCP = true
-			m.fRawTCP = c.Unfiltered
+			m.fInTCP = true
 		case ProtoTLS:
-			m.fOutTLS = true
-			m.fRawTLS = c.Unfiltered
+			m.fInTLS = true
 		case ProtoJSON:
-			m.fOutJSN = true
-			m.fRawJSN = c.Unfiltered
+			m.fInJSN = true
 		}
 	}
+
+		for _, c := range conf.Clients {
+			if !c.Enabled {
+				continue
+			}
+			switch c.ForwardProto {
+			case ProtoUDP:
+				m.fOutUDP = true
+				m.fRawUDP = c.Unfiltered
+			case ProtoTCP:
+				m.fOutTCP = true
+				m.fRawTCP = c.Unfiltered
+			case ProtoTLS:
+				m.fOutTLS = true
+				m.fRawTLS = c.Unfiltered
+			case ProtoJSON:
+				m.fOutJSN = true
+				m.fRawJSN = c.Unfiltered
+			}
+		}
+
 	if conf.Processing {
 		m.processing = true
 		for _, s := range strings.Split(conf.ProcessType, `,`) {
