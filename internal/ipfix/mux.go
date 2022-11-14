@@ -158,6 +158,14 @@ func (m *ipfixMux) run() {
 	defer m.wg.Done()
 	m.lm.GetLogger(`application`).Infoln(`mux: switching board running`)
 
+	switch {
+	case <-m.exit:
+		m.lm.GetLogger(`application`).
+			Infoln(`mux: error indicator channel already triggered`)
+		return
+	default:
+	}
+
 	// if filtering is disabled, nobody is reading from outFLT and
 	// writing back into inFLT.
 	// the filtering module is also started if there is a JSON output
