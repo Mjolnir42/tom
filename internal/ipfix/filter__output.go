@@ -28,6 +28,7 @@ loop:
 
 func (f *procFilter) output(pack MessagePack) {
 	if f.fOutJSN && !f.fRawJSN {
+		f.formatOutputJSON(&pack, f.fFmtJSN)
 
 		for m := range pack.ExportJSON(f.fFmtJSN) {
 			f.outpipeJSON <- m
@@ -38,6 +39,28 @@ func (f *procFilter) output(pack MessagePack) {
 
 	for _, r := range pack.records {
 		f.outpipeFDR <- *r
+	}
+}
+
+func (f *procFilter) formatOutputJSON(pack *MessagePack, s string) {
+	switch s {
+	case `vflow`:
+		// decode ipfix wireformat message
+		vfMsg := f.decode(pack.ExportIPFIX())
+		if vfMsg == nil {
+			pack.jsons[0] = nil
+			return
+		}
+		// JSON marshalling of the vflow format
+		vfJSON := f.marshalVFlow(vfMsg)
+		if vfJSON == nil {
+			pack.jsons[0] = nil
+			return
+		}
+		pack.jsons[0] = vfJSON
+		return
+
+	case `flowdata`:
 	}
 }
 
