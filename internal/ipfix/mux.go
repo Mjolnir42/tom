@@ -180,6 +180,8 @@ runloop:
 			m.lm.GetLogger(`application`).
 				Infoln(`mux: shutdown signal received`)
 			break runloop
+		case <-m.exit:
+			break runloop
 		case frame := <-m.inFLT:
 			go m.outputIPFIX(frame)
 		case buf := <-m.inFLJ:
