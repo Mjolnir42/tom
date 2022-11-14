@@ -41,7 +41,7 @@ type procFilter struct {
 	fRawJSN      bool
 	fFmtJSN      string
 	mux          *ipfixMux
-	rules        []rule
+	parsedRules  []config.Rule
 }
 
 func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*procFilter, error) {
