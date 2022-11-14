@@ -288,19 +288,19 @@ func (m *ipfixMux) connectJSONChannel() {
 }
 
 func (m *ipfixMux) unfiltereredForward(frame IPFIXMessage) {
-	if m.fRawUDP {
+	if m.fRawUDP && m.fOutUDP {
 		select {
 		case m.outUDP <- frame.Copy():
 		default:
 		}
 	}
-	if m.fRawTCP {
+	if m.fRawTCP && m.fOutTCP {
 		select {
 		case m.outTCP <- frame.Copy():
 		default:
 		}
 	}
-	if m.fRawTLS {
+	if m.fRawTLS && m.fOutTLS {
 		select {
 		case m.outTLS <- frame.Copy():
 		default:
@@ -317,19 +317,19 @@ inputloop:
 		case <-m.quit:
 			break inputloop
 		case frame := <-m.inUDP:
-			go m.unfiltereredForward(frame)
+			go m.unfiltereredForward(frame.Copy())
 			select {
 			case m.outFLT <- frame:
 			default:
 			}
 		case frame := <-m.inTCP:
-			go m.unfiltereredForward(frame)
+			go m.unfiltereredForward(frame.Copy())
 			select {
 			case m.outFLT <- frame:
 			default:
 			}
 		case frame := <-m.inTLS:
-			go m.unfiltereredForward(frame)
+			go m.unfiltereredForward(frame.Copy())
 			select {
 			case m.outFLT <- frame:
 			default:
