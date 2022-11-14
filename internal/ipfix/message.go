@@ -14,12 +14,22 @@ import (
 )
 
 type IPFIXMessage struct {
-	raddr *net.IP
-	body  []byte
+	raddr  *net.IP
+	header IPFIXHeader
+	body   []byte
+}
+
+type IPFIXHeader struct {
+	Version    uint16
+	Length     uint16
+	ExportTime uint32
+	SequenceNo uint32
+	DomainID   uint32
 }
 
 type MessagePack struct {
 	raddr   *net.IP
+	header  IPFIXHeader
 	ipfix   []byte
 	records []*flowdata.Record
 	jsons   [][]byte
@@ -27,8 +37,9 @@ type MessagePack struct {
 
 func (i IPFIXMessage) Copy() IPFIXMessage {
 	cc := IPFIXMessage{
-		raddr: i.raddr,
-		body:  make([]byte, len(i.body)),
+		raddr:  i.raddr,
+		header: i.header,
+		body:   make([]byte, len(i.body)),
 	}
 	copy(cc.body, i.body)
 	return cc
@@ -36,8 +47,9 @@ func (i IPFIXMessage) Copy() IPFIXMessage {
 
 func (mp MessagePack) ExportIPFIX() IPFIXMessage {
 	i := IPFIXMessage{
-		raddr: mp.raddr,
-		body:  make([]byte, len(mp.ipfix)),
+		raddr:  mp.raddr,
+		header: mp.header,
+		body:   make([]byte, len(mp.ipfix)),
 	}
 	copy(i.body, mp.ipfix)
 	return i
