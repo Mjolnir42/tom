@@ -43,7 +43,7 @@ func (f *procFilter) convert(frame IPFIXMessage) {
 	}
 
 	// unfiltered JSON output in vflow format was requested
-	if f.fRawJSN && f.fFmtJSN == `vflow` {
+	if f.fOutJSN && f.fRawJSN && f.fFmtJSN == `vflow` {
 		j := make([]byte, len(vfJSON))
 		copy(j, vfJSON)
 		select {
@@ -88,7 +88,7 @@ recordloop:
 				r.AgentID = p.String()
 			}
 			// unfiltered JSON output in vflow format was requested
-			if f.fRawJSN && f.fFmtJSN == `flowdata` {
+			if f.fOutJSN && f.fRawJSN && f.fFmtJSN == `flowdata` {
 				j, err := json.Marshal(&r)
 				if err != nil {
 					f.err <- err
