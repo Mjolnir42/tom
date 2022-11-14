@@ -35,6 +35,10 @@ func (f *procFilter) output(pack MessagePack) {
 	}
 
 	f.outpipeIPFIX <- pack.ExportIPFIX()
+
+	for _, r := range pack.records {
+		f.outpipeFDR <- *r
+	}
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
