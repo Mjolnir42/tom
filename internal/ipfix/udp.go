@@ -8,6 +8,7 @@
 package ipfix
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -108,6 +109,32 @@ UDPDataLoop:
 
 			if n == 0 {
 				// no data read, either with io.EOF or without
+				continue UDPDataLoop
+			} else if n < 8 {
+				// read was less than half the ipfix message header
+				continue UDPDataLoop
+			}
+
+			// check in bytes 0-1 is the IPFIX version number
+			if binary.BigEndian.Uint16(buf[:2]) != IPFIXVersion {
+				continue UDPDataLoop
+			}
+
+			// check in bytes 4-7 is a reasonably expected timestamp
+			unixT := int64(binary.BigEndian.Uint32(buf[4:8]))
+			ts := time.Unix(unixT, 0).UTC()
+			switch {
+			case ts.Before(time.Now().UTC().Add(durationMinus5Min)):
+				// skip forward to seek the next valid header
+				fallthrough
+			case ts.After(time.Now().UTC().Add(durationPlus5Min)):
+				continue UDPDataLoop
+			}
+
+			// check in bytes 2-3 is a length header that corresponds to the data
+			// read from the UDP socket
+			packLenByte := int(binary.BigEndian.Uint16(buf[2:4]))
+			if n != packLenByte {
 				continue UDPDataLoop
 			}
 
