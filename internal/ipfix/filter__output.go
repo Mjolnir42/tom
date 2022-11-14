@@ -9,7 +9,26 @@ package ipfix
 
 import (
 	"encoding/json"
+	"time"
+
+	"github.com/mjolnir42/flowdata"
 )
+
+type OutputRecord struct {
+	OctetCount  uint64         `json:"OctetCount"`
+	PacketCount uint64         `json:"PacketCount"`
+	ProtocolID  uint8          `json:"ProtocolID"`
+	Protocol    string         `json:"Protocol,omitempty"`
+	IPVersion   uint8          `json:"IPVersion"`
+	SrcAddress  string         `json:"SrcAddress"`
+	SrcPort     uint16         `json:"SrcPort"`
+	DstAddress  string         `json:"DstAddress"`
+	DstPort     uint16         `json:"DstPort"`
+	TcpFlags    flowdata.Flags `json:"TcpFlags"`
+	StartMilli  time.Time      `json:"StartDateTimeMilli"`
+	EndMilli    time.Time      `json:"EndDateTimeMilli"`
+	AgentID     string         `json:"AgentID"`
+}
 
 func (f *procFilter) outputWorker() {
 	defer f.wg.Done()
@@ -65,7 +84,21 @@ func (f *procFilter) formatOutputJSON(pack *MessagePack, s string) {
 		converr := make([]int, 0)
 		for i := range pack.records {
 			var err error
-			pack.jsons[i], err = json.Marshal(pack.records[i])
+			pack.jsons[i], err = json.Marshal(&OutputRecord{
+				OctetCount:  pack.records[i].OctetCount,
+				PacketCount: pack.records[i].PacketCount,
+				ProtocolID:  pack.records[i].ProtocolID,
+				Protocol:    pack.records[i].Protocol,
+				IPVersion:   pack.records[i].IPVersion,
+				SrcAddress:  pack.records[i].SrcAddress,
+				SrcPort:     pack.records[i].SrcPort,
+				DstAddress:  pack.records[i].DstAddress,
+				DstPort:     pack.records[i].DstPort,
+				TcpFlags:    pack.records[i].TcpFlags.Copy(),
+				StartMilli:  pack.records[i].StartMilli,
+				EndMilli:    pack.records[i].EndMilli,
+				AgentID:     pack.records[i].AgentID,
+			})
 			if err != nil {
 				converr = append(converr, i)
 				f.err <- err
