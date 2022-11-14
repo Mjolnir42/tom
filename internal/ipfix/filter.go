@@ -36,6 +36,7 @@ type procFilter struct {
 	outpipeJSON  chan []byte
 	outpipeFDR   chan flowdata.Record
 	outpipeRawJS chan []byte
+	fOutJSN      bool
 	fRawJSN      bool
 	fFmtJSN      string
 	mux          *ipfixMux
@@ -63,6 +64,7 @@ func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lh
 		}
 		switch c.ForwardProto {
 		case ProtoJSON:
+			f.fOutJSN = true
 			f.fRawJSN = c.Unfiltered
 			f.fFmtJSN = c.Format
 		}
