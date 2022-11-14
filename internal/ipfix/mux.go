@@ -8,7 +8,6 @@
 package ipfix
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 
@@ -171,6 +170,9 @@ func (m *ipfixMux) run() {
 	}
 
 	m.wg.Add(1)
+	go m.runOutputLoop()
+
+	m.wg.Add(1)
 	go m.runInputLoop()
 
 runloop:
@@ -182,57 +184,8 @@ runloop:
 			break runloop
 		case <-m.exit:
 			break runloop
-		case frame := <-m.inFLT:
-			go m.outputIPFIX(frame)
-		case buf := <-m.inFLJ:
-			if buf == nil {
-				continue runloop
-			}
-			go m.outputJSON(buf)
-		case r := <-m.inFLR:
-			go m.outputFlowdata(r)
 		}
 	}
-}
-
-func (m *ipfixMux) setup() {
-	defer m.wg.Done()
-
-	// check for invalid configurations
-	if m.fInJSN && !m.fOutJSN {
-		m.err <- fmt.Errorf("%s",
-			`JSON input can only be forwarded to JSON output`,
-		)
-		close(m.exit)
-		return
-	}
-	m.wg.Add(1)
-	go m.connectJSONChannel()
-
-	if !m.forwarding && !m.aggregation {
-		m.err <- fmt.Errorf("%s",
-			`No IPFIX output module or aggregation activated`,
-		)
-		close(m.exit)
-		return
-	}
-
-	// start opportunistic drain of deactivated outputs
-	m.wg.Add(5)
-	go m.opportunUDP()
-	go m.opportunTCP()
-	go m.opportunTLS()
-	go m.opportunJSON()
-	go m.opportunAGG()
-
-	// if filtering is disabled, nobody is reading from outFLT and
-	// writing back into inFLT.
-	// the filtering module is also started if there is a JSON output
-	if !m.filtering && !m.fOutJSN {
-		m.wg.Add(1)
-		go m.connectFilterChannel()
-	}
-
 }
 
 func (m *ipfixMux) Err() chan error {
@@ -252,83 +205,32 @@ func (m *ipfixMux) Stop() chan error {
 	return m.Err()
 }
 
-func (m *ipfixMux) pipe(p string) chan IPFIXMessage {
-	switch p {
-	case `inUDP`:
-		return m.inUDP
-	case `inTCP`:
-		return m.inTCP
-	case `inTLS`:
-		return m.inTLS
-	case `outUDP`:
-		return m.outUDP
-	case `outTCP`:
-		return m.outTCP
-	case `outTLS`:
-		return m.outTLS
-	case `outFLT`:
-		return m.outFLT
-	case `inFLT`:
-		return m.inFLT
-	default:
-		return m.discard
-	}
-}
-
-func (m *ipfixMux) jsonPipe(p string) chan []byte {
-	switch p {
-	case `inJSN`:
-		return m.inJSN
-	case `outJSN`:
-		return m.outJSN
-	case `inFLJ`:
-		return m.inFLJ
-	default:
-		return m.discardJSON
-	}
-}
-
-func (m *ipfixMux) flowdataPipe(p string) chan flowdata.Record {
-	switch p {
-	case `inFLR`:
-		return m.inFLR
-	case `outAGG`:
-		return m.outAGG
-	default:
-		return m.discardFDR
-	}
-}
-
-func (m *ipfixMux) connectFilterChannel() {
+func (m *ipfixMux) runInputLoop() {
 	defer m.wg.Done()
 
+inputloop:
 	for {
 		select {
 		case <-m.quit:
-			break
-		case frame := <-m.outFLT:
+			break inputloop
+		case <-m.exit:
+			break inputloop
+		case frame := <-m.inUDP:
+			go m.unfiltereredForward(frame.Copy())
 			select {
-			case m.inFLT <- frame:
+			case m.outFLT <- frame:
 			default:
 			}
-		}
-	}
-}
-
-// connectJSONChannel is a direct connection between the JSON input and
-// output as received JSON data is not further processed
-func (m *ipfixMux) connectJSONChannel() {
-	defer m.wg.Done()
-
-	for {
-		select {
-		case <-m.quit:
-			break
-		case <-m.exit:
-			break
-		case buf := <-m.inJSN:
+		case frame := <-m.inTCP:
+			go m.unfiltereredForward(frame.Copy())
 			select {
-			case m.outJSN <- buf:
+			case m.outFLT <- frame:
+			default:
+			}
+		case frame := <-m.inTLS:
+			go m.unfiltereredForward(frame.Copy())
+			select {
+			case m.outFLT <- frame:
 			default:
 			}
 		}
@@ -356,32 +258,26 @@ func (m *ipfixMux) unfiltereredForward(frame IPFIXMessage) {
 	}
 }
 
-func (m *ipfixMux) runInputLoop() {
+func (m *ipfixMux) runOutputLoop() {
 	defer m.wg.Done()
 
-inputloop:
+outputloop:
 	for {
 		select {
 		case <-m.quit:
-			break inputloop
-		case frame := <-m.inUDP:
-			go m.unfiltereredForward(frame.Copy())
-			select {
-			case m.outFLT <- frame:
-			default:
+			break outputloop
+		case <-m.exit:
+			break outputloop
+		case frame := <-m.inFLT:
+			go m.outputIPFIX(frame)
+		case buf := <-m.inFLJ:
+			if buf == nil {
+				continue outputloop
 			}
-		case frame := <-m.inTCP:
-			go m.unfiltereredForward(frame.Copy())
-			select {
-			case m.outFLT <- frame:
-			default:
-			}
-		case frame := <-m.inTLS:
-			go m.unfiltereredForward(frame.Copy())
-			select {
-			case m.outFLT <- frame:
-			default:
-			}
+			go m.outputJSON(buf)
+		case r := <-m.inFLR:
+			go m.outputFlowdata(r)
+
 		}
 	}
 }
