@@ -8,10 +8,9 @@
 package ipfix
 
 import (
-// "github.com/mjolnir42/flowdata"
 )
 
-func (f *procFilter) filterWorker() {
+func (f *procFilter) outputWorker() {
 	defer f.wg.Done()
 
 loop:
@@ -19,15 +18,15 @@ loop:
 		select {
 		case <-f.quit:
 			break loop
-		case mp := <-f.pipeFilter:
-			f.filter(mp)
+		case <-f.exit:
+			break loop
+		case mp := <-f.pipeOutput:
+			f.output(mp)
 		}
 	}
 }
 
-func (f *procFilter) filter(pack MessagePack) {
-
-	f.pipeOutput <- pack
+func (f *procFilter) output(pack MessagePack) {
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
