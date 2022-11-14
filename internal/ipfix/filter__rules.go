@@ -163,6 +163,12 @@ func (f *procFilter) parseRules() error {
 					r.MatchField,
 				)
 			}
+			if r.InverseMatch {
+				return fmt.Errorf(
+					"set rule with negated set value is nonsense: %s",
+					r.MatchField,
+				)
+			}
 		}
 		if r.Action == `DROP` || r.Action == `PASS` {
 			switch r.MatchField {
