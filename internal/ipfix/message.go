@@ -43,4 +43,20 @@ func (mp MessagePack) ExportIPFIX() IPFIXMessage {
 	return i
 }
 
+func (mp MessagePack) ExportJSON(s string) chan []byte {
+	o := make(chan []byte)
+	go func(pipe chan []byte, format string) {
+		switch format {
+		case `vflow`:
+			pipe <- mp.jsons[0]
+		case `flowdata`:
+			for i := range mp.jsons {
+				pipe <- mp.jsons[i]
+			}
+		}
+		close(pipe)
+	}(o, s)
+	return o
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

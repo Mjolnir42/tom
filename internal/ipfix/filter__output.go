@@ -27,6 +27,13 @@ loop:
 }
 
 func (f *procFilter) output(pack MessagePack) {
+	if f.fOutJSN && !f.fRawJSN {
+
+		for m := range pack.ExportJSON(f.fFmtJSN) {
+			f.outpipeJSON <- m
+		}
+	}
+
 	f.outpipeIPFIX <- pack.ExportIPFIX()
 }
 
