@@ -13,20 +13,8 @@ import (
 	// "github.com/mjolnir42/flowdata"
 )
 
-type rule struct {
-	MatchField         string
-	FieldType          string
-	MatchValueString   []string
-	MatchValueUint8    []uint8
-	MatchValueUint16   []uint16
-	Action             string
-	ReplaceValueString string
-	ReplaceValueUint8  uint8
-	ReplaceValueUint16 uint16
-}
-
 func (f *procFilter) parseRules() error {
-	f.rules = make([]rule, 0, len(f.conf.Filters.Rules))
+	f.parsedRules = make([]config.Rule, 0, len(f.conf.Filters.Rules))
 
 	for i := range f.conf.Filters.Rules {
 		tok := strings.Split(f.conf.Filters.Rules[i], `;`)
@@ -50,6 +38,9 @@ func (f *procFilter) parseRules() error {
 		default:
 			return fmt.Errorf("unknown rule field: %s", tok[1])
 		}
+
+		// store parsed rule
+		f.parsedRules[i] = r
 	}
 	return nil
 }

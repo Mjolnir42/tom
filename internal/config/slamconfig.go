@@ -70,7 +70,21 @@ type IPClient struct {
 }
 
 type IPFilter struct {
-	Rules []string `json:"rules"`
+	Rules  []string `json:"rules"`
+	Parsed []Rule   `json:"-"`
+}
+
+type Rule struct {
+	MatchField         string
+	FieldType          string
+	MatchValueString   []string
+	MatchValueUint8    []uint8
+	MatchValueUint16   []uint16
+	Action             string
+	ReplaceValueString string
+	ReplaceValueUint8  uint8
+	ReplaceValueUint16 uint16
+	InverseMatch       bool
 }
 
 func (c *SlamConfiguration) Parse(fname string, lh *lhm.LogHandleMap) error {
