@@ -19,6 +19,8 @@ drainloop:
 		select {
 		case <-m.quit:
 			break drainloop
+		case <-m.exit:
+			break drainloop
 		case <-m.discard:
 			m.lm.GetLogger(`error`).
 				Errorln(`ipfix.mux: drained stray message from channel discard`)
@@ -46,6 +48,8 @@ drainloop:
 		select {
 		case <-m.quit:
 			break drainloop
+		case <-m.exit:
+			break drainloop
 		case <-m.outUDP:
 			m.err <- fmt.Errorf(
 				"ipfix.mux: drained stray message from channel %s", `outUDP`,
@@ -67,6 +71,8 @@ drainloop:
 	for {
 		select {
 		case <-m.quit:
+			break drainloop
+		case <-m.exit:
 			break drainloop
 		case <-m.outTCP:
 			m.err <- fmt.Errorf(
@@ -90,6 +96,8 @@ drainloop:
 		select {
 		case <-m.quit:
 			break drainloop
+		case <-m.exit:
+			break drainloop
 		case <-m.outTLS:
 			m.err <- fmt.Errorf(
 				"ipfix.mux: drained stray message from channel %s", `outTLS`,
@@ -112,6 +120,8 @@ drainloop:
 		select {
 		case <-m.quit:
 			break drainloop
+		case <-m.exit:
+			break drainloop
 		case <-m.outJSN:
 			m.err <- fmt.Errorf(
 				"ipfix.mux: drained stray message from channel %s", `outJSN`,
@@ -133,6 +143,8 @@ drainloop:
 	for {
 		select {
 		case <-m.quit:
+			break drainloop
+		case <-m.exit:
 			break drainloop
 		case <-m.outAGG:
 			m.err <- fmt.Errorf(
