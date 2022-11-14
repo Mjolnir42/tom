@@ -89,7 +89,21 @@ recordloop:
 			}
 			// unfiltered JSON output in vflow format was requested
 			if f.fOutJSN && f.fRawJSN && f.fFmtJSN == `flowdata` {
-				j, err := json.Marshal(&r)
+				j, err := json.Marshal(&OutputRecord{
+					OctetCount:  r.OctetCount,
+					PacketCount: r.PacketCount,
+					ProtocolID:  r.ProtocolID,
+					Protocol:    r.Protocol,
+					IPVersion:   r.IPVersion,
+					SrcAddress:  r.SrcAddress,
+					SrcPort:     r.SrcPort,
+					DstAddress:  r.DstAddress,
+					DstPort:     r.DstPort,
+					TcpFlags:    r.TcpFlags.Copy(),
+					StartMilli:  r.StartMilli,
+					EndMilli:    r.EndMilli,
+					AgentID:     r.AgentID,
+				})
 				if err != nil {
 					f.err <- err
 					return
