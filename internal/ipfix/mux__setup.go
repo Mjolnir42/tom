@@ -46,8 +46,9 @@ func (m *ipfixMux) setup() {
 
 	// if filtering is disabled, nobody is reading from outFLT and
 	// writing back into inFLT.
-	// the filtering module is also started if there is a JSON output
-	if !m.filtering && !m.fOutJSN {
+	// the filtering module is also started if there is a JSON output,
+	// as well as if conversion for aggregation is required
+	if !m.filtering && !m.aggregation && !m.fOutJSN {
 		m.wg.Add(1)
 		go m.connectFilterChannel()
 	}

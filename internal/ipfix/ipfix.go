@@ -67,6 +67,7 @@ type registry struct {
 	procFilter    *procFilter
 	procAggregate *procAggregate
 	filterActive  bool
+	aggregActive  bool
 	jsClntActive  bool
 	//jsonClient *jsonClient
 }
@@ -135,6 +136,7 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 				reg.filterActive = true
 			case ProcAggregate:
 				reg.procAggregate, err = newAggregate(conf.IPFIX, mux, pool, lm)
+				reg.aggregActive = true
 			default:
 				err = fmt.Errorf("Unsupported IPFIX processing: %s\n", s)
 			}
@@ -145,7 +147,14 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 	} else {
 		lm.GetLogger(`application`).Println(`IPFIX subsystem: processing disabled`)
 	}
-	if reg.jsClntActive && !reg.filterActive {
+	switch {
+	case reg.aggregActive && !reg.filterActive:
+		reg.procFilter, err = newFilter(conf.IPFIX, mux, pool, lm)
+		reg.filterActive = true
+		if err != nil {
+			return
+		}
+	case reg.jsClntActive && !reg.filterActive:
 		reg.procFilter, err = newFilter(conf.IPFIX, mux, pool, lm)
 		reg.filterActive = true
 		if err != nil {
