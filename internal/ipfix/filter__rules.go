@@ -187,25 +187,4 @@ func (f *procFilter) parseRules() error {
 	return nil
 }
 
-/*
-DROP, ProtocolID, $value | NOT $value                                               uint8
-DROP, Protocol, $value,$value | NOT $value,$value                                   string
-DROP, TcpFlags, $value,$value | NOT $value,$value    SYN,FIN | NOT SYN,FIN          string
-DROP, SrcAddress                                                                    string
-DROP, SrcPort                                                                       uint16
-DROP, DstAddress                                                                    string
-DROP, DstPort                                                                       uint16
-DROP, IPVersion                                                                     uint8
-
-
-SET, AgentID, $value | clientIP
-SET,
-
-REPLACE, SrcAddress, $old, $new
-REPLACE, SrcPort, $old, $new
-REPLACE, DstAddress, $old, $new
-REPLACE, DstPort, $old, $new
-REPLACE, AgentID, $old, $new
-*/
-
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
