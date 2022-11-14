@@ -59,6 +59,7 @@ type ipfixMux struct {
 	fRawTCP     bool
 	fRawTLS     bool
 	fRawJSN     bool
+	forwarding  bool
 	processing  bool
 	filtering   bool
 	aggregation bool
@@ -111,6 +112,8 @@ func newIPFIXMux(conf config.SettingsIPFIX, pool *sync.Pool, lm *lhm.LogHandleMa
 		}
 	}
 
+	// setup forwarding clients only if forwarding is enabled
+	if conf.Forwarding {
 		for _, c := range conf.Clients {
 			if !c.Enabled {
 				continue
@@ -130,6 +133,9 @@ func newIPFIXMux(conf config.SettingsIPFIX, pool *sync.Pool, lm *lhm.LogHandleMa
 				m.fRawJSN = c.Unfiltered
 			}
 		}
+	}
+	// internally enable forwarding if at least one output was activated
+	m.forwarding = m.fOutUDP || m.fOutTCP || m.fOutTLS || m.fOutJSN
 
 	if conf.Processing {
 		m.processing = true
