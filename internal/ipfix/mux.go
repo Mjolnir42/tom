@@ -281,27 +281,6 @@ func (m *ipfixMux) connectJSONChannel() {
 	}
 }
 
-func (m *ipfixMux) drainDiscardChannels() {
-	defer m.wg.Done()
-
-drainloop:
-	for {
-		select {
-		case <-m.quit:
-			break drainloop
-		case <-m.discard:
-			m.lm.GetLogger(`error`).
-				Errorln(`ipfix.mux: drained stray message from channel discard`)
-		case <-m.discardJSON:
-			m.lm.GetLogger(`error`).
-				Errorln(`ipfix.mux: drained stray message from channel discardJSON`)
-		case <-m.discardFDR:
-			m.lm.GetLogger(`error`).
-				Errorln(`ipfix.mux: drained stray message from channel discardFDR`)
-		}
-	}
-}
-
 func (m *ipfixMux) unfiltereredForward(frame IPFIXMessage) {
 	if m.fRawUDP {
 		select {
