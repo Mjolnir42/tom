@@ -34,4 +34,13 @@ func (i IPFIXMessage) Copy() IPFIXMessage {
 	return cc
 }
 
+func (mp MessagePack) ExportIPFIX() IPFIXMessage {
+	i := IPFIXMessage{
+		raddr: mp.raddr,
+		body:  make([]byte, len(mp.ipfix)),
+	}
+	copy(i.body, mp.ipfix)
+	return i
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
