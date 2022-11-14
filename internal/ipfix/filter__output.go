@@ -8,6 +8,7 @@
 package ipfix
 
 import (
+	"encoding/json"
 )
 
 func (f *procFilter) outputWorker() {
@@ -61,6 +62,22 @@ func (f *procFilter) formatOutputJSON(pack *MessagePack, s string) {
 		return
 
 	case `flowdata`:
+		converr := make([]int, 0)
+		for i := range pack.records {
+			var err error
+			pack.jsons[i], err = json.Marshal(pack.records[i])
+			if err != nil {
+				converr = append(converr, i)
+				f.err <- err
+			}
+		}
+		for i := range converr {
+			x := converr[i]
+			pack.jsons = append(
+				pack.jsons[:x],
+				pack.jsons[x+1:]...,
+			)
+		}
 	}
 }
 
