@@ -188,23 +188,6 @@ runloop:
 	}
 }
 
-func (m *ipfixMux) Err() chan error {
-	return m.err
-}
-
-func (m *ipfixMux) Exit() chan interface{} {
-	return m.exit
-}
-
-func (m *ipfixMux) Stop() chan error {
-	go func(e chan error) {
-		close(m.quit)
-		m.wg.Wait()
-		close(e)
-	}(m.Err())
-	return m.Err()
-}
-
 func (m *ipfixMux) runInputLoop() {
 	defer m.wg.Done()
 
