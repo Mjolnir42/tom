@@ -212,21 +212,21 @@ protoloop:
 
 			case <-ipfixSrvUDP.Exit():
 				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: UDP server process died`)
-				lm.GetLogger(`error`).Infoln(`IPFIX subsystem: UDP server process died`)
+				lm.GetLogger(`error`).Errorln(`IPFIX subsystem: UDP server process died`)
 				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
 				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
 				break runloop
 
 			case <-ipfixSrvTCP.Exit():
 				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: TCP server process died`)
-				lm.GetLogger(`error`).Infoln(`IPFIX subsystem: TCP server process died`)
+				lm.GetLogger(`error`).Errorln(`IPFIX subsystem: TCP server process died`)
 				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
 				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
 				break runloop
 
 			case <-ipfixSrvTLS.Exit():
 				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: TLS server process died`)
-				lm.GetLogger(`error`).Infoln(`IPFIX subsystem: TLS server process died`)
+				lm.GetLogger(`error`).Errorln(`IPFIX subsystem: TLS server process died`)
 				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
 				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
 				break runloop
