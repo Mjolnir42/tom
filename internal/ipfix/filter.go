@@ -32,6 +32,7 @@ type procFilter struct {
 	pipe         chan IPFIXMessage
 	pipeConvert  chan IPFIXMessage
 	pipeFilter   chan MessagePack
+	pipeOutput   chan MessagePack
 	outpipeIPFIX chan IPFIXMessage
 	outpipeJSON  chan []byte
 	outpipeFDR   chan flowdata.Record
@@ -79,6 +80,7 @@ func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lh
 
 	f.pipeConvert = make(chan IPFIXMessage, 64)
 	f.pipeFilter = make(chan MessagePack, 64)
+	f.pipeOutput = make(chan MessagePack, 64)
 
 	// inFLT is the mux input for filtered ipfix
 	f.outpipeIPFIX = f.mux.pipe(`inFLT`)
@@ -98,6 +100,9 @@ func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lh
 
 		f.wg.Add(1)
 		go f.filterWorker()
+
+		f.wg.Add(1)
+		go f.outputWorker()
 	}
 
 	f.wg.Add(1)
