@@ -60,7 +60,14 @@ func (f *procFilter) convert(frame IPFIXMessage) {
 	}
 
 	pack := MessagePack{
-		raddr:   frame.raddr,
+		raddr: frame.raddr,
+		header: IPFIXHeader{
+			Version:    vfMsg.Header.Version,
+			Length:     vfMsg.Header.Length,
+			ExportTime: vfMsg.Header.ExportTime,
+			SequenceNo: vfMsg.Header.SequenceNo,
+			DomainID:   vfMsg.Header.DomainID,
+		},
 		records: make([]*flowdata.Record, len(vfMsg.DataSets)),
 		jsons:   make([][]byte, len(vfMsg.DataSets)),
 	}
