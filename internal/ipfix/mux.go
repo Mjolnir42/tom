@@ -169,14 +169,6 @@ func (m *ipfixMux) run() {
 	default:
 	}
 
-	// if filtering is disabled, nobody is reading from outFLT and
-	// writing back into inFLT.
-	// the filtering module is also started if there is a JSON output
-	if !m.filtering && !m.fOutJSN {
-		m.wg.Add(1)
-		go m.connectFilterChannel()
-	}
-
 	m.wg.Add(1)
 	go m.runInputLoop()
 
@@ -210,6 +202,15 @@ func (m *ipfixMux) setup() {
 	go m.opportunTLS()
 	go m.opportunJSON()
 	go m.opportunAGG()
+
+	// if filtering is disabled, nobody is reading from outFLT and
+	// writing back into inFLT.
+	// the filtering module is also started if there is a JSON output
+	if !m.filtering && !m.fOutJSN {
+		m.wg.Add(1)
+		go m.connectFilterChannel()
+	}
+
 }
 
 func (m *ipfixMux) Err() chan error {
