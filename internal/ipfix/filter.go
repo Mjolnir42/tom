@@ -14,6 +14,7 @@ import (
 	"github.com/mjolnir42/flowdata"
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/config"
+	"github.com/vmware/go-ipfix/pkg/entities"
 )
 
 var (
@@ -42,6 +43,7 @@ type procFilter struct {
 	fFmtJSN      string
 	mux          *ipfixMux
 	parsedRules  []config.Rule
+	templates map[uint16]entities.Message
 }
 
 func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*procFilter, error) {
