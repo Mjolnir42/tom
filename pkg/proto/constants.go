@@ -35,11 +35,17 @@ const (
 )
 
 const (
+	ModelBulk  = `bulk`
+	EntityFlow = `flow`
+)
+
+const (
 	ActionAdd             = `add`
 	ActionAttrAdd         = `attribute.add`
 	ActionAttrRemove      = `attribute.remove`
 	ActionAuthenticateEPK = `authenticate-epk`
 	ActionEnrolment       = `enrolment`
+	ActionEnsure          = `ensure`
 	ActionHdSet           = `headof.set`
 	ActionHdUnset         = `headof.unset`
 	ActionLink            = `link`
@@ -124,8 +130,8 @@ const (
 	nttSocketShort        = `sok`
 	nttUserShort          = `usr`
 
-	tomIDEntities = EntityServer + `|` + EntityRuntime + `|` + EntityOrchestration + `|` + EntityContainer + `|` + EntitySocket + `|` + EntityLibrary + `|` + EntityMachine + `|` + EntityTeam + `|` + EntityUser
-	tomIDShortNTT = nttServerShort + `|` + nttRuntimeShort + `|` + nttOrchestrationShort + `|` + nttContainerShort + `|` + nttSocketShort + `|` + nttLibraryShort + `|` + nttMachineShort + `|` + nttUserShort
+	tomIDEntities = EntityServer + `|` + EntityRuntime + `|` + EntityOrchestration + `|` + EntityContainer + `|` + EntitySocket + `|` + EntityLibrary + `|` + EntityMachine + `|` + EntityTeam + `|` + EntityUser + `|` + EntityFlow
+	tomIDShortNTT = nttServerShort + `|` + nttRuntimeShort + `|` + nttOrchestrationShort + `|` + nttContainerShort + `|` + nttSocketShort + `|` + nttLibraryShort + `|` + nttMachineShort + `|` + nttUserShort + `|` + EntityTeam + `|` + EntityFlow
 
 	tomIDFormatDNS = `^(?P<id>[` + CharUnreserved + `]+)\.(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + tomIDEntities + `)\.tom\.?$`
 	tomIDShortDNS  = `^(?P<id>[` + CharUnreserved + `]+)\.(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + tomIDShortNTT + `)\.tom\.?$`

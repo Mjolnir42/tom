@@ -22,6 +22,7 @@ import (
 	"github.com/mjolnir42/tom/internal/core"
 	"github.com/mjolnir42/tom/internal/handler"
 	"github.com/mjolnir42/tom/internal/model/asset"
+	"github.com/mjolnir42/tom/internal/model/bulk"
 	"github.com/mjolnir42/tom/internal/model/iam"
 	"github.com/mjolnir42/tom/internal/model/meta"
 	"github.com/mjolnir42/tom/internal/model/supervisor"
@@ -131,6 +132,7 @@ func run() int {
 		iam.New(api).RouteRegister(router)
 		meta.New(api).RouteRegister(router)
 		asset.New(api).RouteRegister(router)
+		bulk.New(api).RouteRegister(router)
 		supervisor.New(api).RouteRegister(router)
 
 		lm.GetLogger(`application`).Infof(

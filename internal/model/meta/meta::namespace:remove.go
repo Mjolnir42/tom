@@ -165,6 +165,7 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 		switch attrType {
 		case proto.AttributeUnique:
 			for _, statement := range []string{
+				stmt.FlowDelNamespaceUniqValues,
 				stmt.ContainerDelNamespaceUniqValues,
 				stmt.OrchestrationDelNamespaceUniqValues,
 				stmt.RuntimeDelNamespaceUniqValues,
@@ -194,6 +195,7 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 			}
 		case proto.AttributeStandard:
 			for _, statement := range []string{
+				stmt.FlowDelNamespaceStdValues,
 				stmt.ContainerDelNamespaceStdValues,
 				stmt.OrchestrationDelNamespaceStdValues,
 				stmt.RuntimeDelNamespaceStdValues,
@@ -272,6 +274,7 @@ func (h *NamespaceWriteHandler) remove(q *msg.Request, mr *msg.Result) {
 		stmt.RuntimeDelNamespaceParent,
 		stmt.ServerDelNamespaceParent,
 		// Base objects
+		stmt.FlowDelNamespace,
 		stmt.ContainerDelNamespace,
 		stmt.OrchestrationDelNamespace,
 		stmt.RuntimeDelNamespace,

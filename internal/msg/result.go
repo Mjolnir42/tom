@@ -29,6 +29,7 @@ type Result struct {
 
 	Container           []proto.Container
 	ContainerHeader     []proto.ContainerHeader
+	Flow                []proto.Flow
 	Library             []proto.Library
 	Namespace           []proto.Namespace
 	NamespaceHeader     []proto.NamespaceHeader
@@ -78,6 +79,8 @@ func (r *Result) Clear(err ...error) {
 	case SectionContainer:
 		r.Container = []proto.Container{}
 		r.ContainerHeader = []proto.ContainerHeader{}
+	case SectionFlow:
+		r.Flow = []proto.Flow{}
 	case proto.EntitySupervisor:
 		r.Auth = Super{}
 	}
@@ -187,6 +190,20 @@ func (r *Result) ApplyVerbosity() {
 		obj.CreatedAt = ``
 		obj.CreatedBy = ``
 		r.ContainerHeader[i] = obj
+	}
+	for i := range r.Flow {
+		obj := r.Flow[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		for k := range obj.Property {
+			prop := obj.Property[k]
+			prop.CreatedAt = ``
+			prop.CreatedBy = ``
+			prop.ValidSince = ``
+			prop.ValidUntil = ``
+			obj.Property[k] = prop
+		}
+		r.Flow[i] = obj
 	}
 	for i := range r.Library {
 		obj := r.Library[i]

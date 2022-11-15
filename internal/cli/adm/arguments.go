@@ -586,6 +586,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		return []string{`std-attr`, `uniq-attr`}, []string{}, []string{}
 	case proto.CmdNamespacePropSet, proto.CmdNamespacePropUpdate, proto.CmdNamespacePropRemove:
 		return []string{`property`}, []string{}, []string{`property`}
+	case proto.CmdFlowAdd, proto.CmdFlowEnsure:
+		fallthrough
 	case proto.CmdContainerAdd:
 		fallthrough
 	case proto.CmdServerAdd:
@@ -594,6 +596,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		fallthrough
 	case proto.CmdRuntimeAdd:
 		return []string{`property`}, []string{`namespace`, `type`, `since`, `until`}, []string{`namespace`, `type`}
+	case proto.CmdFlowList, proto.CmdFlowShow, proto.CmdFlowRemove:
+		fallthrough
 	case proto.CmdContainerList, proto.CmdContainerShow, proto.CmdContainerRemove:
 		fallthrough
 	case proto.CmdOrchestrationList, proto.CmdOrchestrationShow, proto.CmdOrchestrationRemove:
@@ -604,6 +608,8 @@ func ArgumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOpt
 		return []string{}, []string{`namespace`}, []string{}
 	case proto.CmdContainerResolve, proto.CmdRuntimeResolve, proto.CmdOrchestrationResolve, proto.CmdServerResolve:
 		return []string{}, []string{`namespace`, `level`}, []string{`level`}
+	case proto.CmdFlowPropSet, proto.CmdFlowPropUpdate, proto.CmdFlowPropRemove:
+		fallthrough
 	case proto.CmdContainerPropSet, proto.CmdContainerPropUpdate, proto.CmdContainerPropRemove:
 		fallthrough
 	case proto.CmdServerPropSet, proto.CmdServerPropUpdate, proto.CmdServerPropRemove:
