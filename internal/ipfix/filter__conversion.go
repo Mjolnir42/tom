@@ -71,6 +71,7 @@ func (f *procFilter) convert(frame IPFIXMessage) {
 		records: make([]*flowdata.Record, len(vfMsg.DataSets)),
 		jsons:   make([][]byte, len(vfMsg.DataSets)),
 	}
+	pack.SetClientID()
 
 recordloop:
 	for r := range fdMsg.Convert() {

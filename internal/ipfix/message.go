@@ -8,7 +8,10 @@
 package ipfix
 
 import (
+	"encoding/binary"
 	"net"
+	"strconv"
+	"strings"
 
 	"github.com/mjolnir42/flowdata"
 )
@@ -27,6 +30,7 @@ type IPFIXHeader struct {
 	DomainID   uint32
 	isTemplate bool
 	numRecords uint32
+	ClientID   uint32
 }
 
 type MessagePack struct {
@@ -71,6 +75,29 @@ func (mp MessagePack) ExportJSON(s string) chan []byte {
 		close(pipe)
 	}(o, s)
 	return o
+}
+
+func (mp MessagePack) SetClientID() {
+	switch mp.raddr.To4() {
+	case nil:
+		// address is ip6
+		r := []byte(mp.raddr.To16())
+		b := make([]byte, 4, 4)
+		copy(b[:2], r[2:4])
+		copy(b[2:3], r[13:14])
+		copy(b[3:], r[15:])
+		mp.header.ClientID = binary.BigEndian.Uint32(b)
+	default:
+		// address is ip4
+		s := strings.SplitN(mp.raddr.To4().String(), `.`, 4)
+		b := make([]byte, 4, 4)
+		for i := range b {
+			num, _ := strconv.Atoi(s[i])
+			b[i] = uint8(num)
+		}
+		mp.header.ClientID = binary.BigEndian.Uint32(b)
+	}
+	mp.header.ClientID = mp.header.ClientID | mp.header.DomainID
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
