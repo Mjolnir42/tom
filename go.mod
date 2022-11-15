@@ -22,5 +22,6 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/urfave/cli/v2 v2.3.0
+	github.com/vmware/go-ipfix v0.5.12 // indirect
 	golang.org/x/crypto v0.1.0
 )
