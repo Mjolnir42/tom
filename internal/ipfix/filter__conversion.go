@@ -70,7 +70,7 @@ func (f *procFilter) convert(frame IPFIXMessage) {
 			isTemplate: false,
 			numRecords: uint32(len(vfMsg.DataSets)),
 		},
-		records: make([]*flowdata.Record, len(vfMsg.DataSets)),
+		records: make([]*flowdata.Record, 0, len(vfMsg.DataSets)),
 		jsons:   make([][]byte, len(vfMsg.DataSets)),
 	}
 	pack.SetClientID()
