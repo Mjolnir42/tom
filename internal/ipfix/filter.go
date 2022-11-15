@@ -43,8 +43,8 @@ type procFilter struct {
 	fFmtJSN      string
 	mux          *ipfixMux
 	parsedRules  []config.Rule
-	templates map[uint16]entities.Message
 	sequences    map[uint32]uint32
+	templates    map[uint16]entities.Message
 }
 
 func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*procFilter, error) {
