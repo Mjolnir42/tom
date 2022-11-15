@@ -67,6 +67,8 @@ func (f *procFilter) convert(frame IPFIXMessage) {
 			ExportTime: vfMsg.Header.ExportTime,
 			SequenceNo: vfMsg.Header.SequenceNo,
 			DomainID:   vfMsg.Header.DomainID,
+			isTemplate: false,
+			numRecords: uint32(len(vfMsg.DataSets)),
 		},
 		records: make([]*flowdata.Record, len(vfMsg.DataSets)),
 		jsons:   make([][]byte, len(vfMsg.DataSets)),
