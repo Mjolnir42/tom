@@ -132,9 +132,11 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 			lm.GetLogger(`application`).Println(`IPFIX subsystem: starting processing functions`)
 			switch s {
 			case ProcFilter:
+				lm.GetLogger(`application`).Println(`IPFIX subsystem: starting filter processing`)
 				reg.procFilter, err = newFilter(conf.IPFIX, mux, pool, lm)
 				reg.filterActive = true
 			case ProcAggregate:
+				lm.GetLogger(`application`).Println(`IPFIX subsystem: starting aggregation processing`)
 				reg.procAggregate, err = newAggregate(conf.IPFIX, mux, pool, lm)
 				reg.aggregActive = true
 			default:
@@ -267,6 +269,10 @@ protoloop:
 
 			case err := <-ipfixSrvTLS.Err():
 				lm.GetLogger(`error`).Errorln(err)
+
+			case err := <-mux.Err():
+				lm.GetLogger(`error`).Errorln(err)
+
 			}
 		}
 

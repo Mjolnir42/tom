@@ -145,9 +145,15 @@ func newIPFIXMux(conf config.SettingsIPFIX, pool *sync.Pool, lm *lhm.LogHandleMa
 				m.filtering = true
 			case ProcAggregate:
 				m.aggregation = true
+			default:
+				m.lm.GetLogger(`error`).Errorf("ipfix.mux: unknown processing function %s", s)
 			}
 		}
+	} else {
+		m.lm.GetLogger(`application`).Infoln(`ipfix.mux: disabled processing`)
 	}
+
+	// XXX TODO create IPFIX template record
 
 	m.wg.Add(2)
 	go func() {
@@ -159,12 +165,11 @@ func newIPFIXMux(conf config.SettingsIPFIX, pool *sync.Pool, lm *lhm.LogHandleMa
 
 func (m *ipfixMux) run() {
 	defer m.wg.Done()
-	m.lm.GetLogger(`application`).Infoln(`mux: switching board running`)
+	m.lm.GetLogger(`application`).Infoln(`ipfix.mux: main switchboard running`)
 
 	select {
 	case <-m.exit:
-		m.lm.GetLogger(`application`).
-			Infoln(`mux: error indicator channel already triggered`)
+		m.lm.GetLogger(`application`).Infoln(`ipfix.mux: shutdown, error indicator channel already triggered`)
 		return
 	default:
 	}
@@ -179,8 +184,7 @@ runloop:
 	for {
 		select {
 		case <-m.quit:
-			m.lm.GetLogger(`application`).
-				Infoln(`mux: shutdown signal received`)
+			m.lm.GetLogger(`application`).Infoln(`ipfix.mux: shutdown signal received`)
 			break runloop
 		case <-m.exit:
 			break runloop
@@ -244,6 +248,8 @@ func (m *ipfixMux) unfiltereredForward(frame IPFIXMessage) {
 func (m *ipfixMux) runOutputLoop() {
 	defer m.wg.Done()
 
+	// XXX TODO after x seconds write template to m.outputIPFIX
+
 outputloop:
 	for {
 		select {
@@ -260,7 +266,6 @@ outputloop:
 			go m.outputJSON(buf)
 		case r := <-m.inFLR:
 			go m.outputFlowdata(r)
-
 		}
 	}
 }
