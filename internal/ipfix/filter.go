@@ -115,19 +115,21 @@ func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lh
 
 func (f *procFilter) run() {
 	defer f.wg.Done()
-	f.lm.GetLogger(`application`).Infoln(`Filter module running`)
+	f.lm.GetLogger(`application`).Infoln(`ipfix.filter: module running`)
 
 runloop:
 	for {
 		select {
 		case <-f.quit:
-			f.lm.GetLogger(`application`).Infoln(`Filter: shutdown signal received`)
+			f.lm.GetLogger(`application`).Infoln(`ipfix.filter: shutdown signal received`)
 			break runloop
 		case frame := <-f.pipe:
 			select {
 			case f.pipeConvert <- frame:
 			default:
 			}
+		case err := <-f.err:
+			f.lm.GetLogger(`error`).Errorln(`ipfix.filter:`, err)
 		}
 	}
 	// every 5 minutes => mCache.Dump(f.conf.TemplFile)

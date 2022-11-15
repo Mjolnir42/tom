@@ -28,6 +28,9 @@ loop:
 func (f *procFilter) filter(pack *MessagePack) {
 	f.applyRules(pack)
 
+	// XXX TODO create IPFIX message into pack.ipfix
+	//f.createIPFIX(&pack)
+
 	f.pipeOutput <- pack
 }
 
@@ -37,6 +40,7 @@ func (f *procFilter) applyRules(pack *MessagePack) {
 	// record index
 recordloop:
 	for ridx := range pack.records {
+
 		// instruction index
 	rulesloop:
 		for iidx := range f.parsedRules {

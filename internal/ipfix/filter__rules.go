@@ -19,6 +19,7 @@ func (f *procFilter) parseRules() error {
 	f.parsedRules = make([]config.Rule, 0, len(f.conf.Filters.Rules))
 
 	for i := range f.conf.Filters.Rules {
+		f.lm.GetLogger(`application`).Infof("ipfix.filter: parsing rule: %s", f.conf.Filters.Rules[i])
 		f.conf.Filters.Rules[i] = strings.TrimSpace(
 			f.conf.Filters.Rules[i],
 		)
