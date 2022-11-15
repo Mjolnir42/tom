@@ -227,8 +227,13 @@ recordloop:
 						}
 					}
 				}
-				if f.parsedRules[iidx].InverseMatch && !match {
-					match = true
+				if f.parsedRules[iidx].InverseMatch {
+					switch {
+					case match:
+						match = false
+					case !match:
+						match = true
+					}
 				}
 				if match {
 					switch f.parsedRules[iidx].Action {
