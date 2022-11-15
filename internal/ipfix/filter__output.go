@@ -48,7 +48,7 @@ loop:
 
 func (f *procFilter) output(pack *MessagePack) {
 	if f.fOutJSN && !f.fRawJSN {
-		f.formatOutputJSON(&pack, f.fFmtJSN)
+		f.formatOutputJSON(pack, f.fFmtJSN)
 
 		for m := range pack.ExportJSON(f.fFmtJSN) {
 			f.outpipeJSON <- m

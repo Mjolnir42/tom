@@ -54,7 +54,7 @@ runloop:
 		case <-m.quit:
 			m.lm.GetLogger(`application`).Infoln(`ipfix.aggregation: shutdown signal received`)
 			break runloop
-		case record := <-m.pipe:
+		case <-m.pipe:
 			// XXX TODO process record
 			//
 			// flowset-collection-name => hostname / type slamdd-go/ipfix
