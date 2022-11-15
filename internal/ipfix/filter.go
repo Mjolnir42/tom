@@ -44,6 +44,7 @@ type procFilter struct {
 	mux          *ipfixMux
 	parsedRules  []config.Rule
 	templates map[uint16]entities.Message
+	sequences    map[uint32]uint32
 }
 
 func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*procFilter, error) {
