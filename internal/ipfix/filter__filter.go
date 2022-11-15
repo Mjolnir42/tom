@@ -25,8 +25,8 @@ loop:
 	}
 }
 
-func (f *procFilter) filter(pack MessagePack) {
-	f.applyRules(&pack)
+func (f *procFilter) filter(pack *MessagePack) {
+	f.applyRules(pack)
 
 	f.pipeOutput <- pack
 }

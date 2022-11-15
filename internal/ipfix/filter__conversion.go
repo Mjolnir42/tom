@@ -127,8 +127,8 @@ recordloop:
 			// store record
 			pack.records = append(pack.records, &r)
 		}
-		f.pipeFilter <- pack
 	}
+	f.pipeFilter <- &pack
 }
 
 func (f *procFilter) decode(frame IPFIXMessage) *flow.Message {
