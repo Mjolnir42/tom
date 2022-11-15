@@ -46,7 +46,7 @@ loop:
 	}
 }
 
-func (f *procFilter) output(pack MessagePack) {
+func (f *procFilter) output(pack *MessagePack) {
 	if f.fOutJSN && !f.fRawJSN {
 		f.formatOutputJSON(&pack, f.fFmtJSN)
 
@@ -57,8 +57,8 @@ func (f *procFilter) output(pack MessagePack) {
 
 	f.outpipeIPFIX <- pack.ExportIPFIX()
 
-	for _, r := range pack.records {
-		f.outpipeFDR <- *r
+	for i := range pack.records {
+		f.outpipeFDR <- *(pack.records[i])
 	}
 }
 
