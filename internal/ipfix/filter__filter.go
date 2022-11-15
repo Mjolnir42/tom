@@ -35,7 +35,7 @@ func (f *procFilter) filter(pack *MessagePack) {
 }
 
 func (f *procFilter) applyRules(pack *MessagePack) {
-	keep := make([]*flowdata.Record, 0)
+	keep := make([]*flowdata.Record, 0, len(pack.records))
 
 	// record index
 recordloop:
@@ -235,14 +235,16 @@ recordloop:
 					case `DROP`:
 						continue recordloop
 					case `PASS`:
-						keep = append(keep, pack.records[ridx])
+						r := pack.records[ridx].Copy()
+						keep = append(keep, &r)
 						continue recordloop
 					}
 				}
 			}
 		}
 		// record passed all rules without hitting a DROP rule
-		keep = append(keep, pack.records[ridx])
+		r := pack.records[ridx].Copy()
+		keep = append(keep, &r)
 		continue recordloop
 	}
 	// only return the records we keep
