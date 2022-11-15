@@ -35,6 +35,7 @@ type Request struct {
 	Update UpdateData
 
 	Container     proto.Container
+	Flow          proto.Flow
 	Library       proto.Library
 	Namespace     proto.Namespace
 	Orchestration proto.Orchestration
@@ -63,6 +64,8 @@ func New(r *http.Request, params httprouter.Params, cmd, sec, ac string) Request
 	switch sec {
 	case SectionContainer:
 		rq.Container = *(proto.NewContainer())
+	case SectionFlow:
+		rq.Flow = *(proto.NewFlow())
 	case SectionLibrary:
 		rq.Library = proto.Library{} // TODO when implenting model
 	case SectionNamespace:

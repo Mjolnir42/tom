@@ -19,6 +19,7 @@ type Result struct {
 
 	Container           *[]Container           `json:"container,omitempty"`
 	ContainerHeader     *[]ContainerHeader     `json:"container-list,omitempty"`
+	Flow                *[]Flow                `json:"flow,omitempty"`
 	Library             *[]Library             `json:"library,omitempty"`
 	Namespace           *[]Namespace           `json:"namespace,omitempty"`
 	NamespaceHeader     *[]NamespaceHeader     `json:"namespace-list,omitempty"`

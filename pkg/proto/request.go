@@ -19,6 +19,7 @@ import (
 type Request struct {
 	Verbose       bool           `json:"verbose,omitempty,string"`
 	Container     *Container     `json:"container,omitempty"`
+	Flow          *Flow          `json:"flow,omitempty"`
 	Library       *Library       `json:"library,omitempty"`
 	Namespace     *Namespace     `json:"namespace,omitempty"`
 	Orchestration *Orchestration `json:"orchestration,omitempty"`
@@ -35,6 +36,9 @@ func (r *Request) Serialize() []byte {
 	data := make([]byte, 0)
 	if r.Container != nil {
 		data = append(data, r.Container.Serialize()...)
+	}
+	if r.Flow != nil {
+		data = append(data, r.Flow.Serialize()...)
 	}
 	if r.Library != nil {
 		data = append(data, r.Library.Serialize()...)
