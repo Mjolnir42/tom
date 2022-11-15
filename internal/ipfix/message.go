@@ -25,6 +25,8 @@ type IPFIXHeader struct {
 	ExportTime uint32
 	SequenceNo uint32
 	DomainID   uint32
+	isTemplate bool
+	numRecords uint32
 }
 
 type MessagePack struct {
