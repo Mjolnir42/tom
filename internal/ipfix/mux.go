@@ -139,7 +139,7 @@ func newIPFIXMux(conf config.SettingsIPFIX, pool *sync.Pool, lm *lhm.LogHandleMa
 
 	if conf.Processing {
 		m.processing = true
-		for _, s := range strings.Split(conf.ProcessType, `,`) {
+		for _, s := range strings.Split(conf.ProcessType, `+`) {
 			switch s {
 			case ProcFilter:
 				m.filtering = true

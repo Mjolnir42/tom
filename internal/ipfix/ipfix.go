@@ -128,7 +128,7 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 
 	// start processing stage
 	if conf.IPFIX.Processing {
-		for _, s := range strings.Split(conf.IPFIX.ProcessType, `,`) {
+		for _, s := range strings.Split(conf.IPFIX.ProcessType, `+`) {
 			lm.GetLogger(`application`).Println(`IPFIX subsystem: starting processing functions`)
 			switch s {
 			case ProcFilter:
