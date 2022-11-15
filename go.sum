@@ -319,6 +319,8 @@ github.com/mjolnir42/epk v0.0.0-20221013122735-55335f3c244f h1:+UcjUFl/mzrQm7iKS
 github.com/mjolnir42/epk v0.0.0-20221013122735-55335f3c244f/go.mod h1:083EEDEuAUQeuWpANmS0HjcH7mkjPKd4FBiytmGsaS8=
 github.com/mjolnir42/flowdata v0.0.5 h1:MfQzETHTJMkr3Ahajk8GCazMRtWwnYrdcdh+FjZhzxg=
 github.com/mjolnir42/flowdata v0.0.5/go.mod h1:K6H9Yibrb92h6LelVp+aUlMEuT77aWVy6DSSVMrPkMU=
+github.com/mjolnir42/flowdata v0.0.6 h1:b0lu1+fY1jl5GDk4OvqzG3APQuv1tqclziBONtptatY=
+github.com/mjolnir42/flowdata v0.0.6/go.mod h1:K6H9Yibrb92h6LelVp+aUlMEuT77aWVy6DSSVMrPkMU=
 github.com/mjolnir42/lhm v0.0.3 h1:xUEhLwhVSOfBC0u70moxH9U8kc53KydTFr6gl6v+kkI=
 github.com/mjolnir42/lhm v0.0.3/go.mod h1:wYr7C+DlFS7PhZ5Re8dzocmt5/Frdk1jhTd7QTfCmY0=
 github.com/moby/spdystream v0.2.0/go.mod h1:f7i0iNDQJ059oMTcWxx8MA/zKFIuD/lY+0GqbN2Wy8c=

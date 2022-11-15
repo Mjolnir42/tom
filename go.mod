@@ -16,7 +16,7 @@ require (
 	github.com/mattn/go-shellwords v1.0.12
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mjolnir42/epk v0.0.0-20221013122735-55335f3c244f
-	github.com/mjolnir42/flowdata v0.0.5 // indirect
+	github.com/mjolnir42/flowdata v0.0.6 // indirect
 	github.com/mjolnir42/lhm v0.0.3
 	github.com/nahanni/go-ucl v0.0.0-20161122070711-3788fcf0dad8
 	github.com/satori/go.uuid v1.2.0
