@@ -83,50 +83,50 @@ recordloop:
 				continue recordloop
 			}
 			r.SrcAddress = p.String()
-			if r.DstAddress != `` {
-				p := net.ParseIP(r.DstAddress)
-				if p == nil {
-					continue recordloop
-				}
-				r.DstAddress = p.String()
-			}
-			if r.AgentID != `` {
-				p := net.ParseIP(r.AgentID)
-				if p == nil {
-					continue recordloop
-				}
-				r.AgentID = p.String()
-			}
-			// unfiltered JSON output in vflow format was requested
-			if f.fOutJSN && f.fRawJSN && f.fFmtJSN == `flowdata` {
-				j, err := json.Marshal(&OutputRecord{
-					OctetCount:  r.OctetCount,
-					PacketCount: r.PacketCount,
-					ProtocolID:  r.ProtocolID,
-					Protocol:    r.Protocol,
-					IPVersion:   r.IPVersion,
-					SrcAddress:  r.SrcAddress,
-					SrcPort:     r.SrcPort,
-					DstAddress:  r.DstAddress,
-					DstPort:     r.DstPort,
-					TcpFlags:    r.TcpFlags.Copy(),
-					StartMilli:  r.StartMilli,
-					EndMilli:    r.EndMilli,
-					AgentID:     r.AgentID,
-				})
-				if err != nil {
-					f.err <- err
-					return
-				}
-				select {
-				case f.outpipeRawJS <- j:
-				default:
-				}
-			}
-
-			// store record
-			pack.records = append(pack.records, &r)
 		}
+		if r.DstAddress != `` {
+			p := net.ParseIP(r.DstAddress)
+			if p == nil {
+				continue recordloop
+			}
+			r.DstAddress = p.String()
+		}
+		if r.AgentID != `` {
+			p := net.ParseIP(r.AgentID)
+			if p == nil {
+				continue recordloop
+			}
+			r.AgentID = p.String()
+		}
+		// unfiltered JSON output in vflow format was requested
+		if f.fOutJSN && f.fRawJSN && f.fFmtJSN == `flowdata` {
+			j, err := json.Marshal(&OutputRecord{
+				OctetCount:  r.OctetCount,
+				PacketCount: r.PacketCount,
+				ProtocolID:  r.ProtocolID,
+				Protocol:    r.Protocol,
+				IPVersion:   r.IPVersion,
+				SrcAddress:  r.SrcAddress,
+				SrcPort:     r.SrcPort,
+				DstAddress:  r.DstAddress,
+				DstPort:     r.DstPort,
+				TcpFlags:    r.TcpFlags.Copy(),
+				StartMilli:  r.StartMilli,
+				EndMilli:    r.EndMilli,
+				AgentID:     r.AgentID,
+			})
+			if err != nil {
+				f.err <- err
+				return
+			}
+			select {
+			case f.outpipeRawJS <- j:
+			default:
+			}
+		}
+
+		// store record
+		pack.records = append(pack.records, &r)
 	}
 	f.pipeFilter <- &pack
 }
