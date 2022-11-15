@@ -6,6 +6,7 @@ require (
 	github.com/EdgeCast/vflow v0.9.1 // indirect
 	github.com/Showmax/go-fqdn v1.0.0
 	github.com/boltdb/bolt v1.3.1
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/droundy/goopt v0.0.0-20170604162106-0b8effe182da
 	github.com/gholt/blackfridaytext v0.0.0-20190816214545-16f7b9b9742e
 	github.com/gholt/brimtext v1.0.0
