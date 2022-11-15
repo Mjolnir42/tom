@@ -161,7 +161,7 @@ func (m *ipfixMux) run() {
 	defer m.wg.Done()
 	m.lm.GetLogger(`application`).Infoln(`mux: switching board running`)
 
-	switch {
+	select {
 	case <-m.exit:
 		m.lm.GetLogger(`application`).
 			Infoln(`mux: error indicator channel already triggered`)
