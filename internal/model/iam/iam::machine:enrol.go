@@ -104,8 +104,8 @@ func (m *Model) MachineEnrol(w http.ResponseWriter, r *http.Request,
 	m.x.Send(&w, &result, exportMachineEnrol)
 }
 
-// enrolment is the handler for registering machine accounts
-func (h *UserWriteHandler) enrolment(q *msg.Request, mr *msg.Result) {
+// machineEnrolment is the handler for registering machine accounts
+func (h *UserWriteHandler) machineEnrolment(q *msg.Request, mr *msg.Result) {
 	var (
 		err                        error
 		isMachine, isSelfEnrolment bool

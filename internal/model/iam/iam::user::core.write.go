@@ -61,18 +61,29 @@ func (h *UserWriteHandler) Register(hm *handler.Map) {
 func (h *UserWriteHandler) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 
-	switch q.Action {
-	case proto.ActionAdd:
-		h.add(q, &result)
-	case proto.ActionRemove:
-		h.remove(q, &result)
-	case proto.ActionUpdate:
-		h.update(q, &result)
-	case proto.ActionEnrolment:
-		h.enrolment(q, &result)
+	switch q.Section {
+	case msg.SectionUser:
+		switch q.Action {
+		case proto.ActionAdd:
+			h.add(q, &result)
+		case proto.ActionRemove:
+			h.remove(q, &result)
+		case proto.ActionUpdate:
+			h.update(q, &result)
+		default:
+			result.UnknownRequest(q)
+		}
+	case msg.SectionMachine:
+		switch q.Action {
+		case proto.ActionEnrolment:
+			h.machineEnrolment(q, &result)
+		default:
+			result.UnknownRequest(q)
+		}
 	default:
 		result.UnknownRequest(q)
 	}
+
 	q.Reply <- result
 }
 
