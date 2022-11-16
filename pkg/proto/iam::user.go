@@ -10,6 +10,7 @@ package proto //
 const (
 	CmdUser       = ModelIAM + `::` + EntityUser + `:`
 	CmdUserAdd    = ModelIAM + `::` + EntityUser + `:` + ActionAdd
+	CmdUserEnrol  = ModelIAM + `::` + EntityUser + `:` + ActionEnrolment
 	CmdUserList   = ModelIAM + `::` + EntityUser + `:` + ActionList
 	CmdUserRemove = ModelIAM + `::` + EntityUser + `:` + ActionRemove
 	CmdUserShow   = ModelIAM + `::` + EntityUser + `:` + ActionShow
@@ -24,6 +25,13 @@ func init() {
 		Body:        true,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{},
+	}
+	Commands[CmdUserEnrol] = CmdDef{
+		Method:      MethodPUT,
+		Path:        `/user/` + PlHoldTomID,
+		Body:        true,
+		ResultTmpl:  TemplateCommand,
+		Placeholder: []string{PlHoldTomID},
 	}
 	Commands[CmdUserList] = CmdDef{
 		Method:      MethodGET,
