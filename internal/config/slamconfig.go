@@ -33,10 +33,13 @@ type SlamConfiguration struct {
 }
 
 type AuthConfiguration struct {
-	Passphrase string                   `json:"-"`
-	PubKey     ed25519.PublicKey        `json:"-"`
-	PrivEPK    *epk.EncryptedPrivateKey `json:"-"`
-	CredPath   string                   `json:"credential.path"`
+	Passphrase     string                   `json:"-"`
+	PubKey         ed25519.PublicKey        `json:"-"`
+	PrivEPK        *epk.EncryptedPrivateKey `json:"-"`
+	CredPath       string                   `json:"credential.path"`
+	UserName       string                   `json:"username"`
+	IDLibrary      string                   `json:"identity.library"`
+	UseFingerprint bool                     `json:"use.fingerprint.as.username,string"`
 }
 
 type SettingsIPFIX struct {
