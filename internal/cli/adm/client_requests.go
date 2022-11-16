@@ -351,13 +351,4 @@ func checkApplicationError(result *proto.Result) error {
 	return nil
 }
 
-func generateTokenEPK(path string) string {
-	// TODO generate nonce
-	// TODO generate hash
-	// TODO generate signature
-	// TODO encode payload
-	// return payload
-	return path
-}
-
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
