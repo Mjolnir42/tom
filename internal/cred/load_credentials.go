@@ -22,9 +22,13 @@ func LoadCredentials(cfg *config.AuthConfiguration, lm *lhm.LogHandleMap) (bool,
 	var (
 		err        error
 		initialize bool = true
+		logging    bool = true
 		rawPass    []byte
 		fd         *os.File
 	)
+	if lm == nil {
+		logging = false
+	}
 
 	// fix up credential path
 	if cfg.CredPath, err = filepath.Abs(cfg.CredPath); err != nil {
@@ -35,9 +39,11 @@ func LoadCredentials(cfg *config.AuthConfiguration, lm *lhm.LogHandleMap) (bool,
 	}
 	if _, err = os.Open(cfg.CredPath); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			lm.GetLogger(`application`).Infoln(`Credential directory missing, attempting create.`)
+			if logging {
+				lm.GetLogger(`application`).Infoln(`Credential directory missing, attempting create.`)
+			}
 
-			if err = os.Mkdir(cfg.CredPath, os.FileMode(0750)); err == nil {
+			if err = os.Mkdir(cfg.CredPath, os.FileMode(0750)); err == nil && logging {
 				lm.GetLogger(`application`).Infoln(`successfully created credential directory.`)
 			}
 		} else {
@@ -50,7 +56,9 @@ func LoadCredentials(cfg *config.AuthConfiguration, lm *lhm.LogHandleMap) (bool,
 		filepath.Join(cfg.CredPath, `passphrase`),
 	); err != nil && errors.Is(err, os.ErrNotExist) {
 		if initialize {
-			lm.GetLogger(`application`).Infoln(`initializing passphrase file`)
+			if logging {
+				lm.GetLogger(`application`).Infoln(`initializing passphrase file`)
+			}
 			if err = createPassphraseFile(filepath.Join(cfg.CredPath, `passphrase`), cfg); err != nil {
 				return false, err
 			}
@@ -67,7 +75,9 @@ func LoadCredentials(cfg *config.AuthConfiguration, lm *lhm.LogHandleMap) (bool,
 			return false, errors.New(`passphrase file is empty`)
 		}
 		cfg.Passphrase = string(mask(rawPass))
-		lm.GetLogger(`application`).Infoln(`successfully loaded passphrase from file`)
+		if logging {
+			lm.GetLogger(`application`).Infoln(`successfully loaded passphrase from file`)
+		}
 	}
 
 	// load keypair from file
@@ -75,7 +85,9 @@ func LoadCredentials(cfg *config.AuthConfiguration, lm *lhm.LogHandleMap) (bool,
 		filepath.Join(cfg.CredPath, `machinekey.epk`),
 	); err != nil && errors.Is(err, os.ErrNotExist) {
 		if initialize {
-			lm.GetLogger(`application`).Infoln(`initializing machine keypair`)
+			if logging {
+				lm.GetLogger(`application`).Infoln(`initializing machine keypair`)
+			}
 			if err = createKeypairFiles(cfg); err != nil {
 				return false, err
 			}
@@ -91,14 +103,18 @@ func LoadCredentials(cfg *config.AuthConfiguration, lm *lhm.LogHandleMap) (bool,
 		if cfg.PrivEPK, err = epk.ReadFrom(fd); err != nil {
 			return false, err
 		}
-		lm.GetLogger(`application`).Infoln(`successfully loaded private key from file`)
+		if logging {
+			lm.GetLogger(`application`).Infoln(`successfully loaded private key from file`)
+		}
 	}
 
 	// test loaded credentials
 	if cfg.PubKey, err = cfg.PrivEPK.Public(cfg.Passphrase); err != nil {
 		return false, err
 	}
-	lm.GetLogger(`application`).Infoln(`successfully unlocked public key from private key`)
+	if logging {
+		lm.GetLogger(`application`).Infoln(`successfully unlocked public key from private key`)
+	}
 	// pre-calculate publickey fingerprint hash
 	if cfg.Fingerprint, err = GetHash(cfg.PubKey); err != nil {
 		return false, err
