@@ -49,18 +49,20 @@ type Request struct {
 // New returns a Request
 func New(r *http.Request, params httprouter.Params, cmd, sec, ac string) Request {
 	returnChannel := make(chan Result, 1)
-	identity := authUser(params)
 	rq := Request{
-		ID:         requestID(params),
-		Command:    cmd,
-		Section:    sec,
-		Action:     ac,
+		ID:          requestID(params),
+		Command:     cmd,
+		Section:     sec,
+		Action:      ac,
 		Enforcement: authEnforcement(params),
-		RequestURI: requestURI(params),
-		RemoteAddr: remoteAddr(r),
-		UserIDLib:  identity[0],
-		AuthUser:   identity[1],
-		Reply:      returnChannel,
+		RequestURI:  requestURI(params),
+		RemoteAddr:  remoteAddr(r),
+		Reply:       returnChannel,
+	}
+	identity := authUser(params)
+	if len(identity) == 2 {
+		rq.UserIDLib = identity[0]
+		rq.AuthUser = identity[1]
 	}
 	rq.Verbose, _ = strconv.ParseBool(r.URL.Query().Get(`verbose`))
 	switch sec {
