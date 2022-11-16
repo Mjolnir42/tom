@@ -57,7 +57,7 @@ func init() {
 	Commands[CmdUserUpdate] = CmdDef{
 		Method:      MethodPATCH,
 		Path:        `/user/` + PlHoldTomID,
-		Body:        false,
+		Body:        true,
 		ResultTmpl:  TemplateCommand,
 		Placeholder: []string{PlHoldTomID},
 	}
