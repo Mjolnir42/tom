@@ -100,6 +100,10 @@ func LoadCredentials(cfg *config.AuthConfiguration, lm *lhm.LogHandleMap, ctx *c
 		return false, err
 	}
 	lm.GetLogger(`application`).Infoln(`successfully unlocked public key from private key`)
+	// pre-calculate publickey fingerprint hash
+	if cfg.Fingerprint, err = GetHash(cfg.PubKey); err != nil {
+		return false, err
+	}
 
 	return initialize, nil
 }

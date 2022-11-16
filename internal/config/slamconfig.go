@@ -34,6 +34,7 @@ type SlamConfiguration struct {
 
 type AuthConfiguration struct {
 	Passphrase     string                   `json:"-"`
+	Fingerprint    string                   `json:"-"`
 	PubKey         ed25519.PublicKey        `json:"-"`
 	PrivEPK        *epk.EncryptedPrivateKey `json:"-"`
 	CredPath       string                   `json:"credential.path"`
