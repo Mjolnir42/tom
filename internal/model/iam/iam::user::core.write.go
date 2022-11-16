@@ -45,6 +45,7 @@ func NewUserWriteHandler(length int) (string, *UserWriteHandler) {
 func (h *UserWriteHandler) Register(hm *handler.Map) {
 	for _, action := range []string{
 		proto.ActionAdd,
+		proto.ActionEnrolment,
 		proto.ActionRemove,
 		proto.ActionUpdate,
 	} {
@@ -70,6 +71,8 @@ func (h *UserWriteHandler) process(q *msg.Request) {
 			h.remove(q, &result)
 		case proto.ActionUpdate:
 			h.update(q, &result)
+		case proto.ActionEnrolment:
+			h.userEnrolment(q, &result)
 		default:
 			result.UnknownRequest(q)
 		}
