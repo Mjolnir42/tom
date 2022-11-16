@@ -32,7 +32,7 @@ func init() {
 }
 
 func machineEnrol(m *Model) httprouter.Handle {
-	return m.x.Authenticated(m.MachineEnrol)
+	return m.x.Unauthenticated(m.MachineEnrol)
 }
 
 func exportMachineEnrol(result *proto.Result, r *msg.Result) {
