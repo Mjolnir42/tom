@@ -12,7 +12,9 @@ import (
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
+	"github.com/mjolnir42/tom/internal/cli/adm"
 	"github.com/mjolnir42/tom/internal/config"
+	"github.com/mjolnir42/tom/internal/cred"
 	"github.com/urfave/cli/v2"
 )
 
@@ -33,7 +35,7 @@ func configSetup(c *cli.Context) (*config.ClientConfig, error) {
 		confPath = filepath.Clean(filepath.Join(home, ".tom", "tom.conf"))
 	}
 
-	cfg := &config.ClientConfig{Run: config.RunTimeConfig{}}
+	cfg := &config.ClientConfig{Run: config.RunTimeConfig{}, Auth: &config.AuthConfiguration{}}
 	if err = cfg.PopulateFromFile(confPath); err != nil {
 		return nil, err
 	}
@@ -45,6 +47,35 @@ func configSetup(c *cli.Context) (*config.ClientConfig, error) {
 	cfg.Run.PathLogs = filepath.Clean(cfg.LogDir)
 	if cfg.CAFile != `` {
 		cfg.Run.PathCA = filepath.Clean(cfg.CAFile)
+	}
+
+	switch cfg.Auth.CredPath {
+	case ``:
+		cfg.Auth.CredPath = filepath.Clean(filepath.Join(home, ".tom"))
+	default:
+		cfg.Auth.CredPath = filepath.Clean(cfg.Auth.CredPath)
+	}
+	var initialize bool
+	if initialize, err = cred.LoadCredentials(
+		cfg.Auth,
+		nil,
+	); err != nil {
+		return nil, err
+	}
+
+	switch cfg.Auth.UseFingerprint {
+	case cfg.Auth.UseFingerprint:
+		adm.ConfigureIdentity(cfg.Auth.IDLibrary, cfg.Auth.Fingerprint)
+	default:
+		adm.ConfigureIdentity(cfg.Auth.IDLibrary, cfg.Auth.UserName)
+	}
+
+	adm.ConfigureEPK(cfg.Auth.PrivEPK, cfg.Auth.Passphrase)
+
+	if initialize {
+		if err = adm.RegisterUserEnrolment(cfg.Auth, c); err != nil {
+			return nil, err
+		}
 	}
 
 	return cfg, nil
