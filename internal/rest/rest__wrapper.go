@@ -68,6 +68,19 @@ func (x *Rest) enrich(h httprouter.Handle) httprouter.Handle {
 			Value: r.RequestURI,
 		})
 
+		// record authentication enforcement status
+		if !x.conf.Enforce {
+			ps = append(ps, httprouter.Param{
+				Key:   `AuthenticationEnforcement`,
+				Value: `false`,
+			})
+		} else {
+			ps = append(ps, httprouter.Param{
+				Key:   `AuthenticationEnforcement`,
+				Value: `true`,
+			})
+		}
+
 		h(w, r, ps)
 	}
 }

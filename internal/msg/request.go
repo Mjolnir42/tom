@@ -19,16 +19,17 @@ import (
 )
 
 type Request struct {
-	ID         uuid.UUID
-	Command    string
-	Section    string
-	Action     string
-	RemoteAddr string
-	UserIDLib  string
-	AuthUser   string
-	RequestURI string
-	Reply      chan Result `json:"-"`
-	Verbose    bool
+	ID          uuid.UUID
+	Command     string
+	Section     string
+	Action      string
+	RemoteAddr  string
+	UserIDLib   string
+	AuthUser    string
+	RequestURI  string
+	Reply       chan Result `json:"-"`
+	Enforcement bool
+	Verbose     bool
 
 	Auth Super
 
@@ -54,6 +55,7 @@ func New(r *http.Request, params httprouter.Params, cmd, sec, ac string) Request
 		Command:    cmd,
 		Section:    sec,
 		Action:     ac,
+		Enforcement: authEnforcement(params),
 		RequestURI: requestURI(params),
 		RemoteAddr: remoteAddr(r),
 		UserIDLib:  identity[0],
