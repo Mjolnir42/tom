@@ -26,6 +26,7 @@ var (
 	authenticate  bool
 	priv          *epk.EncryptedPrivateKey
 	epkPhrase     string
+	enrolment     string
 )
 
 func ConfigureClient(c *resty.Client) {
@@ -34,6 +35,10 @@ func ConfigureClient(c *resty.Client) {
 
 func ConfigureCache(c *db.DB) {
 	cache = c
+}
+
+func ConfigureEnrolmentKey(k string) {
+	enrolment = k
 }
 
 func ConfigureIdentity(lib, user string) {
