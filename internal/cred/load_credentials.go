@@ -16,10 +16,9 @@ import (
 	"github.com/mjolnir42/epk"
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/config"
-	"github.com/urfave/cli/v2"
 )
 
-func LoadCredentials(cfg *config.AuthConfiguration, lm *lhm.LogHandleMap, ctx *cli.Context) (bool, error) {
+func LoadCredentials(cfg *config.AuthConfiguration, lm *lhm.LogHandleMap) (bool, error) {
 	var (
 		err        error
 		initialize bool = true
