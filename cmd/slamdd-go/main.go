@@ -127,7 +127,6 @@ func run() int {
 	if initialize, err = cred.LoadCredentials(
 		SlamCfg.Auth,
 		lm,
-		nil,
 	); err != nil {
 		lm.GetLogger(`error`).Errorln(err)
 		return EX_ERROR
