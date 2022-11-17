@@ -63,6 +63,8 @@ type IPDaemon struct {
 	CAFile      string `json:"ca.file"`
 	CertFile    string `json:"certificate.file"`
 	CertKeyFile string `json:"certificate.keyfile"`
+	BasicUser   string `json:"basic.auth.user"`
+	BasicPass   string `json:"basic.auth.pass"`
 }
 
 type IPClient struct {
@@ -72,6 +74,8 @@ type IPClient struct {
 	CAFile       string `json:"ca.file"`
 	Unfiltered   bool   `json:"unfiltered.copy,string"`
 	Format       string `json:"json.format"` // vflow,flowdata
+	BasicUser    string `json:"basic.auth.user"`
+	BasicPass    string `json:"basic.auth.pass"`
 }
 
 type IPFilter struct {
