@@ -24,6 +24,7 @@ type UserWriteHandler struct {
 	name          string
 	conn          *sql.DB
 	lm            *lhm.LogHandleMap
+	stmtActivate  *sql.Stmt
 	stmtAdd       *sql.Stmt
 	stmtAddKey    *sql.Stmt
 	stmtDetect    *sql.Stmt
@@ -114,6 +115,7 @@ func (h *UserWriteHandler) Run() {
 		stmt.LibraryDetect:    &h.stmtDetect,
 		stmt.MachineEnrol:     &h.stmtEnrolment,
 		stmt.MachineUpdateUID: &h.stmtUpdateUID,
+		stmt.UserActivate:     &h.stmtActivate,
 		stmt.UserAdd:          &h.stmtAdd,
 		stmt.UserAddKey:       &h.stmtAddKey,
 		stmt.UserRemove:       &h.stmtRemove,

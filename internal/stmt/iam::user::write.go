@@ -60,11 +60,21 @@ SELECT            $1::uuid,
                   $2::text,
                   $3::text,
                   $6::uuid;`
+
+	UserActivate = `
+UPDATE            inventory.user
+   SET            isActive = 'yes'::boolean
+FROM              inventory.identity_library
+WHERE             inventory.user.identityLibraryID = inventory.identity_library.identityLibraryID
+  AND             inventory.user.uID = $1::text
+  AND             inventory.identity_library.name = $2::text
+  AND NOT         inventory.user.isDeleted;`
 )
 
 func init() {
 	m[MachineEnrol] = `MachineEnrol`
 	m[MachineUpdateUID] = `MachineUpdateUID`
+	m[UserActivate] = `UserActivate`
 	m[UserAddKey] = `UserAddKey`
 	m[UserAdd] = `UserAdd`
 	m[UserRemove] = `UserRemove`
