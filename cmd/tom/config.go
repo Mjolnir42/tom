@@ -65,7 +65,7 @@ func configSetup(c *cli.Context) (*config.ClientConfig, bool, error) {
 	}
 
 	switch cfg.Auth.UseFingerprint {
-	case cfg.Auth.UseFingerprint:
+	case true:
 		adm.ConfigureIdentity(cfg.Auth.IDLibrary, cfg.Auth.Fingerprint)
 	default:
 		adm.ConfigureIdentity(cfg.Auth.IDLibrary, cfg.Auth.UserName)
