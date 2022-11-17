@@ -42,6 +42,12 @@ func registerCommands(app cli.App) *cli.App {
 				Usage:   `request verbose service replies`,
 				Value:   false,
 			},
+			&cli.StringFlag{
+				Name:    `config`,
+				Aliases: []string{`c`},
+				Usage:   `configuration file`,
+				Hidden:  true,
+			},
 		}...,
 	)
 
