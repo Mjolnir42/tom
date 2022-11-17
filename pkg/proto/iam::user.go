@@ -107,8 +107,21 @@ func NewUser() *User {
 	}
 }
 
+func (u *User) SetTomID() Entity {
+	u.TomID = u.FormatDNS()
+	return u
+}
+
+func (u *User) String() string {
+	return u.FormatDNS()
+}
+
 func (u *User) FormatDNS() string {
 	return u.UserName + `.` + u.LibraryName + `.` + EntityUser + `.tom`
+}
+
+func (u *User) FormatTomID() string {
+	return `tom://` + u.LibraryName + `/` + EntityUser + `/user-name=` + u.UserName
 }
 
 func (u *User) FormatMachineDNS() string {
@@ -122,13 +135,35 @@ func (u *User) ParseTomID() error {
 		return ErrEmptyTomID
 	case isTomIDFormatDNS(u.TomID):
 		u.UserName, u.LibraryName, typeID = parseTomIDFormatDNS(u.TomID)
-		return assessTomID(EntityMachine, typeID)
+		if err := assessTomID(EntityMachine, typeID); err == nil {
+			return nil
+		}
+		return assessTomID(EntityUser, typeID)
 	case isTomIDFormatURI(u.TomID):
 		u.UserName, u.LibraryName, typeID = parseTomIDFormatURI(u.TomID)
-		return assessTomID(EntityMachine, typeID)
+		if err := assessTomID(EntityMachine, typeID); err == nil {
+			return nil
+		}
+		return assessTomID(EntityUser, typeID)
 	default:
 		return ErrInvalidTomID
 	}
+}
+
+func (u *User) PropertyIterator() <-chan PropertyDetail {
+	ret := make(chan PropertyDetail)
+	go func() {
+		close(ret)
+	}()
+	return ret
+}
+
+func (u *User) ExportName() string {
+	return u.UserName
+}
+
+func (u *User) ExportNamespace() string {
+	return u.LibraryName
 }
 
 // Serialize ...

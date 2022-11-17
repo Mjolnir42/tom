@@ -181,6 +181,11 @@ func ParseTomID(s string) (error, string, Entity) {
 			Namespace: namespace,
 			Name:      name,
 		}).SetTomID()
+	case EntityUser:
+		return nil, entity, (&User{
+			LibraryName: namespace,
+			UserName:    name,
+		}).SetTomID()
 	default:
 		return ErrInvalidTomID, ``, nil
 	}
