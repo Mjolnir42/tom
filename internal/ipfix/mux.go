@@ -153,8 +153,6 @@ func newIPFIXMux(conf config.SettingsIPFIX, pool *sync.Pool, lm *lhm.LogHandleMa
 		m.lm.GetLogger(`application`).Infoln(`ipfix.mux: disabled processing`)
 	}
 
-	// XXX TODO create IPFIX template record
-
 	m.wg.Add(2)
 	go func() {
 		m.setup()

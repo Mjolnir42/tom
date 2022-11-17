@@ -49,6 +49,7 @@ type SettingsIPFIX struct {
 	Processing  bool       `json:"processing.enabled,string"`
 	ProcessType string     `json:"processing.type"`
 	TemplFile   string     `json:"template.file"`
+	Refresh     string     `json:"template.refresh.interval"`
 	Servers     []IPDaemon `json:"server"`
 	Clients     []IPClient `json:"client"`
 	Filters     IPFilter   `json:"filter"`
