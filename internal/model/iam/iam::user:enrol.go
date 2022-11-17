@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"hash"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/msg"
@@ -80,6 +81,33 @@ func (m *Model) UserEnrol(w http.ResponseWriter, r *http.Request,
 
 	switch request.User.Credential.Category {
 	case proto.CredentialPubKey:
+		var tx, vFrom, vUntil time.Time
+		var err error
+
+		tx = time.Now().UTC()
+		if vFrom, err = time.Parse(req.Auth.CSR.ValidFrom, time.RFC3339); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+		if vUntil, err = time.Parse(req.Auth.CSR.ValidUntil, time.RFC3339); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+
+		switch {
+		case req.Auth.CSR.UserID != req.User.UserName:
+			fallthrough
+		case req.Auth.CSR.Library != req.User.LibraryName:
+			fallthrough
+		case req.Auth.CSR.PublicKey != req.User.Credential.Value:
+			fallthrough
+		case tx.Before(vFrom):
+			fallthrough
+		case tx.After(vUntil):
+			m.x.ReplyBadRequest(&w, &request, fmt.Errorf(`Invalid CSR field contents`))
+			return
+		default:
+		}
 		if ok, err := req.Verify(); err != nil {
 			m.x.ReplyUnauthorized(&w, &request)
 			return
