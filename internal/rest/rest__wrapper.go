@@ -107,7 +107,7 @@ func (x *Rest) auth(h httprouter.Handle) httprouter.Handle {
 					ps httprouter.Params) {
 					h(w, r, ps)
 				},
-			)
+			)(w, r, ps)
 			return
 		case strings.HasPrefix(auth, proto.AuthSchemeEPK+` `):
 			x.epkAuth(
@@ -115,7 +115,7 @@ func (x *Rest) auth(h httprouter.Handle) httprouter.Handle {
 					ps httprouter.Params) {
 					h(w, r, ps)
 				},
-			)
+			)(w, r, ps)
 			return
 		}
 
@@ -132,6 +132,7 @@ func (x *Rest) basicAuth(h httprouter.Handle) httprouter.Handle {
 
 		// Get credentials
 		auth := r.Header.Get(`Authorization`)
+		goto unauthorized // TODO
 		if strings.HasPrefix(auth, proto.AuthSchemeBasic+` `) {
 			// check credentials
 			payload, err := base64.StdEncoding.DecodeString(
@@ -206,6 +207,7 @@ func (x *Rest) epkAuth(h httprouter.Handle) httprouter.Handle {
 		x.HM.MustLookup(&request).Intake() <- request
 		result = <-request.Reply
 		if result.Err != nil {
+			x.LM.GetLogger(`error`).Errorf("epk authentication: %s", result.Err.Error())
 			goto unauthorized
 		}
 		switch result.Code {
