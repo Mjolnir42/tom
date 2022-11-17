@@ -1,0 +1,33 @@
+! pmacct configuration
+!
+daemonize: false
+promisc: false
+pmacctd_nonroot: false
+timestamps_utc: true
+timestamps_rfc3339: true
+snaplen: 128
+aggregate: src_host,dst_host,proto,src_port,dst_port,timestamp_start,timestamp_end
+!
+! pcap_interfaces_map: pcap_if.map
+!
+pcap_interface: em0
+pcap_interface_wait: true
+! filter expression to discard the flow to the collector, as well as broadcast and multicast traffic
+pcap_filter: !((udp port 4743 and dst net 127.0.0.1/32) || (ether broadcast) || (ip broadcast) || (ether multicast) || (ip multicast) || (ip6 multicast) || ip net 224.0.0.0/3)
+plugins: nfprobe
+pmacctd_pipe_size: 16777216
+plugin_pipe_size:  16777216
+nfprobe_version: 10
+nfprobe_maxflows: 8388608
+nfprobe_dont_cache: true
+nfprobe_timeouts: tcp=300:tcp.rst=60:tcp.fin=120:udp=180:icmp=60:general=300:maxlife=300:expint=30
+!
+! IP address of the flow collector to send flows to
+nfprobe_receiver: 127.0.0.1:4739
+!
+pmacctd_frag_buffer_size: 67108864
+pmacctd_flow_buffer_size: 134217728
+pmacctd_flow_buffer_buckets: 65536
+pmacctd_conntrack_buffer_size: 33554432
+pmacctd_flow_lifetime: 300
+pmacctd_flow_tcp_lifetime: 300

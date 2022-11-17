@@ -1,0 +1,43 @@
+ipfix {
+  enabled: true
+  forwarding.enabled: true
+  forwarding.address: 127.0.0.1:9999
+  forwarding.protocol: udp
+  tls.servername: localhost
+  ca.file: /home/xxx/src/tom/modelupdate/ca/rootCA.pem
+  processing.enabled: false
+  processing.type: filter,aggregate
+  server: {
+    enabled: true
+    listen.protocol: udp
+    listen.address: 127.0.0.1:9739
+  }
+  server: {
+    enabled: true
+    listen.protocol: tcp
+    listen.address: 127.0.0.1:9739
+  }
+  server: {
+    enabled: true
+    listen.protocol: tls
+    listen.address: 127.0.0.1:9740
+    tls.servername: localhost
+    ca.file: /home/xxx/src/tom/modelupdate/ca/rootCA.pem
+    certificate.file: /home/xxx/src/tom/modelupdate/localhost.pem
+    certificate.keyfile: /home/xxx/src/tom/modelupdate/localhost.key
+  }
+  client: {
+  }
+  client: {
+  }
+  client: {
+  }
+}
+auth: {
+  credential.path: /home/xxx/src/tom/modelupdate/docs/slamdd/configuration/2
+}
+# debug, info, warn, error, fatal, panic
+log.level: debug
+log.path: /home/xxx/src/tom/modelupdate/logs/slamdd/2/
+api: https://127.0.0.1:8443/
+api.ca.file: /home/xxx/src/tom/modelupdate/ca/rootCA.pem

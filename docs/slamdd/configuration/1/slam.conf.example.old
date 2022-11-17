@@ -1,0 +1,51 @@
+ipfix {
+  enabled: true
+  forwarding.enabled: true
+  processing.enabled: true
+  processing.type: filter
+  template.file: /home/xxx/src/tom/modelupdate/docs/slamdd/configuration/1/ipfix.tpl
+  server: {
+    enabled: true
+    listen.protocol: udp
+    listen.address: 127.0.0.1:4739
+  }
+  server: {
+    enabled: true
+    listen.protocol: tcp
+    listen.address: 127.0.0.1:4739
+  }
+  server: {
+    enabled: true
+    listen.protocol: tls
+    listen.address: 127.0.0.1:4740
+    tls.servername: localhost
+    ca.file: /home/xxx/src/tom/modelupdate/ca/rootCA.pem
+    certificate.file: /home/xxx/src/tom/modelupdate/localhost.pem
+    certificate.keyfile: /home/xxx/src/tom/modelupdate/localhost.key
+  }
+  client: {
+    enabled: false
+    forwarding.address: 127.0.0.1:9739
+    forwarding.protocol: udp
+  }
+  client: {
+    enabled: true
+    forwarding.address: 127.0.0.1:9739
+    forwarding.protocol: tcp
+    ca.file: /home/xxx/src/tom/modelupdate/ca/rootCA.pem
+  }
+  client: {
+    enabled: true
+    forwarding.address: 127.0.0.1:9740
+    forwarding.protocol: tls
+    ca.file: /home/xxx/src/tom/modelupdate/ca/rootCA.pem
+  }
+}
+auth: {
+  credential.path: /home/xxx/src/tom/modelupdate/docs/slamdd/configuration/1
+}
+# debug, info, warn, error, fatal, panic
+log.level: debug
+log.path: /home/xxx/src/tom/modelupdate/logs/slamdd/1
+api: https://127.0.0.1:8443/
+api.ca.file: /home/xxx/src/tom/modelupdate/ca/rootCA.pem
