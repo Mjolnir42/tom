@@ -57,7 +57,7 @@ type IPFIXServer interface {
 	Stop() chan error
 }
 
-type registry struct {
+type handlerRegistry struct {
 	udpServer     IPFIXServer
 	udpClient     *udpClient
 	tcpServer     IPFIXServer
@@ -96,7 +96,7 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 
 	mux := newIPFIXMux(conf.IPFIX, pool, lm)
 
-	reg := registry{}
+	reg := handlerRegistry{}
 
 	// start client stage
 	if conf.IPFIX.Forwarding {
