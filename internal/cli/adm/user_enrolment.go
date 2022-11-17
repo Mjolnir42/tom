@@ -39,7 +39,7 @@ func RegisterUserEnrolment(cfg *config.AuthConfiguration, ctx *cli.Context) erro
 
 	req.Auth.CSR = &proto.DataCSR{
 		UserID:       req.User.UserName,
-		Library:      req.User.UserName,
+		Library:      req.User.LibraryName,
 		PublicKey:    req.User.Credential.Value,
 		EnrolmentKey: enrolment, // package var, set via ConfigureEnrolmentKey()
 		ValidFrom:    tx.Add(-1 * time.Second).Format(time.RFC3339),
