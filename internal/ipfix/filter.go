@@ -9,6 +9,7 @@ package ipfix
 
 import (
 	"sync"
+	"time"
 
 	flow "github.com/EdgeCast/vflow/ipfix"
 	"github.com/mjolnir42/flowdata"
@@ -45,6 +46,7 @@ type procFilter struct {
 	parsedRules  []config.Rule
 	sequences    map[uint32]uint32
 	templates    map[uint16]entities.Message
+	TemplateInt  time.Duration
 }
 
 func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*procFilter, error) {
@@ -56,6 +58,16 @@ func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lh
 		mux:  mux,
 		pool: pool,
 		lm:   lm,
+	}
+	switch f.conf.Refresh {
+	case ``:
+		f.TemplateInt = 120 * time.Second
+	default:
+		d, err := time.ParseDuration(f.conf.Refresh)
+		if err != nil {
+			return nil, err
+		}
+		f.TemplateInt = d
 	}
 	// read from inpipe
 	// filter
@@ -108,6 +120,8 @@ func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lh
 		go f.outputWorker()
 	}
 
+	f.createTemplate()
+
 	f.wg.Add(1)
 	go f.run()
 	return f, nil
@@ -130,6 +144,10 @@ runloop:
 			}
 		case err := <-f.err:
 			f.lm.GetLogger(`error`).Errorln(`ipfix.filter:`, err)
+		case <-time.Tick(f.TemplateInt):
+			for msg := range f.GetTemplateMsg(uint16(4739)) {
+				f.outpipeIPFIX <- msg
+			}
 		}
 	}
 	// every 5 minutes => mCache.Dump(f.conf.TemplFile)
@@ -150,6 +168,102 @@ func (f *procFilter) Stop() chan error {
 		close(e)
 	}(f.Err())
 	return f.Err()
+}
+
+func (f *procFilter) createTemplate() {
+	templateID := uint16(4379)
+	templateSet := entities.NewSet(false)
+	if err := templateSet.PrepareSet(entities.Template, templateID); err != nil {
+		f.err <- err
+		close(f.exit)
+		return
+	}
+
+	elements := make([]entities.InfoElementWithValue, 0)
+	for _, field := range []string{
+		`octetDeltaCount`,
+		`packetDeltaCount`,
+		`protocolIdentifier`,
+		`tcpControlBits`,
+		`sourceTransportPort`,
+		`sourceIPv4Address`,
+		`destinationTransportPort`,
+		`destinationIpv4Address`,
+		`ingressInterface`,
+		`egressInterface`,
+		`sourceIPv6Address`,
+		`destinationIPv6Address`,
+		`ipVersion`,
+		`flowDirection`,
+		`exporterIPv4Address`,
+		`exporterIPv6Address`,
+		`exportingProcessID`,
+		`flowStartMilliseconds`,
+		`flowEndMilliseconds`,
+	} {
+		var element *entities.InfoElement
+		var err error
+
+		if element, err = registry.GetInfoElement(field, registry.IANAEnterpriseID); err != nil {
+			f.err <- err
+			close(f.exit)
+			return
+		}
+		ie, _ := entities.DecodeAndCreateInfoElementWithValue(element, nil)
+		elements = append(elements, ie)
+	}
+
+	templateSet.AddRecord(elements, templateID)
+	templateSet.UpdateLenInHeader()
+
+	f.lock.Lock()
+	defer f.lock.Unlock()
+
+	f.templates[templateID] = templateSet
+}
+
+func (f *procFilter) GetTemplateMsg(tID uint16) chan IPFIXMessage {
+	ret := make(chan IPFIXMessage)
+
+	go func(out chan IPFIXMessage) {
+		f.lock.RLock()
+		defer f.lock.RUnlock()
+
+		set := f.templates[tID]
+
+		var obsDomID, seqNo uint32
+		for obsDomID = range f.sequences {
+			seqNo = f.sequences[obsDomID]
+
+			msg := entities.NewMessage(false)
+			msgLen := entities.MsgHeaderLength + set.GetSetLength()
+			msg.SetVersion(10)
+			msg.SetObsDomainID(obsDomID)
+			msg.SetMessageLen(uint16(msgLen))
+			msg.SetExportTime(uint32(time.Now().Unix()))
+			msg.SetSequenceNum(seqNo)
+
+			byteSlice := make([]byte, msgLen)
+			copy(
+				byteSlice[:entities.MsgHeaderLength],
+				msg.GetMsgHeader(),
+			)
+			copy(
+				byteSlice[entities.MsgHeaderLength:entities.MsgHeaderLength+entities.SetHeaderLen],
+				set.GetHeaderBuffer(),
+			)
+			index := entities.MsgHeaderLength + entities.SetHeaderLen
+			for _, record := range set.GetRecords() {
+				len := record.GetRecordLength()
+				copy(byteSlice[index:index+len], record.GetBuffer())
+				index += len
+			}
+			out <- IPFIXMessage{
+				body: byteSlice,
+			}
+		}
+	}(ret)
+	return ret
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
