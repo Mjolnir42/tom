@@ -22,7 +22,7 @@ var client *resty.Client
 func initCommon(c *cli.Context) error {
 	var session tls.ClientSessionCache
 
-	cfg, err := configSetup(c)
+	cfg, init, err := configSetup(c)
 	if err != nil {
 		return err
 	}
@@ -45,6 +45,12 @@ func initCommon(c *cli.Context) error {
 	// configure adm client library
 	adm.ConfigureClient(client)
 	adm.ConfigureJSONPostProcessor(cfg.ProcJSON)
+
+	if init {
+		if err = adm.RegisterUserEnrolment(cfg.Auth, c); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
