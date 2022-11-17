@@ -150,9 +150,13 @@ runloop:
 			for msg := range f.GetTemplateMsg(uint16(4739)) {
 				f.outpipeIPFIX <- msg
 			}
+		case <-time.Tick(5 * time.Minute):
+			if err := mCache.Dump(f.conf.TemplFile); err != nil {
+				// save in memory template cache on disk
+				f.err <- err
+			}
 		}
 	}
-	// every 5 minutes => mCache.Dump(f.conf.TemplFile)
 }
 
 func (f *procFilter) Err() chan error {
