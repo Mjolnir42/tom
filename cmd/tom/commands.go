@@ -48,6 +48,11 @@ func registerCommands(app cli.App) *cli.App {
 				Usage:   `configuration file`,
 				Hidden:  true,
 			},
+			&cli.StringFlag{
+				Name:   `enrolment`,
+				Usage:  `key/token for user enrolment`,
+				Hidden: true,
+			},
 		}...,
 	)
 

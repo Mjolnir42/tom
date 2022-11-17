@@ -47,6 +47,9 @@ func initCommon(c *cli.Context) error {
 	adm.ConfigureJSONPostProcessor(cfg.ProcJSON)
 
 	if init {
+		if c.IsSet(`enrolment`) {
+			adm.ConfigureEnrolmentKey(c.String(`enrolment`))
+		}
 		if err = adm.RegisterUserEnrolment(cfg.Auth, c); err != nil {
 			return err
 		}

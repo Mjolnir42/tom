@@ -38,14 +38,12 @@ func RegisterUserEnrolment(cfg *config.AuthConfiguration, ctx *cli.Context) erro
 	req.Auth.Fingerprint = cfg.Fingerprint
 
 	req.Auth.CSR = &proto.DataCSR{
-		UserID:     req.User.UserName,
-		Library:    req.User.UserName,
-		PublicKey:  req.User.Credential.Value,
-		ValidFrom:  tx.Add(-1 * time.Second).Format(time.RFC3339),
-		ValidUntil: tx.Add(60 * time.Second).Format(time.RFC3339),
-	}
-	if ctx.IsSet(`enrolmentkey`) {
-		req.Auth.CSR.EnrolmentKey = ctx.String(`enrolmentkey`)
+		UserID:       req.User.UserName,
+		Library:      req.User.UserName,
+		PublicKey:    req.User.Credential.Value,
+		EnrolmentKey: enrolment, // package var, set via ConfigureEnrolmentKey()
+		ValidFrom:    tx.Add(-1 * time.Second).Format(time.RFC3339),
+		ValidUntil:   tx.Add(60 * time.Second).Format(time.RFC3339),
 	}
 	// CSR hash is included in the request body signature
 	if err = req.Auth.CSR.CalculateDataHash(); err != nil {
