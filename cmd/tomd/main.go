@@ -26,7 +26,6 @@ import (
 	"github.com/mjolnir42/tom/internal/model/iam"
 	"github.com/mjolnir42/tom/internal/model/meta"
 	"github.com/mjolnir42/tom/internal/model/supervisor"
-	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/internal/rest"
 	"github.com/sirupsen/logrus"
 )
@@ -127,13 +126,7 @@ func run() int {
 			i,
 			dm.URL.String(),
 		)
-		// anonymous function is IsAuthorized? authorizationFunction
-		api := rest.New(func(q *msg.Request) bool {
-			if q.Enforcement {
-				return false
-			}
-			return true
-		}, i, hm, lm, &TomCfg)
+		api := rest.New(rest.Authorize, i, hm, lm, &TomCfg)
 		router := httprouter.New()
 
 		// create datamodels
