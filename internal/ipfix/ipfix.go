@@ -64,12 +64,13 @@ type handlerRegistry struct {
 	tcpClient     *tcpClient
 	tlsServer     IPFIXServer
 	tlsClient     *tlsClient
+	jsonServer    IPFIXServer
+	jsonClient    *jsonClient
 	procFilter    *procFilter
 	procAggregate *procAggregate
 	filterActive  bool
 	aggregActive  bool
 	jsClntActive  bool
-	//jsonClient *jsonClient
 }
 
 type ping struct{}
@@ -113,8 +114,8 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 			case ProtoTLS:
 				reg.tlsClient, err = newTLSClient(conf.IPFIX, conf.IPFIX.Clients[i], mux, pool, lm)
 			case ProtoJSON:
-			// TODO reg.jsonClient, err = newJSONClient(conf.IPFIX, outpipe, pool, lm)
-			// TODO reg.jsClntActive = true
+				reg.jsonClient, err = newJSONClient(conf.IPFIX, conf.IPFIX.Clients[i], mux, pool, lm)
+				reg.jsClntActive = true
 			default:
 				err = fmt.Errorf("Unsupported IPFIX output protocol: %s\n", conf.IPFIX.Clients[i].ForwardProto)
 			}
@@ -166,7 +167,7 @@ func New(conf config.SlamConfiguration, lm *lhm.LogHandleMap) (exit chan interfa
 
 	// start server stage
 protoloop:
-	for _, fixproto := range []string{ProtoUDP, ProtoTCP, ProtoTLS} {
+	for _, fixproto := range []string{ProtoUDP, ProtoTCP, ProtoTLS, ProtoJSON} {
 
 		for _, srv := range conf.IPFIX.Servers {
 			if fixproto == srv.ServerProto {
@@ -181,6 +182,8 @@ protoloop:
 					reg.tcpServer, err = newTCPServer(srv, mux, pool, lm)
 				case ProtoTLS:
 					reg.tlsServer, err = newTLSServer(srv, mux, pool, lm)
+				case ProtoJSON:
+					reg.jsonServer, err = newJSONServer(srv, mux, pool, lm)
 				}
 				if err != nil {
 					return
@@ -196,6 +199,8 @@ protoloop:
 			reg.tcpServer, err = newMockServer()
 		case ProtoTLS:
 			reg.tlsServer, err = newMockServer()
+		case ProtoJSON:
+			reg.jsonServer, err = newMockServer()
 		}
 		if err != nil {
 			return
@@ -206,7 +211,7 @@ protoloop:
 		cancel := make(chan os.Signal, 1)
 		signal.Notify(cancel, os.Interrupt, syscall.SIGTERM)
 
-		var ipfixSrvUDP, ipfixSrvTCP, ipfixSrvTLS IPFIXServer
+		var ipfixSrvUDP, ipfixSrvTCP, ipfixSrvTLS, ipfixSrvJSN IPFIXServer
 		errordrain := make(chan error)
 
 		for _, srv := range conf.IPFIX.Servers {
@@ -217,11 +222,14 @@ protoloop:
 				ipfixSrvTCP = reg.tcpServer
 			case ProtoTLS:
 				ipfixSrvTLS = reg.tlsServer
+			case ProtoJSON:
+				ipfixSrvJSN = reg.jsonServer
 			}
 		}
 		drainUDP := make(chan interface{})
 		drainTCP := make(chan interface{})
 		drainTLS := make(chan interface{})
+		drainJSN := make(chan interface{})
 	runloop:
 		for {
 			select {
@@ -230,6 +238,7 @@ protoloop:
 				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
 				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
 				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
+				go chanCopy(ipfixSrvJSN.Stop(), errordrain, drainJSN)
 				break runloop
 
 			case <-ipfixSrvUDP.Exit():
@@ -237,6 +246,7 @@ protoloop:
 				lm.GetLogger(`error`).Errorln(`IPFIX subsystem: UDP server process died`)
 				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
 				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
+				go chanCopy(ipfixSrvJSN.Stop(), errordrain, drainJSN)
 				break runloop
 
 			case <-ipfixSrvTCP.Exit():
@@ -244,6 +254,7 @@ protoloop:
 				lm.GetLogger(`error`).Errorln(`IPFIX subsystem: TCP server process died`)
 				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
 				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
+				go chanCopy(ipfixSrvJSN.Stop(), errordrain, drainJSN)
 				break runloop
 
 			case <-ipfixSrvTLS.Exit():
@@ -251,6 +262,15 @@ protoloop:
 				lm.GetLogger(`error`).Errorln(`IPFIX subsystem: TLS server process died`)
 				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
 				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
+				go chanCopy(ipfixSrvJSN.Stop(), errordrain, drainJSN)
+				break runloop
+
+			case <-ipfixSrvJSN.Exit():
+				lm.GetLogger(`application`).Infoln(`IPFIX subsystem: JSON server process died`)
+				lm.GetLogger(`error`).Errorln(`IPFIX subsystem: JSON server process died`)
+				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
+				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
+				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
 				break runloop
 
 			case <-mux.Exit():
@@ -259,6 +279,7 @@ protoloop:
 				go chanCopy(ipfixSrvUDP.Stop(), errordrain, drainUDP)
 				go chanCopy(ipfixSrvTCP.Stop(), errordrain, drainTCP)
 				go chanCopy(ipfixSrvTLS.Stop(), errordrain, drainTLS)
+				go chanCopy(ipfixSrvJSN.Stop(), errordrain, drainJSN)
 				break runloop
 
 			case err := <-ipfixSrvUDP.Err():
@@ -268,6 +289,9 @@ protoloop:
 				lm.GetLogger(`error`).Errorln(err)
 
 			case err := <-ipfixSrvTLS.Err():
+				lm.GetLogger(`error`).Errorln(err)
+
+			case err := <-ipfixSrvJSN.Err():
 				lm.GetLogger(`error`).Errorln(err)
 
 			case err := <-mux.Err():
@@ -293,19 +317,25 @@ protoloop:
 				break graceful
 			case <-drainUDP:
 				servers = servers | 0b00000001
-				if servers == 7 && !closed {
+				if servers == 0b00001111 && !closed {
 					close(errordrain)
 					closed = true
 				}
 			case <-drainTCP:
 				servers = servers | 0b00000010
-				if servers == 7 && !closed {
+				if servers == 0b00001111 && !closed {
 					close(errordrain)
 					closed = true
 				}
 			case <-drainTLS:
 				servers = servers | 0b00000100
-				if servers == 7 && !closed {
+				if servers == 0b00001111 && !closed {
+					close(errordrain)
+					closed = true
+				}
+			case <-drainJSN:
+				servers = servers | 0b00001000
+				if servers == 0b00001111 && !closed {
 					close(errordrain)
 					closed = true
 				}
