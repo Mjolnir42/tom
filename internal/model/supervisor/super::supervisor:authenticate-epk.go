@@ -72,7 +72,7 @@ func (h *CoreHandler) authenticateEPK(q *msg.Request, mr *msg.Result) {
 	//                          -> string/IDLib
 	//                          -> string/userID
 	//                          -> base64/signature
-	if data = strings.Split(`:`, q.Auth.Token); len(data) < 7 {
+	if data = strings.Split(q.Auth.Token, `:`); len(data) < 7 {
 		mr.ExpectationFailed(fmt.Errorf(
 			"Incomplete TOM-epk authentication token of length %d",
 			len(data)),
