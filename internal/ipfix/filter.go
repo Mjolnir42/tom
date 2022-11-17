@@ -144,6 +144,8 @@ runloop:
 			}
 		case err := <-f.err:
 			f.lm.GetLogger(`error`).Errorln(`ipfix.filter:`, err)
+		case <-f.exit:
+			break runloop
 		case <-time.Tick(f.TemplateInt):
 			for msg := range f.GetTemplateMsg(uint16(4739)) {
 				f.outpipeIPFIX <- msg
