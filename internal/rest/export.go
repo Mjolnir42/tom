@@ -58,6 +58,11 @@ func Authorize(q *msg.Request) bool {
 	if !q.Enforcement {
 		return false
 	}
+
+	// authentication is enforced, but the anonymous user appeared
+	if q.AuthUser == `system~nobody` {
+		return false
+	}
 	return true
 }
 
