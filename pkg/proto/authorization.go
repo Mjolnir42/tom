@@ -92,8 +92,13 @@ func (d *DataCSR) CalculateDataHash() error {
 	hfunc.Write(d.Serialize())
 	dgst = hfunc.Sum(nil)
 
-	d.Sig = &Signature{
-		DataHash: base64.StdEncoding.EncodeToString(dgst),
+	switch d.Sig {
+	case nil:
+		d.Sig = &Signature{
+			DataHash: base64.StdEncoding.EncodeToString(dgst),
+		}
+	default:
+		d.Sig.DataHash = base64.StdEncoding.EncodeToString(dgst)
 	}
 	return nil
 }
