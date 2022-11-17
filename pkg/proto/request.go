@@ -100,6 +100,12 @@ func (r *Request) Verify() (bool, error) {
 	var pubKeyBytes, msgBytes, sigBytes []byte
 	var res bool
 
+	if r.Auth.CSR != nil {
+		if err = r.Auth.CSR.CalculateDataHash(); err != nil {
+			return res, err
+		}
+	}
+
 	if err = r.CalculateDataHash(); err != nil {
 		return res, err
 	}
