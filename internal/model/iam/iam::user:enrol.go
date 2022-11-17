@@ -256,6 +256,18 @@ func (h *UserWriteHandler) userEnrolment(q *msg.Request, mr *msg.Result) {
 		)
 	}
 
+	// ensure user record is active
+	if res, err = tx.Stmt(h.stmtActivate).Exec(
+		q.User.UserName,
+		q.User.LibraryName,
+	); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	if !mr.AssertOneRowAffected(res.RowsAffected()) {
+		return
+	}
+
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err)
 		return
