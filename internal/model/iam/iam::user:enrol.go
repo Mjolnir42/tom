@@ -254,6 +254,7 @@ func (h *UserWriteHandler) userEnrolment(q *msg.Request, mr *msg.Result) {
 		mr.ExpectationFailed(
 			fmt.Errorf(`User enrolment should contain credential of type public-key`),
 		)
+		return
 	}
 
 	// ensure user record is active
