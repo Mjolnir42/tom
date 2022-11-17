@@ -27,6 +27,12 @@ func (x *Rest) replyBadRequestDispatch(w *http.ResponseWriter, q *msg.Request, e
 	x.send(w, &result, nopExport)
 }
 
+func (x *Rest) replyUnauthorizedDispatch(w *http.ResponseWriter, q *msg.Request) {
+	result := msg.FromRequest(q)
+	result.Unauthorized()
+	x.send(w, &result, nopExport)
+}
+
 func (x *Rest) replyForbiddenDispatch(w *http.ResponseWriter, q *msg.Request) {
 	result := msg.FromRequest(q)
 	result.Forbidden()

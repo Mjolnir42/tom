@@ -81,7 +81,7 @@ func (m *Model) UserEnrol(w http.ResponseWriter, r *http.Request,
 	switch request.User.Credential.Category {
 	case proto.CredentialPubKey:
 		if ok, err := req.Verify(); err != nil {
-			m.x.ReplyBadRequest(&w, &request, err)
+			m.x.ReplyUnauthorized(&w, &request)
 			return
 		} else if !ok {
 			m.x.LM.GetLogger(`application`).Infoln(
@@ -89,7 +89,7 @@ func (m *Model) UserEnrol(w http.ResponseWriter, r *http.Request,
 				req.Auth.Sig.DataHash,
 				req.Auth.Sig.Signature,
 			)
-			m.x.ReplyForbidden(&w, &request)
+			m.x.ReplyUnauthorized(&w, &request)
 			return
 		}
 	default:

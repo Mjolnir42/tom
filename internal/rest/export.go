@@ -39,6 +39,10 @@ func (x *Rest) ReplyBadRequest(w *http.ResponseWriter, q *msg.Request, err error
 	x.replyBadRequestDispatch(w, q, err)
 }
 
+func (x *Rest) ReplyUnauthorized(w *http.ResponseWriter, q *msg.Request) {
+	x.replyUnauthorizedDispatch(w, q)
+}
+
 func (x *Rest) ReplyForbidden(w *http.ResponseWriter, q *msg.Request) {
 	x.replyForbiddenDispatch(w, q)
 }
