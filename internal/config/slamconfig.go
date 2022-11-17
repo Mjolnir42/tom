@@ -76,6 +76,8 @@ type IPClient struct {
 	Format       string `json:"json.format"` // vflow,flowdata
 	BasicUser    string `json:"basic.auth.user"`
 	BasicPass    string `json:"basic.auth.pass"`
+	Endpoint     string `json:"endpoint"`
+	Method       string `json:"method"`
 }
 
 type IPFilter struct {
