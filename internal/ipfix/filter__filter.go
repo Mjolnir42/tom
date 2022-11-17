@@ -28,8 +28,19 @@ loop:
 func (f *procFilter) filter(pack *MessagePack) {
 	f.applyRules(pack)
 
-	// XXX TODO create IPFIX message into pack.ipfix
-	//f.createIPFIX(&pack)
+	if err := f.createIPFIX(pack); err != nil {
+		f.err <- err
+		switch {
+		case f.fOutJSN:
+			// JSON output requires IPFIX re-encoding after filter
+			return
+		case f.fOutIPFIX:
+			// IPFIX output requires IPFIX re-encoding after filter
+			return
+		default:
+			// if there is only aggregation, the encoding is no issue
+		}
+	}
 
 	f.pipeOutput <- pack
 }
