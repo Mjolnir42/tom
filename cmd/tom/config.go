@@ -18,11 +18,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func configSetup(c *cli.Context) (*config.ClientConfig, error) {
+func configSetup(c *cli.Context) (*config.ClientConfig, bool, error) {
 
 	home, err := homedir.Dir()
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	var confPath string
@@ -37,11 +37,11 @@ func configSetup(c *cli.Context) (*config.ClientConfig, error) {
 
 	cfg := &config.ClientConfig{Run: config.RunTimeConfig{}, Auth: &config.AuthConfiguration{}}
 	if err = cfg.PopulateFromFile(confPath); err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	cfg.Run.API, err = url.Parse(cfg.API)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	cfg.Run.PathLogs = filepath.Clean(cfg.LogDir)
@@ -55,12 +55,13 @@ func configSetup(c *cli.Context) (*config.ClientConfig, error) {
 	default:
 		cfg.Auth.CredPath = filepath.Clean(cfg.Auth.CredPath)
 	}
+
 	var initialize bool
 	if initialize, err = cred.LoadCredentials(
 		cfg.Auth,
 		nil,
 	); err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	switch cfg.Auth.UseFingerprint {
@@ -72,13 +73,7 @@ func configSetup(c *cli.Context) (*config.ClientConfig, error) {
 
 	adm.ConfigureEPK(cfg.Auth.PrivEPK, cfg.Auth.Passphrase)
 
-	if initialize {
-		if err = adm.RegisterUserEnrolment(cfg.Auth, c); err != nil {
-			return nil, err
-		}
-	}
-
-	return cfg, nil
+	return cfg, initialize, nil
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
