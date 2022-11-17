@@ -16,6 +16,7 @@ import (
 	"github.com/mjolnir42/lhm"
 	"github.com/mjolnir42/tom/internal/config"
 	"github.com/vmware/go-ipfix/pkg/entities"
+	"github.com/vmware/go-ipfix/pkg/registry"
 )
 
 var (
@@ -30,6 +31,7 @@ type procFilter struct {
 	err          chan error
 	wg           sync.WaitGroup
 	pool         *sync.Pool
+	lock         sync.RWMutex
 	lm           *lhm.LogHandleMap
 	pipe         chan IPFIXMessage
 	pipeConvert  chan IPFIXMessage
@@ -46,19 +48,21 @@ type procFilter struct {
 	mux          *ipfixMux
 	parsedRules  []config.Rule
 	sequences    map[uint32]uint32
-	templates    map[uint16]entities.Message
+	templates    map[uint16]entities.Set
 	TemplateInt  time.Duration
 }
 
 func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lhm.LogHandleMap) (*procFilter, error) {
 	f := &procFilter{
-		conf: conf,
-		quit: make(chan interface{}),
-		exit: make(chan interface{}),
-		err:  make(chan error),
-		mux:  mux,
-		pool: pool,
-		lm:   lm,
+		conf:      conf,
+		quit:      make(chan interface{}),
+		exit:      make(chan interface{}),
+		err:       make(chan error),
+		mux:       mux,
+		pool:      pool,
+		lm:        lm,
+		templates: make(map[uint16]entities.Set),
+		sequences: make(map[uint32]uint32),
 	}
 	switch f.conf.Refresh {
 	case ``:
