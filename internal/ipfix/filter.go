@@ -42,6 +42,7 @@ type procFilter struct {
 	fOutJSN      bool
 	fRawJSN      bool
 	fFmtJSN      string
+	fOutIPFIX    bool
 	mux          *ipfixMux
 	parsedRules  []config.Rule
 	sequences    map[uint32]uint32
@@ -74,15 +75,19 @@ func newFilter(conf config.SettingsIPFIX, mux *ipfixMux, pool *sync.Pool, lm *lh
 	// if processing contains aggregate
 	//		copy to mirror
 	// write to outpipe
-	for _, c := range conf.Clients {
-		if !c.Enabled {
-			continue
-		}
-		switch c.ForwardProto {
-		case ProtoJSON:
-			f.fOutJSN = true
-			f.fRawJSN = c.Unfiltered
-			f.fFmtJSN = c.Format
+	if conf.Forwarding {
+		for _, c := range conf.Clients {
+			if !c.Enabled {
+				continue
+			}
+			switch c.ForwardProto {
+			case ProtoUDP, ProtoTCP, ProtoTLS:
+				f.fOutIPFIX = true
+			case ProtoJSON:
+				f.fOutJSN = true
+				f.fRawJSN = c.Unfiltered
+				f.fFmtJSN = c.Format
+			}
 		}
 	}
 
