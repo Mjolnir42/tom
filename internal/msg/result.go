@@ -60,7 +60,14 @@ func (r *Result) Clear(err ...error) {
 		r.Err = err[len(err)-1]
 	}
 	if r.Err == nil {
-		r.Err = fmt.Errorf(`Unspecified error condition`)
+		switch r.Code {
+		case http.StatusUnauthorized:
+			r.Err = fmt.Errorf("%s", http.StatusText(int(r.Code)))
+		case http.StatusForbidden:
+			r.Err = fmt.Errorf("%s", http.StatusText(int(r.Code)))
+		default:
+			r.Err = fmt.Errorf(`Unspecified error condition`)
+		}
 	}
 
 	switch r.Section {
