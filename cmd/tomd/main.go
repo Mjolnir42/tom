@@ -95,7 +95,7 @@ func run() int {
 		lm.GetLogger(`error`).Fatal(err)
 	}
 
-	go lm.Reopen(``, func(e error) {
+	go lm.Reopen(`ignore_`, func(e error) {
 		logrus.Error(e)
 		os.Exit(2)
 	})

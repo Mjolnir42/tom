@@ -19,10 +19,14 @@ install_linux: generate
 	@echo "Building Linux ...."
 	@env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install -tags osusergo,netgo -ldflags "-X main.tomVersion=$(TOMVER)-$(GITHASH)/$(BRANCH) -X main.slamVersion=$(TOMVER)-$(GITHASH)/$(BRANCH)" ./...
 
-generate:
+generate: depend
 	@echo "Generating ...."
 	@go generate ./cmd/...
 	@go generate ./internal/...
+
+depend:
+	@echo "Downloading && installaing go-bindata"
+	@go install github.com/jteeuwen/go-bindata/go-bindata@v3.0.7+incompatible
 
 sanitize: build check
 
