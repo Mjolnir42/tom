@@ -100,10 +100,11 @@ func run() int {
 		os.Exit(EX_ABORT)
 	})
 
-	SlamCfg.Auth = &config.AuthConfiguration{
-		PrivEPK: &epk.EncryptedPrivateKey{},
-		PubKey:  ed25519.PublicKey{},
+	if SlamCfg.Auth == nil {
+		SlamCfg.Auth = &config.AuthConfiguration{}
 	}
+	SlamCfg.Auth.PrivEPK = &epk.EncryptedPrivateKey{}
+	SlamCfg.Auth.PubKey = ed25519.PublicKey{}
 
 	// setup REST client
 	client = resty.New().
