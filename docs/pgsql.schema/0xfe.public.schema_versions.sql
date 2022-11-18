@@ -267,5 +267,45 @@ VALUES
 (   'view',
     20220225001,
     'update view.resolve..To..At functions'
+),
+(   'abstract',
+    20220915999,
+    'modelupdate'
+),
+(   'meta',
+    20220915999,
+    'modelupdate'
+),
+(   'bulk',
+    20220915999,
+    'modelupdate'
+),
+(   'inventory',
+    20220915999,
+    'modelupdate'
+),
+(   'yp',
+    20220915999,
+    'modelupdate'
+),
+(   'asset',
+    20220915999,
+    'modelupdate'
+),
+(   'filter',
+    20220915999,
+    'modelupdate'
+),
+(   'view',
+    20220915999,
+    'modelupdate'
+),
+(   'ix',
+    20220915999,
+    'modelupdate'
+),
+(   'production',
+    20220915999,
+    'modelupdate'
 )
 ;
