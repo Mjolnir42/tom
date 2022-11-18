@@ -100,6 +100,11 @@ func DecodeJSONBody(r *http.Request, s interface{}) error {
 					c.Container.Property = map[string]proto.PropertyDetail{}
 				}
 			}
+			if c.Flow != nil {
+				if c.Flow.Property == nil {
+					c.Flow.Property = map[string]proto.PropertyDetail{}
+				}
+			}
 			if c.Orchestration != nil {
 				if c.Orchestration.Parent == nil {
 					c.Orchestration.Parent = []string{}

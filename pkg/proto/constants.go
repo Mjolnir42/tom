@@ -19,6 +19,7 @@ const (
 const (
 	ModelIAM      = `iam`
 	EntityLibrary = `library`
+	EntityMachine = `machine`
 	EntityTeam    = `team`
 	EntityUser    = `user`
 )
@@ -29,35 +30,50 @@ const (
 )
 
 const (
-	ActionAdd        = `add`
-	ActionAttrAdd    = `attribute.add`
-	ActionAttrRemove = `attribute.remove`
-	ActionHdSet      = `headof.set`
-	ActionHdUnset    = `headof.unset`
-	ActionLink       = `link`
-	ActionList       = `list`
-	ActionMbrAdd     = `member.add`
-	ActionMbrList    = `member.list`
-	ActionMbrRemove  = `member.remove`
-	ActionMbrSet     = `member.set`
-	ActionPropRemove = `property.remove`
-	ActionPropSet    = `property.set`
-	ActionPropUpdate = `property.update`
-	ActionRemove     = `remove`
-	ActionResolve    = `resolve`
-	ActionShow       = `show`
-	ActionStack      = `stack`
-	ActionUnstack    = `unstack`
-	ActionUpdate     = `update`
+	ModelInternal    = `internal`
+	EntitySupervisor = `supervisor`
 )
 
 const (
-	MethodDELETE = `DELETE`
-	MethodGET    = `GET`
-	MethodHEAD   = `HEAD`
-	MethodPATCH  = `PATCH`
-	MethodPOST   = `POST`
-	MethodPUT    = `PUT`
+	ModelBulk  = `bulk`
+	EntityFlow = `flow`
+)
+
+const (
+	ActionAdd             = `add`
+	ActionAttrAdd         = `attribute.add`
+	ActionAttrRemove      = `attribute.remove`
+	ActionAuthenticateEPK = `authenticate-epk`
+	ActionEnrolment       = `enrolment`
+	ActionEnsure          = `ensure`
+	ActionHdSet           = `headof.set`
+	ActionHdUnset         = `headof.unset`
+	ActionLink            = `link`
+	ActionList            = `list`
+	ActionMbrAdd          = `member.add`
+	ActionMbrList         = `member.list`
+	ActionMbrRemove       = `member.remove`
+	ActionMbrSet          = `member.set`
+	ActionPropRemove      = `property.remove`
+	ActionPropSet         = `property.set`
+	ActionPropUpdate      = `property.update`
+	ActionRemove          = `remove`
+	ActionResolve         = `resolve`
+	ActionShow            = `show`
+	ActionStack           = `stack`
+	ActionUnstack         = `unstack`
+	ActionUpdate          = `update`
+)
+
+const (
+	MethodDELETE    = `DELETE`
+	MethodGET       = `GET`
+	MethodHEAD      = `HEAD`
+	MethodPATCH     = `PATCH`
+	MethodPOST      = `POST`
+	MethodPUT       = `PUT`
+	AuthSchemeBasic = `Basic`
+	AuthSchemeEPK   = `TOM-epk`
 )
 
 const (
@@ -77,6 +93,7 @@ const (
 	PlHoldTomID    = `:tomID`
 	PlHoldTargetID = `:targetID`
 	PlHoldResolv   = `:level`
+	PlHoldUID      = `:uID`
 )
 
 const (
@@ -98,14 +115,23 @@ const (
 )
 
 const (
+	CredentialPassword = `password`
+	CredentialPubKey   = `public-key`
+	CredentialToken    = `token`
+)
+
+const (
 	nttContainerShort     = `cnr`
+	nttLibraryShort       = `lib`
+	nttMachineShort       = `mac`
 	nttOrchestrationShort = `ore`
 	nttRuntimeShort       = `rte`
 	nttServerShort        = `srv`
 	nttSocketShort        = `sok`
+	nttUserShort          = `usr`
 
-	tomIDEntities = EntityServer + `|` + EntityRuntime + `|` + EntityOrchestration + `|` + EntityContainer + `|` + EntitySocket
-	tomIDShortNTT = nttServerShort + `|` + nttRuntimeShort + `|` + nttOrchestrationShort + `|` + nttContainerShort + `|` + nttSocketShort
+	tomIDEntities = EntityServer + `|` + EntityRuntime + `|` + EntityOrchestration + `|` + EntityContainer + `|` + EntitySocket + `|` + EntityLibrary + `|` + EntityMachine + `|` + EntityTeam + `|` + EntityUser + `|` + EntityFlow
+	tomIDShortNTT = nttServerShort + `|` + nttRuntimeShort + `|` + nttOrchestrationShort + `|` + nttContainerShort + `|` + nttSocketShort + `|` + nttLibraryShort + `|` + nttMachineShort + `|` + nttUserShort + `|` + EntityTeam + `|` + EntityFlow
 
 	tomIDFormatDNS = `^(?P<id>[` + CharUnreserved + `]+)\.(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + tomIDEntities + `)\.tom\.?$`
 	tomIDShortDNS  = `^(?P<id>[` + CharUnreserved + `]+)\.(?P<ns>[` + CharNamespace + `]+)\.(?P<ntt>` + tomIDShortNTT + `)\.tom\.?$`

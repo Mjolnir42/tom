@@ -194,4 +194,17 @@ func (r *Runtime) ExportNamespace() string {
 	return r.Namespace
 }
 
+// Serialize ...
+func (r *Runtime) Serialize() []byte {
+	data := make([]byte, 0)
+	data = append(data, []byte(r.Namespace)...)
+	data = append(data, []byte(r.Name)...)
+	data = append(data, []byte(r.Type)...)
+	data = append(data, []byte(r.Parent)...)
+	data = append(data, SerializeStringSlice(r.Link)...)
+	data = append(data, SerializeStringSlice(r.Children)...)
+	data = append(data, SerializeMapPropertyDetail(r.Property)...)
+	return data
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

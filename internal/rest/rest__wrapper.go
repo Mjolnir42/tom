@@ -14,6 +14,8 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/pkg/proto"
 	"github.com/satori/go.uuid"
 )
 
@@ -31,13 +33,22 @@ func (x *Rest) Unauthenticated(h httprouter.Handle) httprouter.Handle {
 // Authenticated is the standard request wrapper
 func (x *Rest) Authenticated(h httprouter.Handle) httprouter.Handle {
 	return x.Unauthenticated(
-		x.basicAuth(
+		x.auth(
 			func(w http.ResponseWriter, r *http.Request,
 				ps httprouter.Params) {
 				h(w, r, ps)
 			},
 		),
 	)
+}
+
+// Deny is the request wrapper to straight up refuse processing
+func (x *Rest) Deny(h httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request,
+		ps httprouter.Params) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized),
+			http.StatusUnauthorized)
+	}
 }
 
 // enrich is a wrapper that adds metadata information to the request
@@ -57,7 +68,60 @@ func (x *Rest) enrich(h httprouter.Handle) httprouter.Handle {
 			Value: r.RequestURI,
 		})
 
+		// record authentication enforcement status
+		if !x.conf.Enforce {
+			ps = append(ps, httprouter.Param{
+				Key:   `AuthenticationEnforcement`,
+				Value: `false`,
+			})
+		} else {
+			ps = append(ps, httprouter.Param{
+				Key:   `AuthenticationEnforcement`,
+				Value: `true`,
+			})
+		}
+
 		h(w, r, ps)
+	}
+}
+
+// auth handles HTTP authentication on requests
+func (x *Rest) auth(h httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request,
+		ps httprouter.Params) {
+
+		if !x.conf.Enforce {
+			ps = append(ps, httprouter.Param{
+				Key:   `AuthenticatedUser`,
+				Value: `system~nobody`,
+			})
+			h(w, r, ps)
+			return
+		}
+
+		auth := r.Header.Get(`Authorization`)
+		switch {
+		case strings.HasPrefix(auth, proto.AuthSchemeBasic+` `):
+			x.basicAuth(
+				func(w http.ResponseWriter, r *http.Request,
+					ps httprouter.Params) {
+					h(w, r, ps)
+				},
+			)(w, r, ps)
+			return
+		case strings.HasPrefix(auth, proto.AuthSchemeEPK+` `):
+			x.epkAuth(
+				func(w http.ResponseWriter, r *http.Request,
+					ps httprouter.Params) {
+					h(w, r, ps)
+				},
+			)(w, r, ps)
+			return
+		}
+
+		w.Header().Set(`WWW-Authenticate`, `Basic realm=Restricted`)
+		http.Error(w, http.StatusText(http.StatusUnauthorized),
+			http.StatusUnauthorized)
 	}
 }
 
@@ -65,14 +129,14 @@ func (x *Rest) enrich(h httprouter.Handle) httprouter.Handle {
 func (x *Rest) basicAuth(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
 		ps httprouter.Params) {
-		const basicAuthPrefix string = "Basic "
 
 		// Get credentials
 		auth := r.Header.Get(`Authorization`)
-		if strings.HasPrefix(auth, basicAuthPrefix) {
+		goto unauthorized // TODO
+		if strings.HasPrefix(auth, proto.AuthSchemeBasic+` `) {
 			// check credentials
 			payload, err := base64.StdEncoding.DecodeString(
-				auth[len(basicAuthPrefix):])
+				auth[len(proto.AuthSchemeBasic+` `):])
 			if err == nil {
 				pair := bytes.SplitN(payload, []byte(":"), 2)
 				if len(pair) == 2 {
@@ -106,6 +170,61 @@ func (x *Rest) basicAuth(h httprouter.Handle) httprouter.Handle {
 		}
 	unauthorized:
 		w.Header().Set(`WWW-Authenticate`, `Basic realm=Restricted`)
+		http.Error(w, http.StatusText(http.StatusUnauthorized),
+			http.StatusUnauthorized)
+	}
+}
+
+// epkAuth handles HTTP signature on requests
+func (x *Rest) epkAuth(h httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request,
+		ps httprouter.Params) {
+		var payload []byte
+		var err error
+		var result msg.Result
+		var request msg.Request
+
+		// ...
+		auth := r.Header.Get(`Authorization`)
+		if !strings.HasPrefix(auth, proto.AuthSchemeEPK+` `) {
+			goto unauthorized
+		}
+
+		if payload, err = base64.StdEncoding.DecodeString(auth[len(proto.AuthSchemeEPK+` `):]); err != nil {
+			goto unauthorized
+		}
+
+		request = msg.New(
+			r, ps,
+			proto.CmdSupervisorAuthEPK,
+			proto.EntitySupervisor,
+			proto.ActionAuthenticateEPK,
+		)
+		request.Auth = msg.Super{
+			RequestURI: r.URL.Path,
+			Token:      string(payload),
+		}
+		x.HM.MustLookup(&request).Intake() <- request
+		result = <-request.Reply
+		if result.Err != nil {
+			x.LM.GetLogger(`error`).Errorf("epk authentication: %s", result.Err.Error())
+			goto unauthorized
+		}
+		switch result.Code {
+		case 200:
+			ps = append(ps, httprouter.Param{
+				Key:   `AuthenticatedUser`,
+				Value: result.Auth.IDLib + `~` + result.Auth.UserID,
+			})
+			h(w, r, ps)
+			return
+
+		default:
+			goto unauthorized
+		}
+
+	unauthorized:
+		w.Header().Set(`WWW-Authenticate`, `TOM-epk realm=Restricted`)
 		http.Error(w, http.StatusText(http.StatusUnauthorized),
 			http.StatusUnauthorized)
 	}

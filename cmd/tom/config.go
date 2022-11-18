@@ -8,60 +8,21 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
 	"net/url"
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
-	"github.com/nahanni/go-ucl"
+	"github.com/mjolnir42/tom/internal/cli/adm"
+	"github.com/mjolnir42/tom/internal/config"
+	"github.com/mjolnir42/tom/internal/cred"
 	"github.com/urfave/cli/v2"
 )
 
-type Config struct {
-	API      string        `json:"api"`
-	LogDir   string        `json:"logdir"`
-	ProcJSON string        `json:"json.output.processor"`
-	CAFile   string        `json:"ca.file"`
-	Run      RunTimeConfig `json:"-"`
-}
-
-type RunTimeConfig struct {
-	API      *url.URL `json:"-"`
-	PathLogs string   `json:"-"`
-	PathCA   string   `json:"-"`
-}
-
-func (c *Config) populateFromFile(fname string) error {
-	file, err := ioutil.ReadFile(fname)
-	if err != nil {
-		return err
-	}
-
-	// UCL parses into map[string]interface{}
-	fileBytes := bytes.NewBuffer([]byte(file))
-	parser := ucl.NewParser(fileBytes)
-	uclData, err := parser.Ucl()
-	if err != nil {
-		return err
-	}
-
-	// take detour via JSON to load UCL into struct
-	uclJSON, err := json.Marshal(uclData)
-	if err != nil {
-		return err
-	}
-	json.Unmarshal([]byte(uclJSON), &c)
-
-	return nil
-}
-
-func configSetup(c *cli.Context) (*Config, error) {
+func configSetup(c *cli.Context) (*config.ClientConfig, bool, error) {
 
 	home, err := homedir.Dir()
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	var confPath string
@@ -74,13 +35,13 @@ func configSetup(c *cli.Context) (*Config, error) {
 		confPath = filepath.Clean(filepath.Join(home, ".tom", "tom.conf"))
 	}
 
-	cfg := &Config{Run: RunTimeConfig{}}
-	if err = cfg.populateFromFile(confPath); err != nil {
-		return nil, err
+	cfg := &config.ClientConfig{Run: config.RunTimeConfig{}, Auth: &config.AuthConfiguration{}}
+	if err = cfg.PopulateFromFile(confPath); err != nil {
+		return nil, false, err
 	}
 	cfg.Run.API, err = url.Parse(cfg.API)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	cfg.Run.PathLogs = filepath.Clean(cfg.LogDir)
@@ -88,7 +49,31 @@ func configSetup(c *cli.Context) (*Config, error) {
 		cfg.Run.PathCA = filepath.Clean(cfg.CAFile)
 	}
 
-	return cfg, nil
+	switch cfg.Auth.CredPath {
+	case ``:
+		cfg.Auth.CredPath = filepath.Clean(filepath.Join(home, ".tom"))
+	default:
+		cfg.Auth.CredPath = filepath.Clean(cfg.Auth.CredPath)
+	}
+
+	var initialize bool
+	if initialize, err = cred.LoadCredentials(
+		cfg.Auth,
+		nil,
+	); err != nil {
+		return nil, false, err
+	}
+
+	switch cfg.Auth.UseFingerprint {
+	case true:
+		adm.ConfigureIdentity(cfg.Auth.IDLibrary, cfg.Auth.Fingerprint)
+	default:
+		adm.ConfigureIdentity(cfg.Auth.IDLibrary, cfg.Auth.UserName)
+	}
+
+	adm.ConfigureEPK(cfg.Auth.PrivEPK, cfg.Auth.Passphrase)
+
+	return cfg, initialize, nil
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

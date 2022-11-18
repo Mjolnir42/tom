@@ -195,4 +195,17 @@ func (o *Orchestration) ExportNamespace() string {
 	return o.Namespace
 }
 
+// Serialize ...
+func (o *Orchestration) Serialize() []byte {
+	data := make([]byte, 0)
+	data = append(data, []byte(o.Namespace)...)
+	data = append(data, []byte(o.Name)...)
+	data = append(data, []byte(o.Type)...)
+	data = append(data, SerializeStringSlice(o.Parent)...)
+	data = append(data, SerializeStringSlice(o.Link)...)
+	data = append(data, SerializeStringSlice(o.Children)...)
+	data = append(data, SerializeMapPropertyDetail(o.Property)...)
+	return data
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

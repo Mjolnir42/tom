@@ -70,6 +70,12 @@ following name prefixes:
 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~._-
 ```
 
+## permitted characters for attribute names
+
+```
+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~.:_-
+```
+
 # examples
 
 ## namespace: inventory
@@ -109,4 +115,18 @@ tom://inventory/orchestration/name=vz01-ha.example.com
 pgSQL13.inventory.container.tom
 pgSQL13.inventory.cnr.tom
 tom://inventory/container/name=pgSQL13
+```
+
+## identity library: engineroom
+
+```
+engineroom.library.tom
+tom:///library/name=engineroom
+```
+
+## machine: a7b13e3d8424a25a915f6fe9cfdd2b6a
+
+```
+a7b13e3d8424a25a915f6fe9cfdd2b6a.engineroom.machine.tom
+tom://engineroom/machine/uid=a7b13e3d8424a25a915f6fe9cfdd2b6a
 ```

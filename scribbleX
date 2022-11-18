@@ -1,0 +1,7 @@
+{"requestID":"8e334a26-1e64-4ee6-8591-be3bd9954878","command":"iam::machine:enrolment","status":200,"error":"","user":[{"library-name":"engineroom","first-name":"loki.local.paranoidbsd.net","last-name":"loki","user-name":"6bf4b49096cd4cb25d45f64f3f7ca56a","is-active":true,"is-deleted":false}]}
+
+
+4739/tcp    ipfix
+4739/udp    ipfix
+
+4740/tcp    ipfixs

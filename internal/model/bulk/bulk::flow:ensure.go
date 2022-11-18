@@ -1,0 +1,382 @@
+/*-
+ * Copyright (c) 2022, Jörg Pernfuß
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package bulk // import "github.com/mjolnir42/tom/internal/model/bulk/"
+
+import (
+	"database/sql"
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/internal/rest"
+	"github.com/mjolnir42/tom/internal/stmt"
+	"github.com/mjolnir42/tom/pkg/proto"
+)
+
+func init() {
+	proto.AssertCommandIsDefined(proto.CmdFlowEnsure)
+
+	registry = append(registry, function{
+		cmd:    proto.CmdFlowEnsure,
+		handle: flowEnsure,
+	})
+}
+
+func flowEnsure(m *Model) httprouter.Handle {
+	return m.x.Authenticated(m.FlowEnsure)
+}
+
+func exportFlowEnsure(result *proto.Result, r *msg.Result) {
+	result.Flow = &[]proto.Flow{}
+	*result.Flow = append(*result.Flow, r.Flow...)
+}
+
+// FlowEnsure function
+func (m *Model) FlowEnsure(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer rest.PanicCatcher(w, m.x.LM)
+
+	request := msg.New(
+		r, params,
+		proto.CmdFlowEnsure,
+		msg.SectionFlow,
+		proto.ActionEnsure,
+	)
+
+	req := proto.Request{}
+	if err := rest.DecodeJSONBody(r, &req); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
+	}
+	request.Flow = *req.Flow
+
+	if err := proto.ValidNamespace(
+		request.Flow.Namespace,
+	); err != nil {
+		m.x.ReplyBadRequest(&w, &request, err)
+		return
+	}
+
+	// at least the name property must be filled in
+	if request.Flow.Property == nil {
+		m.x.ReplyBadRequest(&w, &request, nil)
+		return
+	}
+
+	for prop, obj := range request.Flow.Property {
+		if err := proto.ValidAttribute(prop); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+		if err := proto.CheckPropertyConstraints(&obj); err != nil {
+			m.x.ReplyBadRequest(&w, &request, err)
+			return
+		}
+	}
+
+	if !m.x.IsAuthorized(&request) {
+		m.x.ReplyForbidden(&w, &request)
+		return
+	}
+
+	m.x.HM.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	m.x.Send(&w, &result, exportFlowEnsure)
+}
+
+// ensure creates or updated new flow
+func (h *FlowWriteHandler) ensure(q *msg.Request, mr *msg.Result) {
+	var (
+		res                                sql.Result
+		creationTime                       time.Time
+		err                                error
+		tx                                 *sql.Tx
+		txTime, validSince, validUntil     time.Time
+		rows                               *sql.Rows
+		found, ok, done                    bool
+		flow                               proto.Flow
+		flowID, key, value, nsName, author string
+	)
+	// setup a consistent transaction time timestamp that is used for all
+	// records
+	txTime = time.Now().UTC()
+
+	if err = msg.ResolveValidSince(
+		q.Flow.Property[`name`].ValidSince,
+		&validSince, &txTime,
+	); err != nil {
+		mr.BadRequest(err)
+		return
+	}
+
+	if err = msg.ResolveValidUntil(
+		q.Flow.Property[`name`].ValidUntil,
+		&validUntil, &txTime,
+	); err != nil {
+		mr.BadRequest(err)
+		return
+	}
+
+	// open transaction
+	if tx, err = h.conn.Begin(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+
+	ensure := *(proto.NewFlow())
+	list := make(map[string]proto.Flow)
+
+	// discover flowID at the start of the transaction, the flow might already
+	// exist
+	if rows, err = tx.Query(
+		stmt.FlowList,
+		q.Flow.Namespace,
+	); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&flowID,
+			&nsName,
+			&key,
+			&value,
+			&author,
+			&creationTime,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			tx.Rollback()
+			return
+		}
+		if flow, ok = list[flowID]; !ok {
+			flow = *(proto.NewFlow())
+		}
+		flow.Namespace = nsName
+		flow.ID = flowID
+		switch {
+		case key == `type`:
+			flow.Type = value
+		case key == `name`:
+			flow.Name = value
+			flow.CreatedBy = author
+			flow.CreatedAt = creationTime.Format(msg.RFC3339Milli)
+		}
+		list[flowID] = flow
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+	flowID = ``
+
+	// scan returned flow collections for requested
+	for i := range list {
+		if list[i].Type != q.Flow.Property[`type`].Value {
+			continue
+		}
+		if list[i].Name != q.Flow.Property[`name`].Value {
+			continue
+		}
+		found = true
+		ensure = list[i]
+		flowID = ensure.ID
+		break
+	}
+
+	// discover all attributes and record them with their type
+	attrMap := map[string]string{}
+	if rows, err = tx.Query(
+		stmt.NamespaceAttributeDiscover,
+		q.Flow.Namespace,
+	); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+	for rows.Next() {
+		var attribute, typ string
+		if err = rows.Scan(
+			&attribute,
+			&typ,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err)
+			tx.Rollback()
+			return
+		}
+		attrMap[attribute] = typ
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		tx.Rollback()
+		return
+	}
+
+	// for all properties specified in the request, check that the attribute
+	// exists and create missing attributes
+	for key := range q.Flow.Property {
+		if _, ok = attrMap[key]; !ok {
+			if res, err = tx.Exec(
+				stmt.NamespaceAttributeAddStandard,
+				q.Flow.Namespace,
+				key,
+				q.UserIDLib,
+				q.AuthUser,
+			); err != nil {
+				mr.ServerError(err)
+				tx.Rollback()
+				return
+			}
+			if !mr.CheckRowsAffected(res.RowsAffected()) {
+				tx.Rollback()
+				return
+			}
+		}
+	}
+
+	// create missing flow collection
+	if !found {
+		// create named flow in specified namespace,
+		// this is an INSERT statement with a RETURNING clause, thus
+		// requires .QueryRow instead of .Exec
+		if err = tx.Stmt(h.stmtAdd).QueryRow(
+			q.Flow.Namespace,
+			q.UserIDLib,
+			q.AuthUser,
+			q.Flow.Property[`name`].Value,
+			validSince,
+			validUntil,
+		).Scan(
+			&flowID,
+		); err == sql.ErrNoRows {
+			// query did not return the generated flowID
+			mr.ServerError(err)
+			tx.Rollback()
+			return
+		} else if err != nil {
+			mr.ServerError(err)
+			tx.Rollback()
+			return
+		}
+	}
+
+	// for all properties specified in the request, update the value.
+	// this transparently creates missing entries.
+	for key := range q.Flow.Property {
+		if key == `name` {
+			continue
+		}
+		if !found {
+			// set type key only if the flow was created in this request
+			if key == `type` || q.Flow.Property[key].Attribute == `type` {
+				continue
+			}
+		}
+		if ok = h.txPropUpdate(
+			q, mr, tx, &txTime, q.Flow.Property[key], flowID,
+		); !ok {
+			tx.Rollback()
+			return
+		}
+		// remove the property from the map of available attributes
+		delete(attrMap, q.Flow.Property[key].Attribute)
+	}
+
+	// remove specialty attributes that are not to be reset
+	for _, attr := range []string{`name`, `type`} {
+		delete(attrMap, attr)
+	}
+
+	// for all properties not in the request, any currently valid value must
+	// be invalided by setting its validUntil value to the time of the
+	// transaction
+	for key := range attrMap {
+		var stmtSelect, stmtClamp *sql.Stmt
+
+		switch attrMap[key] {
+		case proto.AttributeStandard:
+			stmtSelect = tx.Stmt(h.stmtTxStdPropSelect)
+			stmtClamp = tx.Stmt(h.stmtTxStdPropClamp)
+		case proto.AttributeUnique:
+			stmtSelect = tx.Stmt(h.stmtTxUniqPropSelect)
+			stmtClamp = tx.Stmt(h.stmtTxUniqPropClamp)
+		default:
+			mr.ServerError()
+			tx.Rollback()
+			return
+		}
+
+		if ok, done = h.txPropClamp(
+			q, mr, tx, &txTime, stmtSelect, stmtClamp,
+			proto.PropertyDetail{
+				Attribute: key,
+				// construct an imaginary new value for the property. The clamping
+				// function does not invalidate the current value, if the provided
+				// imaginary record matches the existing record in both value and
+				// upper validUntil bound
+				Value: txTime.Format(msg.RFC3339Milli) + key + `_clamp`,
+			},
+			// send the transaction time as the imaginary new value's requested
+			// validSince:
+			// - guaranteed to be after the current value's validSince, as it
+			//   otherwise would not be valid
+			// - this value is used as the new validUntil boundary of the exitsing
+			//   value
+			txTime,
+			// send the transaction time as the imaginary new value's requested
+			// validUntil. This is matched against the existing value's validUntil
+			// to determine if the record needs clamping
+			txTime,
+			// the ID of the flow being edited
+			flowID,
+		); !ok {
+			// appropriate error function is already called by h.txPropClamp
+			tx.Rollback()
+			return
+		} else if done {
+			// txPropClamp did nothing because the existing record matched both
+			// time and value. Retry with a different value.
+			if ok, done = h.txPropClamp(
+				q, mr, tx, &txTime, stmtSelect, stmtClamp,
+				proto.PropertyDetail{
+					Attribute: key,
+					Value:     txTime.Format(msg.RFC3339Milli) + key + `_alternate`,
+				},
+				txTime,
+				txTime,
+				flowID,
+			); !ok {
+				tx.Rollback()
+				return
+			} else if done {
+				// this should not be possible -> abort.
+				mr.ServerError(fmt.Errorf(
+					"txPropClamp encountered impossible repeat matches for %s",
+					key,
+				))
+				tx.Rollback()
+				return
+			}
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		mr.ServerError(err)
+		return
+	}
+	mr.Flow = append(mr.Flow, q.Flow)
+	mr.OK()
+}
+
+// vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

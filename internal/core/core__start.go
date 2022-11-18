@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2020, Jörg Pernfuß
+ * Copyright (c) 2020-2022, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -9,8 +9,10 @@ package core // import "github.com/mjolnir42/tom/internal/core/"
 
 import (
 	"github.com/mjolnir42/tom/internal/model/asset"
+	"github.com/mjolnir42/tom/internal/model/bulk"
 	"github.com/mjolnir42/tom/internal/model/iam"
 	"github.com/mjolnir42/tom/internal/model/meta"
+	"github.com/mjolnir42/tom/internal/model/supervisor"
 )
 
 // Start launches all application handlers
@@ -23,6 +25,12 @@ func (x *Core) Start() {
 
 	// asset model
 	asset.HandleRegister(x.hm, x.conf.QueueLen)
+
+	// bulk model
+	bulk.HandleRegister(x.hm, x.conf.QueueLen)
+
+	// supervisor engine
+	supervisor.HandleRegister(x.hm, x.conf.QueueLen)
 
 	for handlerName := range x.hm.Range() {
 		x.hm.Configure(

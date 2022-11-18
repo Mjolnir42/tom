@@ -191,4 +191,16 @@ func (c *Container) ExportNamespace() string {
 	return c.Namespace
 }
 
+// Serialize ...
+func (c *Container) Serialize() []byte {
+	data := make([]byte, 0)
+	data = append(data, []byte(c.Namespace)...)
+	data = append(data, []byte(c.Name)...)
+	data = append(data, []byte(c.Type)...)
+	data = append(data, []byte(c.Parent)...)
+	data = append(data, SerializeStringSlice(c.Link)...)
+	data = append(data, SerializeMapPropertyDetail(c.Property)...)
+	return data
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

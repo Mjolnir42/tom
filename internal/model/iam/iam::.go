@@ -11,6 +11,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/tom/internal/handler"
 	"github.com/mjolnir42/tom/internal/rest"
+	"github.com/mjolnir42/tom/pkg/proto"
 )
 
 var registry = make([]function, 0, 24)
@@ -37,6 +38,43 @@ func (m *Model) RouteRegister(rt *httprouter.Router) {
 	m.routeRegisterLibrary(rt)
 	m.routeRegisterUser(rt)
 	m.routeRegisterTeam(rt)
+
+	m.routeRegisterFromRegistry(rt)
+}
+
+// routeRegisterFromRegistry picks up the route registration requests
+// put into the registry package variable during init() phase of the
+// package
+func (m *Model) routeRegisterFromRegistry(rt *httprouter.Router) {
+	for _, f := range registry {
+		m.x.LM.GetLogger(`application`).Infof(
+			"Registering handle for %s at route %s|%s",
+			f.cmd,
+			proto.Commands[f.cmd].Method,
+			proto.Commands[f.cmd].Path,
+		)
+		switch proto.Commands[f.cmd].Method {
+		case proto.MethodDELETE:
+			rt.DELETE(proto.Commands[f.cmd].Path, f.handle(m))
+		case proto.MethodGET:
+			rt.GET(proto.Commands[f.cmd].Path, f.handle(m))
+		case proto.MethodHEAD:
+			rt.HEAD(proto.Commands[f.cmd].Path, f.handle(m))
+		case proto.MethodPATCH:
+			rt.PATCH(proto.Commands[f.cmd].Path, f.handle(m))
+		case proto.MethodPOST:
+			rt.POST(proto.Commands[f.cmd].Path, f.handle(m))
+
+		case proto.MethodPUT:
+			rt.PUT(proto.Commands[f.cmd].Path, f.handle(m))
+		default:
+			m.x.LM.GetLogger(`error`).Errorf(
+				"Error registering route for %s using unknown method %s",
+				f.cmd,
+				proto.Commands[f.cmd].Method,
+			)
+		}
+	}
 }
 
 // HandleRegister registers the application core handlers in the

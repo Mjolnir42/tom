@@ -1,0 +1,61 @@
+log.level: info
+log.path: /var/log/slamdd
+authentication: {
+  credential.path: /etc/slamdd
+}
+api: https://127.0.0.1:8443/
+api.ca.file: /etc/ssl/rootCA.pem
+ipfix: {
+  enabled: true
+  forwarding.enabled: true
+  processing.enabled: true
+  processing.type: filter+aggregate
+  template.file: /etc/slamdd/ipfix.tmpl
+  server: [
+    {
+      enabled: true
+      listen.protocol: tcp
+      listen.address: 127.0.0.1:4739
+    },
+    {
+      enabled: true
+      listen.protocol: udp
+      listen.address: 127.0.0.1:4739
+    },
+    {
+      enabled: true
+      listen.protocol: tls
+      listen.address: 127.0.0.1:4740
+      tls.servername: localhost
+      ca.file: /etc/ssl/rootCA.pem
+      certificate.file: /etc/slamdd/localhost.pem
+      certificate.keyfile: /etc/slamdd/localhost.key
+    }
+  ]
+  client: [
+    {
+      enabled: false
+      forwarding.protocol: tcp
+      forwarding.address: 127.0.0.1:9999
+    },
+    {
+      enabled: true
+      forwarding.protocol: udp
+      forwarding.address: 127.0.0.1:9999
+    },
+    {
+      enabled: false
+      forwarding.protocol: tls
+      forwarding.address: 127.0.0.1:4740
+      ca.file: /etc/ssl/rootCA.pem
+    }
+  ]
+  filter: {
+    rules: [
+      "DROP;DstAddress;ff02::1",
+      "PASS;Protocol;UDP",
+      "DROP;Protocol;NOT TCP",
+      "DROP;TcpFlags;NOT SYN,FIN",
+    ]
+  }
+}

@@ -9,46 +9,72 @@ package msg // import "github.com/mjolnir42/tom/internal/msg"
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
-//
 func ResolveValidSince(s string, t, tx *time.Time) (err error) {
 	switch s {
 	case `always`:
 		*t = NegTimeInf
 	case `forever`, `perpetual`:
 		err = fmt.Errorf("Invalid keyword for ValidSince: %s", s)
-	case ``:
+	case ``, `now`:
 		*t = *tx
 	default:
-		*t, err = time.Parse(
-			RFC3339Milli,
-			s,
-		)
+		switch {
+		case strings.HasPrefix(s, `-`), strings.HasPrefix(s, `+`):
+			var d time.Duration
+			d, err = time.ParseDuration(s)
+			if err != nil {
+				return
+			}
+			*t = tx.Add(d).UTC()
+		default:
+			*t, err = time.Parse(
+				RFC3339Milli,
+				s,
+			)
+			if err != nil {
+				return
+			}
+			*t = t.UTC()
+		}
 	}
 	return
 }
 
-//
 func ResolvePValidSince(s string, t, tx *time.Time) (err error) {
 	switch s {
 	case `always`, `perpetual`:
 		*t = NegTimeInf
 	case `forever`:
 		err = fmt.Errorf("Invalid keyword for ValidSince: %s", s)
-	case ``:
+	case ``, `now`:
 		*t = *tx
 	default:
-		*t, err = time.Parse(
-			RFC3339Milli,
-			s,
-		)
+		switch {
+		case strings.HasPrefix(s, `-`), strings.HasPrefix(s, `+`):
+			var d time.Duration
+			d, err = time.ParseDuration(s)
+			if err != nil {
+				return
+			}
+			*t = tx.Add(d).UTC()
+		default:
+			*t, err = time.Parse(
+				RFC3339Milli,
+				s,
+			)
+			if err != nil {
+				return
+			}
+			*t = t.UTC()
+		}
 	}
 	return
 }
 
-//
 func ResolveValidUntil(s string, t, tx *time.Time) (err error) {
 	switch s {
 	case `always`, `perpetual`:
@@ -57,16 +83,31 @@ func ResolveValidUntil(s string, t, tx *time.Time) (err error) {
 		*t = PosTimeInf
 	case ``:
 		*t = PosTimeInf
+	case `now`:
+		*t = *tx
 	default:
-		*t, err = time.Parse(
-			RFC3339Milli,
-			s,
-		)
+		switch {
+		case strings.HasPrefix(s, `-`), strings.HasPrefix(s, `+`):
+			var d time.Duration
+			d, err = time.ParseDuration(s)
+			if err != nil {
+				return
+			}
+			*t = tx.Add(d).UTC()
+		default:
+			*t, err = time.Parse(
+				RFC3339Milli,
+				s,
+			)
+			if err != nil {
+				return
+			}
+			*t = t.UTC()
+		}
 	}
 	return
 }
 
-//
 func ResolvePValidUntil(s string, t, tx *time.Time) (err error) {
 	switch s {
 	case `always`:
@@ -75,59 +116,29 @@ func ResolvePValidUntil(s string, t, tx *time.Time) (err error) {
 		*t = PosTimeInf
 	case ``:
 		*t = PosTimeInf
+	case `now`:
+		*t = *tx
 	default:
-		*t, err = time.Parse(
-			RFC3339Milli,
-			s,
-		)
+		switch {
+		case strings.HasPrefix(s, `-`), strings.HasPrefix(s, `+`):
+			var d time.Duration
+			d, err = time.ParseDuration(s)
+			if err != nil {
+				return
+			}
+			*t = tx.Add(d).UTC()
+		default:
+			*t, err = time.Parse(
+				RFC3339Milli,
+				s,
+			)
+			if err != nil {
+				return
+			}
+			*t = t.UTC()
+		}
 	}
 	return
-}
-
-//
-func ParseValidSince(s string, txNow *time.Time) (since *time.Time, err error) {
-	// no consistent transaction timestamp for now was supplied
-	if txNow == nil {
-		*(txNow) = time.Now().UTC()
-	}
-
-	switch s {
-	case `always`, `perpetual`:
-		*(since) = NegTimeInf
-	case `forever`:
-		err = ErrInvalidValidity
-	case ``, `now`:
-		since = txNow
-	default:
-		*(since), err = time.Parse(
-			RFC3339Milli,
-			s,
-		)
-	}
-	return since, err
-}
-
-//
-func ParseValidUntil(s string, txNow *time.Time) (until *time.Time, err error) {
-	// no consistent transaction timestamp for now was supplied
-	if txNow == nil {
-		*(txNow) = time.Now().UTC()
-	}
-
-	switch s {
-	case `always`:
-		err = ErrInvalidValidity
-	case `forever`, `perpetual`:
-		*(until) = PosTimeInf
-	case ``, `now`:
-		until = txNow
-	default:
-		*(until), err = time.Parse(
-			RFC3339Milli,
-			s,
-		)
-	}
-	return until, err
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -152,6 +152,11 @@ func ParseTomID(s string) (error, string, Entity) {
 			Namespace: namespace,
 			Name:      name,
 		}).SetTomID()
+	case EntityFlow:
+		return nil, entity, (&Flow{
+			Namespace: namespace,
+			Name:      name,
+		}).SetTomID()
 	case EntityNamespace:
 		return nil, entity, (&Namespace{
 			Name: name,
@@ -175,6 +180,11 @@ func ParseTomID(s string) (error, string, Entity) {
 		return nil, entity, (&Socket{
 			Namespace: namespace,
 			Name:      name,
+		}).SetTomID()
+	case EntityUser:
+		return nil, entity, (&User{
+			LibraryName: namespace,
+			UserName:    name,
 		}).SetTomID()
 	default:
 		return ErrInvalidTomID, ``, nil
@@ -282,6 +292,16 @@ func nttShort2Long(s string) string {
 		return EntityServer
 	case nttSocketShort:
 		return EntitySocket
+	case EntityFlow:
+		return EntityFlow
+	case EntityTeam:
+		return EntityTeam
+	case nttUserShort:
+		return EntityUser
+	case nttMachineShort:
+		return EntityMachine
+	case nttLibraryShort:
+		return EntityLibrary
 	default:
 		return ``
 	}

@@ -22,9 +22,10 @@ import (
 	"github.com/mjolnir42/tom/internal/core"
 	"github.com/mjolnir42/tom/internal/handler"
 	"github.com/mjolnir42/tom/internal/model/asset"
+	"github.com/mjolnir42/tom/internal/model/bulk"
 	"github.com/mjolnir42/tom/internal/model/iam"
 	"github.com/mjolnir42/tom/internal/model/meta"
-	"github.com/mjolnir42/tom/internal/msg"
+	"github.com/mjolnir42/tom/internal/model/supervisor"
 	"github.com/mjolnir42/tom/internal/rest"
 	"github.com/sirupsen/logrus"
 )
@@ -88,6 +89,9 @@ func run() int {
 	if err = lm.Open(`request`, logrus.InfoLevel); err != nil {
 		lm.GetLogger(`error`).Fatal(err)
 	}
+	if err = lm.Open(`audit`, logrus.InfoLevel); err != nil {
+		lm.GetLogger(`error`).Fatal(err)
+	}
 
 	go lm.Reopen(``, func(e error) {
 		logrus.Error(e)
@@ -122,14 +126,15 @@ func run() int {
 			i,
 			dm.URL.String(),
 		)
-		// anonymous function is IsAuthorized? authorizationFunction
-		api := rest.New(func(q *msg.Request) bool { return true }, i, hm, lm, &TomCfg)
+		api := rest.New(rest.Authorize, i, hm, lm, &TomCfg)
 		router := httprouter.New()
 
 		// create datamodels
 		iam.New(api).RouteRegister(router)
 		meta.New(api).RouteRegister(router)
 		asset.New(api).RouteRegister(router)
+		bulk.New(api).RouteRegister(router)
+		supervisor.New(api).RouteRegister(router)
 
 		lm.GetLogger(`application`).Infof(
 			"Running API router interface %d for %s",

@@ -1,0 +1,45 @@
+YP 
+    - Service
+    - Information System
+    - Domain
+    - Corporate Domain
+
+iX 
+    - Deployment Group
+    - Endpoint
+    - Functional Component
+    - Product
+    - Technical Service
+    - Top Level Service
+
+Asset
+      - Server
+      - Runtime Environment
+      - Orchestration Environment
+      - Container
+      - Socket
+----------------------------------------------------------------
+----------------------------------------------------------------
+[ ASSET DOMAIN ]
+            [ Server
+            [ Runtime Environment
+            [ Orchestration Environment
+            [ Container
+            [ Socket                      (ListenSocket connects to Endpoint)
+
+[ ABSTRACT SERVICE DOMAIN ]
+
+            [ Blueprint
+            [ Module
+            [ Software Asset
+            [ Data
+        ++  [ Service
+
+[ PRODUCTION DOMAIN ]
+
+            [ Technical Product           (realizes Blueprint)
+            [ Deployment Group            (realizes Module)
+            [ Instance                    (realizes Software Asset)
+            [ Shard                       (realizes Data)
+            [ Endpoint                    (realizes Service)
+            [ NetRange?                   (NetRange connects to Runtime Environments)

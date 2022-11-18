@@ -105,38 +105,20 @@ func (h *ContainerWriteHandler) add(q *msg.Request, mr *msg.Result) {
 	// records
 	txTime = time.Now().UTC()
 
-	switch q.Container.Property[`name`].ValidSince {
-	case `always`:
-		validSince = msg.NegTimeInf
-	case `forever`:
-		mr.BadRequest()
+	if err = msg.ResolveValidSince(
+		q.Container.Property[`name`].ValidSince,
+		&validSince, &txTime,
+	); err != nil {
+		mr.BadRequest(err)
 		return
-	case ``:
-		validSince = txTime
-	default:
-		if validSince, err = time.Parse(
-			msg.RFC3339Milli, q.Container.Property[`name`].ValidSince,
-		); err != nil {
-			mr.BadRequest(err)
-			return
-		}
 	}
 
-	switch q.Container.Property[`name`].ValidUntil {
-	case `always`:
-		mr.BadRequest()
+	if err = msg.ResolveValidUntil(
+		q.Container.Property[`name`].ValidUntil,
+		&validUntil, &txTime,
+	); err != nil {
+		mr.BadRequest(err)
 		return
-	case `forever`:
-		validUntil = msg.PosTimeInf
-	case ``:
-		validUntil = msg.PosTimeInf
-	default:
-		if validSince, err = time.Parse(
-			msg.RFC3339Milli, q.Container.Property[`name`].ValidUntil,
-		); err != nil {
-			mr.BadRequest(err)
-			return
-		}
 	}
 
 	// open transaction

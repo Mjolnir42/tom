@@ -44,40 +44,19 @@ func (h *NamespaceWriteHandler) txPropUpdate(
 	}
 
 	var reqValidSince, reqValidUntil time.Time
-	switch prop.ValidSince {
-	case `always`:
-		reqValidSince = msg.NegTimeInf
-	case `forever`:
-		mr.BadRequest()
+	if err = msg.ResolveValidSince(
+		prop.ValidSince,
+		&reqValidSince, txTime,
+	); err != nil {
+		mr.BadRequest(err)
 		return false
-	case ``:
-		reqValidSince = *txTime
-	default:
-		if reqValidSince, err = time.Parse(
-			msg.RFC3339Milli,
-			prop.ValidSince,
-		); err != nil {
-			mr.BadRequest(err)
-			return false
-		}
 	}
-
-	switch prop.ValidUntil {
-	case `always`:
-		mr.BadRequest()
+	if err = msg.ResolveValidUntil(
+		prop.ValidUntil,
+		&reqValidUntil, txTime,
+	); err != nil {
+		mr.BadRequest(err)
 		return false
-	case `forever`:
-		reqValidUntil = msg.PosTimeInf
-	case ``:
-		reqValidUntil = msg.PosTimeInf
-	default:
-		if reqValidUntil, err = time.Parse(
-			msg.RFC3339Milli,
-			prop.ValidUntil,
-		); err != nil {
-			mr.BadRequest(err)
-			return false
-		}
 	}
 
 	// select standard|unique

@@ -18,6 +18,8 @@ import (
 	"strings"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/mjolnir42/tom/internal/cred"
+	"github.com/mjolnir42/tom/internal/msg"
 	"github.com/mjolnir42/tom/pkg/proto"
 	"github.com/urfave/cli/v2"
 )
@@ -34,10 +36,11 @@ type Specification struct {
 // WRAPPER
 func Perform(cmd Specification, c *cli.Context) error {
 	var (
-		err     error
-		path    string
-		resp    *resty.Response
-		verbose bool
+		err         error
+		path, token string
+		resp        *resty.Response
+		verbose     bool
+		r           *resty.Request
 	)
 
 	if _, ok := proto.Commands[cmd.Name]; !ok {
@@ -71,7 +74,6 @@ func Perform(cmd Specification, c *cli.Context) error {
 	for _, ctx := range c.Lineage() {
 		verbose = verbose || ctx.IsSet(`verbose`)
 	}
-
 	if verbose {
 		if cmd.QueryParams == nil {
 			cmd.QueryParams = &map[string]string{}
@@ -79,36 +81,52 @@ func Perform(cmd Specification, c *cli.Context) error {
 		(*cmd.QueryParams)[`verbose`] = `true`
 	}
 
+	//
+	r = client.R()
+	if authenticate {
+		if token, err = cred.CalcEpkAuthToken(msg.Super{
+			PK:         priv,
+			Phrase:     epkPhrase,
+			RequestURI: path,
+			IDLib:      idLibID,
+			UserID:     userID,
+		}); err != nil {
+			return err
+		}
+		r = r.SetAuthScheme(proto.AuthSchemeEPK)
+		r = r.SetAuthToken(token)
+	}
+
 	switch proto.Commands[cmd.Name].Method {
 	case proto.MethodGET:
-		resp, err = getReq(path, cmd.QueryParams)
+		resp, err = getReq(path, cmd.QueryParams, r)
 	case proto.MethodHEAD:
-		resp, err = headReq(path, cmd.QueryParams)
+		resp, err = headReq(path, cmd.QueryParams, r)
 	case proto.MethodDELETE:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = deleteReqBody(cmd.Body, path, cmd.QueryParams)
+			resp, err = deleteReqBody(cmd.Body, path, cmd.QueryParams, r)
 		default:
-			resp, err = deleteReq(path, cmd.QueryParams)
+			resp, err = deleteReq(path, cmd.QueryParams, r)
 		}
 	case proto.MethodPUT:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = putReqBody(cmd.Body, path, cmd.QueryParams)
+			resp, err = putReqBody(cmd.Body, path, cmd.QueryParams, r)
 		default:
-			resp, err = putReq(path, cmd.QueryParams)
+			resp, err = putReq(path, cmd.QueryParams, r)
 		}
 	case proto.MethodPOST:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = postReqBody(cmd.Body, path, cmd.QueryParams)
+			resp, err = postReqBody(cmd.Body, path, cmd.QueryParams, r)
 		default:
 			goto unhandledMethod
 		}
 	case proto.MethodPATCH:
 		switch {
 		case proto.Commands[cmd.Name].Body:
-			resp, err = patchReqBody(cmd.Body, path, cmd.QueryParams)
+			resp, err = patchReqBody(cmd.Body, path, cmd.QueryParams, r)
 		default:
 			goto unhandledMethod
 		}
@@ -158,91 +176,91 @@ func DecodedResponse(resp *resty.Response, res *proto.Result) error {
 // Private functions
 
 // DELETE
-func deleteReq(p string, q *map[string]string) (*resty.Response, error) {
+func deleteReq(p string, q *map[string]string, r *resty.Request) (*resty.Response, error) {
 	switch q {
 	case nil:
-		return handleRequestOptions(client.R().Delete(p))
+		return handleRequestOptions(r.Delete(p))
 	default:
-		return handleRequestOptions(client.R().SetQueryParams(*q).Delete(p))
+		return handleRequestOptions(r.SetQueryParams(*q).Delete(p))
 	}
 }
 
-func deleteReqBody(body interface{}, p string, q *map[string]string) (*resty.Response, error) {
+func deleteReqBody(body interface{}, p string, q *map[string]string, r *resty.Request) (*resty.Response, error) {
 	switch q {
 	case nil:
 		return handleRequestOptions(
-			client.R().SetBody(body).SetContentLength(true).Delete(p))
+			r.SetBody(body).SetContentLength(true).Delete(p))
 	default:
 		return handleRequestOptions(
-			client.R().SetBody(body).SetContentLength(true).
+			r.SetBody(body).SetContentLength(true).
 				SetQueryParams(*q).Delete(p))
 	}
 }
 
 // GET
-func getReq(p string, q *map[string]string) (*resty.Response, error) {
+func getReq(p string, q *map[string]string, r *resty.Request) (*resty.Response, error) {
 	switch q {
 	case nil:
-		return handleRequestOptions(client.R().Get(p))
+		return handleRequestOptions(r.Get(p))
 	default:
-		return handleRequestOptions(client.R().SetQueryParams(*q).Get(p))
+		return handleRequestOptions(r.SetQueryParams(*q).Get(p))
 	}
 }
 
 // HEAD
-func headReq(p string, q *map[string]string) (*resty.Response, error) {
+func headReq(p string, q *map[string]string, r *resty.Request) (*resty.Response, error) {
 	switch q {
 	case nil:
-		return handleRequestOptions(client.R().Head(p))
+		return handleRequestOptions(r.Head(p))
 	default:
-		return handleRequestOptions(client.R().SetQueryParams(*q).Head(p))
+		return handleRequestOptions(r.SetQueryParams(*q).Head(p))
 	}
 }
 
 // PATCH
-func patchReqBody(body interface{}, p string, q *map[string]string) (*resty.Response, error) {
+func patchReqBody(body interface{}, p string, q *map[string]string, r *resty.Request) (*resty.Response, error) {
 	switch q {
 	case nil:
 		return handleRequestOptions(
-			client.R().SetBody(body).SetContentLength(true).Patch(p))
+			r.SetBody(body).SetContentLength(true).Patch(p))
 	default:
 		return handleRequestOptions(
-			client.R().SetBody(body).SetContentLength(true).
+			r.SetBody(body).SetContentLength(true).
 				SetQueryParams(*q).Patch(p))
 	}
 }
 
 // POST
-func postReqBody(body interface{}, p string, q *map[string]string) (*resty.Response, error) {
+func postReqBody(body interface{}, p string, q *map[string]string, r *resty.Request) (*resty.Response, error) {
 	switch q {
 	case nil:
 		return handleRequestOptions(
-			client.R().SetBody(body).SetContentLength(true).Post(p))
+			r.SetBody(body).SetContentLength(true).Post(p))
 	default:
 		return handleRequestOptions(
-			client.R().SetBody(body).SetContentLength(true).
+			r.SetBody(body).SetContentLength(true).
 				SetQueryParams(*q).Post(p))
 	}
 }
 
 // PUT
-func putReq(p string, q *map[string]string) (*resty.Response, error) {
+func putReq(p string, q *map[string]string, r *resty.Request) (*resty.Response, error) {
 	switch q {
 	case nil:
-		return handleRequestOptions(client.R().Put(p))
+		return handleRequestOptions(r.Put(p))
 	default:
-		return handleRequestOptions(client.R().SetQueryParams(*q).Put(p))
+		return handleRequestOptions(r.SetQueryParams(*q).Put(p))
 	}
 }
 
-func putReqBody(body interface{}, p string, q *map[string]string) (*resty.Response, error) {
+func putReqBody(body interface{}, p string, q *map[string]string, r *resty.Request) (*resty.Response, error) {
 	switch q {
 	case nil:
 		return handleRequestOptions(
-			client.R().SetBody(body).SetContentLength(true).Put(p))
+			r.SetBody(body).SetContentLength(true).Put(p))
 	default:
 		return handleRequestOptions(
-			client.R().SetBody(body).SetContentLength(true).
+			r.SetBody(body).SetContentLength(true).
 				SetQueryParams(*q).Put(p))
 	}
 }
@@ -281,10 +299,27 @@ func asyncWait(result *proto.Result) {
 	if !async {
 		return
 	}
+	path := fmt.Sprintf("/job/byID/%s/_processed", result.JobID)
+
+	r := client.R()
+	if authenticate {
+		token, err := cred.CalcEpkAuthToken(msg.Super{
+			PK:         priv,
+			Phrase:     epkPhrase,
+			RequestURI: path,
+			IDLib:      idLibID,
+			UserID:     userID,
+		})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Wait error: %s\n", err.Error())
+		}
+		r = r.SetAuthScheme(proto.AuthSchemeEPK)
+		r = r.SetAuthToken(token)
+	}
 
 	if result.StatusCode == 202 && result.JobID != "" {
 		fmt.Fprintf(os.Stderr, "Waiting for job: %s\n", result.JobID)
-		_, err := getReq(fmt.Sprintf("/job/byID/%s/_processed", result.JobID), nil)
+		_, err := getReq(path, nil, r)
 		if err != nil && err != io.EOF {
 			fmt.Fprintf(os.Stderr, "Wait error: %s\n", err.Error())
 		}

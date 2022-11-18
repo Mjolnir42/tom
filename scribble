@@ -1,0 +1,35 @@
++ supervisor::authenticate
+
++ supervisor::enrollment:machine.add
+
++ supervisor::bootstrap
+
+==========================================================================
+==========================================================================
+/idlib/:lib
+
+/idlib/:lib/user/:user
+
+/idlib/:lib/machine/:machine
+POST /idlib/:lib/machine/
+
+
+tom://engineroom/machine/uid=
+
+fingerprint.engineroom.machine.tom
+-
+${user}.ims.user.tom
+${team}.ims.team.tom
+
+tom://${identityLibrary}/${team|user}/name=
+
+  Library:  tom:///library/name=${name}
+            tom:///library/name=engineroom
+            engineroom.library.tom
+
+  Machine   tom://${library}/${entity}/uid=${uid}
+            ${uid}.${library}.machine.tom
+            ${uid}.engineroom.machine.tom
+
+
+Fingerprint:  

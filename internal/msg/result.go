@@ -25,8 +25,11 @@ type Result struct {
 	Err        error
 	Verbose    bool
 
+	Auth Super
+
 	Container           []proto.Container
 	ContainerHeader     []proto.ContainerHeader
+	Flow                []proto.Flow
 	Library             []proto.Library
 	Namespace           []proto.Namespace
 	NamespaceHeader     []proto.NamespaceHeader
@@ -57,7 +60,14 @@ func (r *Result) Clear(err ...error) {
 		r.Err = err[len(err)-1]
 	}
 	if r.Err == nil {
-		r.Err = fmt.Errorf(`Unspecified error condition`)
+		switch r.Code {
+		case http.StatusUnauthorized:
+			r.Err = fmt.Errorf("%s", http.StatusText(int(r.Code)))
+		case http.StatusForbidden:
+			r.Err = fmt.Errorf("%s", http.StatusText(int(r.Code)))
+		default:
+			r.Err = fmt.Errorf(`Unspecified error condition`)
+		}
 	}
 
 	switch r.Section {
@@ -76,6 +86,10 @@ func (r *Result) Clear(err ...error) {
 	case SectionContainer:
 		r.Container = []proto.Container{}
 		r.ContainerHeader = []proto.ContainerHeader{}
+	case SectionFlow:
+		r.Flow = []proto.Flow{}
+	case proto.EntitySupervisor:
+		r.Auth = Super{}
 	}
 }
 
@@ -85,6 +99,11 @@ func (r *Result) OK() {
 
 func (r *Result) BadRequest(err ...error) {
 	r.Code = http.StatusBadRequest
+	r.Clear(err...)
+}
+
+func (r *Result) Unauthorized(err ...error) {
+	r.Code = http.StatusUnauthorized
 	r.Clear(err...)
 }
 
@@ -178,6 +197,20 @@ func (r *Result) ApplyVerbosity() {
 		obj.CreatedAt = ``
 		obj.CreatedBy = ``
 		r.ContainerHeader[i] = obj
+	}
+	for i := range r.Flow {
+		obj := r.Flow[i]
+		obj.CreatedAt = ``
+		obj.CreatedBy = ``
+		for k := range obj.Property {
+			prop := obj.Property[k]
+			prop.CreatedAt = ``
+			prop.CreatedBy = ``
+			prop.ValidSince = ``
+			prop.ValidUntil = ``
+			obj.Property[k] = prop
+		}
+		r.Flow[i] = obj
 	}
 	for i := range r.Library {
 		obj := r.Library[i]

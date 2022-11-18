@@ -1,4 +1,8 @@
 =======================================================
+XXX         supervisor::authenticate
+XXX         supervisor::enrollment:machine.add
+XXX         supervisor::bootstrap
+=======================================================
     └── tomd/iam
         ├── iam::library:add
         ├── iam::library:list
@@ -9,6 +13,8 @@
         ├── iam::library:list
         ├── iam::library:remove
         ├── iam::library:show
+=======================================================
+XXX         iam::library:update??
 =======================================================
     └── tomd/iam
         ├── iam::user:add
@@ -22,6 +28,9 @@
         ├── iam::user:remove
         ├── iam::user:show
         ├── iam::user:update
+=======================================================
+    └── tomd/iam
+        ├── iam::machine:enrol                   [DONE]
 =======================================================
     └── tomd/iam
         ├── iam::team:add
@@ -188,3 +197,34 @@
         ├── asset::orchestration:stack           [DONE]
         ├── asset::orchestration:unstack         [DONE]
 =======================================================
+    └── tomd/abstract
+        ├── abstract::blueprint:xxx              [    ]
+        ├── abstract::module:xxx                 [    ]
+        ├── abstract::artifact:xxx               [    ]
+        ├── abstract::data:xxx                   [    ]
+        ├── abstract::service:xxx                [    ]
+    └── tom/abstract
+        ├── abstract::blueprint:xxx              [    ]
+        ├── abstract::module:xxx                 [    ]
+        ├── abstract::artifact:xxx               [    ]
+        ├── abstract::data:xxx                   [    ]
+        ├── abstract::service:xxx                [    ]
+=======================================================
+    └── tomd/production
+        ├── production::technical_product:xxx    [    ]
+        ├── production::deployment:xxx           [    ]
+        ├── production::instance:xxx             [    ]
+        ├── production::shard:xxx                [    ]
+        ├── production::endpoint:xxx             [    ]
+        ├── production::netrange:xxx             [    ]
+    └── tom/production
+        ├── production::technical_product:xxx    [    ]
+        ├── production::deployment:xxx           [    ]
+        ├── production::instance:xxx             [    ]
+        ├── production::shard:xxx                [    ]
+        ├── production::endpoint:xxx             [    ]
+        ├── production::netrange:xxx             [    ]
+=======================================================
+## modelupdate...origin/modelupdate
+?? docs/pgsql.schema/0x86.ix.relationship:parent.sql
+?? docs/pgsql.schema/0x87.ix.relationship:mapping.sql

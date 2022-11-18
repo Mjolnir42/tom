@@ -30,6 +30,12 @@ const (
 	SectionLibrary = proto.EntityLibrary
 	SectionTeam    = proto.EntityTeam
 	SectionUser    = proto.EntityUser
+	SectionMachine = proto.EntityMachine
+)
+
+const (
+	CategoryBulk = proto.ModelBulk
+	SectionFlow  = proto.EntityFlow
 )
 
 const (

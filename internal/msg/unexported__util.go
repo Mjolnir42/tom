@@ -27,6 +27,19 @@ func authUser(params httprouter.Params) []string {
 	return strings.Split(params.ByName(`AuthenticatedUser`), `~`)
 }
 
+// authEnforcement extracts the information if auth enforcement is
+// active
+func authEnforcement(params httprouter.Params) bool {
+	switch params.ByName(`AuthenticationEnforcement`) {
+	case `true`:
+		return true
+	case `false`:
+		return false
+	default:
+		return false
+	}
+}
+
 // remoteAddr extracts the IP address part of the IP:port string
 // set as net/http.Request.RemoteAddr. It handles IPv4 cases like
 // 192.0.2.1:48467 and IPv6 cases like [2001:db8::1%lo0]:48467

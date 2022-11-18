@@ -18,13 +18,13 @@ import (
 )
 
 type Configuration struct {
-	Database DbConfig   `json:"database"`
-	Daemon   []Daemon   `json:"daemon"`
-	Auth     AuthConfig `json:"authentication"`
-	LogLevel string     `json:"log.level"`
-	LogPath  string     `json:"log.path"`
-	Version  string     `json:"-"`
-	QueueLen int        `json:"handler.queue.length,string"`
+	Database DbConfig `json:"database"`
+	Daemon   []Daemon `json:"daemon"`
+	LogLevel string   `json:"log.level"`
+	LogPath  string   `json:"log.path"`
+	Version  string   `json:"-"`
+	QueueLen int      `json:"handler.queue.length,string"`
+	Enforce  bool     `json:"enforcement,string"`
 }
 
 type DbConfig struct {
@@ -35,11 +35,6 @@ type DbConfig struct {
 	Pass    string `json:"password"`
 	Timeout string `json:"timeout"`
 	TLSMode string `json:"tlsmode"`
-}
-
-type AuthConfig struct {
-	TokenSeed string `json:"token.seed"`
-	TokenKey  string `json:"token.key"`
 }
 
 type Daemon struct {
