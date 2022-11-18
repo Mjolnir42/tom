@@ -1,3 +1,10 @@
 api: https://127.0.0.1:443/
-logdir: /svc/tom/log
+logdir: ~/.tom/log
 json.output.processor: jq --unbuffered --sort-keys
+ca.file: ~/.tom/ca.pem
+authentication {
+    credential.path: ~/.tom/
+    username: root
+    identity.library: system
+    use.fingerprint.as.username: no
+}

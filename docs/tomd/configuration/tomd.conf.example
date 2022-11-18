@@ -12,8 +12,6 @@ daemon {
   listen: 127.0.0.1
   port: 80
   tls: false
-  cert.file:
-  key.file:
 }
 daemon {
   listen: 127.0.0.1
@@ -26,3 +24,4 @@ daemon {
 log.level: info
 log.path: /svc/tomd/log
 handler.queue.length: 1
+enforcement: false
