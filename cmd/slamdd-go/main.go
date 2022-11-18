@@ -11,8 +11,11 @@ import (
 	"crypto/tls"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/droundy/goopt"
 	"github.com/go-resty/resty/v2"
@@ -137,17 +140,24 @@ func run() int {
 	}
 
 	var ipfEx chan interface{}
-	if ipfEx, err = ipfix.New(SlamCfg, lm); err != nil {
-		lm.GetLogger(`error`).Errorln(err)
-		return EX_ERROR
+	if SlamCfg.IPFIX.Enabled {
+		if ipfEx, err = ipfix.New(SlamCfg, lm); err != nil {
+			lm.GetLogger(`error`).Errorln(err)
+			return EX_ERROR
+		}
 	}
 
+	cancel := make(chan os.Signal, 1)
+	signal.Notify(cancel, os.Interrupt, syscall.SIGTERM)
+
 	lm.GetLogger(`application`).Println(`Waiting for signals`)
-runloop:
-	for {
+	select {
+	case <-ipfEx:
+	case <-cancel:
+		// give ipfix subsystem a chance to shut down gracefully
 		select {
+		case <-time.After(7 * time.Second):
 		case <-ipfEx:
-			break runloop
 		}
 	}
 
