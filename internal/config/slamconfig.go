@@ -22,6 +22,7 @@ import (
 )
 
 type SlamConfiguration struct {
+	Enabled  bool               `json:"data.daemon.enabled,string"`
 	Auth     *AuthConfiguration `json:"authentication"`
 	IPFIX    SettingsIPFIX      `json:"ipfix"`
 	LogLevel string             `json:"log.level"`
