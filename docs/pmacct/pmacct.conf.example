@@ -13,7 +13,7 @@ aggregate: src_host,dst_host,proto,src_port,dst_port,timestamp_start,timestamp_e
 pcap_interface: em0
 pcap_interface_wait: true
 ! filter expression to discard the flow to the collector, as well as broadcast and multicast traffic
-pcap_filter: !((udp port 4743 and dst net 127.0.0.1/32) || (ether broadcast) || (ip broadcast) || (ether multicast) || (ip multicast) || (ip6 multicast) || ip net 224.0.0.0/3)
+pcap_filter: !((udp port 4739 and dst net 127.0.0.1/32) || (ether broadcast) || (ip broadcast) || (ether multicast) || (ip multicast) || (ip6 multicast) || ip net 224.0.0.0/3)
 plugins: nfprobe
 pmacctd_pipe_size: 16777216
 plugin_pipe_size:  16777216
