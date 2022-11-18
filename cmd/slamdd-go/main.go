@@ -103,42 +103,44 @@ func run() int {
 		os.Exit(EX_ABORT)
 	})
 
-	if SlamCfg.Auth == nil {
-		SlamCfg.Auth = &config.AuthConfiguration{}
+	if SlamCfg.Enabled {
+		if SlamCfg.Auth == nil {
+			SlamCfg.Auth = &config.AuthConfiguration{}
+		}
+		SlamCfg.Auth.PrivEPK = &epk.EncryptedPrivateKey{}
+		SlamCfg.Auth.PubKey = ed25519.PublicKey{}
+
+		// setup REST client
+		client = resty.New().
+			SetDisableWarn(true).
+			SetHeader(`User-Agent`, fmt.Sprintf("%s %s", goopt.Summary, goopt.Version)).
+			SetHostURL(SlamCfg.Run.API.String())
+		if SlamCfg.Run.API.Scheme == `https` {
+			session = tls.NewLRUClientSessionCache(64)
+
+			client = client.SetTLSClientConfig(&tls.Config{
+				ServerName:         strings.SplitN(SlamCfg.Run.API.Host, `:`, 2)[0],
+				ClientSessionCache: session,
+				MinVersion:         tls.VersionTLS12,
+			}).SetRootCertificate(SlamCfg.Run.PathCA)
+		}
+
+		adm.ConfigureClient(client)
+
+		var initialize bool
+		lm.GetLogger(`application`).Infoln(`Loading credentials`)
+		if initialize, err = cred.LoadCredentials(
+			SlamCfg.Auth,
+			lm,
+		); err != nil {
+			lm.GetLogger(`error`).Errorln(err)
+			return EX_ERROR
+		} else if initialize {
+			lm.GetLogger(`application`).Infoln(`registering newly initialized credentials with TOM service`)
+			adm.RegisterMachineEnrollment(SlamCfg.Auth, nil)
+		}
+
 	}
-	SlamCfg.Auth.PrivEPK = &epk.EncryptedPrivateKey{}
-	SlamCfg.Auth.PubKey = ed25519.PublicKey{}
-
-	// setup REST client
-	client = resty.New().
-		SetDisableWarn(true).
-		SetHeader(`User-Agent`, fmt.Sprintf("%s %s", goopt.Summary, goopt.Version)).
-		SetHostURL(SlamCfg.Run.API.String())
-	if SlamCfg.Run.API.Scheme == `https` {
-		session = tls.NewLRUClientSessionCache(64)
-
-		client = client.SetTLSClientConfig(&tls.Config{
-			ServerName:         strings.SplitN(SlamCfg.Run.API.Host, `:`, 2)[0],
-			ClientSessionCache: session,
-			MinVersion:         tls.VersionTLS12,
-		}).SetRootCertificate(SlamCfg.Run.PathCA)
-	}
-
-	adm.ConfigureClient(client)
-
-	var initialize bool
-	lm.GetLogger(`application`).Infoln(`Loading credentials`)
-	if initialize, err = cred.LoadCredentials(
-		SlamCfg.Auth,
-		lm,
-	); err != nil {
-		lm.GetLogger(`error`).Errorln(err)
-		return EX_ERROR
-	} else if initialize {
-		lm.GetLogger(`application`).Infoln(`registering newly initialized credentials with TOM service`)
-		adm.RegisterMachineEnrollment(SlamCfg.Auth, nil)
-	}
-
 	var ipfEx chan interface{}
 	if SlamCfg.IPFIX.Enabled {
 		if ipfEx, err = ipfix.New(SlamCfg, lm); err != nil {
