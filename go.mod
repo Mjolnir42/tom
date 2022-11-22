@@ -1,6 +1,6 @@
 module github.com/mjolnir42/tom
 
-go 1.15
+go 1.17
 
 require (
 	github.com/EdgeCast/vflow v0.9.1
@@ -24,4 +24,18 @@ require (
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/vmware/go-ipfix v0.5.12
 	golang.org/x/crypto v0.1.0
+)
+
+require (
+	github.com/client9/reopen v1.0.0 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
+	github.com/go-logr/logr v0.4.0 // indirect
+	github.com/russross/blackfriday v0.0.0-20171011182219-6d1ef893fcb0 // indirect
+	github.com/russross/blackfriday/v2 v2.0.1 // indirect
+	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
+	golang.org/x/net v0.1.0 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/term v0.1.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
+	k8s.io/klog/v2 v2.8.0 // indirect
 )
