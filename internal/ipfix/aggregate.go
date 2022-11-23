@@ -8,12 +8,27 @@
 package ipfix
 
 import (
+	"bytes"
+	"encoding/hex"
+	"encoding/json"
+	"flag"
+	"hash/fnv"
+	"net"
+	"os"
+	"strconv"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/mjolnir42/flowdata"
 	"github.com/mjolnir42/lhm"
+	"github.com/mjolnir42/tom/internal/cli/adm"
 	"github.com/mjolnir42/tom/internal/config"
+	"github.com/mjolnir42/tom/pkg/proto"
+	"github.com/urfave/cli/v2"
 )
+
+var twelveHours time.Duration = 12 * time.Hour
 
 type procAggregate struct {
 	conf config.SettingsIPFIX
@@ -21,6 +36,7 @@ type procAggregate struct {
 	pool *sync.Pool
 	lm   *lhm.LogHandleMap
 	mux  *ipfixMux
+	mtx  sync.RWMutex
 	pipe chan flowdata.Record
 	quit chan interface{}
 	exit chan interface{}
