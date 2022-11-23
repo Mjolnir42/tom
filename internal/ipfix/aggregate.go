@@ -78,4 +78,30 @@ type Conn struct {
 	Protocol   string `json:"proto"`
 }
 
+func ephemeralPorts(src, dst uint16) (int, int) {
+	switch {
+	case src == 0:
+		fallthrough
+	case dst == 0:
+		return int(src), int(dst)
+	}
+
+	var srcIsEph, dstIsEph bool
+	if src >= 32768 {
+		srcIsEph = true
+	}
+	if dst >= 32768 {
+		dstIsEph = true
+	}
+
+	switch {
+	case srcIsEph && !dstIsEph:
+		return 0, int(dst)
+	case !srcIsEph && dstIsEph:
+		return int(src), 0
+	default:
+		return int(src), int(dst)
+	}
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
