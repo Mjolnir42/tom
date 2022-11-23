@@ -66,6 +66,29 @@ runloop:
 			//    hexcode_json => attribute property
 			// 4. set property validUntil +24h
 			// 5. send proto.CmdFlowEnsure request to Tom
+			srcPort, dstPort := ephemeralPorts(r.SrcPort, r.DstPort)
+
+			// srcAddress a, dstAddress b
+			switch bytes.Compare([]byte(srcAddress), []byte(dstAddress)) {
+			case 0:
+				// a == b
+				c.SrcAddress = srcAddress.String()
+				c.SrcPort = srcPort
+				c.DstAddress = dstAddress.String()
+				c.DstPort = dstPort
+			case -1:
+				// a < b
+				c.SrcAddress = srcAddress.String()
+				c.SrcPort = srcPort
+				c.DstAddress = dstAddress.String()
+				c.DstPort = dstPort
+			case +1:
+				// a > b
+				c.SrcAddress = dstAddress.String()
+				c.SrcPort = dstPort
+				c.DstAddress = srcAddress.String()
+				c.DstPort = srcPort
+			}
 		}
 	}
 }
